@@ -1,8 +1,9 @@
 name: InvSeePlusPlus
-main: com.janboerman.invsee.InvseePlusPlus
+main: com.janboerman.invsee.spigot.InvseePlusPlus
 author: Jannyboy11
 version: ${project.version}
 description: ${project.description}
+api-version: 1.16
 website: ${project.url}
 prefix: "InvSee++"
 
@@ -11,8 +12,8 @@ commands:
     description: View a player's inventory
     permission: invseeplusplus.invsee
     usage: "/invsee <username>|<uuid>"
+    aliases: [inventorysee]
 
 permissions:
   invseeplusplus.invsee:
     description: Allows access to /invsee
-

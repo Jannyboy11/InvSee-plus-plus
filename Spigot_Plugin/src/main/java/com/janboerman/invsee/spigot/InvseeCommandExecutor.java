@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 public class InvseeCommandExecutor implements CommandExecutor {
 
@@ -30,12 +31,14 @@ public class InvseeCommandExecutor implements CommandExecutor {
         Player player = (Player) sender;
 
         String playerNameOrUUID = args[0];
+        //TODO support world argument?
+
         CompletableFuture<Optional<SpectatorInventory>> future;
-        if (playerNameOrUUID.length() > 16) {
+        try {
             UUID uuid = UUID.fromString(playerNameOrUUID);
-            future = plugin.getApi().createInventory(uuid);
-        } else {
-            future = plugin.getApi().createInventory(playerNameOrUUID);
+            future = plugin.getApi().spectate(uuid);
+        } catch (IllegalArgumentException e) {
+            future = plugin.getApi().spectate(playerNameOrUUID);
         }
 
         future.handle((optionalSpectatorInv, throwable) -> {
@@ -43,6 +46,7 @@ public class InvseeCommandExecutor implements CommandExecutor {
                 optionalSpectatorInv.ifPresentOrElse(player::openInventory, () -> player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist."));
             } else {
                 player.sendMessage(ChatColor.RED + "An error occured while trying to open " + playerNameOrUUID + "'s inventory.");
+                plugin.getLogger().log(Level.SEVERE, "Error while trying to create spectator inventory", throwable);
             }
             return null;
         });

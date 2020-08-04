@@ -1,5 +1,0 @@
-# A list of UUID resolving methods
-
-uuid-resolve-strategies:
-  - "online-players"
-  - "offline

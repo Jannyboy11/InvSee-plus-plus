@@ -1,11 +1,16 @@
 package com.janboerman.invsee.spigot.api;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -16,25 +21,24 @@ import org.bukkit.plugin.PluginManager;
 
 public abstract class InvseeAPI {
 
-    private static final CompletableFuture COMPLETED_EMPTY = CompletableFuture.completedFuture(Optional.empty());
+    protected static final CompletableFuture COMPLETED_EMPTY = CompletableFuture.completedFuture(Optional.empty());
     private static final UUIDResolveStrategy NON_RESOLVING_STRATEGY = userName -> (CompletableFuture<Optional<UUID>>) COMPLETED_EMPTY;
-
 
     protected final List<UUIDResolveStrategy> uuidResolveStrategies;
     protected final Plugin plugin;
+    private final WeakHashMap<UUID, WeakReference<SpectatorInventory>> openInventories = new WeakHashMap<>();
 
-    private final InMemoryStrategy.CaseInsensitiveMap<UUID> cache = new InMemoryStrategy.CaseInsensitiveMap<>() {
+    private final Map<String, UUID> cache = Collections.synchronizedMap(new InMemoryStrategy.CaseInsensitiveMap<>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, UUID> eldest) {
             return size() > 200;
         }
-    };
+    });
 
     protected InvseeAPI(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
         this.uuidResolveStrategies = new ArrayList<>(3);
         this.uuidResolveStrategies.addAll(List.of(
-                new OnlinePlayerStrategy(plugin.getServer()),
                 new InMemoryStrategy(cache),
                 new MojangAPIStrategy(plugin)));
 
@@ -58,7 +62,9 @@ public abstract class InvseeAPI {
             }
         } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException("InvseeAPI implementation class needs a public constructor that accepts just one argument; the bukkit Plugin instance.", e);
-        } catch (ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException cnfe) {
+            //should not occur, this is our own class.
+            throw new RuntimeException(cnfe);
         }
 
         throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
@@ -73,59 +79,142 @@ public abstract class InvseeAPI {
             final UUIDResolveStrategy strategy = resolveStrategy;
             resolveStrategy = us -> strat.resolveUUID(us).thenCompose(optionalUuid -> {
                 if (optionalUuid.isPresent()) {
+                    cache.put(userName, optionalUuid.get());
                     return CompletableFuture.completedFuture(optionalUuid);
                 }
 
-                return strategy.resolveUUID(userName);
+                //TODO also compose when the future completed exceptionally
+                return strategy.resolveUUID(us);
             });
         }
 
         return resolveStrategy.resolveUUID(userName);
     }
 
-    public CompletableFuture<Optional<SpectatorInventory>> createInventory(String userName) {
+    public CompletableFuture<Optional<SpectatorInventory>> spectate(String userName) {
+        //try online
+        Player target = plugin.getServer().getPlayerExact(userName);
+        if (target != null) {
+            SpectatorInventory spectatorInventory = spectate(target);
+            UUID uuid = target.getUniqueId();
+            cache.put(userName, uuid);
+            openInventories.put(uuid, new WeakReference<>(spectatorInventory));
+            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+        }
+
+        //try offline
         return resolveUUID(userName).thenCompose(optUuid -> {
             if (optUuid.isPresent()) {
                 UUID uuid = optUuid.get();
-                return createInventory(uuid);
+                return spectate(uuid);
             }
 
             return (CompletableFuture<Optional<SpectatorInventory>>) COMPLETED_EMPTY;
         });
     }
 
-    public abstract CompletableFuture<Optional<SpectatorInventory>> createInventory(UUID player);
+    public abstract SpectatorInventory spectate(HumanEntity player);
 
-    public abstract void saveInventory(SpectatorInventory inventory);
+    protected abstract CompletableFuture<Optional<SpectatorInventory>> createOfflineInventory(UUID player);
+
+    protected abstract CompletableFuture<Void> saveInventory(SpectatorInventory inventory);
+
+    public final CompletableFuture<Optional<SpectatorInventory>> spectate(UUID player) {
+        Objects.requireNonNull(player, "player UUID cannot be null!");
+
+        //try cache
+        WeakReference<SpectatorInventory> alreadyOpen = openInventories.get(player);
+        if (alreadyOpen != null) {
+            SpectatorInventory inv = alreadyOpen.get();
+            if (inv != null) {
+                return CompletableFuture.completedFuture(Optional.of(inv));
+            }
+        }
+
+        //try online
+        Player target = plugin.getServer().getPlayer(player);
+        if (target != null) {
+            SpectatorInventory spectatorInventory = spectate(target);
+            openInventories.put(player, new WeakReference<>(spectatorInventory));
+            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+        }
+
+        //try offline
+        return createOfflineInventory(player).thenApply(optionalInv -> {
+            optionalInv.ifPresent(inv -> openInventories.put(player, new WeakReference<>(inv)));
+            return optionalInv;
+        });
+    }
 
 
     // ================================== Event Stuff ==================================
 
-    private static final class PlayerListener implements Listener {
-        //TODO if a player joins, check whether there is a player that is viewing the offline inventory
-        //TODO if so, then set the updates contents to the player's 'online' inventory)
-
-        //TODO if a player leaves, and somebody is editing his inventory, save the inventory when the spectator is done editing
-
+    private final class PlayerListener implements Listener {
 
         @EventHandler
         public void onJoin(PlayerJoinEvent event) {
-            //TODO
+            Player player = event.getPlayer();
+            UUID uuid = player.getUniqueId();
+
+            SpectatorInventory newSpectatorInventory = null;
+            for (Player online : player.getServer().getOnlinePlayers()) {
+                if (online.getOpenInventory().getTopInventory() instanceof SpectatorInventory) {
+                    SpectatorInventory oldSpectatorInventory = (SpectatorInventory) online.getOpenInventory().getTopInventory();
+                    if (oldSpectatorInventory.getSpectatedPlayer().equals(uuid)) {
+                        if (newSpectatorInventory == null) {
+                            newSpectatorInventory = spectate(player);
+                            //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
+                            newSpectatorInventory.setStorageContents(oldSpectatorInventory.getStorageContents());
+                            newSpectatorInventory.setArmourContents(oldSpectatorInventory.getArmourContents());
+                            newSpectatorInventory.setOffHandContents(oldSpectatorInventory.getOffHandContents());
+                        }
+
+                        online.closeInventory();
+                        online.openInventory(newSpectatorInventory);
+                    }
+                }
+            }
         }
 
         @EventHandler
         public void onQuit(PlayerQuitEvent event) {
-            //TODO
+            Player player = event.getPlayer();
+            UUID uuid = player.getUniqueId();
+
+            WeakReference<SpectatorInventory> ref = openInventories.get(uuid);
+            if (ref != null) {
+                SpectatorInventory inv = ref.get();
+                if (inv != null) {
+                    boolean open = false;
+                    for (Player online : player.getServer().getOnlinePlayers()) {
+                        if (online.getOpenInventory().getTopInventory() == inv) {
+                            open = true;
+                            break;
+                        }
+                    }
+                    if (!open) {
+                        openInventories.remove(uuid);
+                    }
+                }
+            }
         }
 
     }
 
-    private static final class InventoryListener implements Listener {
+    private final class InventoryListener implements Listener {
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            //TODO if the spectated player is offline, save.
+            if (event.getInventory() instanceof SpectatorInventory) {
+                SpectatorInventory spectatorInventory = (SpectatorInventory) event.getInventory();
+                if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayer()) == null) {
+                    saveInventory(spectatorInventory).exceptionally(throwable -> {
+                        plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
+                        event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory");
+                        return null;
+                    });
+                }
+            }
         }
     }
-
 
 }

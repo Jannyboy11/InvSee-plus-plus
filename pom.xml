@@ -12,6 +12,7 @@
         <module>Spigot_Impl_1_16</module>
         <module>Spigot_API</module>
         <module>Spigot_Plugin</module>
+        <module>Utils</module>
     </modules>
     <packaging>pom</packaging>
 

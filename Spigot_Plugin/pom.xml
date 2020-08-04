@@ -13,6 +13,7 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
+        <finalName>InvSee++</finalName>
         <plugins>
 
             <plugin>
@@ -64,6 +65,12 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_API</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Spigot_Impl_1_16</artifactId>
             <version>0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

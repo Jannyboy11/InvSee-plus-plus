@@ -11,7 +11,6 @@ public class InvseePlusPlus extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
         this.api = InvseeAPI.setup(this);
         Server server = getServer();
         server.getPluginManager().registerEvents(this, this);
