@@ -8,8 +8,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.logging.Level;
 
+import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,13 +25,24 @@ import org.bukkit.plugin.PluginManager;
 
 public abstract class InvseeAPI {
 
+    private static final boolean SPIGOT;
+    static {
+        boolean configExists;
+        try {
+            Class.forName("org.spigotmc.SpigotConfig");
+            configExists = true;
+        } catch (ClassNotFoundException e) {
+            configExists = false;
+        }
+        SPIGOT = configExists;
+    }
     protected static final CompletableFuture COMPLETED_EMPTY = CompletableFuture.completedFuture(Optional.empty());
 
     protected final List<UUIDResolveStrategy> uuidResolveStrategies;
     protected final Plugin plugin;
     private final Map<UUID, WeakReference<SpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
 
-    private final Map<String, UUID> cache = Collections.synchronizedMap(new InMemoryStrategy.CaseInsensitiveMap<>() {
+    private final Map<String, UUID> cache = Collections.synchronizedMap(new CaseInsensitiveMap<>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, UUID> eldest) {
             return size() > 200;
@@ -37,10 +51,16 @@ public abstract class InvseeAPI {
 
     protected InvseeAPI(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
-        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(3));
-        this.uuidResolveStrategies.addAll(List.of(
-                new InMemoryStrategy(cache),
-                new MojangAPIStrategy(plugin)));
+        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(4));
+        this.uuidResolveStrategies.add(new InMemoryStrategy(cache));
+        if (SPIGOT) {
+            Configuration spigotConfig = plugin.getServer().spigot().getConfig();
+            ConfigurationSection settings = spigotConfig.getConfigurationSection("settings");
+            if (settings != null && settings.getBoolean("bungeecord", false)) {
+                this.uuidResolveStrategies.add(new BungeeCordStrategy(plugin));
+            }
+        }
+        this.uuidResolveStrategies.add(new MojangAPIStrategy(plugin));
 
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerListener(), plugin);

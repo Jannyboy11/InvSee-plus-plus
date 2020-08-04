@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <modules>
         <module>Mojang_API</module>
         <module>Spigot_Impl_1_16</module>
@@ -22,7 +22,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <url>https://github.com/Jannyboy11/Invsee++</url>
+    <url>https://github.com/Jannyboy11/InvSee-plus-plus</url>
 
     <build>
         <plugins>
