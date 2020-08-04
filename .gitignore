@@ -8,6 +8,7 @@ Mojang_API/target/*
 Spigot_API/target/*
 Spigot_Impl_1_16/target/*
 Spigot_Plugin/target/*
+Utils/target/*
 
 #Eclipse
 .settings/*
