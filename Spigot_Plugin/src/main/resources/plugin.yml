@@ -1,0 +1,18 @@
+name: InvSeePlusPlus
+main: com.janboerman.invsee.InvseePlusPlus
+author: Jannyboy11
+version: ${project.version}
+description: ${project.description}
+website: ${project.url}
+prefix: "InvSee++"
+
+commands:
+  invsee:
+    description: View a player's inventory
+    permission: invseeplusplus.invsee
+    usage: "/invsee <username>|<uuid>"
+
+permissions:
+  invseeplusplus.invsee:
+    description: Allows access to /invsee
+
