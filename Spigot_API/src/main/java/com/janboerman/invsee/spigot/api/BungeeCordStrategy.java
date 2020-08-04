@@ -47,7 +47,7 @@ public class BungeeCordStrategy implements UUIDResolveStrategy, PluginMessageLis
         try {
             dataOutputStream.writeUTF(UUIDOther_SUBCHANNEL);
             dataOutputStream.writeUTF(userName);
-            dataOutputStream.flush();
+            dataOutputStream.close();
             byte[] pluginMessage = byteArrayOutputStream.toByteArray();
 
             player.sendPluginMessage(plugin, BUNGEECORD_CHANNEL, pluginMessage);
@@ -77,6 +77,10 @@ public class BungeeCordStrategy implements UUIDResolveStrategy, PluginMessageLis
                 }
             } catch (IOException e) {
                 //nothing we can do here - just let the future complete exceptionally after the 5 second timeout.
+            } finally {
+                try {
+                    dataInputStream.close();
+                } catch (IOException e) {}
             }
         }
     }
