@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -22,11 +23,10 @@ import org.bukkit.plugin.PluginManager;
 public abstract class InvseeAPI {
 
     protected static final CompletableFuture COMPLETED_EMPTY = CompletableFuture.completedFuture(Optional.empty());
-    private static final UUIDResolveStrategy NON_RESOLVING_STRATEGY = userName -> (CompletableFuture<Optional<UUID>>) COMPLETED_EMPTY;
 
     protected final List<UUIDResolveStrategy> uuidResolveStrategies;
     protected final Plugin plugin;
-    private final WeakHashMap<UUID, WeakReference<SpectatorInventory>> openInventories = new WeakHashMap<>();
+    private final Map<UUID, WeakReference<SpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
 
     private final Map<String, UUID> cache = Collections.synchronizedMap(new InMemoryStrategy.CaseInsensitiveMap<>() {
         @Override
@@ -37,7 +37,7 @@ public abstract class InvseeAPI {
 
     protected InvseeAPI(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
-        this.uuidResolveStrategies = new ArrayList<>(3);
+        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(3));
         this.uuidResolveStrategies.addAll(List.of(
                 new InMemoryStrategy(cache),
                 new MojangAPIStrategy(plugin)));
@@ -70,25 +70,23 @@ public abstract class InvseeAPI {
         throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
     }
 
-    protected final CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
-        UUIDResolveStrategy resolveStrategy = NON_RESOLVING_STRATEGY;
-
-        ListIterator<UUIDResolveStrategy> iterator = uuidResolveStrategies.listIterator(uuidResolveStrategies.size());
-        while (iterator.hasPrevious()) {
-            UUIDResolveStrategy strat = iterator.previous();
-            final UUIDResolveStrategy strategy = resolveStrategy;
-            resolveStrategy = us -> strat.resolveUUID(us).thenCompose(optionalUuid -> {
+    private static final CompletableFuture<Optional<UUID>> resolveUUID(String username, Iterator<UUIDResolveStrategy> strategies) {
+        if (strategies.hasNext()) {
+            UUIDResolveStrategy strategy = strategies.next();
+            return strategy.resolveUUID(username).thenCompose((Optional<UUID> optionalUuid) -> {
                 if (optionalUuid.isPresent()) {
-                    cache.put(userName, optionalUuid.get());
                     return CompletableFuture.completedFuture(optionalUuid);
+                } else {
+                    return resolveUUID(username, strategies);
                 }
-
-                //TODO also compose when the future completed exceptionally
-                return strategy.resolveUUID(us);
             });
+        } else {
+            return (CompletableFuture<Optional<UUID>>) COMPLETED_EMPTY;
         }
+    }
 
-        return resolveStrategy.resolveUUID(userName);
+    protected final CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
+        return resolveUUID(userName, uuidResolveStrategies.iterator());
     }
 
     public CompletableFuture<Optional<SpectatorInventory>> spectate(String userName) {
@@ -110,7 +108,7 @@ public abstract class InvseeAPI {
             }
 
             return (CompletableFuture<Optional<SpectatorInventory>>) COMPLETED_EMPTY;
-        });
+        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
     }
 
     public abstract SpectatorInventory spectate(HumanEntity player);
@@ -143,7 +141,7 @@ public abstract class InvseeAPI {
         return createOfflineInventory(player).thenApply(optionalInv -> {
             optionalInv.ifPresent(inv -> openInventories.put(player, new WeakReference<>(inv)));
             return optionalInv;
-        });
+        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
     }
 
 
