@@ -17,3 +17,4 @@ commands:
 permissions:
   invseeplusplus.invsee:
     description: Allows access to /invsee
+    default: op
