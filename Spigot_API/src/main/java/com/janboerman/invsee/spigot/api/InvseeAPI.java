@@ -70,11 +70,12 @@ public abstract class InvseeAPI {
         throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
     }
 
-    private static final CompletableFuture<Optional<UUID>> resolveUUID(String username, Iterator<UUIDResolveStrategy> strategies) {
+    private CompletableFuture<Optional<UUID>> resolveUUID(String username, Iterator<UUIDResolveStrategy> strategies) {
         if (strategies.hasNext()) {
             UUIDResolveStrategy strategy = strategies.next();
             return strategy.resolveUUID(username).thenCompose((Optional<UUID> optionalUuid) -> {
                 if (optionalUuid.isPresent()) {
+                    cache.put(username, optionalUuid.get());
                     return CompletableFuture.completedFuture(optionalUuid);
                 } else {
                     return resolveUUID(username, strategies);
