@@ -9,8 +9,10 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class BungeeCordStrategy implements UUIDResolveStrategy, PluginMessageListener {
 
@@ -53,7 +55,13 @@ public class BungeeCordStrategy implements UUIDResolveStrategy, PluginMessageLis
             player.sendPluginMessage(plugin, BUNGEECORD_CHANNEL, pluginMessage);
             CompletableFuture<Optional<UUID>> future = new CompletableFuture<>();
             future.orTimeout(5, TimeUnit.SECONDS);
-            future = future.exceptionally(throwable -> { futureMap.remove(userName); return Optional.empty(); });
+            future = future.exceptionally(throwable -> {
+                if (!(throwable instanceof CancellationException)) {
+                    plugin.getLogger().log(Level.WARNING, "Could not request " + userName + "'s UUID from BungeeCord", throwable);
+                }
+                futureMap.remove(userName);
+                return Optional.empty();
+            });
             futureMap.put(userName, future);
             return future;
         } catch (IOException e) {
@@ -76,7 +84,7 @@ public class BungeeCordStrategy implements UUIDResolveStrategy, PluginMessageLis
                     }
                 }
             } catch (IOException e) {
-                //nothing we can do here - just let the future complete exceptionally after the 5 second timeout.
+                //nothing we can do here - just let the future complete after the 5 second timeout.
             } finally {
                 try {
                     dataInputStream.close();

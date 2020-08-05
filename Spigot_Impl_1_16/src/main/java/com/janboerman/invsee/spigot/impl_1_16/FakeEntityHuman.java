@@ -6,7 +6,7 @@ import net.minecraft.server.v1_16_R1.EntityHuman;
 import net.minecraft.server.v1_16_R1.World;
 
 class FakeEntityHuman extends EntityHuman {
-    public FakeEntityHuman(World world, BlockPosition blockposition, GameProfile gameprofile) {
+    FakeEntityHuman(World world, BlockPosition blockposition, GameProfile gameprofile) {
         super(world, blockposition, gameprofile);
     }
 

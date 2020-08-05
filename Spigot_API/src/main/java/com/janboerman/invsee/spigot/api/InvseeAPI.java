@@ -25,7 +25,7 @@ import org.bukkit.plugin.PluginManager;
 
 public abstract class InvseeAPI {
 
-    private static final boolean SPIGOT;
+    protected static final boolean SPIGOT;
     static {
         boolean configExists;
         try {
@@ -106,11 +106,19 @@ public abstract class InvseeAPI {
         }
     }
 
-    protected final CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
+    protected CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
         return resolveUUID(userName, uuidResolveStrategies.iterator());
     }
 
+    public abstract SpectatorInventory spectate(HumanEntity player);
+
+    protected abstract CompletableFuture<Optional<SpectatorInventory>> createOfflineInventory(UUID player);
+
+    protected abstract CompletableFuture<Void> saveInventory(SpectatorInventory inventory);
+
     public CompletableFuture<Optional<SpectatorInventory>> spectate(String userName) {
+        Objects.requireNonNull(userName, "userName cannot be null!");
+
         //try online
         Player target = plugin.getServer().getPlayerExact(userName);
         if (target != null) {
@@ -131,12 +139,6 @@ public abstract class InvseeAPI {
             return (CompletableFuture<Optional<SpectatorInventory>>) COMPLETED_EMPTY;
         }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
     }
-
-    public abstract SpectatorInventory spectate(HumanEntity player);
-
-    protected abstract CompletableFuture<Optional<SpectatorInventory>> createOfflineInventory(UUID player);
-
-    protected abstract CompletableFuture<Void> saveInventory(SpectatorInventory inventory);
 
     public final CompletableFuture<Optional<SpectatorInventory>> spectate(UUID player) {
         Objects.requireNonNull(player, "player UUID cannot be null!");
@@ -174,6 +176,10 @@ public abstract class InvseeAPI {
         public void onJoin(PlayerJoinEvent event) {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
+            
+            //TODO in theory there is a race going on here; there might be a spectator waiting for the offline inventory already.
+            //TODO so I need to cache the future in a Map<String, CompletableFuture<Optional<SpectatorInventory>>> and if it's still present
+            //TODO then I need to complete (or obtrude?) the value.
 
             SpectatorInventory newSpectatorInventory = null;
             for (Player online : player.getServer().getOnlinePlayers()) {

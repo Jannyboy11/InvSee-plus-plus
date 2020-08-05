@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Objects;
 import java.util.UUID;
 
-class BukkitInventory extends CraftInventory implements SpectatorInventory {
+public class BukkitInventory extends CraftInventory implements SpectatorInventory {
 
-    BukkitInventory(NmsInventory nmsInventory) {
+    protected BukkitInventory(NmsInventory nmsInventory) {
         super(nmsInventory);
     }
 

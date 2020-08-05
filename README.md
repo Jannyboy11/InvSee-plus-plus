@@ -1,7 +1,9 @@
 # InvSee++
 
 A bukkit plugin for manipulating player inventories.
-This plugin will even work when target players are offline, even when they have never been on the server.
+This plugin will still work when target players are offline, even when they have never been on the server.
+
+Do you like this plugin? Then please leave a rating on [SpigotMC](https://www.spigotmc.org/resources/invsee.82342/)!
 
 ### Commands
 `/invsee <userName>|<uniqueId>`
@@ -10,7 +12,7 @@ This plugin will even work when target players are offline, even when they have 
 
 `invseeplusplus.invsee` allows access to `/invsee`. By default only for server operators.
 
-#### Compiling
+### Compiling
 
 ###### Prerequesites: [JDK-11](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
@@ -19,5 +21,5 @@ This plugin will even work when target players are offline, even when they have 
 - In the root directory of the project run `mvn clean package`.
 You can find the plugin jar at Spigot_Plugin/target/InvSee++.jar.
 
-#### License
+### License
 2-Clause BSD. See the LICENSE.txt file.

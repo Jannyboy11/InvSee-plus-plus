@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.logging.Level;
 
 public class MojangAPIStrategy implements UUIDResolveStrategy {
 
@@ -24,9 +24,11 @@ public class MojangAPIStrategy implements UUIDResolveStrategy {
 
     @Override
     public CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
-        return mojangApi.lookupUniqueId(userName).thenApplyAsync(
-                Function.identity(),
-                runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        return mojangApi.lookupUniqueId(userName).handle((Optional<UUID> success, Throwable error) -> {
+            if (error == null) return success;
+            plugin.getLogger().log(Level.WARNING, "Could not request " + userName + " from Mojang's REST API", error);
+            return Optional.empty();
+        });
     }
 
 }

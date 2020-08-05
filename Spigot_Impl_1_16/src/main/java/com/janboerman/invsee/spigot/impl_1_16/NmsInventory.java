@@ -10,7 +10,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.*;
 
-class NmsInventory implements IInventory {
+public class NmsInventory implements IInventory {
 
     private static final ItemStack EMPTY_STACK = ItemStack.b;
 
@@ -23,7 +23,7 @@ class NmsInventory implements IInventory {
     private final List<HumanEntity> transaction = new ArrayList<>();
     InventoryHolder owner;
 
-    NmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
+    protected NmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
         this.spectatedPlayerUuid = spectatedPlayerUuid;
         this.storageContents = storageContents;
         this.armourContents = armourContents;

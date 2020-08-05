@@ -9,10 +9,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -61,7 +58,7 @@ public class SearchSaveFilesStrategy implements UUIDResolveStrategy {
                             String lastKnownName = bukkit.getString("lastKnownName");
                             if (lastKnownName.equalsIgnoreCase(userName)) {
                                 String fileName = playerFile.getName();
-                                String uuid = fileName.substring(4);
+                                String uuid = fileName.substring(0, fileName.length() - 4);
                                 if (uuid.startsWith("-")) uuid = uuid.substring(1);
                                 try {
                                     UUID uniqueId = UUID.fromString(uuid);
@@ -73,7 +70,7 @@ public class SearchSaveFilesStrategy implements UUIDResolveStrategy {
                         }
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    plugin.getLogger().log(Level.WARNING, "Error reading player's save file: " + playerFile.getAbsolutePath(), e);
                 }
             }
             return Optional.empty();
