@@ -54,4 +54,6 @@ public class InvseeCommandExecutor implements CommandExecutor {
         return true;
     }
 
+    //TODO If we are on Paper, use AsyncTabCompleteEvent to implement async tabcompletion for offline players?
+    //TODO I would need to adjust the InvSeeAPI interface because 'providing offline player names' can only be implemented efficiently by the serverversion-specific implementation class.
 }

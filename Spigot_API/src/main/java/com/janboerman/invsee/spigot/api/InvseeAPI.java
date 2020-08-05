@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 
@@ -41,6 +42,8 @@ public abstract class InvseeAPI {
     protected final List<UUIDResolveStrategy> uuidResolveStrategies;
     protected final Plugin plugin;
     private final Map<UUID, WeakReference<SpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<String, CompletableFuture<Optional<SpectatorInventory>>> pendingByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
+    private final Map<UUID, CompletableFuture<Optional<SpectatorInventory>>> pendingByUUID = new ConcurrentHashMap<>();
 
     private final Map<String, UUID> cache = Collections.synchronizedMap(new CaseInsensitiveMap<>() {
         @Override
@@ -130,7 +133,7 @@ public abstract class InvseeAPI {
         }
 
         //try offline
-        return resolveUUID(userName).thenCompose(optUuid -> {
+        var future = resolveUUID(userName).thenCompose(optUuid -> {
             if (optUuid.isPresent()) {
                 UUID uuid = optUuid.get();
                 return spectate(uuid);
@@ -138,6 +141,9 @@ public abstract class InvseeAPI {
 
             return (CompletableFuture<Optional<SpectatorInventory>>) COMPLETED_EMPTY;
         }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        pendingByName.put(userName, future);
+        future.handle((result, error) -> pendingByName.remove(userName));
+        return future;
     }
 
     public final CompletableFuture<Optional<SpectatorInventory>> spectate(UUID player) {
@@ -161,10 +167,13 @@ public abstract class InvseeAPI {
         }
 
         //try offline
-        return createOfflineInventory(player).thenApply(optionalInv -> {
+        var future = createOfflineInventory(player).thenApply(optionalInv -> {
             optionalInv.ifPresent(inv -> openInventories.put(player, new WeakReference<>(inv)));
             return optionalInv;
         }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        pendingByUUID.put(player, future);
+        future.handle((result, error) -> pendingByUUID.remove(player));
+        return future;
     }
 
 
@@ -176,12 +185,17 @@ public abstract class InvseeAPI {
         public void onJoin(PlayerJoinEvent event) {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
-            
-            //TODO in theory there is a race going on here; there might be a spectator waiting for the offline inventory already.
-            //TODO so I need to cache the future in a Map<String, CompletableFuture<Optional<SpectatorInventory>>> and if it's still present
-            //TODO then I need to complete (or obtrude?) the value.
+            String userName = player.getName();
 
             SpectatorInventory newSpectatorInventory = null;
+
+            //check if somebody was looking up the player and make sure they get the player's live inventory
+            CompletableFuture<Optional<SpectatorInventory>> nameFuture = pendingByName.remove(userName);
+            if (nameFuture != null) nameFuture.complete(Optional.of(newSpectatorInventory = spectate(player)));
+            CompletableFuture<Optional<SpectatorInventory>> uuidFuture = pendingByUUID.remove(uuid);
+            if (uuidFuture != null) uuidFuture.complete(Optional.of(newSpectatorInventory != null ? newSpectatorInventory : (newSpectatorInventory = spectate(player))));
+
+            //check if somebody was looking in the offline inventory and update player's inventory.
             for (Player online : player.getServer().getOnlinePlayers()) {
                 if (online.getOpenInventory().getTopInventory() instanceof SpectatorInventory) {
                     SpectatorInventory oldSpectatorInventory = (SpectatorInventory) online.getOpenInventory().getTopInventory();
