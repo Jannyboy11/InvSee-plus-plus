@@ -12,7 +12,9 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.*;
 
-public class MainNmsInventory implements IInventory, ITileInventory {
+public class MainNmsInventory extends TileEntityContainer {
+
+    private static final TileEntityTypes TileEntityTypeFakePlayerInventory = new TileEntityTypes(MainNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.EmptyPart());
 
     protected final UUID spectatedPlayerUuid;
     protected final NonNullList<ItemStack> storageContents;
@@ -26,7 +28,19 @@ public class MainNmsInventory implements IInventory, ITileInventory {
     private final List<HumanEntity> transaction = new ArrayList<>();
     protected InventoryHolder owner;
 
+    private MainNmsInventory() { //used for the fake tile entity type
+        super(TileEntityTypeFakePlayerInventory);
+        spectatedPlayerUuid = null;
+        storageContents = null;
+        armourContents = null;
+        offHand = null;
+    }
+
     protected MainNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
+        // Possibly could've used TileEntityTypes.CHEST, but I'm afraid that will cause troubles elsewhere.
+        // So use the fake type for now.
+        // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
+        super(TileEntityTypeFakePlayerInventory);
         this.spectatedPlayerUuid = spectatedPlayerUuid;
         this.storageContents = storageContents;
         this.armourContents = armourContents;
@@ -36,6 +50,7 @@ public class MainNmsInventory implements IInventory, ITileInventory {
     protected MainNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand, String title) {
         this(spectatedPlayerUuid, storageContents, armourContents, offHand);
         this.title = title;
+        this.setCustomName(CraftChatMessage.fromStringOrNull(title));
     }
 
     private Pair<Integer, NonNullList<ItemStack>> decideWhichInv(int slot) {
@@ -193,7 +208,19 @@ public class MainNmsInventory implements IInventory, ITileInventory {
     }
 
     @Override
-    public Container createMenu(int containerId, PlayerInventory playerInventory, EntityHuman entityHuman) {
-        return new MainNmsContainer(containerId, this, playerInventory, entityHuman);
+    protected IChatBaseComponent getContainerName() {
+        return new ChatMessage("minecraft:generic_9x5");
     }
+
+    @Override
+    protected Container createContainer(int containerId, PlayerInventory playerInventory) {
+        return new MainNmsContainer(containerId, this, playerInventory, playerInventory.player);
+    }
+
+    @Override
+    public boolean e(EntityHuman entityhuman) {
+        //there is no chestlock here
+        return true;
+    }
+
 }

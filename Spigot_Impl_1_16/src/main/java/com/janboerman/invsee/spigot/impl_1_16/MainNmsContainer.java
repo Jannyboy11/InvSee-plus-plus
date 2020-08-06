@@ -17,7 +17,7 @@ public class MainNmsContainer extends Container {
         this.top = nmsInventory;
         this.bottom = playerInventory;
         this.player = player;
-        setTitle(nmsInventory.getScoreboardDisplayName());
+        //setTitle(nmsInventory.getScoreboardDisplayName());
 
         int actualTopSize = top.storageContents.size() + top.armourContents.size() + top.offHand.size();
 

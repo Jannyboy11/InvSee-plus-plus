@@ -10,9 +10,12 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-class EnderNmsInventory implements IInventory, ITileInventory {
+class EnderNmsInventory extends TileEntityContainer {
+
+    private static final TileEntityTypes TileEntityTypeFakeEnderChest = new TileEntityTypes(EnderNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.EmptyPart());
 
     protected final UUID spectatedPlayerUuid;
     protected final NonNullList<ItemStack> storageContents;
@@ -24,7 +27,17 @@ class EnderNmsInventory implements IInventory, ITileInventory {
     private final List<HumanEntity> transaction = new ArrayList<>();
     protected InventoryHolder owner;
 
+    private EnderNmsInventory() {   //used for the fake tile entity type
+        super(TileEntityTypeFakeEnderChest);
+        spectatedPlayerUuid = null;
+        storageContents = null;
+    }
+
     public EnderNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents) {
+        // Possibly could've used TileEntityTypes.ENDER_CHEST, but I'm afraid that will cause troubles elsewhere.
+        // So use the fake type for now.
+        // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
+        super(TileEntityTypeFakeEnderChest);
         this.spectatedPlayerUuid = spectatedPlayerUuid;
         this.storageContents = storageContents;
     }
@@ -32,6 +45,7 @@ class EnderNmsInventory implements IInventory, ITileInventory {
     public EnderNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, String title) {
         this(spectatedPlayerUuid, storageContents);
         this.title = title;
+        this.setCustomName(CraftChatMessage.fromStringOrNull(title));
     }
 
     @Override
@@ -152,7 +166,18 @@ class EnderNmsInventory implements IInventory, ITileInventory {
     }
 
     @Override
-    public Container createMenu(int containerId, PlayerInventory playerInventory, EntityHuman entityHuman) {
-        return new EnderNmsContainer(containerId, this, playerInventory, entityHuman);
+    protected IChatBaseComponent getContainerName() {
+        return new ChatMessage("minecraft:generic_9x3");
+    }
+
+    @Override
+    protected Container createContainer(int containerId, PlayerInventory playerInventory) {
+        return new EnderNmsContainer(containerId, this, playerInventory, playerInventory.player);
+    }
+
+    @Override
+    public boolean e(EntityHuman entityhuman) {
+        //there is no chestlock here
+        return true;
     }
 }

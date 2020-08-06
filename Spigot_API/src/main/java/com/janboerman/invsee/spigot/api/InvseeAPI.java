@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
+import com.janboerman.invsee.utils.Rethrow;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.configuration.Configuration;
@@ -160,7 +161,10 @@ public abstract class InvseeAPI {
             }
 
             return (CompletableFuture<Optional<MainSpectatorInventory>>) COMPLETED_EMPTY;
-        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        }).handleAsync((success, error) -> {
+            if (error == null) return success;
+            return Rethrow.unchecked(error);
+        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
         pendingInventoriesByName.put(userName, future);
         future.handle((result, error) -> pendingInventoriesByName.remove(userName));
         return future;
@@ -190,7 +194,10 @@ public abstract class InvseeAPI {
         var future = createOfflineInventory(player, title).thenApply(optionalInv -> {
             optionalInv.ifPresent(inv -> openInventories.put(player, new WeakReference<>(inv)));
             return optionalInv;
-        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        }).handleAsync((success, error) -> {
+            if (error == null) return success;
+            return Rethrow.unchecked(error);
+        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
         pendingInventoriesByUuid.put(player, future);
         future.handle((result, error) -> pendingInventoriesByUuid.remove(player));
         return future;
@@ -217,7 +224,10 @@ public abstract class InvseeAPI {
             }
 
             return (CompletableFuture<Optional<EnderSpectatorInventory>>) COMPLETED_EMPTY;
-        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        }).handleAsync((success, error) -> {
+            if (error == null) return success;
+            return Rethrow.unchecked(error);
+        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
         pendingEnderChestsByName.put(userName, future);
         future.handle((result, error) -> pendingEnderChestsByName.remove(userName));
         return future;
@@ -247,7 +257,10 @@ public abstract class InvseeAPI {
         var future = createOfflineEnderChest(player, title).thenApply(optionalInv -> {
             optionalInv.ifPresent(inv -> openEnderChests.put(player, new WeakReference<>(inv)));
             return optionalInv;
-        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        }).handleAsync((success, error) -> {
+            if (error == null) return success;
+            return Rethrow.unchecked(error);
+        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
         pendingEnderChestsByUuid.put(player, future);
         future.handle((result, error) -> pendingEnderChestsByUuid.remove(player));
         return future;
