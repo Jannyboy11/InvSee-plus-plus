@@ -7,10 +7,12 @@ Do you like this plugin? Then please leave a rating on [SpigotMC](https://www.sp
 
 ### Commands
 `/invsee <userName>|<uniqueId>`
+`/endersee <userName>|<uniequeId>`
 
 ### Permissions
 
 `invseeplusplus.invsee` allows access to `/invsee`. By default only for server operators.
+`invseeplusplus.endersee` allows access to `/endersee`. By default only for server operators.
 
 ### Compiling
 

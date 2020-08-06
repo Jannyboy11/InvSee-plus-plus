@@ -16,7 +16,7 @@ commands:
   endersee:
     description: View a player's enderchest
     permission: invseeplusplus.endersee
-    usage: "/endersee <uisername>|<uuid>"
+    usage: "/endersee <username>|<uuid>"
     aliases: [enderchestsee, esee]
 
 permissions:

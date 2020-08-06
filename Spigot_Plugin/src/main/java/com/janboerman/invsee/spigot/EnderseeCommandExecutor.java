@@ -45,8 +45,8 @@ class EnderseeCommandExecutor implements CommandExecutor {
             if (throwable == null) {
                 optionalSpectatorInv.ifPresentOrElse(player::openInventory, () -> player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist."));
             } else {
-                player.sendMessage(ChatColor.RED + "An error occured while trying to open " + playerNameOrUUID + "'s enderchest.");
-                plugin.getLogger().log(Level.SEVERE, "Error while trying to create enderchest spectator inventory", throwable);
+                player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s enderchest.");
+                plugin.getLogger().log(Level.SEVERE, "Error while trying to create ender-chest spectator inventory", throwable);
             }
             return null;
         });
@@ -54,4 +54,5 @@ class EnderseeCommandExecutor implements CommandExecutor {
         return true;
     }
 
+    //TODO async tabcompletion on Paper
 }

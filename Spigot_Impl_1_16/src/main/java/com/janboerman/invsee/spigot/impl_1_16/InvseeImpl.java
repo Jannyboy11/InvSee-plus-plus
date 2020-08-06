@@ -12,7 +12,6 @@ import org.bukkit.craftbukkit.v1_16_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Optional;
@@ -22,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 public class InvseeImpl extends InvseeAPI {
 
     static CompletableFuture COMPLETED_EMPTY = InvseeAPI.COMPLETED_EMPTY;
+    static ItemStack EMPTY_STACK = ItemStack.b;
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);

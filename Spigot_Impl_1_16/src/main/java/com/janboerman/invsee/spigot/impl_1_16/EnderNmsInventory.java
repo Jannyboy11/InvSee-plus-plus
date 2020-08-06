@@ -1,6 +1,5 @@
 package com.janboerman.invsee.spigot.impl_1_16;
 
-import com.janboerman.invsee.utils.ConcatList;
 import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftHumanEntity;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.UUID;
 
 class EnderNmsInventory implements IInventory, ITileInventory {
-    protected static final ItemStack EMPTY_STACK = ItemStack.b;
 
     protected final UUID spectatedPlayerUuid;
     protected final NonNullList<ItemStack> storageContents;
@@ -51,14 +49,14 @@ class EnderNmsInventory implements IInventory, ITileInventory {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot < 0 || slot >= getSize()) return EMPTY_STACK;
+        if (slot < 0 || slot >= getSize()) return InvseeImpl.EMPTY_STACK;
 
         return storageContents.get(slot);
     }
 
     @Override
     public ItemStack splitStack(int slot, int subtractAmount) {
-        if (slot < 0 || slot >= getSize()) return EMPTY_STACK;
+        if (slot < 0 || slot >= getSize()) return InvseeImpl.EMPTY_STACK;
 
         ItemStack stack = ContainerUtil.a(storageContents, slot, subtractAmount);
         if (!stack.isEmpty()) {
@@ -69,13 +67,13 @@ class EnderNmsInventory implements IInventory, ITileInventory {
 
     @Override
     public ItemStack splitWithoutUpdate(int slot) {
-        if (slot < 0 || slot >= getSize()) return EMPTY_STACK;
+        if (slot < 0 || slot >= getSize()) return InvseeImpl.EMPTY_STACK;
 
         var stack = storageContents.get(slot);
         if (stack.isEmpty()) {
-            return EMPTY_STACK;
+            return InvseeImpl.EMPTY_STACK;
         } else {
-            storageContents.set(slot, EMPTY_STACK);
+            storageContents.set(slot, InvseeImpl.EMPTY_STACK);
             return stack;
         }
     }

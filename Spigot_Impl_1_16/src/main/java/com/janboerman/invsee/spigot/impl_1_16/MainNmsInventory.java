@@ -14,8 +14,6 @@ import java.util.*;
 
 public class MainNmsInventory implements IInventory, ITileInventory {
 
-    protected static final ItemStack EMPTY_STACK = ItemStack.b;
-
     protected final UUID spectatedPlayerUuid;
     protected final NonNullList<ItemStack> storageContents;
     protected final NonNullList<ItemStack> armourContents;
@@ -79,7 +77,7 @@ public class MainNmsInventory implements IInventory, ITileInventory {
     @Override
     public ItemStack getItem(int slot) {
         var pair = decideWhichInv(slot);
-        if (pair == null) return EMPTY_STACK;
+        if (pair == null) return InvseeImpl.EMPTY_STACK;
 
         return pair.getSecond().get(pair.getFirst());
     }
@@ -87,7 +85,7 @@ public class MainNmsInventory implements IInventory, ITileInventory {
     @Override
     public ItemStack splitStack(int slot, int subtractAmount) {
         var pair = decideWhichInv(slot);
-        if (pair == null) return EMPTY_STACK;
+        if (pair == null) return InvseeImpl.EMPTY_STACK;
 
         ItemStack stack = ContainerUtil.a(pair.getSecond(), pair.getFirst(), subtractAmount);
         if (!stack.isEmpty()) {
@@ -99,16 +97,16 @@ public class MainNmsInventory implements IInventory, ITileInventory {
     @Override
     public ItemStack splitWithoutUpdate(int slot) {
         var pair = decideWhichInv(slot);
-        if (pair == null) return EMPTY_STACK;
+        if (pair == null) return InvseeImpl.EMPTY_STACK;
 
         slot = pair.getFirst();
         var items = pair.getSecond();
 
         var stack = items.get(slot);
         if (stack.isEmpty()) {
-            return EMPTY_STACK;
+            return InvseeImpl.EMPTY_STACK;
         } else {
-            items.set(slot, EMPTY_STACK);
+            items.set(slot, InvseeImpl.EMPTY_STACK);
             return stack;
         }
     }
@@ -148,7 +146,7 @@ public class MainNmsInventory implements IInventory, ITileInventory {
     @Override
     public List<ItemStack> getContents() {
         ConcatList<ItemStack> contents = new ConcatList<>(storageContents, new ConcatList<>(armourContents, offHand));
-        ConcatList<ItemStack> padded = new ConcatList<>(contents, NonNullList.a(getSize() - contents.size(), EMPTY_STACK));
+        ConcatList<ItemStack> padded = new ConcatList<>(contents, NonNullList.a(getSize() - contents.size(), InvseeImpl.EMPTY_STACK));
         return padded;
     }
 

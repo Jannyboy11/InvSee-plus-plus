@@ -6,6 +6,7 @@ import net.minecraft.server.v1_16_R1.EntityHuman;
 import net.minecraft.server.v1_16_R1.World;
 
 class FakeEntityHuman extends EntityHuman {
+
     FakeEntityHuman(World world, BlockPosition blockposition, GameProfile gameprofile) {
         super(world, blockposition, gameprofile);
     }
@@ -19,4 +20,5 @@ class FakeEntityHuman extends EntityHuman {
     public boolean isCreative() {
         return false;
     }
+
 }

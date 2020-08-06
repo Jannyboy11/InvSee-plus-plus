@@ -15,7 +15,7 @@ public class InAccessibleSlot extends Slot {
     }
 
     public ItemStack getItem() {
-        return MainNmsInventory.EMPTY_STACK;
+        return InvseeImpl.EMPTY_STACK;
     }
 
     public boolean hasItem() {
@@ -33,7 +33,7 @@ public class InAccessibleSlot extends Slot {
     public ItemStack a(int subtractAmount) {
         //return what we get after splitting the ItemStack in our slot: a stack with at most count subtractAmount.
         //since no amount can be subtracted from our inaccessible slot, we always return the empty ItemStack.
-        return MainNmsInventory.EMPTY_STACK;
+        return InvseeImpl.EMPTY_STACK;
     }
 
     public boolean isAllowed(EntityHuman player) {
