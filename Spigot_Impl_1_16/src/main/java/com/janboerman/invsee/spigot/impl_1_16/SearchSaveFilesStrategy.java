@@ -77,5 +77,4 @@ public class SearchSaveFilesStrategy implements UUIDResolveStrategy {
         }, runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable));
     }
 
-
 }

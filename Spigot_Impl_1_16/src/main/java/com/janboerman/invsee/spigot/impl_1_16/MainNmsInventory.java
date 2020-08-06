@@ -5,29 +5,39 @@ import com.janboerman.invsee.utils.Pair;
 import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_16_R1.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.*;
 
-public class NmsInventory implements IInventory {
+public class MainNmsInventory implements IInventory, ITileInventory {
 
-    private static final ItemStack EMPTY_STACK = ItemStack.b;
+    protected static final ItemStack EMPTY_STACK = ItemStack.b;
 
     protected final UUID spectatedPlayerUuid;
     protected final NonNullList<ItemStack> storageContents;
     protected final NonNullList<ItemStack> armourContents;
     protected final NonNullList<ItemStack> offHand;
 
-    private int maxStack = MAX_STACK;
-    private final List<HumanEntity> transaction = new ArrayList<>();
-    InventoryHolder owner;
+    protected Inventory bukkit;
+    protected String title;
 
-    protected NmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
+    private int maxStack = IInventory.MAX_STACK;
+    private final List<HumanEntity> transaction = new ArrayList<>();
+    protected InventoryHolder owner;
+
+    protected MainNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
         this.spectatedPlayerUuid = spectatedPlayerUuid;
         this.storageContents = storageContents;
         this.armourContents = armourContents;
         this.offHand = offHand;
+    }
+
+    protected MainNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand, String title) {
+        this(spectatedPlayerUuid, storageContents, armourContents, offHand);
+        this.title = title;
     }
 
     private Pair<Integer, NonNullList<ItemStack>> decideWhichInv(int slot) {
@@ -177,5 +187,15 @@ public class NmsInventory implements IInventory {
         storageContents.clear();
         armourContents.clear();
         offHand.clear();
+    }
+
+    @Override
+    public IChatBaseComponent getScoreboardDisplayName() {
+        return CraftChatMessage.fromStringOrNull(title);
+    }
+
+    @Override
+    public Container createMenu(int containerId, PlayerInventory playerInventory, EntityHuman entityHuman) {
+        return new MainNmsContainer(containerId, this, playerInventory, entityHuman);
     }
 }

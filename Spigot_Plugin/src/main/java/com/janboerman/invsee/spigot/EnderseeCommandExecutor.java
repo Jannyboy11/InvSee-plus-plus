@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot;
 
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,11 +13,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-class InvseeCommandExecutor implements CommandExecutor {
+class EnderseeCommandExecutor implements CommandExecutor {
 
     private final InvseePlusPlus plugin;
 
-    InvseeCommandExecutor(InvseePlusPlus plugin) {
+    EnderseeCommandExecutor(InvseePlusPlus plugin) {
         this.plugin = plugin;
     }
 
@@ -32,28 +33,25 @@ class InvseeCommandExecutor implements CommandExecutor {
 
         String playerNameOrUUID = args[0];
 
-        CompletableFuture<Optional<MainSpectatorInventory>> future;
+        CompletableFuture<Optional<EnderSpectatorInventory>> future;
         try {
             UUID uuid = UUID.fromString(playerNameOrUUID);
-            future = plugin.getApi().spectateInventory(uuid, playerNameOrUUID + "'s inventory");
+            future = plugin.getApi().spectateEnderChest(uuid, playerNameOrUUID + "'s enderchest");
         } catch (IllegalArgumentException e) {
-            future = plugin.getApi().spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
+            future = plugin.getApi().spectateEnderChest(playerNameOrUUID, playerNameOrUUID + "'s enderchest");
         }
 
         future.handle((optionalSpectatorInv, throwable) -> {
             if (throwable == null) {
                 optionalSpectatorInv.ifPresentOrElse(player::openInventory, () -> player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist."));
             } else {
-                player.sendMessage(ChatColor.RED + "An error occured while trying to open " + playerNameOrUUID + "'s inventory.");
-                plugin.getLogger().log(Level.SEVERE, "Error while trying to create main inventory spectator inventory", throwable);
+                player.sendMessage(ChatColor.RED + "An error occured while trying to open " + playerNameOrUUID + "'s enderchest.");
+                plugin.getLogger().log(Level.SEVERE, "Error while trying to create enderchest spectator inventory", throwable);
             }
             return null;
         });
 
         return true;
     }
-
-    //TODO If we are on Paper, use AsyncTabCompleteEvent to implement async tabcompletion for offline players?
-    //TODO I would need to adjust the InvSeeAPI interface because 'providing offline player names' can only be implemented efficiently by the serverversion-specific implementation class.
 
 }

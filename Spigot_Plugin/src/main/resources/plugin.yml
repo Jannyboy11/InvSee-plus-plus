@@ -12,9 +12,17 @@ commands:
     description: View a player's inventory
     permission: invseeplusplus.invsee
     usage: "/invsee <username>|<uuid>"
-    aliases: [inventorysee]
+    aliases: [inventorysee, isee]
+  endersee:
+    description: View a player's enderchest
+    permission: invseeplusplus.endersee
+    usage: "/endersee <uisername>|<uuid>"
+    aliases: [enderchestsee, esee]
 
 permissions:
   invseeplusplus.invsee:
     description: Allows access to /invsee
+    default: op
+  invseeplusplus.endersee:
+    description: Allows access to /endersee
     default: op

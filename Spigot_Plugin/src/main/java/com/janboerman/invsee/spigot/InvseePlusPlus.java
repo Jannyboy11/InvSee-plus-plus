@@ -11,6 +11,7 @@ public class InvseePlusPlus extends JavaPlugin {
     public void onEnable() {
         this.api = InvseeAPI.setup(this);
         getCommand("invsee").setExecutor(new InvseeCommandExecutor(this));
+        getCommand("endersee").setExecutor(new EnderseeCommandExecutor(this));
     }
 
     public InvseeAPI getApi() {

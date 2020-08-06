@@ -21,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -41,21 +42,28 @@ public abstract class InvseeAPI {
 
     protected final List<UUIDResolveStrategy> uuidResolveStrategies;
     protected final Plugin plugin;
-    private final Map<UUID, WeakReference<SpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
-    private final Map<String, CompletableFuture<Optional<SpectatorInventory>>> pendingByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
-    private final Map<UUID, CompletableFuture<Optional<SpectatorInventory>>> pendingByUUID = new ConcurrentHashMap<>();
-
-    private final Map<String, UUID> cache = Collections.synchronizedMap(new CaseInsensitiveMap<>() {
+    private final Map<String, UUID> uuidCache = Collections.synchronizedMap(new CaseInsensitiveMap<>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, UUID> eldest) {
             return size() > 200;
         }
     });
 
+    private final Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<String, CompletableFuture<Optional<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
+    private final Map<UUID, CompletableFuture<Optional<MainSpectatorInventory>>> pendingInventoriesByUuid = new ConcurrentHashMap<>();
+
+    private final Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<String, CompletableFuture<Optional<EnderSpectatorInventory>>> pendingEnderChestsByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
+    private final Map<UUID, CompletableFuture<Optional<EnderSpectatorInventory>>> pendingEnderChestsByUuid = new ConcurrentHashMap<>();
+
+    private Function<Player, String> mainSpectatorInvTitleProvider = player -> player.getName() + "'s inventory";
+    private Function<Player, String> enderSpectatorInvTitleProvider = player -> player.getName() + "'s enderchest";
+
     protected InvseeAPI(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
         this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(4));
-        this.uuidResolveStrategies.add(new InMemoryStrategy(cache));
+        this.uuidResolveStrategies.add(new InMemoryStrategy(uuidCache));
         if (SPIGOT) {
             Configuration spigotConfig = plugin.getServer().spigot().getConfig();
             ConfigurationSection settings = spigotConfig.getConfigurationSection("settings");
@@ -68,6 +76,16 @@ public abstract class InvseeAPI {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerListener(), plugin);
         pluginManager.registerEvents(new InventoryListener(), plugin);
+    }
+
+    public final void setMainInventoryTitleFactory(Function<Player, String> titleFactory) {
+        Objects.requireNonNull(titleFactory);
+        this.mainSpectatorInvTitleProvider = titleFactory;
+    }
+
+    public void setEnderInventoryTitleFactory(Function<Player, String> titleFactory) {
+        Objects.requireNonNull(titleFactory);
+        this.enderSpectatorInvTitleProvider = titleFactory;
     }
 
     public static InvseeAPI setup(Plugin plugin) {
@@ -98,7 +116,7 @@ public abstract class InvseeAPI {
             UUIDResolveStrategy strategy = strategies.next();
             return strategy.resolveUUID(username).thenCompose((Optional<UUID> optionalUuid) -> {
                 if (optionalUuid.isPresent()) {
-                    cache.put(username, optionalUuid.get());
+                    uuidCache.put(username, optionalUuid.get());
                     return CompletableFuture.completedFuture(optionalUuid);
                 } else {
                     return resolveUUID(username, strategies);
@@ -113,21 +131,23 @@ public abstract class InvseeAPI {
         return resolveUUID(userName, uuidResolveStrategies.iterator());
     }
 
-    public abstract SpectatorInventory spectate(HumanEntity player);
+    public abstract MainSpectatorInventory spectateInventory(HumanEntity player, String title);
+    protected abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID player, String title);
+    protected abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
-    protected abstract CompletableFuture<Optional<SpectatorInventory>> createOfflineInventory(UUID player);
+    public abstract EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title);
+    protected abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String title);
+    protected abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
-    protected abstract CompletableFuture<Void> saveInventory(SpectatorInventory inventory);
-
-    public CompletableFuture<Optional<SpectatorInventory>> spectate(String userName) {
+    public CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(String userName, String title) {
         Objects.requireNonNull(userName, "userName cannot be null!");
 
         //try online
         Player target = plugin.getServer().getPlayerExact(userName);
         if (target != null) {
-            SpectatorInventory spectatorInventory = spectate(target);
+            MainSpectatorInventory spectatorInventory = spectateInventory(target, title);
             UUID uuid = target.getUniqueId();
-            cache.put(userName, uuid);
+            uuidCache.put(userName, uuid);
             openInventories.put(uuid, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
         }
@@ -136,23 +156,23 @@ public abstract class InvseeAPI {
         var future = resolveUUID(userName).thenCompose(optUuid -> {
             if (optUuid.isPresent()) {
                 UUID uuid = optUuid.get();
-                return spectate(uuid);
+                return spectateInventory(uuid, title);
             }
 
-            return (CompletableFuture<Optional<SpectatorInventory>>) COMPLETED_EMPTY;
+            return (CompletableFuture<Optional<MainSpectatorInventory>>) COMPLETED_EMPTY;
         }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
-        pendingByName.put(userName, future);
-        future.handle((result, error) -> pendingByName.remove(userName));
+        pendingInventoriesByName.put(userName, future);
+        future.handle((result, error) -> pendingInventoriesByName.remove(userName));
         return future;
     }
 
-    public final CompletableFuture<Optional<SpectatorInventory>> spectate(UUID player) {
+    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID player, String title) {
         Objects.requireNonNull(player, "player UUID cannot be null!");
 
         //try cache
-        WeakReference<SpectatorInventory> alreadyOpen = openInventories.get(player);
+        WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(player);
         if (alreadyOpen != null) {
-            SpectatorInventory inv = alreadyOpen.get();
+            MainSpectatorInventory inv = alreadyOpen.get();
             if (inv != null) {
                 return CompletableFuture.completedFuture(Optional.of(inv));
             }
@@ -161,18 +181,75 @@ public abstract class InvseeAPI {
         //try online
         Player target = plugin.getServer().getPlayer(player);
         if (target != null) {
-            SpectatorInventory spectatorInventory = spectate(target);
+            MainSpectatorInventory spectatorInventory = spectateInventory(target, title);
             openInventories.put(player, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
         }
 
         //try offline
-        var future = createOfflineInventory(player).thenApply(optionalInv -> {
+        var future = createOfflineInventory(player, title).thenApply(optionalInv -> {
             optionalInv.ifPresent(inv -> openInventories.put(player, new WeakReference<>(inv)));
             return optionalInv;
         }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
-        pendingByUUID.put(player, future);
-        future.handle((result, error) -> pendingByUUID.remove(player));
+        pendingInventoriesByUuid.put(player, future);
+        future.handle((result, error) -> pendingInventoriesByUuid.remove(player));
+        return future;
+    }
+
+    public CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(String userName, String title) {
+        Objects.requireNonNull(userName, "userName cannot be null!");
+
+        //try online
+        Player target = plugin.getServer().getPlayerExact(userName);
+        if (target != null) {
+            EnderSpectatorInventory spectatorInventory = spectateEnderChest(target, title);
+            UUID uuid = target.getUniqueId();
+            uuidCache.put(userName, uuid);
+            openEnderChests.put(uuid, new WeakReference<>(spectatorInventory));
+            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+        }
+
+        //try offline
+        var future = resolveUUID(userName).thenCompose(optUuid -> {
+            if (optUuid.isPresent()) {
+                UUID uuid = optUuid.get();
+                return spectateEnderChest(uuid, title);
+            }
+
+            return (CompletableFuture<Optional<EnderSpectatorInventory>>) COMPLETED_EMPTY;
+        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        pendingEnderChestsByName.put(userName, future);
+        future.handle((result, error) -> pendingEnderChestsByName.remove(userName));
+        return future;
+    }
+
+    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID player, String title) {
+        Objects.requireNonNull(player, "player UUID cannot be null!");
+
+        //try cache
+        WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(player);
+        if (alreadyOpen != null) {
+            EnderSpectatorInventory inv = alreadyOpen.get();
+            if (inv != null) {
+                return CompletableFuture.completedFuture(Optional.of(inv));
+            }
+        }
+
+        //try online
+        Player target = plugin.getServer().getPlayer(player);
+        if (target != null) {
+            EnderSpectatorInventory spectatorInventory = spectateEnderChest(target, title);
+            openEnderChests.put(player, new WeakReference<>(spectatorInventory));
+            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+        }
+
+        //try offline
+        var future = createOfflineEnderChest(player, title).thenApply(optionalInv -> {
+            optionalInv.ifPresent(inv -> openEnderChests.put(player, new WeakReference<>(inv)));
+            return optionalInv;
+        }).thenApplyAsync(Function.identity(), runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        pendingEnderChestsByUuid.put(player, future);
+        future.handle((result, error) -> pendingEnderChestsByUuid.remove(player));
         return future;
     }
 
@@ -187,30 +264,50 @@ public abstract class InvseeAPI {
             UUID uuid = player.getUniqueId();
             String userName = player.getName();
 
-            SpectatorInventory newSpectatorInventory = null;
+            MainSpectatorInventory newInventorySpectator = null;
+            String mainTitle = mainSpectatorInvTitleProvider.apply(player);
+            EnderSpectatorInventory newEnderSpectator = null;
+            String enderTitle = enderSpectatorInvTitleProvider.apply(player);
 
             //check if somebody was looking up the player and make sure they get the player's live inventory
-            CompletableFuture<Optional<SpectatorInventory>> nameFuture = pendingByName.remove(userName);
-            if (nameFuture != null) nameFuture.complete(Optional.of(newSpectatorInventory = spectate(player)));
-            CompletableFuture<Optional<SpectatorInventory>> uuidFuture = pendingByUUID.remove(uuid);
-            if (uuidFuture != null) uuidFuture.complete(Optional.of(newSpectatorInventory != null ? newSpectatorInventory : (newSpectatorInventory = spectate(player))));
+            CompletableFuture<Optional<MainSpectatorInventory>> mainInvNameFuture = pendingInventoriesByName.remove(userName);
+            if (mainInvNameFuture != null) mainInvNameFuture.complete(Optional.of(newInventorySpectator = spectateInventory(player, mainTitle)));
+            CompletableFuture<Optional<MainSpectatorInventory>> mainInvUuidFuture = pendingInventoriesByUuid.remove(uuid);
+            if (mainInvUuidFuture != null) mainInvUuidFuture.complete(Optional.of(newInventorySpectator != null ? newInventorySpectator : (newInventorySpectator = spectateInventory(player, mainTitle))));
+            CompletableFuture<Optional<EnderSpectatorInventory>> enderNameFuture = pendingEnderChestsByName.remove(userName);
+            if (enderNameFuture != null) enderNameFuture.complete(Optional.of(newEnderSpectator = spectateEnderChest(player, enderTitle)));
+            CompletableFuture<Optional<EnderSpectatorInventory>> enderUuidFuture = pendingEnderChestsByUuid.remove(uuid);
+            if (enderUuidFuture != null) enderUuidFuture.complete(Optional.of(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderTitle))));
 
             //check if somebody was looking in the offline inventory and update player's inventory.
             for (Player online : player.getServer().getOnlinePlayers()) {
-                if (online.getOpenInventory().getTopInventory() instanceof SpectatorInventory) {
-                    SpectatorInventory oldSpectatorInventory = (SpectatorInventory) online.getOpenInventory().getTopInventory();
+                Inventory topInventory = online.getOpenInventory().getTopInventory();
+                if (topInventory instanceof MainSpectatorInventory) {
+                    MainSpectatorInventory oldSpectatorInventory = (MainSpectatorInventory) topInventory;
                     if (oldSpectatorInventory.getSpectatedPlayer().equals(uuid)) {
-                        if (newSpectatorInventory == null) {
-                            newSpectatorInventory = spectate(player);
+                        if (newInventorySpectator == null) {
+                            newInventorySpectator = spectateInventory(player, mainTitle);
                             //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
-                            newSpectatorInventory.setStorageContents(oldSpectatorInventory.getStorageContents());
-                            newSpectatorInventory.setArmourContents(oldSpectatorInventory.getArmourContents());
-                            newSpectatorInventory.setOffHandContents(oldSpectatorInventory.getOffHandContents());
+                            newInventorySpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
+                            newInventorySpectator.setArmourContents(oldSpectatorInventory.getArmourContents());
+                            newInventorySpectator.setOffHandContents(oldSpectatorInventory.getOffHandContents());
                         }
 
                         online.closeInventory();
-                        online.openInventory(newSpectatorInventory);
+                        online.openInventory(newInventorySpectator);
                     }
+                } else if (topInventory instanceof EnderSpectatorInventory) {
+                    EnderSpectatorInventory oldSpectatorInventory = (EnderSpectatorInventory) topInventory;
+                    if (oldSpectatorInventory.getSpectatedPlayer().equals(uuid)) {
+                        if (newEnderSpectator == null) {
+                            //this also update the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
+                            newEnderSpectator = spectateEnderChest(player, enderTitle);
+                            newEnderSpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
+                        }
+                    }
+
+                    online.closeInventory();
+                    online.openInventory(newEnderSpectator);
                 }
             }
         }
@@ -220,9 +317,9 @@ public abstract class InvseeAPI {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
 
-            WeakReference<SpectatorInventory> ref = openInventories.get(uuid);
-            if (ref != null) {
-                SpectatorInventory inv = ref.get();
+            WeakReference<MainSpectatorInventory> invRef = openInventories.get(uuid);
+            if (invRef != null) {
+                MainSpectatorInventory inv = invRef.get();
                 if (inv != null) {
                     boolean open = false;
                     for (Player online : player.getServer().getOnlinePlayers()) {
@@ -236,19 +333,46 @@ public abstract class InvseeAPI {
                     }
                 }
             }
+            WeakReference<EnderSpectatorInventory> enderRef = openEnderChests.get(uuid);
+            if (enderRef != null) {
+                EnderSpectatorInventory ender = enderRef.get();
+                if (ender != null) {
+                    boolean open = false;
+                    for (Player online : player.getServer().getOnlinePlayers()) {
+                        if (online.getOpenInventory().getTopInventory() == ender) {
+                            open = true;
+                            break;
+                        }
+                    }
+                    if (!open) {
+                        openEnderChests.remove(uuid);
+                    }
+                }
+            }
         }
-
     }
 
     private final class InventoryListener implements Listener {
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
-            if (event.getInventory() instanceof SpectatorInventory) {
-                SpectatorInventory spectatorInventory = (SpectatorInventory) event.getInventory();
+            Inventory inventory = event.getInventory();
+            if (inventory instanceof MainSpectatorInventory) {
+                MainSpectatorInventory spectatorInventory = (MainSpectatorInventory) inventory;
                 if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayer()) == null) {
+                    //spectated player is no longer online
                     saveInventory(spectatorInventory).exceptionally(throwable -> {
                         plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
-                        event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory");
+                        event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory.");
+                        return null;
+                    });
+                }
+            } else if (inventory instanceof EnderSpectatorInventory) {
+                EnderSpectatorInventory spectatorInventory = (EnderSpectatorInventory) inventory;
+                if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayer()) == null) {
+                    //spectated player is no longer online
+                    saveEnderChest(spectatorInventory).exceptionally(throwable -> {
+                        plugin.getLogger().log(Level.SEVERE, "Error while saving offline enderchest", throwable);
+                        event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the enderchest.");
                         return null;
                     });
                 }

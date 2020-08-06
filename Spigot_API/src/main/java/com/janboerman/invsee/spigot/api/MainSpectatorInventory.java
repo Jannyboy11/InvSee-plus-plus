@@ -5,9 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-//TODO rename this thing?
-//TODO create a similar thing for enderchests?
-public interface SpectatorInventory extends Inventory {
+public interface MainSpectatorInventory extends Inventory {
 
     public UUID getSpectatedPlayer();
 
@@ -18,4 +16,7 @@ public interface SpectatorInventory extends Inventory {
     ItemStack[] getOffHandContents();
 
     void setOffHandContents(ItemStack[] offHand);
+
+    String getTitle();
+
 }

@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_16;
 
-import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -8,20 +8,25 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Objects;
 import java.util.UUID;
 
-public class BukkitInventory extends CraftInventory implements SpectatorInventory {
+public class MainBukkitInventory extends CraftInventory implements MainSpectatorInventory {
 
-    protected BukkitInventory(NmsInventory nmsInventory) {
+    protected MainBukkitInventory(MainNmsInventory nmsInventory) {
         super(nmsInventory);
     }
 
     @Override
-    public NmsInventory getInventory() {
-        return (NmsInventory) super.getInventory();
+    public MainNmsInventory getInventory() {
+        return (MainNmsInventory) super.getInventory();
     }
 
     @Override
     public UUID getSpectatedPlayer() {
         return getInventory().spectatedPlayerUuid;
+    }
+
+    @Override
+    public String getTitle() {
+        return getInventory().title;
     }
 
     @Override
