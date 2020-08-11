@@ -3,11 +3,7 @@ package com.janboerman.invsee.spigot.api;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.UUID;
-
-public interface MainSpectatorInventory extends Inventory {
-
-    public UUID getSpectatedPlayer();
+public interface MainSpectatorInventory extends Inventory, SpectatorInventory {
 
     ItemStack[] getArmourContents();
 
@@ -16,7 +12,5 @@ public interface MainSpectatorInventory extends Inventory {
     ItemStack[] getOffHandContents();
 
     void setOffHandContents(ItemStack[] offHand);
-
-    String getTitle();
 
 }

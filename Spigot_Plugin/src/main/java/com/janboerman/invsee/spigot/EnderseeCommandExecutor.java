@@ -36,7 +36,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
         CompletableFuture<Optional<EnderSpectatorInventory>> future;
         try {
             UUID uuid = UUID.fromString(playerNameOrUUID);
-            future = plugin.getApi().spectateEnderChest(uuid, playerNameOrUUID + "'s enderchest");
+            future = plugin.getApi().spectateEnderChest(uuid, "InvSee++ Player", playerNameOrUUID + "'s enderchest");
         } catch (IllegalArgumentException e) {
             future = plugin.getApi().spectateEnderChest(playerNameOrUUID, playerNameOrUUID + "'s enderchest");
         }
@@ -54,5 +54,4 @@ class EnderseeCommandExecutor implements CommandExecutor {
         return true;
     }
 
-    //TODO async tabcompletion on Paper
 }

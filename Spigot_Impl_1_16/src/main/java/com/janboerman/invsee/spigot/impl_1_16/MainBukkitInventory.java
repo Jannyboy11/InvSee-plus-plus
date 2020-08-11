@@ -20,7 +20,12 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
     }
 
     @Override
-    public UUID getSpectatedPlayer() {
+    public String getSpectatedPlayerName() {
+        return getInventory().spectatedPlayerName;
+    }
+
+    @Override
+    public UUID getSpectatedPlayerId() {
         return getInventory().spectatedPlayerUuid;
     }
 

@@ -17,7 +17,12 @@ public class EnderBukkitInventory extends CraftInventory implements EnderSpectat
     }
 
     @Override
-    public UUID getSpectatedPlayer() {
+    public String getSpectatedPlayerName() {
+        return getInventory().spectatedPlayerName;
+    }
+
+    @Override
+    public UUID getSpectatedPlayerId() {
         return getInventory().spectatedPlayerUuid;
     }
 

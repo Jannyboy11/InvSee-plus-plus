@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.impl_1_16;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Location;
@@ -17,6 +18,8 @@ import org.bukkit.plugin.Plugin;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 public class InvseeImpl extends InvseeAPI {
 
@@ -31,9 +34,10 @@ public class InvseeImpl extends InvseeAPI {
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         UUID uuid = player.getUniqueId();
+        String name = player.getName();
         CraftInventoryPlayer craftInventory = (CraftInventoryPlayer) player.getInventory();
         PlayerInventory nmsInventory = craftInventory.getInventory();
-        MainNmsInventory spectatorInv = new MainNmsInventory(uuid, nmsInventory.items, nmsInventory.armor, nmsInventory.extraSlots, title);
+        MainNmsInventory spectatorInv = new MainNmsInventory(uuid, name, nmsInventory.items, nmsInventory.armor, nmsInventory.extraSlots, title);
         MainBukkitInventory bukkitInventory = new MainBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
         return bukkitInventory;
@@ -42,134 +46,95 @@ public class InvseeImpl extends InvseeAPI {
     @Override
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
         UUID uuid = player.getUniqueId();
+        String name = player.getName();
         CraftInventory craftInventory = (CraftInventory) player.getEnderChest();
         InventoryEnderChest nmsInventory = (InventoryEnderChest) craftInventory.getInventory();
-        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, nmsInventory.items, title);
+        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, title);
         EnderBukkitInventory bukkitInventory = new EnderBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
         return bukkitInventory;
     }
 
     @Override
-    protected CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID player, String title) {
-
-        CraftServer server = (CraftServer) plugin.getServer();
-        DedicatedPlayerList playerList = server.getHandle();
-        WorldNBTStorage worldNBTStorage = playerList.playerFileData;
-
-        CraftWorld world = (CraftWorld) server.getWorlds().get(0);
-        Location spawn = world.getSpawnLocation();
-        GameProfile gameProfile = new GameProfile(player, "InvSee++"); //only UUID is important.
-
-        FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
-                world.getHandle(),
-                new BlockPosition(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()),
-                gameProfile);
-
-        return CompletableFuture.supplyAsync(() -> {
-            NBTTagCompound playerCompound = worldNBTStorage.load(fakeEntityHuman);
-            if (playerCompound != null) {
-                fakeEntityHuman.loadData(playerCompound);   //only player-specific stuff
-            } //else: no player save file exists.
-
-            CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
-            return Optional.of(spectateInventory(craftHumanEntity, title));
-
-        }, runnable -> server.getScheduler().runTaskAsynchronously(plugin, runnable));
+    protected CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID player, String name, String title) {
+        return createOffline(player, name, title, this::spectateInventory);
     }
 
     @Override
-    protected CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String title) {
-        //TODO un-duplicate?
-        CraftServer server = (CraftServer) plugin.getServer();
-        DedicatedPlayerList playerList = server.getHandle();
-        WorldNBTStorage worldNBTStorage = playerList.playerFileData;
-
-        CraftWorld world = (CraftWorld) server.getWorlds().get(0);
-        Location spawn = world.getSpawnLocation();
-        GameProfile gameProfile = new GameProfile(player, "InvSee++"); //only UUID is important.
-
-        FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
-                world.getHandle(),
-                new BlockPosition(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()),
-                gameProfile);
-
-        return CompletableFuture.supplyAsync(() -> {
-            NBTTagCompound playerCompound = worldNBTStorage.load(fakeEntityHuman);
-            if (playerCompound != null) {
-                fakeEntityHuman.loadData(playerCompound);   //only player-specific stuff
-            } //else: no player save file exists.
-
-            CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
-            return Optional.of(spectateEnderChest(craftHumanEntity, title));
-
-        }, runnable -> server.getScheduler().runTaskAsynchronously(plugin, runnable));
+    protected CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String name, String title) {
+        return createOffline(player, name, title, this::spectateEnderChest);
     }
-
 
     @Override
     protected CompletableFuture<Void> saveInventory(MainSpectatorInventory newInventory) {
-
-        CraftServer server = (CraftServer) plugin.getServer();
-        DedicatedPlayerList playerList = server.getHandle();
-        WorldNBTStorage worldNBTStorage = playerList.playerFileData;
-
-        CraftWorld world = (CraftWorld) server.getWorlds().get(0);
-        Location spawn = world.getSpawnLocation();
-        GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayer(), "InvSee++"); //only UUID is important.
-
-        FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
-                world.getHandle(),
-                new BlockPosition(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()),
-                gameProfile);
-
-        return CompletableFuture.runAsync(() -> {
-            NBTTagCompound playerCompound = worldNBTStorage.load(fakeEntityHuman);
-            if (playerCompound != null) {
-                fakeEntityHuman.load(playerCompound);   //all entity stuff + player stuff
-            } //else: no player save file exists
-
-            CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
-            MainSpectatorInventory currentInventory = spectateInventory(craftHumanEntity, newInventory.getTitle());
-            currentInventory.setStorageContents(newInventory.getStorageContents());
-            currentInventory.setArmourContents(newInventory.getArmourContents());
-            currentInventory.setOffHandContents(newInventory.getOffHandContents());
-
-            worldNBTStorage.save(fakeEntityHuman);
-
-        }, runnable -> server.getScheduler().runTaskAsynchronously(plugin, runnable));
-
+        return save(newInventory, this::spectateInventory, (currentInv, newInv) -> {
+            currentInv.setStorageContents(newInv.getStorageContents());
+            currentInv.setArmourContents(newInv.getArmourContents());
+            currentInv.setOffHandContents(newInv.getOffHandContents());
+        });
     }
 
     @Override
     protected CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory newInventory) {
-        //TODO un-duplicate?
+        return save(newInventory, this::spectateEnderChest, (currentInv, newInv) -> {
+            currentInv.setStorageContents(newInv.getStorageContents());
+        });
+    }
+
+    private <SpectatorInventory> CompletableFuture<Optional<SpectatorInventory>> createOffline(UUID player, String name, String title, BiFunction<? super HumanEntity, String, SpectatorInventory> invCreator) {
         CraftServer server = (CraftServer) plugin.getServer();
         DedicatedPlayerList playerList = server.getHandle();
         WorldNBTStorage worldNBTStorage = playerList.playerFileData;
 
         CraftWorld world = (CraftWorld) server.getWorlds().get(0);
         Location spawn = world.getSpawnLocation();
-        GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayer(), "InvSee++"); //only UUID is important.
+        GameProfile gameProfile = new GameProfile(player, name);
 
         FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
                 world.getHandle(),
                 new BlockPosition(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()),
                 gameProfile);
 
-        return CompletableFuture.runAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             NBTTagCompound playerCompound = worldNBTStorage.load(fakeEntityHuman);
             if (playerCompound != null) {
-                fakeEntityHuman.load(playerCompound);   //all entity stuff + player stuff
-            } //else: no player save file exists
+                fakeEntityHuman.loadData(playerCompound);   //only player-specific stuff
+            } //else: player save file exists.
 
             CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
-            EnderSpectatorInventory currentInventory = spectateEnderChest(craftHumanEntity, newInventory.getTitle());
-            currentInventory.setStorageContents(newInventory.getStorageContents());
+            return Optional.of(invCreator.apply(craftHumanEntity, title));
 
-            worldNBTStorage.save(fakeEntityHuman);
+        }, asyncExecutor);
+    }
 
-        }, runnable -> server.getScheduler().runTaskAsynchronously(plugin, runnable));
+    private <SI extends SpectatorInventory> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, String, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
+
+        CraftServer server = (CraftServer) plugin.getServer();
+        DedicatedPlayerList playerList = server.getHandle();
+        WorldNBTStorage worldNBTStorage = playerList.playerFileData;
+
+        CraftWorld world = (CraftWorld) server.getWorlds().get(0);
+        GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayerId(), newInventory.getSpectatedPlayerName());
+
+        EntityPlayer fakeEntityPlayer = new EntityPlayer(
+                server.getServer(),
+                world.getHandle(),
+                gameProfile,
+                new PlayerInteractManager(world.getHandle()));
+
+        return CompletableFuture.runAsync(() -> {
+            NBTTagCompound playerCompound = worldNBTStorage.load(fakeEntityPlayer);
+            if (playerCompound != null) {
+                fakeEntityPlayer.load(playerCompound);   //all entity stuff + player stuff
+            } //else: no player save file exists
+
+            CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityPlayer);
+            SI currentInv = currentInvProvider.apply(craftHumanEntity, newInventory.getTitle());
+
+            transfer.accept(currentInv, newInventory);
+
+            worldNBTStorage.save(fakeEntityPlayer);
+        }, asyncExecutor);
     }
 
 }

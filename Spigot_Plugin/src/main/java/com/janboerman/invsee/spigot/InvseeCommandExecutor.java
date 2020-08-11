@@ -35,7 +35,7 @@ class InvseeCommandExecutor implements CommandExecutor {
         CompletableFuture<Optional<MainSpectatorInventory>> future;
         try {
             UUID uuid = UUID.fromString(playerNameOrUUID);
-            future = plugin.getApi().spectateInventory(uuid, playerNameOrUUID + "'s inventory");
+            future = plugin.getApi().spectateInventory(uuid, "InvSee++ Player", playerNameOrUUID + "'s inventory");
         } catch (IllegalArgumentException e) {
             future = plugin.getApi().spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
         }
@@ -52,8 +52,5 @@ class InvseeCommandExecutor implements CommandExecutor {
 
         return true;
     }
-
-    //TODO If we are on Paper, use AsyncTabCompleteEvent to implement async tabcompletion for offline players?
-    //TODO I would need to adjust the InvSeeAPI interface because 'providing offline player names' can only be implemented efficiently by the serverversion-specific implementation class.
 
 }

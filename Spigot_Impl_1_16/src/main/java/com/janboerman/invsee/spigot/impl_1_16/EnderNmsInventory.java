@@ -18,6 +18,7 @@ class EnderNmsInventory extends TileEntityContainer {
     private static final TileEntityTypes TileEntityTypeFakeEnderChest = new TileEntityTypes(EnderNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.EmptyPart());
 
     protected final UUID spectatedPlayerUuid;
+    protected final String spectatedPlayerName;
     protected final NonNullList<ItemStack> storageContents;
 
     protected Inventory bukkit;
@@ -30,20 +31,22 @@ class EnderNmsInventory extends TileEntityContainer {
     private EnderNmsInventory() {   //used for the fake tile entity type
         super(TileEntityTypeFakeEnderChest);
         spectatedPlayerUuid = null;
+        spectatedPlayerName = null;
         storageContents = null;
     }
 
-    public EnderNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents) {
+    public EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents) {
         // Possibly could've used TileEntityTypes.ENDER_CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
         super(TileEntityTypeFakeEnderChest);
         this.spectatedPlayerUuid = spectatedPlayerUuid;
+        this.spectatedPlayerName = spectatedPlayerName;
         this.storageContents = storageContents;
     }
 
-    public EnderNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, String title) {
-        this(spectatedPlayerUuid, storageContents);
+    public EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title) {
+        this(spectatedPlayerUuid, spectatedPlayerName, storageContents);
         this.title = title;
         this.setCustomName(CraftChatMessage.fromStringOrNull(title));
     }

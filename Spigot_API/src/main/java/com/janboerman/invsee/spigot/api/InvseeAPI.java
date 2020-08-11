@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.logging.Level;
 
@@ -49,6 +50,7 @@ public abstract class InvseeAPI {
             return size() > 200;
         }
     });
+    private final Map<String, UUID> uuidCacheView = Collections.unmodifiableMap(uuidCache);
 
     private final Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<String, CompletableFuture<Optional<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
@@ -60,6 +62,9 @@ public abstract class InvseeAPI {
 
     private Function<Player, String> mainSpectatorInvTitleProvider = player -> player.getName() + "'s inventory";
     private Function<Player, String> enderSpectatorInvTitleProvider = player -> player.getName() + "'s enderchest";
+
+    public final Executor serverThreadExecutor;
+    public final Executor asyncExecutor;
 
     protected InvseeAPI(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
@@ -77,6 +82,9 @@ public abstract class InvseeAPI {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerListener(), plugin);
         pluginManager.registerEvents(new InventoryListener(), plugin);
+
+        this.serverThreadExecutor = runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable);
+        this.asyncExecutor = runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable);
     }
 
     public final void setMainInventoryTitleFactory(Function<Player, String> titleFactory) {
@@ -128,16 +136,22 @@ public abstract class InvseeAPI {
         }
     }
 
+    //TODO uuid->username resolving?!
+
+    public Map<String, UUID> getUuidCache() {
+        return uuidCacheView;
+    }
+
     protected CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
         return resolveUUID(userName, uuidResolveStrategies.iterator());
     }
 
     public abstract MainSpectatorInventory spectateInventory(HumanEntity player, String title);
-    protected abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID player, String title);
+    protected abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title);
     protected abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
     public abstract EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title);
-    protected abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String title);
+    protected abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
     protected abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
     public CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(String userName, String title) {
@@ -157,24 +171,25 @@ public abstract class InvseeAPI {
         var future = resolveUUID(userName).thenCompose(optUuid -> {
             if (optUuid.isPresent()) {
                 UUID uuid = optUuid.get();
-                return spectateInventory(uuid, title);
+                return spectateInventory(uuid, userName, title);
             }
 
             return (CompletableFuture<Optional<MainSpectatorInventory>>) COMPLETED_EMPTY;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
-        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        }, serverThreadExecutor);
         pendingInventoriesByName.put(userName, future);
         future.handle((result, error) -> pendingInventoriesByName.remove(userName));
         return future;
     }
 
-    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID player, String title) {
-        Objects.requireNonNull(player, "player UUID cannot be null!");
+    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title) {
+        Objects.requireNonNull(playerId, "player UUID cannot be null!");
+        Objects.requireNonNull(playerName, "player name cannot be null!");
 
         //try cache
-        WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(player);
+        WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
         if (alreadyOpen != null) {
             MainSpectatorInventory inv = alreadyOpen.get();
             if (inv != null) {
@@ -183,23 +198,23 @@ public abstract class InvseeAPI {
         }
 
         //try online
-        Player target = plugin.getServer().getPlayer(player);
+        Player target = plugin.getServer().getPlayer(playerId);
         if (target != null) {
             MainSpectatorInventory spectatorInventory = spectateInventory(target, title);
-            openInventories.put(player, new WeakReference<>(spectatorInventory));
+            openInventories.put(playerId, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
         }
 
         //try offline
-        var future = createOfflineInventory(player, title).thenApply(optionalInv -> {
-            optionalInv.ifPresent(inv -> openInventories.put(player, new WeakReference<>(inv)));
+        var future = createOfflineInventory(playerId, playerName, title).thenApply(optionalInv -> {
+            optionalInv.ifPresent(inv -> openInventories.put(playerId, new WeakReference<>(inv)));
             return optionalInv;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
-        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
-        pendingInventoriesByUuid.put(player, future);
-        future.handle((result, error) -> pendingInventoriesByUuid.remove(player));
+        }, serverThreadExecutor);
+        pendingInventoriesByUuid.put(playerId, future);
+        future.handle((result, error) -> pendingInventoriesByUuid.remove(playerId));
         return future;
     }
 
@@ -220,24 +235,25 @@ public abstract class InvseeAPI {
         var future = resolveUUID(userName).thenCompose(optUuid -> {
             if (optUuid.isPresent()) {
                 UUID uuid = optUuid.get();
-                return spectateEnderChest(uuid, title);
+                return spectateEnderChest(uuid, userName, title);
             }
 
             return (CompletableFuture<Optional<EnderSpectatorInventory>>) COMPLETED_EMPTY;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
-        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
+        }, serverThreadExecutor);
         pendingEnderChestsByName.put(userName, future);
         future.handle((result, error) -> pendingEnderChestsByName.remove(userName));
         return future;
     }
 
-    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID player, String title) {
-        Objects.requireNonNull(player, "player UUID cannot be null!");
+    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title) {
+        Objects.requireNonNull(playerId, "player UUID cannot be null!");
+        Objects.requireNonNull(playerName, "player name cannot be null!");
 
         //try cache
-        WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(player);
+        WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(playerId);
         if (alreadyOpen != null) {
             EnderSpectatorInventory inv = alreadyOpen.get();
             if (inv != null) {
@@ -246,23 +262,23 @@ public abstract class InvseeAPI {
         }
 
         //try online
-        Player target = plugin.getServer().getPlayer(player);
+        Player target = plugin.getServer().getPlayer(playerId);
         if (target != null) {
             EnderSpectatorInventory spectatorInventory = spectateEnderChest(target, title);
-            openEnderChests.put(player, new WeakReference<>(spectatorInventory));
+            openEnderChests.put(playerId, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
         }
 
         //try offline
-        var future = createOfflineEnderChest(player, title).thenApply(optionalInv -> {
-            optionalInv.ifPresent(inv -> openEnderChests.put(player, new WeakReference<>(inv)));
+        var future = createOfflineEnderChest(playerId, playerName, title).thenApply(optionalInv -> {
+            optionalInv.ifPresent(inv -> openEnderChests.put(playerId, new WeakReference<>(inv)));
             return optionalInv;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
-        }, runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable));
-        pendingEnderChestsByUuid.put(player, future);
-        future.handle((result, error) -> pendingEnderChestsByUuid.remove(player));
+        }, serverThreadExecutor);
+        pendingEnderChestsByUuid.put(playerId, future);
+        future.handle((result, error) -> pendingEnderChestsByUuid.remove(playerId));
         return future;
     }
 
@@ -297,7 +313,7 @@ public abstract class InvseeAPI {
                 Inventory topInventory = online.getOpenInventory().getTopInventory();
                 if (topInventory instanceof MainSpectatorInventory) {
                     MainSpectatorInventory oldSpectatorInventory = (MainSpectatorInventory) topInventory;
-                    if (oldSpectatorInventory.getSpectatedPlayer().equals(uuid)) {
+                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
                         if (newInventorySpectator == null) {
                             newInventorySpectator = spectateInventory(player, mainTitle);
                             //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
@@ -311,7 +327,7 @@ public abstract class InvseeAPI {
                     }
                 } else if (topInventory instanceof EnderSpectatorInventory) {
                     EnderSpectatorInventory oldSpectatorInventory = (EnderSpectatorInventory) topInventory;
-                    if (oldSpectatorInventory.getSpectatedPlayer().equals(uuid)) {
+                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
                         if (newEnderSpectator == null) {
                             //this also update the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
                             newEnderSpectator = spectateEnderChest(player, enderTitle);
@@ -323,12 +339,15 @@ public abstract class InvseeAPI {
                     online.openInventory(newEnderSpectator);
                 }
             }
+
+            uuidCache.remove(userName, uuid);
         }
 
         @EventHandler
         public void onQuit(PlayerQuitEvent event) {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
+            uuidCache.put(player.getName(), uuid);
 
             WeakReference<MainSpectatorInventory> invRef = openInventories.get(uuid);
             if (invRef != null) {
@@ -371,7 +390,7 @@ public abstract class InvseeAPI {
             Inventory inventory = event.getInventory();
             if (inventory instanceof MainSpectatorInventory) {
                 MainSpectatorInventory spectatorInventory = (MainSpectatorInventory) inventory;
-                if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayer()) == null) {
+                if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayerId()) == null) {
                     //spectated player is no longer online
                     saveInventory(spectatorInventory).exceptionally(throwable -> {
                         plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
@@ -381,7 +400,7 @@ public abstract class InvseeAPI {
                 }
             } else if (inventory instanceof EnderSpectatorInventory) {
                 EnderSpectatorInventory spectatorInventory = (EnderSpectatorInventory) inventory;
-                if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayer()) == null) {
+                if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayerId()) == null) {
                     //spectated player is no longer online
                     saveEnderChest(spectatorInventory).exceptionally(throwable -> {
                         plugin.getLogger().log(Level.SEVERE, "Error while saving offline enderchest", throwable);

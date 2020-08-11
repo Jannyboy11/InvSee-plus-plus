@@ -39,7 +39,7 @@ public class MainNmsContainer extends Container {
         int magicAddY = (5 /*5 for 5 rows of the top inventory*/ - 4 /*4 for 4 rows of the bottom inventory??*/) * 18;
 
         //player 'storage'
-        for (int yPos = 0; yPos < 3; yPos++) {
+        for (int yPos = 1; yPos < 4; yPos++) {
             for (int xPos = 0; xPos < 9; xPos++) {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;

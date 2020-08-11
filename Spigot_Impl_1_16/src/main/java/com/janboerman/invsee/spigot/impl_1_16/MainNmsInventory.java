@@ -20,6 +20,7 @@ public class MainNmsInventory extends TileEntityContainer {
     protected final NonNullList<ItemStack> storageContents;
     protected final NonNullList<ItemStack> armourContents;
     protected final NonNullList<ItemStack> offHand;
+    protected final String spectatedPlayerName;
 
     protected Inventory bukkit;
     protected String title;
@@ -31,24 +32,26 @@ public class MainNmsInventory extends TileEntityContainer {
     private MainNmsInventory() { //used for the fake tile entity type
         super(TileEntityTypeFakePlayerInventory);
         spectatedPlayerUuid = null;
+        spectatedPlayerName = null;
         storageContents = null;
         armourContents = null;
         offHand = null;
     }
 
-    protected MainNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
+    protected MainNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
         // Possibly could've used TileEntityTypes.CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
         super(TileEntityTypeFakePlayerInventory);
         this.spectatedPlayerUuid = spectatedPlayerUuid;
+        this.spectatedPlayerName = spectatedPlayerName;
         this.storageContents = storageContents;
         this.armourContents = armourContents;
         this.offHand = offHand;
     }
 
-    protected MainNmsInventory(UUID spectatedPlayerUuid, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand, String title) {
-        this(spectatedPlayerUuid, storageContents, armourContents, offHand);
+    protected MainNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand, String title) {
+        this(spectatedPlayerUuid, spectatedPlayerName, storageContents, armourContents, offHand);
         this.title = title;
         this.setCustomName(CraftChatMessage.fromStringOrNull(title));
     }
