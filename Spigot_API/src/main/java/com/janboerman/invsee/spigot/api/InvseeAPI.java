@@ -19,7 +19,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -388,6 +390,10 @@ public abstract class InvseeAPI {
     }
 
     private final class InventoryListener implements Listener {
+        private static final String
+                INVENTORY_EDIT_PERMISSION = "invseeplusplus.invsee.edit",
+                ENDERCHEST_EDIT_PERMISSION = "invseeplusplus.endersee.edit";
+
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
             Inventory inventory = event.getInventory();
@@ -411,6 +417,16 @@ public abstract class InvseeAPI {
                         return null;
                     });
                 }
+            }
+        }
+
+        @EventHandler(priority = EventPriority.HIGH)
+        public void onClick(InventoryClickEvent event) {
+            Inventory inventory = event.getInventory();
+            HumanEntity player = event.getWhoClicked();
+            if ((inventory instanceof MainSpectatorInventory && !player.hasPermission(INVENTORY_EDIT_PERMISSION))
+                || (inventory instanceof EnderSpectatorInventory && !player.hasPermission(ENDERCHEST_EDIT_PERMISSION))) {
+                event.setCancelled(true);
             }
         }
     }

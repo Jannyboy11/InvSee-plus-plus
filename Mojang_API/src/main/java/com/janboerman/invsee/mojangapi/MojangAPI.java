@@ -45,6 +45,9 @@ public class MojangAPI {
     public CompletableFuture<Optional<UUID>> lookupUniqueId(String username) {
         CompletableFuture<HttpResponse<InputStream>> future = httpClient.sendAsync(HttpRequest
                 .newBuilder(URI.create("https://api.mojang.com/users/profiles/minecraft/" + username))
+                .header("Accept", "application/json")
+                .header("User-Agent", "InvSee++/MojangAPI")
+                .header("Connection", "close")
                 .timeout(Duration.ofSeconds(5))
                 .build(), HttpResponse.BodyHandlers.ofInputStream());
 

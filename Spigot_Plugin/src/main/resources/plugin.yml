@@ -10,19 +10,55 @@ prefix: "InvSee++"
 commands:
   invsee:
     description: View a player's inventory
-    permission: invseeplusplus.invsee
+    permission: invseeplusplus.invsee.view
     usage: "/invsee <username>|<uuid>"
     aliases: [inventorysee, isee]
   endersee:
     description: View a player's enderchest
-    permission: invseeplusplus.endersee
+    permission: invseeplusplus.endersee.view
     usage: "/endersee <username>|<uuid>"
     aliases: [enderchestsee, esee]
 
 permissions:
+  invseeplusplus.*:
+    description: Gives access to view and edit players' inventories and enderchests
+    children:
+      invseeplusplus.invsee.view: true
+      invseeplusplus.invsee.edit: true
+      invseeplusplus.endersee.view: true
+      invseeplusplus.endersee.edit: true
+
+  invseeplusplus.view:
+    description: Gives access to view players' inventories and enderchests
+    children:
+      invseeplusplus.invsee.view: true
+      invseeplusplus.endersee.view: true
+  invseeplusplus.edit:
+    description: Gives access to edit players' inventories and enderchests
+    children:
+      invseeplusplus.invsee.edit: true
+      invseeplusplus.endersee.edit: true
+
   invseeplusplus.invsee:
-    description: Allows access to /invsee
-    default: op
+    description: Gives access to view and edit a plyer's inventory
+    children:
+      invseeplusplus.invsee.view: true
+      invseeplusplus.invsee.edit: true
   invseeplusplus.endersee:
-    description: Allows access to /endersee
+    description: Gives access to view and edit a player's enderchest
+    children:
+      invseeplusplus.endersee.view: true
+      invseeplusplus.endersee.edit: true
+
+  invseeplusplus.invsee.view:
+    description: Gives access to view a player's inventory
+    default: op
+  invseeplusplus.invsee.edit:
+    description: Gives access to edit a player's inventory
+    default: op
+  invseeplusplus.endersee.view:
+    description: Gives access to view a player's enderchest
+    default: op
+  invseeplusplus.endersee.edit:
+    description: Gives access to edit a player's enderchest
     default: op
