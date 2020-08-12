@@ -104,8 +104,11 @@ public abstract class InvseeAPI {
             Constructor<?> ctor = null;
 
             if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R1.CraftServer")) {
-                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16.InvseeImpl").getConstructor(Plugin.class);
-            } //make a bunch of else-ifs here for future minecraft versions.
+                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R1.InvseeImpl").getConstructor(Plugin.class);
+            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R2.CraftServer")) {
+                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R2.InvseeImpl").getConstructor(Plugin.class);
+            }
+            //make a bunch of else-ifs here for future minecraft versions.
 
             if (ctor != null) {
                 return InvseeAPI.class.cast(ctor.newInstance(plugin));

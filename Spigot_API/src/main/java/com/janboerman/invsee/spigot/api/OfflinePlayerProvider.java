@@ -23,10 +23,15 @@ public interface OfflinePlayerProvider {
             try {
                 Constructor<?> ctor;
                 if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R1.CraftServer")) {
-                    implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_16.KnownPlayersProvider");
+                    implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R1.KnownPlayersProvider");
                     ctor = implementationClass.getConstructor(Plugin.class);
                     offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
-                } //add a bunch of else-if's here in future minecraft versions
+                } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R2.CraftServer")) {
+                    implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R2.KnownPlayersProvider");
+                    ctor = implementationClass.getConstructor(Plugin.class);
+                    offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
+                }
+                //add a bunch of else-if's here in future minecraft versions
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 plugin.getLogger().log(Level.SEVERE, "Could not create OfflinePlayerProvider, it needs a public constructor with one parameter: the plugin", e);
             }

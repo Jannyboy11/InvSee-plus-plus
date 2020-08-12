@@ -19,7 +19,8 @@ Do you like this plugin? Then please leave a rating on [SpigotMC](https://www.sp
 ###### Prerequesites: [JDK-11](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
 1. Install Spigot into your local repository first by running BuildTools with
-`java -jar BuildTools.jar --rev 1.16.1`.
+    - `java -jar BuildTools.jar --rev 1.16.1`
+    - `java -jar BuildTools.jar --rev 1.16.2`
 2. In the root directory of the project run `mvn clean package`.
 You can find the plugin jar at Spigot_Plugin/target/InvSee++.jar.
 
