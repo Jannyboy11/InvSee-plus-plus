@@ -69,4 +69,43 @@ public class MainNmsContainer extends Container {
     public boolean canUse(EntityHuman entityHuman) {
         return true;
     }
+
+    @Override
+    public ItemStack shiftClick(EntityHuman entityhuman, int rawIndex) {
+        //returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
+
+        ItemStack itemstack = InvseeImpl.EMPTY_STACK;
+        Slot slot = this.slots.get(rawIndex);
+        final int topRows = 5;
+
+        if (slot != null && slot.hasItem()) {
+            ItemStack clickedSlotItem = slot.getItem();
+
+            itemstack = clickedSlotItem.cloneItemStack();
+            if (rawIndex < topRows * 9) {
+                //clicked in the top inventory
+                if (!doShiftClickTransfer(clickedSlotItem, topRows * 9, this.slots.size(), true)) {
+                    return InvseeImpl.EMPTY_STACK;
+                }
+            } else {
+                //clicked in the bottom inventory
+                if (!doShiftClickTransfer(clickedSlotItem, 0, topRows * 9, false)) {
+                    return InvseeImpl.EMPTY_STACK;
+                }
+            }
+
+            if (clickedSlotItem.isEmpty()) {
+                slot.set(InvseeImpl.EMPTY_STACK);
+            } else {
+                slot.d();
+            }
+        }
+
+        return itemstack;
+    }
+
+    private boolean doShiftClickTransfer(ItemStack clickedSlotItem, int targetMinIndex, int targetMaxIndex, boolean topClicked) {
+        //returns true is something if part of the clickedSlotItem was transferred, otherwise false
+        return super.a(clickedSlotItem, targetMinIndex, targetMaxIndex, topClicked);
+    }
 }
