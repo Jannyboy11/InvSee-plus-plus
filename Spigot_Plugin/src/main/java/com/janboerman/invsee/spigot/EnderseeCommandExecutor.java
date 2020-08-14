@@ -41,14 +41,13 @@ class EnderseeCommandExecutor implements CommandExecutor {
             future = plugin.getApi().spectateEnderChest(playerNameOrUUID, playerNameOrUUID + "'s enderchest");
         }
 
-        future.handle((optionalSpectatorInv, throwable) -> {
+        future.whenComplete((optionalSpectatorInv, throwable) -> {
             if (throwable == null) {
                 optionalSpectatorInv.ifPresentOrElse(player::openInventory, () -> player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist."));
             } else {
                 player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s enderchest.");
                 plugin.getLogger().log(Level.SEVERE, "Error while trying to create ender-chest spectator inventory", throwable);
             }
-            return null;
         });
 
         return true;

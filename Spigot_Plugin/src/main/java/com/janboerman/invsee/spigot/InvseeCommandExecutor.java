@@ -40,14 +40,13 @@ class InvseeCommandExecutor implements CommandExecutor {
             future = plugin.getApi().spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
         }
 
-        future.handle((optionalSpectatorInv, throwable) -> {
+        future.whenComplete((optionalSpectatorInv, throwable) -> {
             if (throwable == null) {
                 optionalSpectatorInv.ifPresentOrElse(player::openInventory, () -> player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist."));
             } else {
                 player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s inventory.");
                 plugin.getLogger().log(Level.SEVERE, "Error while trying to create main-inventory spectator inventory", throwable);
             }
-            return null;
         });
 
         return true;

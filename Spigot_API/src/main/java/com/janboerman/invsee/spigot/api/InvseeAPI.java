@@ -185,7 +185,7 @@ public abstract class InvseeAPI {
             return Rethrow.unchecked(error);
         }, serverThreadExecutor);
         pendingInventoriesByName.put(userName, future);
-        future.handle((result, error) -> pendingInventoriesByName.remove(userName));
+        future.whenComplete((result, error) -> pendingInventoriesByName.remove(userName));
         return future;
     }
 
@@ -219,7 +219,7 @@ public abstract class InvseeAPI {
             return Rethrow.unchecked(error);
         }, serverThreadExecutor);
         pendingInventoriesByUuid.put(playerId, future);
-        future.handle((result, error) -> pendingInventoriesByUuid.remove(playerId));
+        future.whenComplete((result, error) -> pendingInventoriesByUuid.remove(playerId));
         return future;
     }
 
@@ -249,7 +249,7 @@ public abstract class InvseeAPI {
             return Rethrow.unchecked(error);
         }, serverThreadExecutor);
         pendingEnderChestsByName.put(userName, future);
-        future.handle((result, error) -> pendingEnderChestsByName.remove(userName));
+        future.whenComplete((result, error) -> pendingEnderChestsByName.remove(userName));
         return future;
     }
 
@@ -283,7 +283,7 @@ public abstract class InvseeAPI {
             return Rethrow.unchecked(error);
         }, serverThreadExecutor);
         pendingEnderChestsByUuid.put(playerId, future);
-        future.handle((result, error) -> pendingEnderChestsByUuid.remove(playerId));
+        future.whenComplete((result, error) -> pendingEnderChestsByUuid.remove(playerId));
         return future;
     }
 
