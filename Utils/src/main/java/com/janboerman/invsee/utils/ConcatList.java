@@ -319,17 +319,17 @@ public class ConcatList<T> extends AbstractList<T> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return first.removeAll(c) & second.removeAll(c);
+        return first.removeAll(c) | second.removeAll(c);
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return first.retainAll(c) & second.retainAll(c);
+        return first.retainAll(c) | second.retainAll(c);
     }
 
     @Override
     public boolean removeIf(Predicate<? super T> filter) {
-        return first.removeIf(filter) & second.removeIf(filter);
+        return first.removeIf(filter) | second.removeIf(filter);
     }
 
 
