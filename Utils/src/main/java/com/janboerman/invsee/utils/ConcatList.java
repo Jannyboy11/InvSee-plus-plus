@@ -332,5 +332,4 @@ public class ConcatList<T> extends AbstractList<T> {
         return first.removeIf(filter) | second.removeIf(filter);
     }
 
-
 }

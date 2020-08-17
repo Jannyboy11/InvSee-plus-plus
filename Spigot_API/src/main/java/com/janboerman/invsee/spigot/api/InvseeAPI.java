@@ -390,9 +390,6 @@ public abstract class InvseeAPI {
     }
 
     private final class InventoryListener implements Listener {
-        private static final String
-                INVENTORY_EDIT_PERMISSION = "invseeplusplus.invsee.edit",
-                ENDERCHEST_EDIT_PERMISSION = "invseeplusplus.endersee.edit";
 
         @EventHandler
         public void onClose(InventoryCloseEvent event) {
@@ -420,15 +417,6 @@ public abstract class InvseeAPI {
             }
         }
 
-        @EventHandler(priority = EventPriority.HIGH)
-        public void onClick(InventoryClickEvent event) {
-            Inventory inventory = event.getInventory();
-            HumanEntity player = event.getWhoClicked();
-            if ((inventory instanceof MainSpectatorInventory && !player.hasPermission(INVENTORY_EDIT_PERMISSION))
-                || (inventory instanceof EnderSpectatorInventory && !player.hasPermission(ENDERCHEST_EDIT_PERMISSION))) {
-                event.setCancelled(true);
-            }
-        }
     }
 
 }

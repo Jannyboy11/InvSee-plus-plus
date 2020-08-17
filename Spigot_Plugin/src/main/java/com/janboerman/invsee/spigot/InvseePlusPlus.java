@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
@@ -27,9 +28,12 @@ public class InvseePlusPlus extends JavaPlugin {
         invseeCommand.setTabCompleter(tabCompleter);
         enderseeCommand.setTabCompleter(tabCompleter);
 
+        PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
+
         try {
             Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-            getServer().getPluginManager().registerEvents(new AsyncTabCompleter(this), this);
+            pluginManager.registerEvents(new AsyncTabCompleter(this), this);
         } catch (ClassNotFoundException e) {
             getLogger().log(Level.WARNING, "InvSee++ is not running on Paper.");
             getLogger().log(Level.WARNING, "Tab-completion for offline players will not work for all players!");
