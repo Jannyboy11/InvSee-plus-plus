@@ -8,27 +8,32 @@ public class MainNmsContainer extends Container {
 
     private final EntityHuman player;
     private final MainNmsInventory top;
-    private final IInventory bottom;
+    private final PlayerInventory bottom;
 
     private InventoryView bukkitView;
 
     public MainNmsContainer(int containerId, MainNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player) {
-        super(Containers.GENERIC_9X5, containerId);
+        super(Containers.GENERIC_9X6, containerId);
         this.top = nmsInventory;
         this.bottom = playerInventory;
         this.player = player;
-        //setTitle(nmsInventory.getScoreboardDisplayName());
+        //setTitle(nmsInventory.getScoreboardDisplayName()); //setTitle is actually called when the thing actually opens. or something.
 
-        int actualTopSize = top.storageContents.size() + top.armourContents.size() + top.offHand.size();
+        int firstFiveRows = top.storageContents.size()
+                + top.armourContents.size()
+                + top.offHand.size()
+                + 1 /*cursor*/;
 
         //top inventory slots
-        for (int yPos = 0; yPos < 5; yPos++) {
+        for (int yPos = 0; yPos < 6; yPos++) {
             for (int xPos = 0; xPos < 9; xPos++) {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;
                 int magicY = 18 + yPos * 18;
-                if (index < actualTopSize) {
+                if (index < firstFiveRows) {
                     a(new Slot(top, index, magicX, magicY));
+                } else if (45 <= index && index < 54) {
+                    a(new PersonalSlot(top, index, magicX, magicY));
                 } else {
                     a(new InAccessibleSlot(top, index, magicX, magicY));
                 }
@@ -36,7 +41,7 @@ public class MainNmsContainer extends Container {
         }
 
         //bottom inventory slots
-        int magicAddY = (5 /*5 for 5 rows of the top inventory*/ - 4 /*4 for 4 rows of the bottom inventory??*/) * 18;
+        int magicAddY = (6 /*6 for 6 rows of the top inventory*/ - 4 /*4 for 4 rows of the bottom inventory??*/) * 18;
 
         //player 'storage'
         for (int yPos = 1; yPos < 4; yPos++) {
@@ -73,10 +78,11 @@ public class MainNmsContainer extends Container {
     @Override
     public ItemStack shiftClick(EntityHuman entityhuman, int rawIndex) {
         //returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
+        //remember that we are called inside the body of a loop!
 
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
         Slot slot = this.slots.get(rawIndex);
-        final int topRows = 5;
+        final int topRows = 6;
 
         if (slot != null && slot.hasItem()) {
             ItemStack clickedSlotItem = slot.getItem();

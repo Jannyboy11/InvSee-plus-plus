@@ -36,11 +36,11 @@ public class InvseeTabCompleter implements TabCompleter {
             String prefix = args[0];
             InvseeAPI api = plugin.getApi();
             Set<String> cached = api.getUuidCache().keySet();
-            return Stream.concat(sender.getServer().getOnlinePlayers().stream().map(Player::getName), cached.stream())
+            return List.copyOf(Stream.concat(sender.getServer().getOnlinePlayers().stream().map(Player::getName), cached.stream())
                     .filter(name -> StringHelper.startsWithIgnoreCase(name, prefix))
                     .distinct()
-                    .sorted(String.CASE_INSENSITIVE_ORDER)
-                    .collect(Collectors.toList());
+                    .sorted()
+                    .collect(Collectors.toCollection(() -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER))));
         }
 
         return List.of();

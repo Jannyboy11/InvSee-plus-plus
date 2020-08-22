@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
     <modules>
         <module>Mojang_API</module>
         <module>Spigot_Impl_1_16_R1</module>

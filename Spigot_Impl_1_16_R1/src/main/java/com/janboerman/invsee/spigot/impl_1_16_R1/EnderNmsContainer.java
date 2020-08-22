@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_16_R1;
 
 import net.minecraft.server.v1_16_R1.*;
+
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventoryView;
 import org.bukkit.inventory.InventoryView;
 
@@ -67,6 +68,7 @@ public class EnderNmsContainer extends Container {
     @Override
     public ItemStack shiftClick(EntityHuman entityhuman, int rawIndex) {
         //returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
+        //remember that we are called inside the body of a loop!
 
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
         Slot slot = this.slots.get(rawIndex);

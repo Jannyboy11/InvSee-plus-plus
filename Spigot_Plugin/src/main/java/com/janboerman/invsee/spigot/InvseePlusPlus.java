@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot;
 
+import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import org.bukkit.command.PluginCommand;

@@ -1,7 +1,8 @@
-package com.janboerman.invsee.spigot;
+package com.janboerman.invsee.paper;
 
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 
+import com.janboerman.invsee.spigot.InvseePlusPlus;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.utils.StringHelper;
 import org.bukkit.event.EventHandler;

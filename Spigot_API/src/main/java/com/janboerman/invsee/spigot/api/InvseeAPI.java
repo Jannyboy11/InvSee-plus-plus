@@ -21,8 +21,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -86,7 +86,7 @@ public abstract class InvseeAPI {
         pluginManager.registerEvents(new InventoryListener(), plugin);
 
         this.serverThreadExecutor = runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable);
-        this.asyncExecutor = runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable);
+        this.asyncExecutor = runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable);
     }
 
     public final void setMainInventoryTitleFactory(Function<Player, String> titleFactory) {
@@ -334,7 +334,7 @@ public abstract class InvseeAPI {
                     EnderSpectatorInventory oldSpectatorInventory = (EnderSpectatorInventory) topInventory;
                     if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
                         if (newEnderSpectator == null) {
-                            //this also update the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
+                            //this also updates the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
                             newEnderSpectator = spectateEnderChest(player, enderTitle);
                             newEnderSpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
                         }
@@ -392,7 +392,7 @@ public abstract class InvseeAPI {
     private final class InventoryListener implements Listener {
 
         @EventHandler
-        public void onClose(InventoryCloseEvent event) {
+        public void onSpectatorClose(InventoryCloseEvent event) {
             Inventory inventory = event.getInventory();
             if (inventory instanceof MainSpectatorInventory) {
                 MainSpectatorInventory spectatorInventory = (MainSpectatorInventory) inventory;
@@ -414,6 +414,27 @@ public abstract class InvseeAPI {
                         return null;
                     });
                 }
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onTargetOpen(InventoryOpenEvent event) {
+            HumanEntity target = event.getPlayer();
+            WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
+            MainSpectatorInventory spectatorInventory;
+            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) != null) {
+                //set the cursor reference and crafting inventory
+                spectatorInventory.watch(event.getView());
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onTargetClose(InventoryCloseEvent event) {
+            HumanEntity target = event.getPlayer();
+            WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
+            MainSpectatorInventory spectatorInventory;
+            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) != null) {
+                spectatorInventory.unwatch();
             }
         }
 

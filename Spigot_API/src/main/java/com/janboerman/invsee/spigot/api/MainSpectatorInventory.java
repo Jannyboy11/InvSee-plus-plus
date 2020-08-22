@@ -1,9 +1,14 @@
 package com.janboerman.invsee.spigot.api;
 
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 public interface MainSpectatorInventory extends Inventory, SpectatorInventory {
+
+    void watch(InventoryView targetPlayerView);
+
+    void unwatch();
 
     ItemStack[] getArmourContents();
 
@@ -12,5 +17,15 @@ public interface MainSpectatorInventory extends Inventory, SpectatorInventory {
     ItemStack[] getOffHandContents();
 
     void setOffHandContents(ItemStack[] offHand);
+
+    void setCursorContents(ItemStack cursor);
+
+    ItemStack getCursorContents();
+
+    void setPersonalContents(ItemStack[] craftingContents);
+
+    ItemStack[] getPersonalContents();
+
+    int getPersonalContentsSize();
 
 }

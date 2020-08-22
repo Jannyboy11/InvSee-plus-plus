@@ -15,6 +15,7 @@ import org.bukkit.craftbukkit.v1_16_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Optional;
@@ -35,13 +36,13 @@ public class InvseeImpl extends InvseeAPI {
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
-        UUID uuid = player.getUniqueId();
-        String name = player.getName();
-        CraftInventoryPlayer craftInventory = (CraftInventoryPlayer) player.getInventory();
-        PlayerInventory nmsInventory = craftInventory.getInventory();
-        MainNmsInventory spectatorInv = new MainNmsInventory(uuid, name, nmsInventory.items, nmsInventory.armor, nmsInventory.extraSlots, title);
+        MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), title);
         MainBukkitInventory bukkitInventory = new MainBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
+
+        InventoryView targetView = player.getOpenInventory();
+        bukkitInventory.watch(targetView);
+
         return bukkitInventory;
     }
 

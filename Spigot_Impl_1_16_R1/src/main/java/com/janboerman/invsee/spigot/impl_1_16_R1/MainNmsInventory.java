@@ -1,7 +1,9 @@
 package com.janboerman.invsee.spigot.impl_1_16_R1;
 
 import com.janboerman.invsee.utils.ConcatList;
-import com.janboerman.invsee.utils.Pair;
+import com.janboerman.invsee.utils.Ref;
+import com.janboerman.invsee.utils.SingletonList;
+import static com.janboerman.invsee.spigot.impl_1_16_R1.InvseeImpl.EMPTY_STACK;
 import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftHumanEntity;
@@ -17,10 +19,14 @@ public class MainNmsInventory extends TileEntityContainer {
     private static final TileEntityTypes TileEntityTypeFakePlayerInventory = new TileEntityTypes(MainNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.EmptyPart());
 
     protected final UUID spectatedPlayerUuid;
+    protected final String spectatedPlayerName;
     protected final NonNullList<ItemStack> storageContents;
     protected final NonNullList<ItemStack> armourContents;
     protected final NonNullList<ItemStack> offHand;
-    protected final String spectatedPlayerName;
+
+    protected final Ref<ItemStack> onCursor;
+    protected final List<ItemStack> playerCraftingContents;
+    protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
     protected Inventory bukkit;
     protected String title;
@@ -36,46 +42,79 @@ public class MainNmsInventory extends TileEntityContainer {
         storageContents = null;
         armourContents = null;
         offHand = null;
+        onCursor = null;
+        playerCraftingContents = null;
     }
 
-    protected MainNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand) {
+    protected MainNmsInventory(EntityHuman target) {
         // Possibly could've used TileEntityTypes.CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
         super(TileEntityTypeFakePlayerInventory);
-        this.spectatedPlayerUuid = spectatedPlayerUuid;
-        this.spectatedPlayerName = spectatedPlayerName;
-        this.storageContents = storageContents;
-        this.armourContents = armourContents;
-        this.offHand = offHand;
+        this.spectatedPlayerUuid = target.getUniqueID();
+        this.spectatedPlayerName = target.getName();
+        PlayerInventory inv = target.inventory;
+        this.storageContents = inv.items;
+        this.armourContents = inv.armor;
+        this.offHand = inv.extraSlots;
+        this.onCursor = new Ref<>() {
+            @Override
+            public void set(ItemStack item) {
+                inv.setCarried(item);
+            }
+
+            @Override
+            public ItemStack get() {
+                return inv.getCarried();
+            }
+        };
+        this.personalContents = this.playerCraftingContents = target.defaultContainer.j().getContents(); //luckily getContents() does not copy
     }
 
-    protected MainNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, NonNullList<ItemStack> armourContents, NonNullList<ItemStack> offHand, String title) {
-        this(spectatedPlayerUuid, spectatedPlayerName, storageContents, armourContents, offHand);
+    protected MainNmsInventory(EntityHuman target, String title) {
+        this(target);
+
         this.title = title;
         this.setCustomName(CraftChatMessage.fromStringOrNull(title));
     }
 
-    private Pair<Integer, NonNullList<ItemStack>> decideWhichInv(int slot) {
-        if (0 <= slot && slot < storageContents.size()) {
-            return new Pair<>(slot, storageContents);
-        } else if (slot < storageContents.size() + armourContents.size()) {
-            return new Pair<>(slot - storageContents.size(), armourContents);
-        } else if (slot < storageContents.size() + armourContents.size() + offHand.size()) {
-            return new Pair<>(slot - storageContents.size() - armourContents.size(), offHand);
-        } else {
-            return null;
+    private Ref<ItemStack> decideWhichItem(int slot) {
+        int storageSize = storageContents.size();
+        if (0 <= slot && slot < storageSize) {
+            int idx = slot;
+            return Ref.ofList(idx, storageContents);
         }
+
+        int armourSize = armourContents.size();
+        if (storageSize <= slot && slot < storageSize + armourSize) {
+            int idx = slot - storageSize;
+            return Ref.ofList(idx, armourContents);
+        }
+
+        int offhandSize = offHand.size();
+        if (storageSize + armourSize <= slot && slot < storageSize + armourSize + offhandSize) {
+            int idx = slot - storageSize - armourSize;
+            return Ref.ofList(idx, offHand);
+        }
+
+        if (storageSize + armourSize + offhandSize == slot) {
+            return onCursor;
+        }
+
+        if (45 <= slot && slot < 54) {
+            int idx = slot - 45;
+            if (idx < personalContents.size()) {
+                return Ref.ofList(idx, personalContents);
+            }
+        }
+
+        return null;
     }
 
     @Override
     public int getSize() {
-        int size = storageContents.size() + armourContents.size() + offHand.size();
-        int remainder = size % 9;
-        if (remainder != 0) {
-            size += (9 - remainder);
-        }
-        return size;
+        //includes the non-interactable slots
+        return 54;
     }
 
     @Override
@@ -89,55 +128,60 @@ public class MainNmsInventory extends TileEntityContainer {
         for (ItemStack stack : offHand) {
             if (!stack.isEmpty()) return false;
         }
+        for (ItemStack stack : personalContents) {
+            if (!stack.isEmpty()) return false;
+        }
+        if (!onCursor.get().isEmpty()) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public ItemStack getItem(int slot) {
-        var pair = decideWhichInv(slot);
-        if (pair == null) return InvseeImpl.EMPTY_STACK;
+        Ref<ItemStack> ref = decideWhichItem(slot);
+        if (ref == null) return EMPTY_STACK;
 
-        return pair.getSecond().get(pair.getFirst());
+        return ref.get();
     }
 
     @Override
     public ItemStack splitStack(int slot, int subtractAmount) {
-        var pair = decideWhichInv(slot);
-        if (pair == null) return InvseeImpl.EMPTY_STACK;
+        Ref<ItemStack> ref = decideWhichItem(slot);
+        if (ref == null) return EMPTY_STACK;
 
-        ItemStack stack = ContainerUtil.a(pair.getSecond(), pair.getFirst(), subtractAmount);
-        if (!stack.isEmpty()) {
-            update();
+        ItemStack stack = ref.get();
+        if (!stack.isEmpty() && subtractAmount > 0) {
+            ItemStack oldStackCopy = ref.get().cloneAndSubtract(subtractAmount);
+            if (!oldStackCopy.isEmpty()) {
+                update();
+            }
+            return oldStackCopy;
+        } else {
+            return EMPTY_STACK;
         }
-        return stack;
     }
 
     @Override
     public ItemStack splitWithoutUpdate(int slot) {
-        var pair = decideWhichInv(slot);
-        if (pair == null) return InvseeImpl.EMPTY_STACK;
+        Ref<ItemStack> ref = decideWhichItem(slot);
+        if (ref == null) return EMPTY_STACK;
 
-        slot = pair.getFirst();
-        var items = pair.getSecond();
-
-        var stack = items.get(slot);
+        ItemStack stack = ref.get();
         if (stack.isEmpty()) {
-            return InvseeImpl.EMPTY_STACK;
+            return EMPTY_STACK;
         } else {
-            items.set(slot, InvseeImpl.EMPTY_STACK);
+            ref.set(EMPTY_STACK);
             return stack;
         }
     }
 
     @Override
     public void setItem(int slot, ItemStack itemStack) {
-        var pair = decideWhichInv(slot);
-        if (pair == null) return;
+        Ref<ItemStack> ref = decideWhichItem(slot);
+        if (ref == null) return;
 
-        slot = pair.getFirst();
-        var items = pair.getSecond();
-
-        items.set(slot, itemStack);
+        ref.set(itemStack);
         if (!itemStack.isEmpty() && itemStack.getCount() > getMaxStackSize()) {
             itemStack.setCount(getMaxStackSize());
         }
@@ -154,6 +198,14 @@ public class MainNmsInventory extends TileEntityContainer {
     public void update() {
         //called after an item in the inventory was removed, added or updated.
         //looking at InventorySubContainer, I don't think we need to do anything here.
+
+        //but we might want to update our viewers? cause of the craftingOrWorkbench switching thing?
+        //in that case, we only need to update those specific slots, not the entire inventory.
+//        for (HumanEntity viewer : getViewers()) {
+//            if (viewer instanceof Player) {
+//                ((Player) viewer).updateInventory();
+//            }
+//        }
     }
 
     @Override
@@ -163,9 +215,16 @@ public class MainNmsInventory extends TileEntityContainer {
 
     @Override
     public List<ItemStack> getContents() {
-        ConcatList<ItemStack> contents = new ConcatList<>(storageContents, new ConcatList<>(armourContents, offHand));
-        ConcatList<ItemStack> padded = new ConcatList<>(contents, NonNullList.a(getSize() - contents.size(), InvseeImpl.EMPTY_STACK));
-        return padded;
+        List<ItemStack> paddingOne = NonNullList.a(45 - storageContents.size() - armourContents.size() - offHand.size() - 1, EMPTY_STACK);
+        List<ItemStack> paddingTwo = NonNullList.a(9 - personalContents.size(), EMPTY_STACK);
+
+        return new ConcatList<>(storageContents,
+                new ConcatList<>(armourContents,
+                        new ConcatList<>(offHand,
+                                new ConcatList<>(new SingletonList<>(onCursor),
+                                        new ConcatList<>(paddingOne,
+                                                new ConcatList<>(personalContents,
+                                                        paddingTwo))))));
     }
 
     @Override
@@ -203,6 +262,8 @@ public class MainNmsInventory extends TileEntityContainer {
         storageContents.clear();
         armourContents.clear();
         offHand.clear();
+        onCursor.set(EMPTY_STACK);
+        playerCraftingContents.clear();
     }
 
     @Override

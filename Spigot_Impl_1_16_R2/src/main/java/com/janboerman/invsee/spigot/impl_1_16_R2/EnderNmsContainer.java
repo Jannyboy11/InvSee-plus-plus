@@ -68,6 +68,7 @@ public class EnderNmsContainer extends Container {
     @Override
     public ItemStack shiftClick(EntityHuman entityhuman, int rawIndex) {
         //returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
+        //remember that we are called inside the body of a loop!
 
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
         Slot slot = this.slots.get(rawIndex);
