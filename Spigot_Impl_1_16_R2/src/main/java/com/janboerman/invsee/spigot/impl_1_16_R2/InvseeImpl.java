@@ -74,6 +74,8 @@ public class InvseeImpl extends InvseeAPI {
             currentInv.setStorageContents(newInv.getStorageContents());
             currentInv.setArmourContents(newInv.getArmourContents());
             currentInv.setOffHandContents(newInv.getOffHandContents());
+            currentInv.setCursorContents(newInv.getCursorContents());
+            currentInv.setPersonalContents(newInv.getPersonalContents());
         });
     }
 

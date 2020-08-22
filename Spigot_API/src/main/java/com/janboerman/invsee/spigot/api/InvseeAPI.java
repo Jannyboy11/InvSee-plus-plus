@@ -325,6 +325,8 @@ public abstract class InvseeAPI {
                             newInventorySpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
                             newInventorySpectator.setArmourContents(oldSpectatorInventory.getArmourContents());
                             newInventorySpectator.setOffHandContents(oldSpectatorInventory.getOffHandContents());
+                            newInventorySpectator.setCursorContents(oldSpectatorInventory.getCursorContents());
+                            newInventorySpectator.setPersonalContents(oldSpectatorInventory.getPersonalContents());
                         }
 
                         online.closeInventory();
