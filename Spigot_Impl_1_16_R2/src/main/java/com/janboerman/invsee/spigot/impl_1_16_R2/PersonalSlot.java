@@ -16,7 +16,7 @@ public class PersonalSlot extends Slot {
     private boolean works() {
         MainNmsInventory inv = (MainNmsInventory) inventory;
         int personalSize = inv.personalContents.size();
-        boolean inRange = personalSize + 45 < index;
+        boolean inRange = index < 45 + personalSize;
         return inRange;
     }
 
