@@ -273,7 +273,7 @@ public class MainNmsInventory extends TileEntityContainer {
 
     @Override
     protected IChatBaseComponent getContainerName() {
-        return new ChatMessage("minecraft:generic_9x5");
+        return new ChatMessage("minecraft:generic_9x6");
     }
 
     @Override

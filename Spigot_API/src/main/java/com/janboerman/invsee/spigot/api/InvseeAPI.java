@@ -109,6 +109,8 @@ public abstract class InvseeAPI {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R1.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R2.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R2.InvseeImpl").getConstructor(Plugin.class);
+            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
+                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl").getConstructor(Plugin.class);
             }
             //make a bunch of else-ifs here for future minecraft versions.
 
@@ -401,8 +403,10 @@ public abstract class InvseeAPI {
                 if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayerId()) == null) {
                     //spectated player is no longer online
                     saveInventory(spectatorInventory).whenComplete((voidResult, throwable) -> {
-                        plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
-                        event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory.");
+                        if (throwable != null) {
+                            plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
+                            event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory.");
+                        }
                     });
                 }
             } else if (inventory instanceof EnderSpectatorInventory) {
@@ -410,8 +414,10 @@ public abstract class InvseeAPI {
                 if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayerId()) == null) {
                     //spectated player is no longer online
                     saveEnderChest(spectatorInventory).whenComplete((voidResult, throwable) -> {
-                        plugin.getLogger().log(Level.SEVERE, "Error while saving offline enderchest", throwable);
-                        event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the enderchest.");
+                        if (throwable != null) {
+                            plugin.getLogger().log(Level.SEVERE, "Error while saving offline enderchest", throwable);
+                            event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the enderchest.");
+                        }
                     });
                 }
             }

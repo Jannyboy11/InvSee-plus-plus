@@ -1,16 +1,13 @@
-package com.janboerman.invsee.spigot.impl_1_16_R2;
+package com.janboerman.invsee.spigot.impl_1_15_R1;
 
 import com.janboerman.invsee.utils.ConcatList;
-
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
-import net.minecraft.server.v1_16_R2.*;
-
-import static com.janboerman.invsee.spigot.impl_1_16_R2.InvseeImpl.EMPTY_STACK;
-
+import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_16_R2.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -20,9 +17,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl.EMPTY_STACK;
+
 public class MainNmsInventory extends TileEntityContainer {
 
-    private static final TileEntityTypes TileEntityTypeFakePlayerInventory = new TileEntityTypes(MainNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.EmptyPart());
+    private static final TileEntityTypes TileEntityTypeFakePlayerInventory = new TileEntityTypes(MainNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.NilSave());
 
     protected final UUID spectatedPlayerUuid;
     protected final String spectatedPlayerName;
@@ -74,7 +73,8 @@ public class MainNmsInventory extends TileEntityContainer {
                 return inv.getCarried();
             }
         };
-        this.personalContents = this.playerCraftingContents = target.defaultContainer.j().getContents(); //luckily getContents() does not copy
+        IInventory /*InventoryCrafting*/ playerCrafting = ((CraftInventory) target.defaultContainer.getBukkitView().getTopInventory()).getInventory();
+        this.personalContents = this.playerCraftingContents = playerCrafting.getContents();
     }
 
     protected MainNmsInventory(EntityHuman target, String title) {

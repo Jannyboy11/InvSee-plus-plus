@@ -47,7 +47,6 @@ public class MojangAPI {
                 .newBuilder(URI.create("https://api.mojang.com/users/profiles/minecraft/" + username))
                 .header("Accept", "application/json")
                 .header("User-Agent", "InvSee++/MojangAPI")
-                .header("Connection", "close")
                 .timeout(Duration.ofSeconds(5))
                 .build(), HttpResponse.BodyHandlers.ofInputStream());
 

@@ -3,7 +3,7 @@ main: com.janboerman.invsee.spigot.InvseePlusPlus
 author: Jannyboy11
 version: ${project.version}
 description: ${project.description}
-api-version: 1.16
+api-version: 1.15
 website: ${project.url}
 prefix: "InvSee++"
 

@@ -30,6 +30,10 @@ public interface OfflinePlayerProvider {
                     implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R2.KnownPlayersProvider");
                     ctor = implementationClass.getConstructor(Plugin.class);
                     offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
+                } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
+                    implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_15_R1.KnownPlayersProvider");
+                    ctor = implementationClass.getConstructor(Plugin.class);
+                    offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
                 }
                 //add a bunch of else-if's here in future minecraft versions
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {

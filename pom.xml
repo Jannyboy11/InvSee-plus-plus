@@ -8,12 +8,13 @@
     <artifactId>InvSee</artifactId>
     <version>0.5-SNAPSHOT</version>
     <modules>
+        <module>Utils</module>
         <module>Mojang_API</module>
+        <module>Spigot_Impl_1_15_R1</module>
         <module>Spigot_Impl_1_16_R1</module>
         <module>Spigot_Impl_1_16_R2</module>
         <module>Spigot_API</module>
         <module>Spigot_Plugin</module>
-        <module>Utils</module>
     </modules>
     <packaging>pom</packaging>
 
