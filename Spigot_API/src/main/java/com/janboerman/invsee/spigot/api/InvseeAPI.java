@@ -292,7 +292,7 @@ public abstract class InvseeAPI {
 
     private final class PlayerListener implements Listener {
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.LOW)
         public void onJoin(PlayerJoinEvent event) {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
@@ -350,7 +350,7 @@ public abstract class InvseeAPI {
             uuidCache.remove(userName, uuid);
         }
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.MONITOR)
         public void onQuit(PlayerQuitEvent event) {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
@@ -393,27 +393,25 @@ public abstract class InvseeAPI {
 
     private final class InventoryListener implements Listener {
 
-        @EventHandler
+        @EventHandler(priority = EventPriority.MONITOR)
         public void onSpectatorClose(InventoryCloseEvent event) {
             Inventory inventory = event.getInventory();
             if (inventory instanceof MainSpectatorInventory) {
                 MainSpectatorInventory spectatorInventory = (MainSpectatorInventory) inventory;
                 if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayerId()) == null) {
                     //spectated player is no longer online
-                    saveInventory(spectatorInventory).exceptionally(throwable -> {
+                    saveInventory(spectatorInventory).whenComplete((voidResult, throwable) -> {
                         plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
                         event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory.");
-                        return null;
                     });
                 }
             } else if (inventory instanceof EnderSpectatorInventory) {
                 EnderSpectatorInventory spectatorInventory = (EnderSpectatorInventory) inventory;
                 if (event.getPlayer().getServer().getPlayer(spectatorInventory.getSpectatedPlayerId()) == null) {
                     //spectated player is no longer online
-                    saveEnderChest(spectatorInventory).exceptionally(throwable -> {
+                    saveEnderChest(spectatorInventory).whenComplete((voidResult, throwable) -> {
                         plugin.getLogger().log(Level.SEVERE, "Error while saving offline enderchest", throwable);
                         event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the enderchest.");
-                        return null;
                     });
                 }
             }
