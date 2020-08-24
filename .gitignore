@@ -6,6 +6,7 @@
 target/*
 Mojang_API/target/*
 Spigot_API/target/*
+Spigot_PerWorldInventory/target/*
 Spigot_Impl_1_15_R1/target/*
 Spigot_Impl_1_16_R1/target/*
 Spigot_Impl_1_16_R2/target/*
