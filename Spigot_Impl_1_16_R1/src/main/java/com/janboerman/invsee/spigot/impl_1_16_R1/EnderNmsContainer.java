@@ -10,18 +10,32 @@ public class EnderNmsContainer extends Container {
     private final EntityHuman player;
     private final EnderNmsInventory top;
     private final IInventory bottom;
+    private final int topRows;
 
     private InventoryView bukkitView;
 
+    private static Containers determineContainerType(EnderNmsInventory inv) {
+        switch (inv.getSize()) {
+            case 9: return Containers.GENERIC_9X1;
+            case 18: return Containers.GENERIC_9X2;
+            case 27: return Containers.GENERIC_9X3;
+            case 36: return Containers.GENERIC_9X4;
+            case 45: return Containers.GENERIC_9X5;
+            case 54: return Containers.GENERIC_9X6;
+        }
+        return Containers.GENERIC_9X3;
+    }
+
     public EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player) {
-        super(Containers.GENERIC_9X3, containerId);
+        super(determineContainerType(nmsInventory), containerId);
+        this.topRows = nmsInventory.getSize() / 9;
         this.player = player;
         this.top = nmsInventory;
         this.bottom = playerInventory;
         //setTitle(nmsInventory.getScoreboardDisplayName());
 
         //top inventory slots
-        for (int yPos = 0; yPos < 3; yPos++) {
+        for (int yPos = 0; yPos < topRows; yPos++) {
             for (int xPos = 0; xPos < 9; xPos++) {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;
@@ -31,7 +45,7 @@ public class EnderNmsContainer extends Container {
         }
 
         //bottom inventory slots
-        int magicAddY = (3 /*3 for 3 rows of the top inventory*/ - 4 /*4 for 4 rows of the bottom inventory??*/) * 18;
+        int magicAddY = (topRows - 4 /*4 for 4 rows of the bottom inventory??*/) * 18;
 
         //player 'storage'
         for (int yPos = 1; yPos < 4; yPos++) {
@@ -72,7 +86,6 @@ public class EnderNmsContainer extends Container {
 
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
         Slot slot = this.slots.get(rawIndex);
-        final int topRows = 3;
 
         if (slot != null && slot.hasItem()) {
             ItemStack clickedSlotItem = slot.getItem();

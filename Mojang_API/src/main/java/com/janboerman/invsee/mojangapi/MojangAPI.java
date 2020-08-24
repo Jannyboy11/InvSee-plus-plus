@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -94,7 +93,7 @@ public class MojangAPI {
                         String error = (String) jsonObject.get("error");
                         String errorMessage = (String) jsonObject.get("errorMessage");
 
-                        throw new RuntimeException("We sent a bad request to Mojang. We a(n) " + error + " with the following message: " + errorMessage);
+                        throw new RuntimeException("We sent a bad request to Mojang. We got a(n) " + error + " with the following message: " + errorMessage);
                     } else {
                         throw new RuntimeException("Expected bad request response json to be a JSON Object, instead we got: " + json);
                     }

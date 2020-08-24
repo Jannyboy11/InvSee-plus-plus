@@ -21,7 +21,9 @@ Do you like this plugin? Then please leave a rating on [SpigotMC](https://www.sp
 1. Install Spigot into your local repository first by running BuildTools with
     - `java -jar BuildTools.jar --rev 1.16.1`
     - `java -jar BuildTools.jar --rev 1.16.2`
-2. In the root directory of the project run `mvn clean package`.
+2. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/EbonJaeger/perworldinventory-kt)
+and running `mvn clean install -DskipTests=true` in its root directory. 
+3. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at Spigot_Plugin/target/InvSee++.jar.
 
 ### License

@@ -6,6 +6,7 @@ description: ${project.description}
 api-version: 1.15
 website: ${project.url}
 prefix: "InvSee++"
+softdepend: [PerWorldInventory]
 
 commands:
   invsee:
