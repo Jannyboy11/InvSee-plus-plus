@@ -50,6 +50,7 @@ public class FakePlayer implements Player {
     private Location compassTarget;
     private Location location;
     private int fireTicks;
+    private boolean persistent;
     private Entity passenger;
     private Entity vehicle;
     private float fallDistance;
@@ -108,8 +109,10 @@ public class FakePlayer implements Player {
     private final PermissibleBase permissible;
     private boolean operator;
     private PersistentDataContainer persistentDataContainer;
+    private final FakeInventory enderChest;
+    private final FakePlayerInventory inventory;
 
-    public FakePlayer(Plugin plugin, UUID uniqueId, String name, Server server) {
+    public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
         this.name = name;
         this.server = server;
@@ -118,6 +121,8 @@ public class FakePlayer implements Player {
         setGameMode(server.getDefaultGameMode());
         resetMaxHealth();
         this.permissible = new PermissibleBase(this);
+        this.enderChest = new FakeInventory(InventoryType.ENDER_CHEST, new ItemStack[27], this);
+        this.inventory = new FakePlayerInventory(new ItemStack[9 * 4 + 4 + 1], this);
     }
 
     @NotNull
@@ -392,11 +397,12 @@ public class FakePlayer implements Player {
 
     @Override
     public boolean isPersistent() {
-        return false;
+        return persistent;
     }
 
     @Override
     public void setPersistent(boolean b) {
+        this.persistent = b;
     }
 
     @Nullable
@@ -641,12 +647,12 @@ public class FakePlayer implements Player {
 
     @Override
     public void saveData() {
-        //TODO do the PlayerProfile lookup thing:)
+        //TODO do the PlayerProfile lookup thing?? I think this is not necessary though.
     }
 
     @Override
     public void loadData() {
-        //TODO do the PlayerProfile lookup thing:)
+        //TODO do the PlayerProfile lookup thing?? I think this is not necessary though.
     }
 
     @Override
@@ -1253,15 +1259,13 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public PlayerInventory getInventory() {
-        //TODO!
-        return null;
+        return inventory;
     }
 
     @NotNull
     @Override
     public Inventory getEnderChest() {
-        //TODO!
-        return null;
+        return enderChest;
     }
 
     @NotNull
@@ -1518,12 +1522,22 @@ public class FakePlayer implements Player {
 
     @Override
     public double getEyeHeight() {
-        return 1.5; //TODO is this correct?
+        //not sure whether this is correct but whatever!
+        if (isSneaking()) {
+            return 1.3;
+        } else if (isSwimming() || isGliding()) {
+            return 0.1;
+        }
+        return 1.5;
     }
 
     @Override
     public double getEyeHeight(boolean b) {
-        return 1.5;
+        if (b) {
+            return getEyeHeight();
+        } else {
+            return 1.5; //not sure!
+        }
     }
 
     @NotNull
@@ -1698,8 +1712,7 @@ public class FakePlayer implements Player {
     @Nullable
     @Override
     public EntityEquipment getEquipment() {
-        //TODO!!
-        return null;
+        return inventory;
     }
 
     @Override

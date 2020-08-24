@@ -1,6 +1,10 @@
+com\janboerman\invsee\spigot\perworldinventory\FakePlayerInventory.class
+com\janboerman\invsee\spigot\perworldinventory\FakePlayerInventory$1.class
 com\janboerman\invsee\spigot\perworldinventory\PerWorldInventoryHook.class
-com\janboerman\invsee\spigot\perworldinventory\FakePlayer.class
 com\janboerman\invsee\spigot\perworldinventory\FakePersistentDataAdapterContext.class
-com\janboerman\invsee\spigot\perworldinventory\FakePersistentDataContainer.class
 com\janboerman\invsee\spigot\perworldinventory\InvseeImplPWI.class
+com\janboerman\invsee\spigot\perworldinventory\FakePlayer.class
+com\janboerman\invsee\spigot\perworldinventory\FakePersistentDataContainer.class
+com\janboerman\invsee\spigot\perworldinventory\FakeInventory$1.class
+com\janboerman\invsee\spigot\perworldinventory\FakeInventory.class
 com\janboerman\invsee\spigot\perworldinventory\FakePlayer$1.class

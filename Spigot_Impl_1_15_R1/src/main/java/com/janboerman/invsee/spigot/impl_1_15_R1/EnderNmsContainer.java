@@ -9,7 +9,7 @@ public class EnderNmsContainer extends Container {
     private final EntityHuman player;
     private final EnderNmsInventory top;
     private final IInventory bottom;
-    private final int topRows;
+    private final int topRows;  //https://github.com/pl3xgaming/Purpur a fork of paper that has configurable rows for the enderchest inventory
 
     private InventoryView bukkitView;
 

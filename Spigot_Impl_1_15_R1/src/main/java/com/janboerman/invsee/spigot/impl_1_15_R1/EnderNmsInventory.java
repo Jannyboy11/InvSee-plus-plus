@@ -170,7 +170,7 @@ class EnderNmsInventory extends TileEntityContainer {
 
     @Override
     protected IChatBaseComponent getContainerName() {
-        return new ChatMessage("minecraft:generic_9x" + (getSize() / 9));
+        return new ChatMessage("minecraft:generic_9x" + (storageContents.size() / 9));
     }
 
     @Override
