@@ -14,7 +14,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 
-//TODO implement this!!!!
 public class FakePlayerInventory extends FakeInventory implements PlayerInventory, EntityEquipment {
 
     private float itemInHandDropChance, itemInMainHandDropChance, itemInOffHandDropChance;
@@ -55,13 +54,13 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
     @NotNull
     @Override
     public ItemStack[] getArmorContents() {
-        return Arrays.copyOfRange(getContents(), 36, 41);
+        return Arrays.copyOfRange(getContents(), 36, 40);
     }
 
     @NotNull
     @Override
     public ItemStack[] getExtraContents() {
-        return Arrays.copyOfRange(getContents(), 41, 42);
+        return Arrays.copyOfRange(getContents(), 40, 41);
     }
 
     @Override
@@ -153,7 +152,7 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
 
     @Override
     public void setArmorContents(@Nullable ItemStack[] itemStacks) {
-        System.arraycopy(itemStacks, 0, items, 37, 4);
+        System.arraycopy(itemStacks, 0, items, 36, 4);
     }
 
     @NotNull
