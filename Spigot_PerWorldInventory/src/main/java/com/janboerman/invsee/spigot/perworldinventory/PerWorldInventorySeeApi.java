@@ -66,7 +66,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     @Override
     public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
         Location logoutLocation = pwiHook.getDataSource().getLogout(new FakePlayer(playerId, playerName, plugin.getServer()));
-        World world = logoutLocation.getWorld();
+        World world = logoutLocation != null ? logoutLocation.getWorld() : plugin.getServer().getWorlds().get(0);
         ProfileKey profileKey = new ProfileKey(playerId, pwiHook.getGroupForWorld(world.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
         var result = createOfflineInventory(playerId, playerName, title, profileKey);
         result.thenAccept(optInv -> optInv.ifPresent(inv -> inventoryWorlds.put(inv, world.getName())));
@@ -76,7 +76,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     @Override
     public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
         Location logoutLocation = pwiHook.getDataSource().getLogout(new FakePlayer(inventory.getSpectatedPlayerId(), inventory.getSpectatedPlayerName(), plugin.getServer()));
-        World world = logoutLocation.getWorld();
+        World world = logoutLocation != null ? logoutLocation.getWorld() : plugin.getServer().getWorlds().get(0);
         ProfileKey profileKey = new ProfileKey(inventory.getSpectatedPlayerId(), pwiHook.getGroupForWorld(world.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
         return saveInventory(inventory, profileKey);
     }
@@ -90,7 +90,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     @Override
     public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
         Location logoutLocation = pwiHook.getDataSource().getLogout(new FakePlayer(playerId, playerName, plugin.getServer()));
-        World world = logoutLocation.getWorld();
+        World world = logoutLocation != null ? logoutLocation.getWorld() : plugin.getServer().getWorlds().get(0);
         ProfileKey profileKey = new ProfileKey(playerId, pwiHook.getGroupForWorld(world.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
         var result = createOfflineEnderChest(playerId, playerName, title, profileKey);
         result.thenAccept(optInv -> optInv.ifPresent(inv -> inventoryWorlds.put(inv, world.getName())));
@@ -100,7 +100,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     @Override
     public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
         Location logoutLocation = pwiHook.getDataSource().getLogout(new FakePlayer(enderChest.getSpectatedPlayerId(), enderChest.getSpectatedPlayerName(), plugin.getServer()));
-        World world = logoutLocation.getWorld();
+        World world = logoutLocation != null ? logoutLocation.getWorld() : plugin.getServer().getWorlds().get(0);
         ProfileKey profileKey = new ProfileKey(enderChest.getSpectatedPlayerId(), pwiHook.getGroupForWorld(world.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
         return saveEnderChest(enderChest, profileKey);
     }

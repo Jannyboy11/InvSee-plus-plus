@@ -102,6 +102,7 @@ public class PwiCommandArgs {
 
         String lastProperty = properties[properties.length - 1];
         String bufferBeforeLastProperty = argument.substring(0, argument.length() - lastProperty.length());
+        //TODO fix: I think bufferBeforeLastProperty can contain the trailing comma.
 
         String[] propKeyValue = lastProperty.split("=", 2);
         if (propKeyValue.length == 0 || (propKeyValue.length == 1 && propKeyValue[0].isEmpty())) {

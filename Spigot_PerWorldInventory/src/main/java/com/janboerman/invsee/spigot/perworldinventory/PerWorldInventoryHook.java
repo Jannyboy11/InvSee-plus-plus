@@ -128,7 +128,7 @@ public class PerWorldInventoryHook {
         if (profileFactory != null) return profileFactory;
 
         try {
-            Field field = ProfileManager.class.getDeclaredField("profileFactor");
+            Field field = ProfileManager.class.getDeclaredField("profileFactory");
             field.setAccessible(true);
             return profileFactory = (ProfileFactory) field.get(getProfileManager());
         } catch (IllegalAccessException | NoSuchFieldException e) {

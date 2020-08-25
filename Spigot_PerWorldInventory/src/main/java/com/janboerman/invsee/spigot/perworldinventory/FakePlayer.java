@@ -111,6 +111,7 @@ public class FakePlayer implements Player {
     private PersistentDataContainer persistentDataContainer;
     private final FakeInventory enderChest;
     private final FakePlayerInventory inventory;
+    private final EnumMap<Attribute, AttributeInstance> attributes = new EnumMap<>(Attribute.class);
 
     public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
@@ -124,6 +125,24 @@ public class FakePlayer implements Player {
         this.enderChest = new FakeInventory(InventoryType.ENDER_CHEST, new ItemStack[27], this);
         this.inventory = new FakePlayerInventory(new ItemStack[9 * 4 + 4 + 1], this);
         this.clientViewDistance = server.getViewDistance();
+
+        registerAttribute(Attribute.GENERIC_MAX_HEALTH);
+        registerAttribute(Attribute.GENERIC_FOLLOW_RANGE);
+        registerAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+        registerAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
+        registerAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
+        registerAttribute(Attribute.GENERIC_ARMOR);
+        registerAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
+        //not yet present in 1.15.2
+        //registerAttribute(Attribute.GENERIC_ATTACK_KNOCKBACK);
+        registerAttribute(Attribute.GENERIC_ATTACK_SPEED);
+        registerAttribute(Attribute.GENERIC_LUCK);
+    }
+
+    private AttributeInstance registerAttribute(Attribute attribute) {
+        AttributeInstance instance = new FakeAttributeInstance(attribute);
+        attributes.put(attribute, instance);
+        return instance;
     }
 
     @NotNull
@@ -644,6 +663,11 @@ public class FakePlayer implements Player {
     @Override
     public void setSprinting(boolean b) {
         this.sprinting = b;
+        if (b) {
+            getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.15);
+        } else {
+            getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1);
+        }
     }
 
     @Override
@@ -1825,7 +1849,7 @@ public class FakePlayer implements Player {
     @Nullable
     @Override
     public AttributeInstance getAttribute(@NotNull Attribute attribute) {
-        return null;
+        return attributes.get(attribute);
     }
 
     @Override
