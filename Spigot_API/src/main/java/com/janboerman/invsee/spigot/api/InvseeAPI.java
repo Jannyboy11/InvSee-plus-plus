@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.logging.Level;
 
@@ -65,6 +66,9 @@ public abstract class InvseeAPI {
     private Function<Player, String> mainSpectatorInvTitleProvider = player -> player.getName() + "'s inventory";
     private Function<Player, String> enderSpectatorInvTitleProvider = player -> player.getName() + "'s enderchest";
 
+    private BiPredicate<MainSpectatorInventory, Player> transferInvToLivePlayer = (spectatorInv, player) -> true;
+    private BiPredicate<EnderSpectatorInventory, Player> transferEnderToLivePlayer = (spectatorInv, player) -> true;
+
     public final Executor serverThreadExecutor;
     public final Executor asyncExecutor;
 
@@ -94,9 +98,19 @@ public abstract class InvseeAPI {
         this.mainSpectatorInvTitleProvider = titleFactory;
     }
 
-    public void setEnderInventoryTitleFactory(Function<Player, String> titleFactory) {
+    public final void setEnderInventoryTitleFactory(Function<Player, String> titleFactory) {
         Objects.requireNonNull(titleFactory);
         this.enderSpectatorInvTitleProvider = titleFactory;
+    }
+
+    public final void setMainInventoryTransferPredicate(BiPredicate<MainSpectatorInventory, Player> bip) {
+        Objects.requireNonNull(bip);
+        this.transferInvToLivePlayer = bip;
+    }
+
+    public final void setEnderChestTransferPredicate(BiPredicate<EnderSpectatorInventory, Player> bip) {
+        Objects.requireNonNull(bip);
+        this.transferEnderToLivePlayer = bip;
     }
 
     public static InvseeAPI setup(Plugin plugin) {
@@ -154,12 +168,12 @@ public abstract class InvseeAPI {
     }
 
     public abstract MainSpectatorInventory spectateInventory(HumanEntity player, String title);
-    protected abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title);
-    protected abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
+    public abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title);
+    public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
     public abstract EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title);
-    protected abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
-    protected abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
+    public abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
+    public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
     public CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(String userName, String title) {
         Objects.requireNonNull(userName, "userName cannot be null!");
@@ -320,27 +334,31 @@ public abstract class InvseeAPI {
                 Inventory topInventory = online.getOpenInventory().getTopInventory();
                 if (topInventory instanceof MainSpectatorInventory) {
                     MainSpectatorInventory oldSpectatorInventory = (MainSpectatorInventory) topInventory;
-                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
-                        if (newInventorySpectator == null) {
-                            newInventorySpectator = spectateInventory(player, mainTitle);
-                            //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
-                            newInventorySpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
-                            newInventorySpectator.setArmourContents(oldSpectatorInventory.getArmourContents());
-                            newInventorySpectator.setOffHandContents(oldSpectatorInventory.getOffHandContents());
-                            newInventorySpectator.setCursorContents(oldSpectatorInventory.getCursorContents());
-                            newInventorySpectator.setPersonalContents(oldSpectatorInventory.getPersonalContents());
-                        }
+                    if (transferInvToLivePlayer.test(oldSpectatorInventory, player)) {
+                        if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
+                            if (newInventorySpectator == null) {
+                                newInventorySpectator = spectateInventory(player, mainTitle);
+                                //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
+                                newInventorySpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
+                                newInventorySpectator.setArmourContents(oldSpectatorInventory.getArmourContents());
+                                newInventorySpectator.setOffHandContents(oldSpectatorInventory.getOffHandContents());
+                                newInventorySpectator.setCursorContents(oldSpectatorInventory.getCursorContents());
+                                newInventorySpectator.setPersonalContents(oldSpectatorInventory.getPersonalContents());
+                            }
 
-                        online.closeInventory();
-                        online.openInventory(newInventorySpectator);
+                            online.closeInventory();
+                            online.openInventory(newInventorySpectator);
+                        }
                     }
                 } else if (topInventory instanceof EnderSpectatorInventory) {
                     EnderSpectatorInventory oldSpectatorInventory = (EnderSpectatorInventory) topInventory;
-                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
-                        if (newEnderSpectator == null) {
-                            //this also updates the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
-                            newEnderSpectator = spectateEnderChest(player, enderTitle);
-                            newEnderSpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
+                    if (transferEnderToLivePlayer.test(oldSpectatorInventory, player)) {
+                        if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
+                            if (newEnderSpectator == null) {
+                                //this also updates the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
+                                newEnderSpectator = spectateEnderChest(player, enderTitle);
+                                newEnderSpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
+                            }
                         }
                     }
 
@@ -364,7 +382,7 @@ public abstract class InvseeAPI {
                 if (inv != null) {
                     boolean open = false;
                     for (Player online : player.getServer().getOnlinePlayers()) {
-                        if (online.getOpenInventory().getTopInventory() == inv) {
+                        if (online.getOpenInventory().getTopInventory().equals(inv)) {
                             open = true;
                             break;
                         }
@@ -380,7 +398,7 @@ public abstract class InvseeAPI {
                 if (ender != null) {
                     boolean open = false;
                     for (Player online : player.getServer().getOnlinePlayers()) {
-                        if (online.getOpenInventory().getTopInventory() == ender) {
+                        if (online.getOpenInventory().getTopInventory().equals(ender)) {
                             open = true;
                             break;
                         }

@@ -25,7 +25,7 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
 
     private int mainHandIndex;
 
-    public FakePlayerInventory(ItemStack[] items /*length 41*/, HumanEntity player) {
+    public FakePlayerInventory(ItemStack[] items, HumanEntity player) {
         super(InventoryType.PLAYER, items, player);
         assert items.length == 41 : "player inventory items length must equal 41!";
     }
@@ -54,13 +54,13 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
     @NotNull
     @Override
     public ItemStack[] getArmorContents() {
-        return Arrays.copyOfRange(getContents(), 36, 40);
+        return Arrays.copyOfRange(items, 36, 40);
     }
 
     @NotNull
     @Override
     public ItemStack[] getExtraContents() {
-        return Arrays.copyOfRange(getContents(), 40, 41);
+        return Arrays.copyOfRange(items, 40, 41);
     }
 
     @Override
@@ -181,14 +181,14 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
 
     @Override
     public void forEach(Consumer<? super ItemStack> action) {
-        for (ItemStack itemStack : getContents()) {
+        for (ItemStack itemStack : items) {
             action.accept(itemStack);
         }
     }
 
     @Override
     public Spliterator<ItemStack> spliterator() {
-        return Spliterators.spliterator(getContents(), Spliterator.ORDERED);
+        return Spliterators.spliterator(items, Spliterator.ORDERED);
     }
 
     @Override

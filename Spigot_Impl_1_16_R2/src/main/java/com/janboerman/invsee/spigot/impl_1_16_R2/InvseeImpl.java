@@ -59,17 +59,17 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    protected CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID player, String name, String title) {
+    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID player, String name, String title) {
         return createOffline(player, name, title, this::spectateInventory);
     }
 
     @Override
-    protected CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String name, String title) {
+    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String name, String title) {
         return createOffline(player, name, title, this::spectateEnderChest);
     }
 
     @Override
-    protected CompletableFuture<Void> saveInventory(MainSpectatorInventory newInventory) {
+    public CompletableFuture<Void> saveInventory(MainSpectatorInventory newInventory) {
         return save(newInventory, this::spectateInventory, (currentInv, newInv) -> {
             currentInv.setStorageContents(newInv.getStorageContents());
             currentInv.setArmourContents(newInv.getArmourContents());
@@ -80,7 +80,7 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    protected CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory newInventory) {
+    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory newInventory) {
         return save(newInventory, this::spectateEnderChest, (currentInv, newInv) -> {
             currentInv.setStorageContents(newInv.getStorageContents());
         });

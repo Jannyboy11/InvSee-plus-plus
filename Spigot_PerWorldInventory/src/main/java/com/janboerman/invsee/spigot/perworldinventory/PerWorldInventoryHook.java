@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.perworldinventory;
 
 import com.google.common.cache.Cache;
 import me.ebonjaeger.perworldinventory.Group;
+import me.ebonjaeger.perworldinventory.GroupManager;
 import me.ebonjaeger.perworldinventory.PerWorldInventory;
 import me.ebonjaeger.perworldinventory.api.PerWorldInventoryAPI;
 import me.ebonjaeger.perworldinventory.configuration.PlayerSettings;
@@ -22,9 +23,16 @@ import java.util.concurrent.ExecutionException;
 
 public class PerWorldInventoryHook {
 
-    private final Plugin plugin;
+    final Plugin plugin;
     private PerWorldInventory perWorldInventory;
     private PerWorldInventoryAPI api;
+
+    private Settings settings;
+    private ProfileManager profileManager;
+    private DataSource dataSource;
+    private ProfileFactory profileFactory;
+    private Cache<ProfileKey, PlayerProfile> profileCache;
+    private GroupManager groupManager;
 
     public PerWorldInventoryHook(Plugin plugin) {
         this.plugin = plugin;
@@ -44,7 +52,7 @@ public class PerWorldInventoryHook {
      *
      * take into account that PerWorldInventory has a feature that groups unmanaged world into one group (or not, if it's disabled in its settings)
      *
-     * take into account that PerWorldInventory has settings whether to have inventories per gamemode
+     * take into account that PerWorldInventory has settings whether to have inventories per gamemode (and that there is a bypass permission for this too!)
      */
 
     public boolean trySetup() {
@@ -58,24 +66,43 @@ public class PerWorldInventoryHook {
         return success;
     }
 
+    protected PerWorldInventoryAPI getPerWorldInventoryAPI() {
+        return api;
+    }
 
+    protected Settings getSettings() {
+        if (settings != null) return settings;
 
-    private Settings getSettings() {
         try {
             Field field = PerWorldInventoryAPI.class.getDeclaredField("settings");
             field.setAccessible(true);
-            return (Settings) field.get(api);
+            return settings = (Settings) field.get(getPerWorldInventoryAPI());
         } catch (IllegalAccessException | NoSuchFieldException e) {
-            return Settings.Companion.create(new File(perWorldInventory.getDataFolder(), "config.yml"));
+            return settings = Settings.Companion.create(new File(perWorldInventory.getDataFolder(), "config.yml"));
+        }
+    }
+
+    protected GroupManager getGroupManager() {
+        if (groupManager != null) return groupManager;
+
+        try {
+            Field field = PerWorldInventoryAPI.class.getDeclaredField("groupManager");
+            field.setAccessible(true);
+            return groupManager = (GroupManager) field.get(getPerWorldInventoryAPI());
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
     @Deprecated
-    private ProfileManager getProfileManager() {
+    protected ProfileManager getProfileManager() {
+        if (profileManager != null) return profileManager;
+
         try {
             Field field = PerWorldInventoryAPI.class.getDeclaredField("profileManager");
             field.setAccessible(true);
-            return (ProfileManager) field.get(api);
+            return profileManager = (ProfileManager) field.get(api);
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
             return null;
@@ -83,11 +110,13 @@ public class PerWorldInventoryHook {
     }
 
     @Deprecated
-    private DataSource getDataSource() {
+    protected DataSource getDataSource() {
+        if (dataSource != null) return dataSource;
+
         try {
             Field field = ProfileManager.class.getDeclaredField("dataSource");
             field.setAccessible(true);
-            return (DataSource) field.get(getProfileManager());
+            return dataSource = (DataSource) field.get(getProfileManager());
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
             return null;
@@ -95,11 +124,13 @@ public class PerWorldInventoryHook {
     }
 
     @Deprecated
-    private ProfileFactory getProfileFactory() {
+    protected ProfileFactory getProfileFactory() {
+        if (profileFactory != null) return profileFactory;
+
         try {
             Field field = ProfileManager.class.getDeclaredField("profileFactor");
             field.setAccessible(true);
-            return (ProfileFactory) field.get(getProfileManager());
+            return profileFactory = (ProfileFactory) field.get(getProfileManager());
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
             return null;
@@ -107,21 +138,20 @@ public class PerWorldInventoryHook {
     }
 
     @Deprecated
-    private Cache<ProfileKey, PlayerProfile> getProfileCache() {
+    protected Cache<ProfileKey, PlayerProfile> getProfileCache() {
+        if (profileCache != null) return profileCache;
+        
         try {
             Field field = ProfileManager.class.getDeclaredField("profileCache");
             field.setAccessible(true);
-            return (Cache<ProfileKey, PlayerProfile>) field.get(getProfileManager());
+            return profileCache = (Cache<ProfileKey, PlayerProfile>) field.get(getProfileManager());
         } catch (IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public PlayerProfile getOrCreateProfile(Player player, Group group, GameMode gameMode) {
-        if (!pwiInventoriesPerGameMode()) gameMode = GameMode.SURVIVAL; //fuck you Kotlin, you can't re-assign your method arguments, can you?! :D
-
-        ProfileKey profileKey = new ProfileKey(player.getUniqueId(), group, gameMode);
+    public PlayerProfile getOrCreateProfile(Player player, ProfileKey profileKey) {
         Cache<ProfileKey, PlayerProfile> cache = getProfileCache();
 
         try {
@@ -141,18 +171,25 @@ public class PerWorldInventoryHook {
         }
     }
 
+    public PlayerProfile getOrCreateProfile(Player player, Group group, GameMode gameMode) {
+        if (!pwiInventoriesPerGameMode()) gameMode = GameMode.SURVIVAL; //fuck you Kotlin, you can't re-assign your method arguments, can you?! :D
+
+        ProfileKey profileKey = new ProfileKey(player.getUniqueId(), group, gameMode);
+        return getOrCreateProfile(player, profileKey);
+    }
+
     public void saveProfile(ProfileKey profileKey, PlayerProfile profile) {
         getDataSource().savePlayer(profileKey, profile);
     }
 
     @Nullable
     public Group getGroupByName(String group) {
-        return api.getGroup(group);
+        return getPerWorldInventoryAPI().getGroup(group);
     }
 
     @NotNull
     public Group getGroupForWorld(String world) {
-        return api.getGroupFromWorld(world);
+        return getPerWorldInventoryAPI().getGroupFromWorld(world);
     }
 
     public boolean pwiManagedInventories() {
@@ -169,6 +206,10 @@ public class PerWorldInventoryHook {
 
     public boolean pwiUnmanagedWorldsSameGroup() {
         return getSettings().getProperty(PluginSettings.SHARE_IF_UNCONFIGURED);
+    }
+
+    public boolean pwiLoadDataOnJoin() {
+        return getSettings().getProperty(PluginSettings.LOAD_DATA_ON_JOIN);
     }
 
 }

@@ -3,6 +3,8 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
+import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,12 +15,28 @@ public class InvseePlusPlus extends JavaPlugin {
 
     private InvseeAPI api;
     private OfflinePlayerProvider offlinePlayerProvider;
+    private PerWorldInventoryHook pwiHook;
+    private PerWorldInventorySeeApi pwiApi;
 
     @Override
     public void onEnable() {
+        //initialisation
         this.api = InvseeAPI.setup(this);
         this.offlinePlayerProvider = OfflinePlayerProvider.setup(this);
 
+        //PerWorldInventory interop
+        PerWorldInventoryHook pwiHook = new PerWorldInventoryHook(this);
+        if (pwiHook.trySetup()) {
+            if (pwiHook.pwiManagedInventories() || pwiHook.pwiManagedEnderChests()) {
+                this.pwiHook = pwiHook;
+                this.pwiApi = new PerWorldInventorySeeApi(this, api, pwiHook);
+                this.api = pwiApi;
+
+                //TODO adjust commands and listeners.
+            }
+        }
+
+        //commands
         PluginCommand invseeCommand = getCommand("invsee");
         PluginCommand enderseeCommand = getCommand("endersee");
 
@@ -29,6 +47,7 @@ public class InvseePlusPlus extends JavaPlugin {
         invseeCommand.setTabCompleter(tabCompleter);
         enderseeCommand.setTabCompleter(tabCompleter);
 
+        //event listeners
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
 

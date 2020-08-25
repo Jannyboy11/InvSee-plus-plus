@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <version>1.16.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -88,6 +88,12 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Impl_1_16_R2</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Spigot_PerWorldInventory</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
