@@ -123,6 +123,7 @@ public class FakePlayer implements Player {
         this.permissible = new PermissibleBase(this);
         this.enderChest = new FakeInventory(InventoryType.ENDER_CHEST, new ItemStack[27], this);
         this.inventory = new FakePlayerInventory(new ItemStack[9 * 4 + 4 + 1], this);
+        this.clientViewDistance = server.getViewDistance();
     }
 
     @NotNull
@@ -647,12 +648,12 @@ public class FakePlayer implements Player {
 
     @Override
     public void saveData() {
-        //TODO do the PlayerProfile lookup thing?? I think this is not necessary though.
+        //do the PlayerProfile lookup thing?? I think that is not necessary though.
     }
 
     @Override
     public void loadData() {
-        //TODO do the PlayerProfile lookup thing?? I think this is not necessary though.
+        //do the PlayerProfile lookup thing?? I think that is not necessary though.
     }
 
     @Override
