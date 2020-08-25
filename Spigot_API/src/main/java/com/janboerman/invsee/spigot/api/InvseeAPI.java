@@ -167,6 +167,10 @@ public abstract class InvseeAPI {
         return resolveUUID(userName, uuidResolveStrategies.iterator());
     }
 
+    public final CompletableFuture<Optional<UUID>> fetchUniqueId(String userName) {
+        return resolveUUID(userName).thenApplyAsync(Function.identity(), serverThreadExecutor);
+    }
+
     public abstract MainSpectatorInventory spectateInventory(HumanEntity player, String title);
     public abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title);
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);

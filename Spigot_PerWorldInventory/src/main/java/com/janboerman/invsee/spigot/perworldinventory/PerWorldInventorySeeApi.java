@@ -10,6 +10,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -50,6 +51,10 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
             return pwiHook.getPerWorldInventoryAPI().canWorldsShare(inventoryWorlds.get(spectatorInventory), player.getWorld().getName());
         });
+    }
+
+    public PerWorldInventoryHook getHook() {
+        return pwiHook;
     }
 
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
@@ -104,18 +109,20 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         CompletableFuture<Optional<MainSpectatorInventory>> nmsInvSpectator = wrapped.createOfflineInventory(playerId, playerName, title);
         if (!pwiHook.pwiManagedInventories()) return nmsInvSpectator;
 
-        FakePlayer player = new FakePlayer(playerId, playerName, plugin.getServer());
+        Player player = plugin.getServer().getPlayer(playerId);
+        if (player == null) player = new FakePlayer(playerId, playerName, plugin.getServer());
         PlayerInventory playerInv = player.getInventory();
 
+        final Player finalPlayer = player;
         return nmsInvSpectator.thenApplyAsync(optionalSpectatorInv -> {
             optionalSpectatorInv.ifPresent(spectatorInv -> {
                 //first set the minecraft-saved contents onto the player
                 playerInv.setStorageContents(spectatorInv.getStorageContents());
                 playerInv.setArmorContents(spectatorInv.getArmourContents());
                 playerInv.setExtraContents(spectatorInv.getOffHandContents());
-                player.setItemOnCursor(spectatorInv.getCursorContents());
+                finalPlayer.setItemOnCursor(spectatorInv.getCursorContents());
 
-                PlayerProfile profile = pwiHook.getOrCreateProfile(player, profileKey);
+                PlayerProfile profile = pwiHook.getOrCreateProfile(finalPlayer, profileKey);
 
                 //then set it back from the profile
                 spectatorInv.setStorageContents(Arrays.copyOf(profile.getInventory(), 36));
@@ -141,15 +148,16 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             return wrapped.saveInventory(inventory);
 
         } else {
-            FakePlayer fakePlayer = new FakePlayer(inventory.getSpectatedPlayerId(), inventory.getSpectatedPlayerName(), plugin.getServer());
-            PlayerInventory playerInv = fakePlayer.getInventory();
+            Player player = plugin.getServer().getPlayer(inventory.getSpectatedPlayerId());
+            if (player == null) player = new FakePlayer(inventory.getSpectatedPlayerId(), inventory.getSpectatedPlayerName(), plugin.getServer());
+            PlayerInventory playerInv = player.getInventory();
 
             playerInv.setStorageContents(inventory.getStorageContents());
             playerInv.setArmorContents(inventory.getArmourContents());
             playerInv.setItemInOffHand(inventory.getOffHandContents()[0]);
-            fakePlayer.setItemOnCursor(inventory.getCursorContents());
+            player.setItemOnCursor(inventory.getCursorContents());
 
-            PlayerProfile profile = pwiHook.getOrCreateProfile(fakePlayer, profileKey);
+            PlayerProfile profile = pwiHook.getOrCreateProfile(player, profileKey);
 
             ItemStack[] profileArmour = inventory.getArmourContents(); //should be redundant, but is not due to a flaw in PerWorldInventory's implementation.
             ItemStack[] profileInventory = new ItemStack[41];
@@ -259,4 +267,5 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             }, wrapped.serverThreadExecutor);
         }
     }
+
 }

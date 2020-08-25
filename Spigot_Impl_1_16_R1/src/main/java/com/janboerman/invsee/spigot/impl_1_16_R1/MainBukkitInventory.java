@@ -78,7 +78,7 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
             nms.personalContents = merchantItems.getContents();
         }
 
-        //TODO do I need to do this at the nms level?
+        //do this at the nms level so that I can save on packets? (only need to update the last 9 slots :-))
         for (HumanEntity viewer : getViewers()) {
             if (viewer instanceof Player) {
                 ((Player) viewer).updateInventory();
@@ -91,7 +91,7 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
         MainNmsInventory nms = getInventory();
         nms.personalContents = nms.playerCraftingContents;
 
-        //TODO do I need to do this at the nms level?
+        //do this at the nms level so that I can save on packets? (only need to update the last 9 slots :-))
         for (HumanEntity viewer : getViewers()) {
             if (viewer instanceof Player) {
                 ((Player) viewer).updateInventory();

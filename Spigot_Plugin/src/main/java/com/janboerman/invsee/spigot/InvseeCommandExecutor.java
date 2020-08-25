@@ -1,6 +1,11 @@
 package com.janboerman.invsee.spigot;
 
+import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
+import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
+import com.janboerman.invsee.utils.Either;
+import me.ebonjaeger.perworldinventory.data.ProfileKey;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,13 +36,53 @@ class InvseeCommandExecutor implements CommandExecutor {
         Player player = (Player) sender;
 
         String playerNameOrUUID = args[0];
-
-        CompletableFuture<Optional<MainSpectatorInventory>> future;
+        boolean isUuid;
+        UUID uuid = null;
         try {
-            UUID uuid = UUID.fromString(playerNameOrUUID);
-            future = plugin.getApi().spectateInventory(uuid, "InvSee++ Player", playerNameOrUUID + "'s inventory");
+            uuid = UUID.fromString(playerNameOrUUID);
+            isUuid = true;
         } catch (IllegalArgumentException e) {
-            future = plugin.getApi().spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
+            isUuid = false;
+        }
+
+        InvseeAPI api = plugin.getApi();
+        CompletableFuture<Optional<MainSpectatorInventory>> future = null;
+
+        if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
+            String pwiArgument = args[1];
+            PerWorldInventorySeeApi pwiApi = (PerWorldInventorySeeApi) api;
+
+            Either<String, PwiCommandArgs> either = PwiCommandArgs.parse(pwiArgument, pwiApi.getHook());
+            if (either.isLeft()) {
+                player.sendMessage(ChatColor.RED + either.getLeft());
+                return true;
+            }
+
+            PwiCommandArgs pwiOptions = either.getRight();
+            CompletableFuture<Optional<UUID>> uuidFuture = isUuid
+                    ? CompletableFuture.completedFuture(Optional.of(uuid))
+                    : pwiApi.fetchUniqueId(playerNameOrUUID);
+
+            final boolean finalIsUuid = isUuid;
+            future = uuidFuture.thenCompose(optId -> {
+                if (optId.isPresent()) {
+                    UUID uniqueId = optId.get();
+                    ProfileKey profileKey = PwiCommandArgs.toProfileKey(uniqueId, pwiOptions, pwiApi.getHook());
+                    String playerName = finalIsUuid ? "InvSee++ Player" : playerNameOrUUID;
+                    return pwiApi.createOfflineInventory(uniqueId, playerName, playerName + "'s inventory", profileKey);
+                } else {
+                    return CompletableFuture.completedFuture(Optional.empty());
+                }
+            });
+        }
+
+        if (future == null) {
+            //No PWI argument - just continue with the regular method
+            if (isUuid) {
+                future = api.spectateInventory(uuid, "InvSee++ Player", playerNameOrUUID + "'s inventory");
+            } else {
+                future = api.spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
+            }
         }
 
         future.whenComplete((optionalSpectatorInv, throwable) -> {

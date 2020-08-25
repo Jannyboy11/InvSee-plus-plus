@@ -1,6 +1,8 @@
 package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.spigot.api.InvseeAPI;
+import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
+import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.StringHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,9 +25,8 @@ public class InvseeTabCompleter implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String s, String[] args) {
-
+        InvseeAPI api = plugin.getApi();
         if (args.length == 0) {
-            InvseeAPI api = plugin.getApi();
             Set<String> cached = api.getUuidCache().keySet();
             Set<String> online = sender.getServer().getOnlinePlayers().stream()
                     .map(Player::getName)
@@ -34,13 +35,16 @@ public class InvseeTabCompleter implements TabCompleter {
             return List.copyOf(online);
         } else if (args.length == 1) {
             String prefix = args[0];
-            InvseeAPI api = plugin.getApi();
             Set<String> cached = api.getUuidCache().keySet();
             return List.copyOf(Stream.concat(sender.getServer().getOnlinePlayers().stream().map(Player::getName), cached.stream())
                     .filter(name -> StringHelper.startsWithIgnoreCase(name, prefix))
                     .distinct()
                     .sorted()
                     .collect(Collectors.toCollection(() -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER))));
+        } else if (args.length == 2 && api instanceof PerWorldInventorySeeApi) {
+            PerWorldInventorySeeApi pwiApi = (PerWorldInventorySeeApi) api;
+            String pwiArgument = args[1];
+            return PwiCommandArgs.complete(pwiArgument, pwiApi.getHook());
         }
 
         return List.of();

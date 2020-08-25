@@ -31,8 +31,6 @@ public class InvseePlusPlus extends JavaPlugin {
                 this.pwiHook = pwiHook;
                 this.pwiApi = new PerWorldInventorySeeApi(this, api, pwiHook);
                 this.api = pwiApi;
-
-                //TODO adjust commands and listeners.
             }
         }
 

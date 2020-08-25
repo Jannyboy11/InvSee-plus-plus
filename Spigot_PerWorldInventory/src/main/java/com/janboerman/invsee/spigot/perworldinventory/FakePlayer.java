@@ -1247,8 +1247,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public Map<String, Object> serialize() {
-        //TODO what does a player serialize?
-        return null;
+        return Map.of(); //can't be bothered to implement this properly. ¯\_(ツ)_/¯
     }
 
     @NotNull
@@ -1602,7 +1601,7 @@ public class FakePlayer implements Player {
 
     @Override
     public int getMaximumAir() {
-        if (maximumAir == null) maximumAir = 20; //TODO is this correct?
+        if (maximumAir == null) maximumAir = 20; //is this correct?
         return maximumAir;
     }
 

@@ -97,6 +97,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency> <!-- It would be good if I could remove this one, and just depend on the hook -->
+            <groupId>me.ebonjaeger</groupId>
+            <artifactId>perworldinventory-kt</artifactId>
+            <version>2.3.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>
