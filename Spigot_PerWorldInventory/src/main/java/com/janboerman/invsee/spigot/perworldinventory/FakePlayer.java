@@ -103,7 +103,6 @@ public class FakePlayer implements Player {
     private Map<MemoryKey<?>, Object> memory = new HashMap<>();
     private double health;
     private double absorptionAmount;
-    private double maxHealth;
     private String customName;
     private HashMap<String, Map<Plugin, MetadataValue>> metadata = new HashMap<>();
     private final PermissibleBase permissible;
@@ -112,6 +111,7 @@ public class FakePlayer implements Player {
     private final FakeInventory enderChest;
     private final FakePlayerInventory inventory;
     private final EnumMap<Attribute, AttributeInstance> attributes = new EnumMap<>(Attribute.class);
+    private final long firstPlayed, lastPlayed;
 
     public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
@@ -120,7 +120,6 @@ public class FakePlayer implements Player {
         setDisplayName(name);
         setPlayerListName(name);
         setGameMode(server.getDefaultGameMode());
-        resetMaxHealth();
         this.permissible = new PermissibleBase(this);
         this.enderChest = new FakeInventory(InventoryType.ENDER_CHEST, new ItemStack[27], this);
         this.inventory = new FakePlayerInventory(new ItemStack[9 * 4 + 4 + 1], this);
@@ -137,6 +136,9 @@ public class FakePlayer implements Player {
         //registerAttribute(Attribute.GENERIC_ATTACK_KNOCKBACK);
         registerAttribute(Attribute.GENERIC_ATTACK_SPEED);
         registerAttribute(Attribute.GENERIC_LUCK);
+
+        this.firstPlayed = 0;
+        this.lastPlayed = System.currentTimeMillis();
     }
 
     private AttributeInstance registerAttribute(Attribute attribute) {
@@ -717,12 +719,12 @@ public class FakePlayer implements Player {
 
     @Override
     public long getFirstPlayed() {
-        return System.currentTimeMillis();
+        return firstPlayed;
     }
 
     @Override
     public long getLastPlayed() {
-        return System.currentTimeMillis();
+        return lastPlayed;
     }
 
     @Override
@@ -1886,17 +1888,18 @@ public class FakePlayer implements Player {
 
     @Override
     public double getMaxHealth() {
-        return maxHealth;
+        return getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
     }
 
     @Override
     public void setMaxHealth(double v) {
-        this.maxHealth = v;
+        getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(v);
+        getAttribute(Attribute.GENERIC_MAX_HEALTH).getModifiers().clear();
     }
 
     @Override
     public void resetMaxHealth() {
-        this.maxHealth = 20;
+        setMaxHealth(20);
     }
 
     @Nullable

@@ -9,6 +9,7 @@ import me.ebonjaeger.perworldinventory.configuration.PlayerSettings;
 import me.ebonjaeger.perworldinventory.configuration.PluginSettings;
 import me.ebonjaeger.perworldinventory.configuration.Settings;
 import me.ebonjaeger.perworldinventory.data.*;
+import me.ebonjaeger.perworldinventory.service.EconomyService;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -33,6 +34,7 @@ public class PerWorldInventoryHook {
     private ProfileFactory profileFactory;
     private Cache<ProfileKey, PlayerProfile> profileCache;
     private GroupManager groupManager;
+    private EconomyService economyService;
 
     public PerWorldInventoryHook(Plugin plugin) {
         this.plugin = plugin;
@@ -95,7 +97,6 @@ public class PerWorldInventoryHook {
         }
     }
 
-    @Deprecated
     protected ProfileManager getProfileManager() {
         if (profileManager != null) return profileManager;
 
@@ -109,7 +110,6 @@ public class PerWorldInventoryHook {
         }
     }
 
-    @Deprecated
     protected DataSource getDataSource() {
         if (dataSource != null) return dataSource;
 
@@ -123,7 +123,19 @@ public class PerWorldInventoryHook {
         }
     }
 
-    @Deprecated
+    protected EconomyService getEconomyService() {
+        if (economyService != null) return economyService;
+
+        try {
+            Field field = ProfileManager.class.getDeclaredField("economyService");
+            field.setAccessible(true);
+            return economyService = (EconomyService) field.get(getProfileManager());
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     protected ProfileFactory getProfileFactory() {
         if (profileFactory != null) return profileFactory;
 
@@ -137,7 +149,6 @@ public class PerWorldInventoryHook {
         }
     }
 
-    @Deprecated
     protected Cache<ProfileKey, PlayerProfile> getProfileCache() {
         if (profileCache != null) return profileCache;
         
@@ -190,6 +201,10 @@ public class PerWorldInventoryHook {
     @NotNull
     public Group getGroupForWorld(String world) {
         return getPerWorldInventoryAPI().getGroupFromWorld(world);
+    }
+
+    public boolean isWorldManagedByPWI(String world) {
+        return getGroupManager().getGroups().values().stream().anyMatch(g -> g.getWorlds().contains(world));
     }
 
     public boolean pwiManagedInventories() {

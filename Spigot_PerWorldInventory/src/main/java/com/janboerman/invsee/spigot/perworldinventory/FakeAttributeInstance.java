@@ -9,21 +9,21 @@ import java.util.*;
 
 public class FakeAttributeInstance implements AttributeInstance {
 
-    private final Attribute attribte;
+    private final Attribute attribute;
     private double baseValue;
     private final Collection<AttributeModifier> modifiers = new TreeSet<>(Comparator
             .comparing(AttributeModifier::getOperation)
             .thenComparing(AttributeModifier::getUniqueId));
 
     public FakeAttributeInstance(Attribute attribute) {
-        this.attribte = attribute;
+        this.attribute = attribute;
         this.baseValue = getDefaultValue();
     }
 
     @NotNull
     @Override
     public Attribute getAttribute() {
-        return attribte;
+        return attribute;
     }
 
     @Override
@@ -55,9 +55,8 @@ public class FakeAttributeInstance implements AttributeInstance {
     @Override
     public double getValue() {
         //https://minecraft.gamepedia.com/Attribute#Operations
-        double base = getBaseValue();
 
-        double x = base;
+        double x = getBaseValue();
         double y = -1;
 
         AttributeModifier.Operation lastOperation = null;
@@ -82,38 +81,52 @@ public class FakeAttributeInstance implements AttributeInstance {
             lastOperation = operation;
         }
 
-        switch (getAttribute()) {
-            case GENERIC_ARMOR:
-                y = between(0, y, 30); break;
-            case GENERIC_ARMOR_TOUGHNESS:
-                y = between(0, y, 20); break;
-            case GENERIC_ATTACK_DAMAGE:
-                y = between(0, y, 2048); break;
-            //not yet present in 1.15.2
-//            case GENERIC_ATTACK_KNOCKBACK:
-//                y = between(0, y, 8); break;
-            case GENERIC_ATTACK_SPEED:
-                y = between(0, y, 1024); break;
-            case GENERIC_FLYING_SPEED:
-                y = between(0, y, 1024); break;
-            case GENERIC_FOLLOW_RANGE:
-                y = between(0, y, 2048); break;
-            case GENERIC_KNOCKBACK_RESISTANCE:
-                y = between(0, y, 1); break;
-            case GENERIC_LUCK:
-                y = between(-1024, y, 1024); break;
-            case GENERIC_MAX_HEALTH:
-                y = between(0, y, 1024); break;
-            case GENERIC_MOVEMENT_SPEED:
-                y = between (0, y, 1024); break;
+        if (getAttribute().name().equals("GENERIC_ATTACK_KNOCKBACK")) {
+            //compat
+            y = between(0, y, 8);
+        } else {
+            switch (getAttribute()) {
+                case GENERIC_ARMOR:
+                    y = between(0, y, 30);
+                    break;
+                case GENERIC_ARMOR_TOUGHNESS:
+                    y = between(0, y, 20);
+                    break;
+                case GENERIC_ATTACK_DAMAGE:
+                    y = between(0, y, 2048);
+                    break;
+                case GENERIC_ATTACK_SPEED:
+                    y = between(0, y, 1024);
+                    break;
+                case GENERIC_FLYING_SPEED:
+                    y = between(0, y, 1024);
+                    break;
+                case GENERIC_FOLLOW_RANGE:
+                    y = between(0, y, 2048);
+                    break;
+                case GENERIC_KNOCKBACK_RESISTANCE:
+                    y = between(0, y, 1);
+                    break;
+                case GENERIC_LUCK:
+                    y = between(-1024, y, 1024);
+                    break;
+                case GENERIC_MAX_HEALTH:
+                    y = between(0, y, 1024);
+                    break;
+                case GENERIC_MOVEMENT_SPEED:
+                    y = between(0, y, 1024);
+                    break;
 
-            case HORSE_JUMP_STRENGTH:
-                y = between(0, y, 2); break;
-            case ZOMBIE_SPAWN_REINFORCEMENTS:
-                y = between(0, y, 1); break;
+                case HORSE_JUMP_STRENGTH:
+                    y = between(0, y, 2);
+                    break;
+                case ZOMBIE_SPAWN_REINFORCEMENTS:
+                    y = between(0, y, 1);
+                    break;
 
-            default:
-                y = between(Double.MIN_NORMAL, y, Double.MAX_VALUE);
+                default:
+                    y = between(Double.MIN_NORMAL, y, Double.MAX_VALUE);
+            }
         }
 
         return y;
@@ -136,9 +149,6 @@ public class FakeAttributeInstance implements AttributeInstance {
                 return 0;
             case GENERIC_ARMOR_TOUGHNESS:
                 return 0;
-            //not yet present in 1.15.2
-//            case GENERIC_ATTACK_KNOCKBACK:
-//                return 0;
             case GENERIC_ATTACK_SPEED:
                 return 4;
             case GENERIC_LUCK:
@@ -150,6 +160,7 @@ public class FakeAttributeInstance implements AttributeInstance {
             case ZOMBIE_SPAWN_REINFORCEMENTS:
                 return 0;
             default:
+                //includes GENERIC_ATTACK_KNOCKBACK (which is absent in 1.15.2)
                 return 0;
         }
     }

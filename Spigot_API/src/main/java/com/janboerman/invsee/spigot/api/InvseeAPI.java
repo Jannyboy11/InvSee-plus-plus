@@ -163,6 +163,16 @@ public abstract class InvseeAPI {
         return uuidCacheView;
     }
 
+    public Optional<MainSpectatorInventory> getOpenMainSpectatorInventory(UUID player) {
+        return Optional.ofNullable(openInventories.get(player))
+                .flatMap(ref -> Optional.ofNullable(ref.get()));
+    }
+
+    public Optional<EnderSpectatorInventory> getOpenEnderSpectatorInventory(UUID player) {
+        return Optional.ofNullable(openEnderChests.get(player))
+                .flatMap(ref -> Optional.ofNullable(ref.get()));
+    }
+
     protected CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
         return resolveUUID(userName, uuidResolveStrategies.iterator());
     }

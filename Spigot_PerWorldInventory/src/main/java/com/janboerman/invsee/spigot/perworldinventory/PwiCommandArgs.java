@@ -101,9 +101,27 @@ public class PwiCommandArgs {
         parseProperties(result, propertyList, hook); //ignore errormessage
 
         String lastProperty = properties[properties.length - 1];
-        String bufferBeforeLastProperty = argument.substring(0, argument.length() - lastProperty.length());
-        //TODO fix: I think bufferBeforeLastProperty can contain the trailing comma.
+        int stripLength = lastProperty.length();
+        boolean endsWithComma = argument.endsWith(",");
+        if (endsWithComma) stripLength += 1; //not sure whether this is correct.
+        String bufferBeforeLastProperty = argument.substring(0, argument.length() - stripLength);
 
+        if (endsWithComma) {
+            //we end with a comma, complete a new property
+            List<String> everything = new ArrayList<>(9);
+            if (result.group == null) {
+                groupNames.stream().map(gn -> argument + "group=" + gn).forEach(everything::add);
+            } else if (result.world == null) {
+                worldNames.stream().map(wn -> argument + "world=" + wn).forEach(everything::add);
+            } else if (result.gameMode == null) {
+                gameModes.stream().map(gm -> argument + "gamemode=" + gm).forEach(everything::add);
+            } else {
+                return List.of(argument.substring(argument.length() - 1) + "}");
+            }
+            return everything;
+        }
+
+        //we don't end with a comma - complete the property
         String[] propKeyValue = lastProperty.split("=", 2);
         if (propKeyValue.length == 0 || (propKeyValue.length == 1 && propKeyValue[0].isEmpty())) {
             if (result.group == null) {
