@@ -198,7 +198,7 @@ public class PwiCommandArgs {
     public static ProfileKey toProfileKey(UUID playerId, PwiCommandArgs options, PerWorldInventoryHook hook) {
         Group group;
         GameMode gameMode = options.gameMode;
-        if (gameMode == null) gameMode = GameMode.SURVIVAL;
+        if (gameMode == null || !hook.pwiInventoriesPerGameMode()) gameMode = GameMode.SURVIVAL;
 
         if (options.group != null) {
             group = options.group;
