@@ -11,6 +11,7 @@ import me.ebonjaeger.perworldinventory.configuration.Settings;
 import me.ebonjaeger.perworldinventory.data.*;
 import me.ebonjaeger.perworldinventory.service.EconomyService;
 import org.bukkit.GameMode;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -203,8 +204,42 @@ public class PerWorldInventoryHook {
         return getPerWorldInventoryAPI().getGroupFromWorld(world);
     }
 
+    public ProfileKey getActiveProfileKey(HumanEntity player) {
+        GameMode gameMode = pwiInventoriesPerGameMode() ? player.getGameMode() : GameMode.SURVIVAL;
+        Group group = getGroupForWorld(player.getWorld().getName());
+        UUID uuid = player.getUniqueId();
+        return new ProfileKey(uuid, group, gameMode);
+    }
+
+    public boolean isMatchedByProfile(HumanEntity player, ProfileKey profileKey) {
+        return isMatchedByProfile(player.getUniqueId(), player.getWorld().getName(), player.getGameMode(), profileKey);
+    }
+
+    public boolean isMatchedByProfile(UUID playerId, Group group, GameMode gameMode, ProfileKey profileKey) {
+        return profileKey.getUuid().equals(playerId)
+                && profileKey.getGroup().getWorlds().equals(group.getWorlds())
+                && (!pwiInventoriesPerGameMode() || profileKey.getGameMode() == gameMode);
+    }
+
+    public boolean isMatchedByProfile(UUID playerId, String world, GameMode gameMode, ProfileKey profileKey) {
+        return profileKey.getUuid().equals(playerId)
+                && profileKey.getGroup().getWorlds().contains(world)
+                && (!pwiInventoriesPerGameMode() || profileKey.getGameMode() == gameMode);
+    }
+
     public boolean isWorldManagedByPWI(String world) {
-        return getGroupManager().getGroups().values().stream().anyMatch(g -> g.getWorlds().contains(world));
+        return pwiUnmanagedWorldsSameGroup()
+                || getGroupManager().getGroups().values().stream().anyMatch(g -> g.getWorlds().contains(world));
+    }
+
+    public boolean isGroupManagedByPWI(String group) {
+        Group g = getGroupByName(group);
+        if (g == null) return false;
+        return isGroupManagedByPWI(g);
+    }
+
+    public boolean isGroupManagedByPWI(Group group) {
+        return group.getConfigured();
     }
 
     public boolean pwiManagedInventories() {

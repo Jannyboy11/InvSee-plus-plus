@@ -63,7 +63,7 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
         if (top instanceof CraftInventoryCrafting /*does not extend CraftResultInventory for some reason.*/) {
             //includes a player's own crafting slots
             InventoryCrafting targetCrafting = (InventoryCrafting) ((CraftInventoryCrafting) top).getInventory();
-            nms.personalContents = targetCrafting.getContents(); //luckily this method does not copy.
+            nms.personalContents = targetCrafting.getContents(); //luckily this getContents() method does not copy.
         } else if (top instanceof CraftResultInventory) {
             //anvil, grindstone, loom, smithing table, cartography table, stone cutter
             IInventory repairItems = ((CraftResultInventory) top).getInventory();

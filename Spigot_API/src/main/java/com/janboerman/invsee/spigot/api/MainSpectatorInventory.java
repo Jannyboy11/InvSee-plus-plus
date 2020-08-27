@@ -1,10 +1,9 @@
 package com.janboerman.invsee.spigot.api;
 
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-public interface MainSpectatorInventory extends Inventory, SpectatorInventory {
+public interface MainSpectatorInventory extends SpectatorInventory {
 
     void watch(InventoryView targetPlayerView);
 

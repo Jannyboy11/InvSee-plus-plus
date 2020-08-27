@@ -1848,6 +1848,12 @@ public class FakePlayer implements Player {
         memory.put(memoryKey, t);
     }
 
+    @NotNull
+    @Override
+    public EntityCategory getCategory() {
+        return EntityCategory.NONE;
+    }
+
     @Nullable
     @Override
     public AttributeInstance getAttribute(@NotNull Attribute attribute) {

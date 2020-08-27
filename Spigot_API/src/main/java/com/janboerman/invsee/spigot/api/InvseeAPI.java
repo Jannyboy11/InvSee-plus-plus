@@ -21,6 +21,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -55,11 +56,11 @@ public abstract class InvseeAPI {
     });
     private final Map<String, UUID> uuidCacheView = Collections.unmodifiableMap(uuidCache);
 
-    private final Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
+    private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<String, CompletableFuture<Optional<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<Optional<MainSpectatorInventory>>> pendingInventoriesByUuid = new ConcurrentHashMap<>();
 
-    private final Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests = Collections.synchronizedMap(new WeakHashMap<>());
+    private Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests = Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<String, CompletableFuture<Optional<EnderSpectatorInventory>>> pendingEnderChestsByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<Optional<EnderSpectatorInventory>>> pendingEnderChestsByUuid = new ConcurrentHashMap<>();
 
@@ -71,6 +72,9 @@ public abstract class InvseeAPI {
 
     public final Executor serverThreadExecutor;
     public final Executor asyncExecutor;
+
+    protected final PlayerListener playerListener = new PlayerListener();
+    protected final InventoryListener inventoryListener = new InventoryListener();
 
     protected InvseeAPI(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
@@ -85,12 +89,21 @@ public abstract class InvseeAPI {
         }
         this.uuidResolveStrategies.add(new MojangAPIStrategy(plugin));
 
-        PluginManager pluginManager = plugin.getServer().getPluginManager();
-        pluginManager.registerEvents(new PlayerListener(), plugin);
-        pluginManager.registerEvents(new InventoryListener(), plugin);
+        registerListeners();
 
         this.serverThreadExecutor = runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable);
         this.asyncExecutor = runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable);
+    }
+
+    public void registerListeners() {
+        PluginManager pluginManager = plugin.getServer().getPluginManager();
+        pluginManager.registerEvents(playerListener, plugin);
+        pluginManager.registerEvents(inventoryListener, plugin);
+    }
+
+    public void unregsiterListeners() {
+        HandlerList.unregisterAll(playerListener);
+        HandlerList.unregisterAll(inventoryListener);
     }
 
     public final void setMainInventoryTitleFactory(Function<Player, String> titleFactory) {
@@ -111,6 +124,22 @@ public abstract class InvseeAPI {
     public final void setEnderChestTransferPredicate(BiPredicate<EnderSpectatorInventory, Player> bip) {
         Objects.requireNonNull(bip);
         this.transferEnderToLivePlayer = bip;
+    }
+
+    public Map<UUID, WeakReference<MainSpectatorInventory>> getOpenInventories() {
+        return openInventories;
+    }
+
+    public Map<UUID, WeakReference<EnderSpectatorInventory>> getOpenEnderChests() {
+        return openEnderChests;
+    }
+
+    protected void setOpenInventories(Map<UUID, WeakReference<MainSpectatorInventory>> openInventories) {
+        this.openInventories = openInventories;
+    }
+
+    protected void setOpenEnderChests(Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests) {
+        this.openEnderChests = openEnderChests;
     }
 
     public static InvseeAPI setup(Plugin plugin) {
@@ -348,8 +377,8 @@ public abstract class InvseeAPI {
                 Inventory topInventory = online.getOpenInventory().getTopInventory();
                 if (topInventory instanceof MainSpectatorInventory) {
                     MainSpectatorInventory oldSpectatorInventory = (MainSpectatorInventory) topInventory;
-                    if (transferInvToLivePlayer.test(oldSpectatorInventory, player)) {
-                        if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
+                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
+                        if (transferInvToLivePlayer.test(oldSpectatorInventory, player)) {
                             if (newInventorySpectator == null) {
                                 newInventorySpectator = spectateInventory(player, mainTitle);
                                 //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
@@ -366,8 +395,8 @@ public abstract class InvseeAPI {
                     }
                 } else if (topInventory instanceof EnderSpectatorInventory) {
                     EnderSpectatorInventory oldSpectatorInventory = (EnderSpectatorInventory) topInventory;
-                    if (transferEnderToLivePlayer.test(oldSpectatorInventory, player)) {
-                        if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
+                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
+                        if (transferEnderToLivePlayer.test(oldSpectatorInventory, player)) {
                             if (newEnderSpectator == null) {
                                 //this also updates the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
                                 newEnderSpectator = spectateEnderChest(player, enderTitle);
@@ -439,7 +468,16 @@ public abstract class InvseeAPI {
                             plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
                             event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory.");
                         }
-                    });
+                    }).thenRunAsync(() -> {
+                        if (spectatorInventory.getViewers().isEmpty()) {
+                            openInventories.compute(spectatorInventory.getSpectatedPlayerId(), (uuid, weakRef) -> {
+                                if (weakRef != null && spectatorInventory.equals(weakRef.get())) {
+                                    return null;    //removes the entry
+                                }
+                                return weakRef; //weakRef is either null or contains another value - just keep it
+                            });
+                        }
+                    }, serverThreadExecutor);
                 }
             } else if (inventory instanceof EnderSpectatorInventory) {
                 EnderSpectatorInventory spectatorInventory = (EnderSpectatorInventory) inventory;
@@ -450,7 +488,16 @@ public abstract class InvseeAPI {
                             plugin.getLogger().log(Level.SEVERE, "Error while saving offline enderchest", throwable);
                             event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the enderchest.");
                         }
-                    });
+                    }).thenRunAsync(() -> {
+                        if (spectatorInventory.getViewers().isEmpty()) {
+                            openEnderChests.compute(spectatorInventory.getSpectatedPlayerId(), (uuid, weakRef) -> {
+                                if (weakRef != null && spectatorInventory.equals(weakRef.get())) {
+                                    return null;    //removes the entry
+                                }
+                                return weakRef; //weakRef is either null or contains another value - just keep it
+                            });
+                        }
+                    }, serverThreadExecutor);
                 }
             }
         }
