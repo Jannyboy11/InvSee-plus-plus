@@ -9,6 +9,7 @@ import me.ebonjaeger.perworldinventory.configuration.PlayerSettings;
 import me.ebonjaeger.perworldinventory.configuration.PluginSettings;
 import me.ebonjaeger.perworldinventory.configuration.Settings;
 import me.ebonjaeger.perworldinventory.data.*;
+import me.ebonjaeger.perworldinventory.permission.PlayerPermission;
 import me.ebonjaeger.perworldinventory.service.EconomyService;
 import org.bukkit.GameMode;
 import org.bukkit.entity.HumanEntity;
@@ -242,12 +243,24 @@ public class PerWorldInventoryHook {
         return group.getConfigured();
     }
 
+    public boolean bypassesGameModeChange(Player player) {
+        return !pwiBypassDisabled() && player.hasPermission(PlayerPermission.BYPASS_GAMEMODE.getNode());
+    }
+
+    public boolean bypassesWorldChange(Player player) {
+        return !pwiBypassDisabled() && player.hasPermission(PlayerPermission.BYPASS_WORLDS.getNode());
+    }
+
     public boolean pwiManagedInventories() {
         return getSettings().getProperty(PlayerSettings.LOAD_INVENTORY);
     }
 
     public boolean pwiManagedEnderChests() {
         return getSettings().getProperty(PlayerSettings.LOAD_ENDER_CHEST);
+    }
+
+    public boolean pwiBypassDisabled() {
+        return getSettings().getProperty(PluginSettings.DISABLE_BYPASS);
     }
 
     public boolean pwiInventoriesPerGameMode() {

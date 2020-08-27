@@ -193,6 +193,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onTeleport(PlayerTeleportEvent event) {
+            if (pwiHook.bypassesWorldChange(event.getPlayer())) return;
+
             World from = event.getFrom().getWorld();
             World to = event.getTo().getWorld();
 
@@ -203,6 +205,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onGameModeChange(PlayerGameModeChangeEvent event) {
+            if (pwiHook.bypassesGameModeChange(event.getPlayer())) return;
+
             if (pwiHook.pwiInventoriesPerGameMode()) {
                 giveSnapshotInventoryToSpectators(pwiHook.getActiveProfileKey(event.getPlayer()));
             }
