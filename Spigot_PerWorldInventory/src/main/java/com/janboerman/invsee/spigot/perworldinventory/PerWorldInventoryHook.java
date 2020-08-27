@@ -190,10 +190,6 @@ public class PerWorldInventoryHook {
         return getOrCreateProfile(player, profileKey);
     }
 
-    public void saveProfile(ProfileKey profileKey, PlayerProfile profile) {
-        getDataSource().savePlayer(profileKey, profile);
-    }
-
     @Nullable
     public Group getGroupByName(String group) {
         return getPerWorldInventoryAPI().getGroup(group);
@@ -202,6 +198,10 @@ public class PerWorldInventoryHook {
     @NotNull
     public Group getGroupForWorld(String world) {
         return getPerWorldInventoryAPI().getGroupFromWorld(world);
+    }
+
+    public boolean worldsShareInventory(String world1, String world2) {
+        return getPerWorldInventoryAPI().canWorldsShare(world1, world2);
     }
 
     public ProfileKey getActiveProfileKey(HumanEntity player) {

@@ -62,7 +62,7 @@ public class PwiCommandArgs {
                 }
 
             } else {
-                return Optional.of("Invalid property, expected one of [group, world, gamemode] but got " + key + "instead.");
+                return Optional.of("Invalid property, expected one of [group, world, gamemode] but got " + key + " instead.");
             }
         }
 

@@ -1,16 +1,13 @@
 package com.janboerman.invsee.spigot.perworldinventory;
 
-import com.google.common.collect.BiMap;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.utils.WeakBiMap;
 import me.ebonjaeger.perworldinventory.Group;
 import me.ebonjaeger.perworldinventory.data.PlayerProfile;
 import me.ebonjaeger.perworldinventory.data.ProfileKey;
 import me.ebonjaeger.perworldinventory.event.InventoryLoadCompleteEvent;
-import me.ebonjaeger.perworldinventory.event.InventoryLoadEvent;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -22,8 +19,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -41,10 +39,10 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
     //there can be more than one open spectator inventories per target player.
     //use the superclass openInventory-mechanic only for profile-unspecific spectator inventories
-    private final WeakBiMap<ProfileKey, MainSpectatorInventory> inventories = new WeakBiMap<>();
-    private final WeakBiMap<ProfileKey, MainSpectatorInventory>.Reversed inventoryKeys = inventories.swap();
-    private final WeakBiMap<ProfileKey, EnderSpectatorInventory> enderchests = new WeakBiMap<>();
-    private final WeakBiMap<ProfileKey, EnderSpectatorInventory>.Reversed enderchestKeys = enderchests.swap();
+    private final Map<ProfileKey, MainSpectatorInventory> inventories = new HashMap<>();
+    private final Map<MainSpectatorInventory, ProfileKey> inventoryKeys = new HashMap<>();
+    private final Map<ProfileKey, EnderSpectatorInventory> enderchests = new HashMap<>();
+    private final Map<EnderSpectatorInventory, ProfileKey> enderchestKeys = new HashMap<>();
 
     private PwiEventListener pwiEventListener;
     private TiedInventoryListener tiedInventoryListener;
@@ -109,15 +107,6 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
     private final class TiedPlayerListener implements Listener {
 
-//        @EventHandler
-//        public void onTargetJoin(PlayerJoinEvent event) {
-//            if (pwiHook.pwiLoadDataOnJoin()) return; //InventoryLoadCompleteEvent will be called.
-//
-//            //super class player listener does resetting of live open inventories. and it uses our custom predicate
-//            //do I need to do anything here?
-//            //I don't think there is anything.
-//        }
-
         @EventHandler
         public void onTargetQuit(PlayerQuitEvent event) {
             //remove from maps if nobody is watching.
@@ -125,18 +114,53 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             Player player = event.getPlayer();
             ProfileKey key = pwiHook.getActiveProfileKey(player);
 
-            inventories.compute(key, (k, mainSpectatorInventory) -> {
-                if (mainSpectatorInventory == null || mainSpectatorInventory.getViewers().isEmpty()) return null;   //remove if no longer being spectated
-                return mainSpectatorInventory;
-            });
-            enderchests.compute(key, (k, enderSpectatorInventory) -> {
-                if (enderSpectatorInventory == null || enderSpectatorInventory.getViewers().isEmpty()) return null; //remove if no longer being spectated
-                return enderSpectatorInventory;
-            });
+            MainSpectatorInventory mainSpectator = inventories.get(key);
+            if (mainSpectator != null && mainSpectator.getViewers().isEmpty()) {
+                inventories.remove(key);
+                inventoryKeys.remove(mainSpectator, key);
+            }
+
+            EnderSpectatorInventory enderSpectator = enderchests.get(key);
+            if (enderSpectator != null && enderSpectator.getViewers().isEmpty()) {
+                enderchests.remove(key);
+                enderchestKeys.remove(enderSpectator, key);
+            }
         }
     }
 
     private final class TiedInventoryListener implements Listener {
+
+        @EventHandler
+        public void onSpectatorClose(InventoryCloseEvent event) {
+            Inventory inventory = event.getInventory();
+            if (inventory instanceof MainSpectatorInventory) {
+                MainSpectatorInventory main = (MainSpectatorInventory) inventory;
+
+                ProfileKey key = inventoryKeys.get(main);
+                if (key != null) {
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                        //remove from maps if nobody is watching
+                        if (main.getViewers().isEmpty()) {
+                            inventories.remove(key, main);
+                            inventoryKeys.remove(main, key);
+                        }
+                    }, 20L * 5);
+                }
+            } else if (inventory instanceof EnderSpectatorInventory) {
+                EnderSpectatorInventory ender = (EnderSpectatorInventory) inventory;
+
+                ProfileKey key = enderchestKeys.get(ender);
+                if (key != null) {
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                        //remove from maps if nobody is watching
+                        if (ender.getViewers().isEmpty()) {
+                            enderchests.remove(key, ender);
+                            enderchestKeys.remove(ender, key);
+                        }
+                    }, 20L * 5);
+                }
+            }
+        }
 
         @EventHandler
         public void onTargetInventoryOpen(InventoryOpenEvent event) {
@@ -168,36 +192,43 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     private final class PwiEventListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onPwiLoad(InventoryLoadEvent event) {
-            //new inventory contents is about to be loaded onto the player.
+        public void onTeleport(PlayerTeleportEvent event) {
+            World from = event.getFrom().getWorld();
+            World to = event.getTo().getWorld();
 
-            //  if the player was being spectated, then
-            //      if the spectator inventory is tied to a profile key, then
-            //          close the spectator inventory for all viewers
-            //          re-open a fresh offline spectator inventory, tied to the same profile key
+            if (!from.equals(to) && !pwiHook.worldsShareInventory(from.toString(), to.toString())) {
+                giveSnapshotInventoryToSpectators(pwiHook.getActiveProfileKey(event.getPlayer()));
+            }
+        }
 
-            Player player = event.getPlayer();
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onGameModeChange(PlayerGameModeChangeEvent event) {
+            if (pwiHook.pwiInventoriesPerGameMode()) {
+                giveSnapshotInventoryToSpectators(pwiHook.getActiveProfileKey(event.getPlayer()));
+            }
+        }
 
-            //there can be more than one open spectator inventories per target player.
-            //use the superclass openInventory-mechanic only for profile-unspecific spectator inventories
-            //that's okay, because this event isn't even fired in that case.
+        //can't use InventoryLoadEvent because I can't get the old profile key from it!
 
-            ProfileKey oldProfileKey = pwiHook.getActiveProfileKey(player);
-            //ProfileKey newProfileKey = new ProfileKey(player.getUniqueId(), event.getGroup(), event.getNewGameMode());
+        private void giveSnapshotInventoryToSpectators(ProfileKey oldProfileKey) {
+            //new data is about to be loaded onto the player
+
+            //  if there are 'live' spectator inventories for the player, then
+            //      take a snapshot of the inventory, and 're-open' for all viewers
 
             MainSpectatorInventory mainSpectator = inventories.get(oldProfileKey);
             EnderSpectatorInventory enderSpectator = enderchests.get(oldProfileKey);
 
-            //TODO DEBUG THIS!! (this does not work correctly!)
-
             if (mainSpectator != null) {
                 List<HumanEntity> viewers = new ArrayList<>(mainSpectator.getViewers());   //copy
                 ItemStack[] contents = mainSpectator.getContents();                        //already is a copy
+
                 viewers.forEach(HumanEntity::closeInventory);
 
                 CompletableFuture<Optional<MainSpectatorInventory>> snapshotFuture = asSnapShotInventory(mainSpectator);
                 snapshotFuture.thenAccept(optional -> optional.ifPresentOrElse(newSpectatorInventory -> {
                     inventories.put(oldProfileKey, newSpectatorInventory);
+                    inventoryKeys.put(newSpectatorInventory, oldProfileKey);
                     newSpectatorInventory.setContents(contents);
                     viewers.forEach(v -> v.openInventory(newSpectatorInventory));
                 }, /*orElse part*/ () -> inventories.remove(oldProfileKey)));
@@ -210,41 +241,46 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 CompletableFuture<Optional<EnderSpectatorInventory>> snapshotFuture = asSnapShotInventory(enderSpectator);
                 snapshotFuture.thenAccept(optional -> optional.ifPresentOrElse(newSpectatorInventory -> {
                     enderchests.put(oldProfileKey, newSpectatorInventory);
+                    enderchestKeys.put(newSpectatorInventory, oldProfileKey);
                     newSpectatorInventory.setContents(contents);
                     viewers.forEach(v -> v.openInventory(newSpectatorInventory));
                 }, /*orElse part*/ () -> enderchests.remove(oldProfileKey)));
             }
         }
 
+
         @EventHandler
         public void onPwiLoadComplete(InventoryLoadCompleteEvent event) {
+            ProfileKey newProfileKey = new ProfileKey(event.getPlayer().getUniqueId(), event.getGroup(), event.getGameMode());
+            giveLiveInventoryToSpectators(newProfileKey);
+        }
+
+        private void giveLiveInventoryToSpectators(ProfileKey newProfileKey) {
             //new inventory contents was loaded onto the player.
 
             //  if there is is an open spectator inventory for the new profile, then
             //      close the spectator inventory for all viewers
             //      re-open a live spectator inventory, tied to the same profile key
 
-            Player player = event.getPlayer();
-            UUID playerId = player.getUniqueId();
-
-            ProfileKey newProfileKey = new ProfileKey(playerId, event.getGroup(), event.getGameMode());
-
             MainSpectatorInventory mainSpectator = inventories.get(newProfileKey);
             EnderSpectatorInventory enderSpectator = enderchests.get(newProfileKey);
 
-            //TODO DEBUG THIS (this does not work correctly!)
-
             if (mainSpectator != null) {
+
                 List<HumanEntity> viewers = new ArrayList<>(mainSpectator.getViewers());    //copy
                 ItemStack[] contents = mainSpectator.getContents();                         //already is a copy
                 viewers.forEach(HumanEntity::closeInventory);
 
-                Optional<MainSpectatorInventory> liveFuture = asLiveInventory(mainSpectator, false);
-                liveFuture.ifPresentOrElse(liveSpectator -> {
-                    inventories.put(newProfileKey, liveSpectator);
-                    liveSpectator.setContents(contents);    //updates the player's inventory!
-                    viewers.forEach(v -> v.openInventory(liveSpectator));
-                }, /*orElse part*/ () -> inventories.remove(newProfileKey));
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                    //run in the next tick to ensure that hte player has changed worlds and the live inventory is actually really live
+                    Optional<MainSpectatorInventory> liveFuture = asLiveInventory(mainSpectator, false);
+                    liveFuture.ifPresentOrElse(liveSpectator -> {
+                        inventories.put(newProfileKey, liveSpectator);
+                        inventoryKeys.put(liveSpectator, newProfileKey);
+                        liveSpectator.setContents(contents);    //updates the player's inventory!
+                        viewers.forEach(v -> v.openInventory(liveSpectator));
+                    }, /*orElse part*/ () -> inventories.remove(newProfileKey));
+                });
             }
 
             if (enderSpectator != null) {
@@ -252,12 +288,16 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 ItemStack[] contents = enderSpectator.getContents();                         //already is a copy
                 viewers.forEach(HumanEntity::closeInventory);
 
-                Optional<EnderSpectatorInventory> liveFuture = asLiveInventory(enderSpectator, false);
-                liveFuture.ifPresentOrElse(liveSpectator -> {
-                    enderchests.put(newProfileKey, liveSpectator);
-                    liveSpectator.setContents(contents);
-                    viewers.forEach(v -> v.openInventory(liveSpectator));
-                }, /*orElse part*/ () -> inventories.remove(newProfileKey));
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                    //run in the next tick to ensure that hte player has changed worlds and the live inventory is actually really live
+                    Optional<EnderSpectatorInventory> liveFuture = asLiveInventory(enderSpectator, false);
+                    liveFuture.ifPresentOrElse(liveSpectator -> {
+                        enderchests.put(newProfileKey, liveSpectator);
+                        enderchestKeys.put(liveSpectator, newProfileKey);
+                        liveSpectator.setContents(contents);
+                        viewers.forEach(v -> v.openInventory(liveSpectator));
+                    }, /*orElse part*/ () -> inventories.remove(newProfileKey));
+                });
             }
         }
     }
@@ -268,11 +308,11 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     }
 
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title, ProfileKey profileKey) {
-        MainSpectatorInventory spectatorInv = inventories.get(profileKey);
-        if (spectatorInv != null) return spectatorInv;
+        //return from cache? but that does not guarantee it's live, so for now, don't use the cache.
 
-        spectatorInv = spectateInventory(player, title);
+        MainSpectatorInventory spectatorInv = spectateInventory(player, title);
         inventories.put(profileKey, spectatorInv);
+        inventoryKeys.put(spectatorInv, profileKey);
         return spectatorInv;
     }
 
@@ -323,11 +363,9 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     }
 
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, ProfileKey profileKey) {
-        EnderSpectatorInventory spectatorInv = enderchests.get(profileKey);
-        if (spectatorInv != null) return spectatorInv;
-
-        spectatorInv = spectateEnderChest(player, title);
+        EnderSpectatorInventory spectatorInv = spectateEnderChest(player, title);
         enderchests.put(profileKey, spectatorInv);
+        enderchestKeys.put(spectatorInv, profileKey);
         return spectatorInv;
     }
 
@@ -379,9 +417,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     }
 
     private CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, ProfileKey profileKey, boolean tieToProfile) {
-        //try cache
-        MainSpectatorInventory cached = inventories.get(profileKey);
-        if (cached != null) return CompletableFuture.completedFuture(Optional.of(cached));
+        //don't ask the cache because it may contain a live inventory! (and we could get called by asSnapshotInventory!)
 
         //try non-managed
         CompletableFuture<Optional<MainSpectatorInventory>> nonPwiMainSpectatorFuture = wrapped.createOfflineInventory(playerId, playerName, title);
@@ -411,6 +447,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 //mark inventory as tied to the profile key
                 if (tieToProfile) {
                     inventoryKeys.put(spectatorInv, profileKey);
+                    inventories.put(profileKey, spectatorInv);
                 }
             });
 
@@ -479,9 +516,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     }
 
     private CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, ProfileKey profileKey, boolean tieToProfile) {
-        //try cache
-        EnderSpectatorInventory cached = enderchests.get(profileKey);
-        if (cached != null) return CompletableFuture.completedFuture(Optional.of(cached));
+        //don't ask the cache because it may contain a live inventory! (and we could get called by asSnapshotInventory!)
 
         //try non-managed
         CompletableFuture<Optional<EnderSpectatorInventory>> nonPwiEnderSpectatorFuture = wrapped.createOfflineEnderChest(playerId, playerName, title);
@@ -505,6 +540,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 //mark inventory as tied to the profile key
                 if (tieToProfile) {
                     enderchestKeys.put(spectatorInv, profileKey);
+                    enderchests.put(profileKey, spectatorInv);
                 }
             });
 
@@ -600,7 +636,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
         //if live spectator inventory is bound to a profile key AND the player does not match that profile, then the inventory wasn't live in the first place.
         ProfileKey profileKey = inventoryKeys.get(liveSpectatorInventory);
-        if (profileKey != null && !pwiHook.isMatchedByProfile(player, inventoryKeys.get(liveSpectatorInventory))) {
+        if (profileKey != null && !pwiHook.isMatchedByProfile(player, profileKey)) {
             return CompletableFuture.completedFuture(Optional.of(liveSpectatorInventory));
         }
 
