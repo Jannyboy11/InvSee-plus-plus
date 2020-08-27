@@ -80,7 +80,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             // do we transfer the contents from the spectator to the live player?
             // only if the enderchests share the same group!
 
-            ProfileKey profileKey = inventoryKeys.get(spectatorInventory);
+            ProfileKey profileKey = enderchestKeys.get(spectatorInventory);
             if (profileKey == null) return true; //not tied to a profile, so just transfer
 
             //check whether world and gamemode match

@@ -48,7 +48,7 @@ public interface OfflinePlayerProvider {
         return offlinePlayerProvider;
     }
 
-    static class Dummy implements OfflinePlayerProvider {
+    public static class Dummy implements OfflinePlayerProvider {
 
         private static final Dummy INSTANCE = new Dummy();
 
