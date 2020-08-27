@@ -1,6 +1,7 @@
 package com.janboerman.invsee.utils;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public abstract class Either<L, R> {
 
@@ -19,7 +20,7 @@ public abstract class Either<L, R> {
     public abstract L getLeft();
     public abstract R getRight();
 
-    private static class Left<L, R> extends Either<L, R> {
+    private static final class Left<L, R> extends Either<L, R> {
         private final L value;
         private Left(L value) {
             this.value = value;
@@ -44,9 +45,28 @@ public abstract class Either<L, R> {
         public R getRight() {
             throw new NoSuchElementException("left");
         }
+
+        @Override
+        public String toString() {
+            return "Left[" + value + ']';
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof Left)) return false;
+
+            Left<?, ?> that = (Left<?, ?>) o;
+            return Objects.equals(value, that.value);
+        }
     }
 
-    private static class Right<L, R> extends Either<L, R> {
+    private static final class Right<L, R> extends Either<L, R> {
         private final R value;
         private Right(R value) {
             this.value = value;
@@ -70,6 +90,25 @@ public abstract class Either<L, R> {
         @Override
         public R getRight() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return "Right[" + value + ']';
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(value) + 1;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof Right)) return false;
+
+            Right<?, ?> that = (Right<?, ?>) o;
+            return Objects.equals(value, that.value);
         }
     }
 }

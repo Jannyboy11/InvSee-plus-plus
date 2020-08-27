@@ -69,7 +69,7 @@ class InvseeCommandExecutor implements CommandExecutor {
                     UUID uniqueId = optId.get();
                     ProfileKey profileKey = PwiCommandArgs.toProfileKey(uniqueId, pwiOptions, pwiApi.getHook());
                     String playerName = finalIsUuid ? "InvSee++ Player" : playerNameOrUUID;
-                    return pwiApi.createOfflineInventory(uniqueId, playerName, playerName + "'s inventory", profileKey);
+                    return pwiApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory", profileKey);
                 } else {
                     return CompletableFuture.completedFuture(Optional.empty());
                 }
@@ -79,6 +79,7 @@ class InvseeCommandExecutor implements CommandExecutor {
         if (future == null) {
             //No PWI argument - just continue with the regular method
             if (isUuid) {
+                //TODO UUID -> name conversion
                 future = api.spectateInventory(uuid, "InvSee++ Player", playerNameOrUUID + "'s inventory");
             } else {
                 future = api.spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");

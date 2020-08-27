@@ -70,7 +70,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
                     UUID uniqueId = optId.get();
                     ProfileKey profileKey = PwiCommandArgs.toProfileKey(uniqueId, pwiOptions, pwiApi.getHook());
                     String playerName = finalIsUuid ? "InvSee++ Player" : playerNameOrUUID;
-                    return pwiApi.createOfflineEnderChest(uniqueId, playerName, playerName + "'s inventory", profileKey);
+                    return pwiApi.spectateEnderChest(uniqueId, playerName, playerName + "'s inventory", profileKey);
                 } else {
                     return CompletableFuture.completedFuture(Optional.empty());
                 }
@@ -78,7 +78,9 @@ class EnderseeCommandExecutor implements CommandExecutor {
         }
 
         if (future == null) {
+            //No PWI argument - just continue with the regular method
             if (isUuid) {
+                //TODO UUID -> name conversion
                 future = api.spectateEnderChest(uuid, "InvSee++ Player", playerNameOrUUID + "'s enderchest");
             } else {
                 future = api.spectateEnderChest(playerNameOrUUID, playerNameOrUUID + "'s enderchest");

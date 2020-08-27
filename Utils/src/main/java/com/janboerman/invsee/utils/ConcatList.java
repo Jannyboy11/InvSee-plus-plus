@@ -18,10 +18,11 @@ public class ConcatList<T> extends AbstractList<T> {
 
     @Override
     public T get(int index) {
-        if (index < first.size()) {
+        int firstSize = first.size();
+        if (index < firstSize) {
             return first.get(index);
         } else {
-            return second.get(index);
+            return second.get(index - firstSize);
         }
     }
 
@@ -32,10 +33,11 @@ public class ConcatList<T> extends AbstractList<T> {
 
     @Override
     public T set(int index, T element) {
-        if (index < first.size()) {
+        int firstSize = first.size();
+        if (index < firstSize) {
             return first.set(index, element);
         } else {
-            return second.set(index, element);
+            return second.set(index - firstSize, element);
         }
     }
 
@@ -276,19 +278,21 @@ public class ConcatList<T> extends AbstractList<T> {
 
     @Override
     public void add(int index, T element) {
-        if (index <= first.size()) {
+        int firstSize = first.size();
+        if (index <= firstSize) {
             first.add(index, element);
         } else {
-            second.add(index - first.size(), element);
+            second.add(index - firstSize, element);
         }
     }
 
     @Override
     public T remove(int index) {
-        if (index <= first.size()) {
+        int firstSize = first.size();
+        if (index <= firstSize) {
             return first.remove(index);
         } else {
-            return second.remove(index - first.size());
+            return second.remove(index - firstSize);
         }
     }
 
@@ -300,10 +304,11 @@ public class ConcatList<T> extends AbstractList<T> {
 
     @Override
     public boolean addAll(int index, Collection<? extends T> c) {
-        if (index <= first.size()) {
+        int firstSize = first.size();
+        if (index <= firstSize) {
             return first.addAll(index, c);
         } else {
-            return second.addAll(index - first.size(),c);
+            return second.addAll(index - firstSize,c);
         }
     }
 

@@ -46,9 +46,9 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     private final WeakBiMap<ProfileKey, EnderSpectatorInventory> enderchests = new WeakBiMap<>();
     private final WeakBiMap<ProfileKey, EnderSpectatorInventory>.Reversed enderchestKeys = enderchests.swap();
 
-    private final PwiEventListener pwiEventListener = new PwiEventListener();
-    private final TiedInventoryListener tiedInventoryListener = new TiedInventoryListener();
-    private final TiedPlayerListener tiedPlayerListener = new TiedPlayerListener();
+    private PwiEventListener pwiEventListener;
+    private TiedInventoryListener tiedInventoryListener;
+    private TiedPlayerListener tiedPlayerListener;
 
     public PerWorldInventorySeeApi(Plugin plugin, InvseeAPI wrapped, PerWorldInventoryHook pwiHook) {
         super(plugin);
@@ -91,9 +91,9 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     public void registerListeners() {
         super.registerListeners();
         PluginManager pluginManager = plugin.getServer().getPluginManager();
-        pluginManager.registerEvents(pwiEventListener, plugin);
-        pluginManager.registerEvents(tiedInventoryListener, plugin);
-        pluginManager.registerEvents(tiedPlayerListener, plugin);
+        pluginManager.registerEvents(pwiEventListener = new PwiEventListener(), plugin);
+        pluginManager.registerEvents(tiedInventoryListener = new TiedInventoryListener(), plugin);
+        pluginManager.registerEvents(tiedPlayerListener = new TiedPlayerListener(), plugin);
     }
 
     public void unregsiterListeners() {
@@ -165,7 +165,6 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         }
     }
 
-    //TODO test this
     private final class PwiEventListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -186,17 +185,17 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             ProfileKey oldProfileKey = pwiHook.getActiveProfileKey(player);
             //ProfileKey newProfileKey = new ProfileKey(player.getUniqueId(), event.getGroup(), event.getNewGameMode());
 
-            boolean wasInventoryLiveSpectated = inventories.containsKey(oldProfileKey);
-            boolean wasEnderChestLiveSpectated = enderchests.containsKey(oldProfileKey);
+            MainSpectatorInventory mainSpectator = inventories.get(oldProfileKey);
+            EnderSpectatorInventory enderSpectator = enderchests.get(oldProfileKey);
 
-            if (wasInventoryLiveSpectated) {
-                MainSpectatorInventory spectatorInventory = inventories.get(oldProfileKey);
+            //TODO DEBUG THIS!! (this does not work correctly!)
 
-                List<HumanEntity> viewers = new ArrayList<>(spectatorInventory.getViewers());   //copy
-                ItemStack[] contents = spectatorInventory.getContents();                        //already is a copy
+            if (mainSpectator != null) {
+                List<HumanEntity> viewers = new ArrayList<>(mainSpectator.getViewers());   //copy
+                ItemStack[] contents = mainSpectator.getContents();                        //already is a copy
                 viewers.forEach(HumanEntity::closeInventory);
 
-                CompletableFuture<Optional<MainSpectatorInventory>> snapshotFuture = asSnapShotInventory(spectatorInventory);
+                CompletableFuture<Optional<MainSpectatorInventory>> snapshotFuture = asSnapShotInventory(mainSpectator);
                 snapshotFuture.thenAccept(optional -> optional.ifPresentOrElse(newSpectatorInventory -> {
                     inventories.put(oldProfileKey, newSpectatorInventory);
                     newSpectatorInventory.setContents(contents);
@@ -204,13 +203,11 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 }, /*orElse part*/ () -> inventories.remove(oldProfileKey)));
             }
 
-            if (wasEnderChestLiveSpectated) {
-                EnderSpectatorInventory spectatorInventory = enderchests.get(oldProfileKey);
+            if (enderSpectator != null) {
+                List<HumanEntity> viewers = new ArrayList<>(enderSpectator.getViewers());   //copy
+                ItemStack[] contents = enderSpectator.getContents();                        //already is a copy
 
-                List<HumanEntity> viewers = new ArrayList<>(spectatorInventory.getViewers());   //copy
-                ItemStack[] contents = spectatorInventory.getContents();                        //already is a copy
-
-                CompletableFuture<Optional<EnderSpectatorInventory>> snapshotFuture = asSnapShotInventory(spectatorInventory);
+                CompletableFuture<Optional<EnderSpectatorInventory>> snapshotFuture = asSnapShotInventory(enderSpectator);
                 snapshotFuture.thenAccept(optional -> optional.ifPresentOrElse(newSpectatorInventory -> {
                     enderchests.put(oldProfileKey, newSpectatorInventory);
                     newSpectatorInventory.setContents(contents);
@@ -232,17 +229,17 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
             ProfileKey newProfileKey = new ProfileKey(playerId, event.getGroup(), event.getGameMode());
 
-            boolean inventorySpectated = inventories.containsKey(newProfileKey);
-            boolean enderchestSpectated = enderchests.containsKey(newProfileKey);
+            MainSpectatorInventory mainSpectator = inventories.get(newProfileKey);
+            EnderSpectatorInventory enderSpectator = enderchests.get(newProfileKey);
 
-            if (inventorySpectated) {
-                MainSpectatorInventory snapshotSpectator = inventories.get(newProfileKey);
+            //TODO DEBUG THIS (this does not work correctly!)
 
-                List<HumanEntity> viewers = new ArrayList<>(snapshotSpectator.getViewers());    //copy
-                ItemStack[] contents = snapshotSpectator.getContents();                         //already is a copy
+            if (mainSpectator != null) {
+                List<HumanEntity> viewers = new ArrayList<>(mainSpectator.getViewers());    //copy
+                ItemStack[] contents = mainSpectator.getContents();                         //already is a copy
                 viewers.forEach(HumanEntity::closeInventory);
 
-                Optional<MainSpectatorInventory> liveFuture = asLiveInventory(snapshotSpectator, false);
+                Optional<MainSpectatorInventory> liveFuture = asLiveInventory(mainSpectator, false);
                 liveFuture.ifPresentOrElse(liveSpectator -> {
                     inventories.put(newProfileKey, liveSpectator);
                     liveSpectator.setContents(contents);    //updates the player's inventory!
@@ -250,14 +247,12 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 }, /*orElse part*/ () -> inventories.remove(newProfileKey));
             }
 
-            if (enderchestSpectated) {
-                EnderSpectatorInventory snapshotSpectator = enderchests.get(newProfileKey);
-
-                List<HumanEntity> viewers = new ArrayList<>(snapshotSpectator.getViewers());    //copy
-                ItemStack[] contents = snapshotSpectator.getContents();                         //already is a copy
+            if (enderSpectator != null) {
+                List<HumanEntity> viewers = new ArrayList<>(enderSpectator.getViewers());    //copy
+                ItemStack[] contents = enderSpectator.getContents();                         //already is a copy
                 viewers.forEach(HumanEntity::closeInventory);
 
-                Optional<EnderSpectatorInventory> liveFuture = asLiveInventory(snapshotSpectator, false);
+                Optional<EnderSpectatorInventory> liveFuture = asLiveInventory(enderSpectator, false);
                 liveFuture.ifPresentOrElse(liveSpectator -> {
                     enderchests.put(newProfileKey, liveSpectator);
                     liveSpectator.setContents(contents);
@@ -273,9 +268,20 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     }
 
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title, ProfileKey profileKey) {
-        MainSpectatorInventory spectatorInv = spectateInventory(player, title);
+        MainSpectatorInventory spectatorInv = inventories.get(profileKey);
+        if (spectatorInv != null) return spectatorInv;
+
+        spectatorInv = spectateInventory(player, title);
         inventories.put(profileKey, spectatorInv);
         return spectatorInv;
+    }
+
+    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileKey profileKey) {
+        Player player = plugin.getServer().getPlayer(playerId);
+        if (player != null && getHook().isMatchedByProfile(player, profileKey))
+            return CompletableFuture.completedFuture(Optional.of(spectateInventory(player, title, profileKey)));
+
+        return createOfflineInventory(playerId, playerName, title, profileKey);
     }
 
     @Override
@@ -316,10 +322,21 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         return wrapped.spectateEnderChest(player, title);
     }
 
-    public EnderSpectatorInventory spectateEnderChests(HumanEntity player, String title, ProfileKey profileKey) {
-        EnderSpectatorInventory spectatorInv = spectateEnderChest(player, title);
+    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, ProfileKey profileKey) {
+        EnderSpectatorInventory spectatorInv = enderchests.get(profileKey);
+        if (spectatorInv != null) return spectatorInv;
+
+        spectatorInv = spectateEnderChest(player, title);
         enderchests.put(profileKey, spectatorInv);
         return spectatorInv;
+    }
+
+    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title, ProfileKey profileKey) {
+        Player player = plugin.getServer().getPlayer(playerId);
+        if (player != null && pwiHook.isMatchedByProfile(player, profileKey))
+            return CompletableFuture.completedFuture(Optional.of(spectateEnderChest(player, title, profileKey)));
+
+        return createOfflineEnderChest(playerId, playerName, title, profileKey);
     }
 
     @Override
