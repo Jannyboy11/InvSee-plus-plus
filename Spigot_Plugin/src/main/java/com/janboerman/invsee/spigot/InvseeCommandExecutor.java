@@ -3,9 +3,9 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
+import com.janboerman.invsee.spigot.perworldinventory.ProfileId;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.Either;
-import me.ebonjaeger.perworldinventory.data.ProfileKey;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -67,9 +67,9 @@ class InvseeCommandExecutor implements CommandExecutor {
             future = uuidFuture.thenCompose(optId -> {
                 if (optId.isPresent()) {
                     UUID uniqueId = optId.get();
-                    ProfileKey profileKey = PwiCommandArgs.toProfileKey(uniqueId, pwiOptions, pwiApi.getHook());
-                    String playerName = finalIsUuid ? "InvSee++ Player" : playerNameOrUUID;
-                    return pwiApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory", profileKey);
+                    ProfileId profileId = new ProfileId(pwiApi.getHook(), pwiOptions, uniqueId);
+                    String playerName = finalIsUuid ? "InvSee++ Player" : playerNameOrUUID; //TODO UUID -> name conversion
+                    return pwiApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory", profileId);
                 } else {
                     return CompletableFuture.completedFuture(Optional.empty());
                 }

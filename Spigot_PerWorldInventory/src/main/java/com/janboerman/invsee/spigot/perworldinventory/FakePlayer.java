@@ -112,6 +112,9 @@ public class FakePlayer implements Player {
     private final FakePlayerInventory inventory;
     private final EnumMap<Attribute, AttributeInstance> attributes = new EnumMap<>(Attribute.class);
     private final long firstPlayed, lastPlayed;
+    private int arrowsInBody;
+    private int arrowCooldown;
+    private boolean invisible;
 
     public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
@@ -198,6 +201,16 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public boolean isInvisible(){
+        return invisible;
+    }
+
+    @Override
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+    }
+
+    @Override
     public void setCompassTarget(@NotNull Location location) {
         this.compassTarget = location;
     }
@@ -242,6 +255,10 @@ public class FakePlayer implements Player {
 
     @Override
     public void sendRawMessage(@NotNull String s) {
+    }
+
+    @Override
+    public void sendRawMessage(UUID from, String s) {
     }
 
     @Override
@@ -404,11 +421,19 @@ public class FakePlayer implements Player {
     }
 
     @Override
-    public void sendMessage(@NotNull String s) {
+    public void sendMessage(@NotNull String message) {
     }
 
     @Override
-    public void sendMessage(@NotNull String[] strings) {
+    public void sendMessage(@NotNull String[] messages) {
+    }
+
+    @Override
+    public void sendMessage(UUID from, String message) {
+    }
+
+    @Override
+    public void sendMessage(UUID from, String[] messages) {
     }
 
     @NotNull
@@ -1634,6 +1659,26 @@ public class FakePlayer implements Player {
     @Override
     public void setMaximumAir(int i) {
         this.maximumAir = i;
+    }
+
+    @Override
+    public int getArrowCooldown() {
+        return arrowCooldown;
+    }
+
+    @Override
+    public void setArrowCooldown(int ticks) {
+        this.arrowCooldown = ticks;
+    }
+
+    @Override
+    public int getArrowsInBody() {
+        return arrowsInBody;
+    }
+
+    @Override
+    public void setArrowsInBody(int count) {
+        this.arrowsInBody = count;
     }
 
     @Override

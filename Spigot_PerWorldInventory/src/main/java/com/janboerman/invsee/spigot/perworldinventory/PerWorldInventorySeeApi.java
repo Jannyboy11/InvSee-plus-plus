@@ -320,8 +320,9 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         return spectatorInv;
     }
 
-    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileKey profileKey) {
+    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileId profileId) {
         Player player = plugin.getServer().getPlayer(playerId);
+        ProfileKey profileKey = profileId.profileKey;
         if (player != null && getHook().isMatchedByProfile(player, profileKey))
             return CompletableFuture.completedFuture(Optional.of(spectateInventory(player, title, profileKey)));
 
@@ -373,8 +374,9 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         return spectatorInv;
     }
 
-    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title, ProfileKey profileKey) {
+    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title, ProfileId profileId) {
         Player player = plugin.getServer().getPlayer(playerId);
+        ProfileKey profileKey = profileId.profileKey;
         if (player != null && pwiHook.isMatchedByProfile(player, profileKey))
             return CompletableFuture.completedFuture(Optional.of(spectateEnderChest(player, title, profileKey)));
 

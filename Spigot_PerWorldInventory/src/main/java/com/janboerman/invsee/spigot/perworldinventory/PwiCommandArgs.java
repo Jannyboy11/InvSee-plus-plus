@@ -15,9 +15,9 @@ public class PwiCommandArgs {
 
     private static final String formError = "Expected the following from: PWI{<property>=<value>,...} where <property> is one of [group, world, gamemode].";
 
-    private String world;
-    private Group group;
-    private GameMode gameMode;
+    String world;
+    Group group;
+    GameMode gameMode;
 
     private PwiCommandArgs() {}
 
@@ -70,6 +70,9 @@ public class PwiCommandArgs {
     }
 
     public static List<String> complete(final String argument, PerWorldInventoryHook hook) {
+        //TODO this can be called asynchronously!
+        //TODO I don't think this is threadsafe.
+
         if (argument.length() < 4) return List.of("PWI{");
         if (!StringHelper.startsWithIgnoreCase(argument, "PWI{")) {
             return List.of("PWI{group=", "PWI{world=", "PWI{gamemode=");
@@ -195,24 +198,4 @@ public class PwiCommandArgs {
         }
     }
 
-    public static ProfileKey toProfileKey(UUID playerId, PwiCommandArgs options, PerWorldInventoryHook hook) {
-        Group group;
-        GameMode gameMode = options.gameMode;
-        if (gameMode == null || !hook.pwiInventoriesPerGameMode()) gameMode = GameMode.SURVIVAL;
-
-        if (options.group != null) {
-            group = options.group;
-        } else if (options.world != null) {
-            group = hook.getGroupForWorld(options.world);
-        } else {
-            //unmanaged group!
-            group = new Group("", Set.of(), gameMode, null);
-        }
-
-        if (options.world != null) {
-            group.addWorld(options.world);
-        }
-
-        return new ProfileKey(playerId, group, gameMode);
-    }
 }

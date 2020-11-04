@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_Impl_1_16_R2</artifactId>
+    <artifactId>Spigot_Impl_1_16_R3</artifactId>
 
 
     <build>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.16.2-R0.1-SNAPSHOT</version>
+            <version>1.16.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

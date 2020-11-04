@@ -152,6 +152,8 @@ public abstract class InvseeAPI {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R1.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R2.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R2.InvseeImpl").getConstructor(Plugin.class);
+            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R3.CraftServer")) {
+                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl").getConstructor(Plugin.class);
             }

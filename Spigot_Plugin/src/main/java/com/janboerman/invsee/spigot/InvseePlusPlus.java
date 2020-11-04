@@ -5,6 +5,7 @@ import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +16,6 @@ public class InvseePlusPlus extends JavaPlugin {
 
     private InvseeAPI api;
     private OfflinePlayerProvider offlinePlayerProvider;
-    private PerWorldInventoryHook pwiHook;
     private PerWorldInventorySeeApi pwiApi;
 
     @Override
@@ -28,9 +28,9 @@ public class InvseePlusPlus extends JavaPlugin {
         PerWorldInventoryHook pwiHook = new PerWorldInventoryHook(this);
         if (pwiHook.trySetup()) {
             if (pwiHook.pwiManagedInventories() || pwiHook.pwiManagedEnderChests()) {
-                this.pwiHook = pwiHook;
                 this.pwiApi = new PerWorldInventorySeeApi(this, api, pwiHook);
                 this.api = pwiApi;
+                getLogger().info("Enabled PerWorldInventory integration.");
             }
         }
 
@@ -45,6 +45,9 @@ public class InvseePlusPlus extends JavaPlugin {
         invseeCommand.setTabCompleter(tabCompleter);
         enderseeCommand.setTabCompleter(tabCompleter);
 
+        //TODO idea: should look functionality. an admin will always see the same inventory that the target player sees.
+        //TODO can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
+
         //event listeners
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
@@ -57,6 +60,17 @@ public class InvseePlusPlus extends JavaPlugin {
             getLogger().log(Level.WARNING, "Tab-completion for offline players will not work for all players!");
             getLogger().log(Level.WARNING, "See https://papermc.io/ for more information.");
         }
+
+        //bStats
+        int pluginId = 9309;
+        Metrics metrics = new Metrics(this, pluginId);
+        metrics.addCustomChart(new Metrics.SimplePie("Back-end", () -> {
+            if (this.api instanceof PerWorldInventorySeeApi) {
+                return "PerWorldInventory";
+            } else {
+                return "Vanilla";
+            }
+        }));
     }
 
     public InvseeAPI getApi() {

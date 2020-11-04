@@ -18,7 +18,7 @@ Do you like this plugin? Then please leave a rating on [SpigotMC](https://www.sp
 
 ###### Prerequesites: [JDK-11](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
-1. Install Spigot into your local repository first by running BuildTools with
+1. Install CraftBukkit into your local repository first by running BuildTools with
     - `java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.16.1 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.16.3 --compile craftbukkit`
