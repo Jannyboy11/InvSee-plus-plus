@@ -20,25 +20,26 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	private InventoryView bukkitView;
 	
 	private static MenuType<?> determineMenuType(EnderNmsInventory inv) {
-		switch(inv.getContainerSize()) {
-			case 9: return MenuType.GENERIC_9x1;
-			case 18: return MenuType.GENERIC_9x2;
-			case 27: return MenuType.GENERIC_9x3;
-			case 36: return MenuType.GENERIC_9x4;
-			case 45: return MenuType.GENERIC_9x5;
-			case 54: return MenuType.GENERIC_9x6;
-			default: return MenuType.GENERIC_9x3;
-		}
+		return switch(inv.getContainerSize()) {
+			case 9 -> MenuType.GENERIC_9x1;
+			case 18 -> MenuType.GENERIC_9x2;
+			case 27 -> MenuType.GENERIC_9x3;
+			case 36 -> MenuType.GENERIC_9x4;
+			case 45 -> MenuType.GENERIC_9x5;
+			case 54 -> MenuType.GENERIC_9x6;
+			default -> MenuType.GENERIC_9x3;
+		};
 	}
 
 	public EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player) {
 		super(determineMenuType(nmsInventory), containerId);
 		
-		this.topRows = nmsInventory.getContainerSize();
+		this.topRows = nmsInventory.getContainerSize() / 9;
 		this.player = player;
 		this.top = nmsInventory;
 		this.bottom = playerInventory;
-		
+		//nmsInventory.startOpen(player);
+
 		//top inventory slots
 		for (int yPos = 0; yPos < topRows; yPos++) {
 			for (int xPos = 0; xPos < 9; xPos++) {
@@ -58,7 +59,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 				int index = xPos + yPos * 9;
 				int magicX = 8 + xPos * 18;
 				int magicY = 103 + yPos * 18 + magicAddY;
-				this.addSlot(new Slot(playerInventory, index, magicX, magicY));
+				this.addSlot(new Slot(bottom, index, magicX, magicY));
 			}
 		}
 		
@@ -67,7 +68,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 			int index = xPos;
 			int magicX = 8 + xPos * 18;
 			int magicY = 161 + magicAddY;
-			this.addSlot(new Slot(playerInventory, index, magicX, magicY));
+			this.addSlot(new Slot(bottom, index, magicX, magicY));
 		}
 	}
 

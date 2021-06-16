@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.network.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
@@ -43,23 +44,21 @@ class EnderNmsInventory implements Container, MenuProvider {
 		this(targetPlayerUuid, targetPlayerName, storageContents);
 		this.title = title;
 	}
-	
 
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
 		return new EnderNmsContainer(containerId, this, playerInventory, player);
 	}
-	
-	
+
 	@Override
 	public Component getDisplayName() {
+		//return new TextComponent("minecraft:generic_9x" + (storageContents.size() / 9));
 		return CraftChatMessage.fromStringOrNull(title);
 	}
 
 	@Override
 	public void clearContent() {
 		storageContents.clear();
-		
 	}
 
 	@Override

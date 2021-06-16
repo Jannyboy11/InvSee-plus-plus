@@ -46,10 +46,8 @@ public class InvseeImpl extends InvseeAPI {
         MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), title);
         MainBukkitInventory bukkitInventory = new MainBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
-        
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
-        
         return bukkitInventory;
     }
 

@@ -29,8 +29,10 @@ Just drop the InvSee++.jar file in your server's /plugins folder and make sure y
     - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.17 --compile craftbukkit --remapped`
 2. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
-and running `mvn clean install -DskipTests=true` in its root directory. 
-3. In the root directory of this project run `mvn clean package`.
+and running `mvn clean install -DskipTests=true` in its root directory.
+3. Install a maven-shade-plugin into your local repository by downloading [maven-shade-plugin's code](https://github.com/apache/maven-shade-plugin)
+and running `mvn clean install` in its root directory.
+4. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at Spigot_Plugin/target/InvSee++.jar.
 
 ### License

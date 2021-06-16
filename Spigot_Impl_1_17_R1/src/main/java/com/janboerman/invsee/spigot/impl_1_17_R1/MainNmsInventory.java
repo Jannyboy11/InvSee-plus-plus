@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.network.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
@@ -63,7 +64,6 @@ class MainNmsInventory implements Container, MenuProvider {
 			}
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
-		
 	}
 	
 	protected MainNmsInventory(Player target, String title) {
@@ -118,13 +118,13 @@ class MainNmsInventory implements Container, MenuProvider {
 	}
 
 	@Override
-	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player thePlayer) {
-		// TODO !! custom container implementation!
-		return null;
+	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player viewer) {
+		return new MainNmsContainer(containerId, this, playerInventory, viewer);
 	}
 
 	@Override
 	public Component getDisplayName() {
+		//return new TextComponent("minecraft:generic_9x6");
 		return CraftChatMessage.fromStringOrNull(title);
 	}
 

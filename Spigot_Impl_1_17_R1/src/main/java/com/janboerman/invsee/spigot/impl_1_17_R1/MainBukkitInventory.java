@@ -46,18 +46,18 @@ class MainBukkitInventory extends CraftInventory implements MainSpectatorInvento
 		
 		MainNmsInventory nms = getInventory();
 		var top = targetPlayerView.getTopInventory();
-		if (top instanceof CraftInventoryCrafting) {
-			CraftingContainer targetCrafting = (CraftingContainer) ((CraftInventoryCrafting) top).getInventory();
+		if (top instanceof CraftInventoryCrafting cic) {
+			CraftingContainer targetCrafting = (CraftingContainer) cic.getInventory();
 			nms.personalContents = targetCrafting.getContents(); //luckily, this does not create a copy.
-		} else if (top instanceof CraftResultInventory) {
+		} else if (top instanceof CraftResultInventory cri) {
 			//anvil, grindstone, loom, smithing table, cartography table, stone cutter
-			Container repairItems = ((CraftResultInventory) top).getInventory();
+			Container repairItems = cri.getInventory();
 			nms.personalContents = repairItems.getContents();
-		} else if (top instanceof CraftInventoryEnchanting) {
-			Container enchantItems = ((CraftInventoryEnchanting) top).getInventory();
+		} else if (top instanceof CraftInventoryEnchanting cie) {
+			Container enchantItems = cie.getInventory();
 			nms.personalContents = enchantItems.getContents();
-		} else if (top instanceof CraftInventoryMerchant) {
-			MerchantContainer merchantItems = ((CraftInventoryMerchant) top).getInventory();
+		} else if (top instanceof CraftInventoryMerchant cim) {
+			MerchantContainer merchantItems = cim.getInventory();
 			nms.personalContents = merchantItems.getContents();
 		}
 		
