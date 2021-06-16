@@ -20,17 +20,6 @@ commands:
     usage: "/endersee <username>|<uuid>"
     aliases: [enderchestsee, esee]
 
-  ginvsee:
-    description: View a player's inventory from another server
-    permission: invseeplusplus.ginvsee.view
-    usage: "/ginvsee <username>|<uuid> <server>"
-    aliases: [globalinvsee, gisee, ginventorysee, globalinventorysee]
-  gendersee:
-    description: View a player's enderchest from another server
-    permission: invseeplusplus.gendersee.view
-    usage: "/gendersee <username>|<uuid> <server>"
-    aliases: [globalendersee, gesee, genderchestsee, globalenderchestsee]
-
 permissions:
   invseeplusplus.*:
     description: Gives access to view and edit players' inventories and enderchests
@@ -56,17 +45,6 @@ permissions:
       invseeplusplus.invsee.edit: true
       invseeplusplus.endersee.edit: true
 
-  invseeplusplus.global.view:
-    description: Gives access to view player's inventories and enderchests from other servers
-    children:
-      invseeplusplus.ginvsee.view: true
-      invseeplusplus.gendersee.view: true
-  invseeplusplus.global.edit:
-    descriptiorin: Gives access to edit players' inventories and enderchests from other servers
-    children:
-      invseeplusplus.ginvsee.edit: true
-      invseeplusplus.gendersee.edit: true
-
   invseeplusplus.invsee:
     description: Gives access to view and edit a player's inventory
     children:
@@ -77,17 +55,6 @@ permissions:
     children:
       invseeplusplus.endersee.view: true
       invseeplusplus.endersee.edit: true
-
-  invseeplusplus.ginvsee:
-    description: Gives access to view and edit a player's inventory from another server
-    children:
-      invseeplusplus.ginvsee.view: true
-      invseeplusplus.ginvsee.edit: true
-  invseeplusplus.gendersee:
-    description: Gives access to view and edit a player's enderchest from antoher server
-    children:
-      invseeplusplus.gendersee.view: true
-      invseeplusplus.gendersee.edit: true
 
   invseeplusplus.invsee.view:
     description: Gives access to view a player's inventory
@@ -100,17 +67,4 @@ permissions:
     default: op
   invseeplusplus.endersee.edit:
     description: Gives access to edit a player's enderchest
-    default: op
-
-  invseeplusplus.ginvsee.view:
-    description: Gives access to view a player's inventory from another server
-    default: op
-  invseeplusplus.ginvsee.edit:
-    description: Gives access to edit a player's inventory from another server
-    default: op
-  invseeplusplus.gendersee.view:
-    description: Gives access to view a player's enderchest from another server
-    default: op
-  invseeplusplus.gendersee.edit:
-    description: Gives access to edit a player's enderchest from another server
     default: op

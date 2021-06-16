@@ -1,6 +1,9 @@
 # InvSee++
 
 A bukkit plugin for manipulating player inventories.
+
+![Logo](https://github.com/Jannyboy11/InvSee-plus-plus/blob/master/img/invsee6.png?raw=true)
+
 This plugin will still work when target players are offline, even when they have never been on the server.
 
 Do you like this plugin? Then please leave a rating anda review on [SpigotMC](https://www.spigotmc.org/resources/invsee.82342/)!
@@ -15,8 +18,17 @@ Just drop the InvSee++.jar file in your server's /plugins folder and make sure y
 
 ### Permissions
 
-- `invseeplusplus.invsee` allows access to `/invsee`. By default only for server operators.
-- `invseeplusplus.endersee` allows access to `/endersee`. By default only for server operators.
+- `invseeplusplus.invsee.view` allows access to `/invsee`. By default only for server operators.
+- `invseeplusplus.invsee.edit` allows the player to manipulate the target player's inventory. By default only for server operators.
+- `invseeplusplus.endersee.view` allows access to `/endersee`. By default only for server operators.
+- `invseeplusplus.endersee.edit` allows the player to manipulate the target player's enderchest. By default only for server operators.
+
+###### Aggregate permissions:
+- `invseeplusplus.invsee` provides `invseeplusplus.invsee.view` and `invseeplusplus.invsee.edit`
+- `invseeplusplus.endersee` provides `invseeplusplus.endersee.view` and `invseeplusplus.endersee.edit`
+- `invseeplusplus.view` provides `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`
+- `invseeplusplus.edit` provides `invseeplusplus.invsee.edit` and `invseeplusplus.endersee.edit`
+- `invseeplusplus.*` provides all four of the base permissions
 
 ### Compiling
 
