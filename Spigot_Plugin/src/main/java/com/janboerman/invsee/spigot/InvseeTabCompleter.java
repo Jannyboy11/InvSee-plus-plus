@@ -25,7 +25,7 @@ public class InvseeTabCompleter implements TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String s, String[] args) {
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         InvseeAPI api = plugin.getApi();
         if (args.length == 0) {
             Collection<? extends Player> onlinePlayers = sender.getServer().getOnlinePlayers();
