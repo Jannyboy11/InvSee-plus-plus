@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.perworldinventory;
 
+import com.janboerman.invsee.spigot.internal.FakePersistentDataContainer;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
@@ -344,6 +345,17 @@ public class FakePlayer implements Player {
     @Override
     public boolean isOnGround() {
         return false;
+    }
+
+    @Override
+    public boolean isInWater() {
+        Material blockType = getLocation().getBlock().getType();
+        switch (blockType) {
+            case WATER:
+                return true;
+            default:
+                return false;
+        }
     }
 
     @NotNull

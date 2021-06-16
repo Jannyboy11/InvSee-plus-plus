@@ -32,7 +32,6 @@ public class EnderNmsContainer extends Container {
         this.player = player;
         this.top = nmsInventory;
         this.bottom = playerInventory;
-        //setTitle(nmsInventory.getScoreboardDisplayName());
 
         //top inventory slots
         for (int yPos = 0; yPos < topRows; yPos++) {

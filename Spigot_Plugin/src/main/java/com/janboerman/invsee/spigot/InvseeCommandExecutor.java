@@ -68,8 +68,10 @@ class InvseeCommandExecutor implements CommandExecutor {
                 if (optId.isPresent()) {
                     UUID uniqueId = optId.get();
                     ProfileId profileId = new ProfileId(pwiApi.getHook(), pwiOptions, uniqueId);
-                    String playerName = finalIsUuid ? "InvSee++ Player" : playerNameOrUUID; //TODO UUID -> name conversion
-                    return pwiApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory", profileId);
+                    CompletableFuture<String> userNameFuture = finalIsUuid
+                            ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                            : CompletableFuture.completedFuture(playerNameOrUUID);
+                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory", profileId));
                 } else {
                     return CompletableFuture.completedFuture(Optional.empty());
                 }
@@ -79,9 +81,12 @@ class InvseeCommandExecutor implements CommandExecutor {
         if (future == null) {
             //No PWI argument - just continue with the regular method
             if (isUuid) {
-                //TODO UUID -> name conversion
-                future = api.spectateInventory(uuid, "InvSee++ Player", playerNameOrUUID + "'s inventory");
+                //playerNameOrUUID is a UUID.
+                final UUID finalUuid = uuid;
+                future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                        .thenCompose(userName -> api.spectateInventory(finalUuid, userName, playerNameOrUUID + "'s inventory"));
             } else {
+                //playerNameOrUUID is a username.
                 future = api.spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
             }
         }

@@ -68,8 +68,10 @@ class EnderseeCommandExecutor implements CommandExecutor {
                 if (optId.isPresent()) {
                     UUID uniqueId = optId.get();
                     ProfileId profileId = new ProfileId(pwiApi.getHook(), pwiOptions, uniqueId);
-                    String playerName = finalIsUuid ? "InvSee++ Player" : playerNameOrUUID; //TODO UUID -> name conversion
-                    return pwiApi.spectateEnderChest(uniqueId, playerName, playerName + "'s inventory", profileId);
+                    CompletableFuture<String> userNameFuture = finalIsUuid
+                            ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                            : CompletableFuture.completedFuture(playerNameOrUUID);
+                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateEnderChest(uniqueId, playerName, playerName + "'s enderchest", profileId));
                 } else {
                     return CompletableFuture.completedFuture(Optional.empty());
                 }
@@ -79,8 +81,9 @@ class EnderseeCommandExecutor implements CommandExecutor {
         if (future == null) {
             //No PWI argument - just continue with the regular method
             if (isUuid) {
-                //TODO UUID -> name conversion
-                future = api.spectateEnderChest(uuid, "InvSee++ Player", playerNameOrUUID + "'s enderchest");
+                final UUID finalUuid = uuid;
+                future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                        .thenCompose(userName -> api.spectateEnderChest(finalUuid, userName, playerNameOrUUID + "'s enderchest"));
             } else {
                 future = api.spectateEnderChest(playerNameOrUUID, playerNameOrUUID + "'s enderchest");
             }

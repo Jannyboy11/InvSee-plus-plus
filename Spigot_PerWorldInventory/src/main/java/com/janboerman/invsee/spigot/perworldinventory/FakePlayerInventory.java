@@ -51,6 +51,11 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
         items[mainHandIndex] = itemStack;
     }
 
+    @Override
+    public void setItemInMainHand(@Nullable ItemStack itemStack, boolean silent) {
+        setItemInMainHand(itemStack);
+    }
+
     @NotNull
     @Override
     public ItemStack[] getArmorContents() {
@@ -79,6 +84,11 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
         items[40] = itemStack;
     }
 
+    @Override
+    public void setItemInOffHand(@Nullable ItemStack itemStack, boolean silent) {
+        setItemInOffHand(itemStack);
+    }
+
     @Nullable
     @Override
     public ItemStack getHelmet() {
@@ -90,6 +100,11 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
         items[39] = itemStack;
     }
 
+    @Override
+    public void setHelmet(@Nullable ItemStack itemStack, boolean silent) {
+        setHelmet(itemStack);
+    }
+
     @Nullable
     @Override
     public ItemStack getChestplate() {
@@ -99,6 +114,11 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
     @Override
     public void setChestplate(@Nullable ItemStack itemStack) {
         items[38] = itemStack;
+    }
+
+    @Override
+    public void setChestplate(@Nullable ItemStack itemStack, boolean silent) {
+        setChestplate(itemStack);
     }
 
     @Nullable
@@ -113,6 +133,11 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
         items[37] = itemStack;
     }
 
+    @Override
+    public void setLeggings(@Nullable ItemStack itemStack, boolean silent) {
+        setLeggings(itemStack);
+    }
+
     @Nullable
     @Override
     public ItemStack getBoots() {
@@ -125,6 +150,11 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
     }
 
     @Override
+    public void setBoots(@Nullable ItemStack itemStack, boolean silent) {
+        setBoots(itemStack);
+    }
+
+    @Override
     public void setItem(@NotNull EquipmentSlot equipmentSlot, @Nullable ItemStack itemStack) {
         switch (equipmentSlot) {
             case FEET: setBoots(itemStack); break;
@@ -134,6 +164,11 @@ public class FakePlayerInventory extends FakeInventory implements PlayerInventor
             case OFF_HAND: setItemInOffHand(itemStack); break;
             case HAND: setItemInMainHand(itemStack); break;
         }
+    }
+
+    @Override
+    public void setItem(@NotNull EquipmentSlot equipmentSlot, @Nullable ItemStack itemStack, boolean silent) {
+        setItem(equipmentSlot, itemStack);
     }
 
     @NotNull

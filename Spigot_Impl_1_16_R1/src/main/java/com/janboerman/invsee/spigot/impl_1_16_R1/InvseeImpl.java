@@ -28,7 +28,8 @@ public class InvseeImpl extends InvseeAPI {
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
-        uuidResolveStrategies.add(1, new SearchSaveFilesStrategy(plugin));
+        uuidResolveStrategies.add(1, new UUIDSearchSaveFilesStrategy(plugin));
+        nameResolveStrategies.add(1, new NameSearchSaveFilesStrategy(plugin));
     }
 
     @Override

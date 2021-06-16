@@ -5,6 +5,7 @@ import com.janboerman.invsee.utils.StringHelper;
 
 import net.minecraft.server.v1_16_R3.NBTCompressedStreamTools;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.ReportedException;
 import net.minecraft.server.v1_16_R3.WorldNBTStorage;
 
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
@@ -62,7 +63,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
                         result.add(lastKnownName);
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException | ReportedException e) {
                 plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e);
             }
         }
@@ -94,8 +95,8 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
                         }
                     }
                 }
-            } catch (IOException e) {
-                plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e);
+            } catch (IOException | ReportedException e) {
+                //plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e);
             }
         }
 

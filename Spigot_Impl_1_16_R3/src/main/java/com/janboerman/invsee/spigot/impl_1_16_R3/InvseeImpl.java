@@ -13,7 +13,6 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
@@ -26,12 +25,13 @@ import java.util.function.BiFunction;
 
 public class InvseeImpl extends InvseeAPI {
 
-    static CompletableFuture COMPLETED_EMPTY = InvseeAPI.COMPLETED_EMPTY;
-    static ItemStack EMPTY_STACK = ItemStack.b;
+    static final CompletableFuture COMPLETED_EMPTY = InvseeAPI.COMPLETED_EMPTY;
+    static final ItemStack EMPTY_STACK = ItemStack.b;
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
-        uuidResolveStrategies.add(1, new SearchSaveFilesStrategy(plugin));
+        uuidResolveStrategies.add(1, new UUIDSearchSaveFilesStrategy(plugin));
+        nameResolveStrategies.add(1, new NameSearchSaveFilesStrategy(plugin));
     }
 
     @Override

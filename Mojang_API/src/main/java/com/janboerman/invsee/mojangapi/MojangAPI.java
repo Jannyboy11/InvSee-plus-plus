@@ -1,6 +1,7 @@
 package com.janboerman.invsee.mojangapi;
 
-import java.io.BufferedReader;
+import com.janboerman.invsee.utils.UUIDHelper;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -41,74 +43,130 @@ public class MojangAPI {
         this(HttpClient.newHttpClient());
     }
 
-    public CompletableFuture<Optional<UUID>> lookupUniqueId(String username) {
+    public CompletableFuture<Optional<UUID>> lookupUniqueId(String userName) {
         CompletableFuture<HttpResponse<InputStream>> future = httpClient.sendAsync(HttpRequest
-                .newBuilder(URI.create("https://api.mojang.com/users/profiles/minecraft/" + username))
+                .newBuilder(URI.create("https://api.mojang.com/users/profiles/minecraft/" + userName))
                 .header("Accept", "application/json")
                 .header("User-Agent", "InvSee++/MojangAPI")
                 .timeout(Duration.ofSeconds(5))
                 .build(), HttpResponse.BodyHandlers.ofInputStream());
 
-        return future.thenApply((HttpResponse<InputStream> inputStreamResponse) -> {
-            int statusCode = inputStreamResponse.statusCode();
+        return future.thenApply((HttpResponse<InputStream> response) -> {
+            int statusCode = response.statusCode();
 
             if (statusCode == 200) {
                 //ok!
-                Charset charset = charsetFromHeaders(inputStreamResponse.headers());
-                InputStream inputStream = inputStreamResponse.body();
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
-
-                try {
-                    Object json = new JSONParser().parse(inputStreamReader);
-                    if (json instanceof JSONObject) {
-                        JSONObject jsonObject = (JSONObject) json;
-                        String id = (String) jsonObject.get("id");
-                        UUID uuid = dashed(id);
-                        return Optional.of(uuid);
-                    } else {
-                        throw new RuntimeException("Expected player profile to be represented as a JSON Object, instead we got: " + json);
-                    }
-                } catch (IOException ioe) {
-                    throw new RuntimeException("Could not read http response body", ioe);
-                } catch (ParseException pe) {
-                    throw new RuntimeException("Invalid JSON from Mojang api", pe);
-                }
-            }
-
-            else if (statusCode == 204) {
-                //no content - a player with that username does not exist.
-                return Optional.empty();
-            }
-
-            else if (statusCode == 400) {
-                //bad request
-                Charset charset = charsetFromHeaders(inputStreamResponse.headers());
-                InputStream inputStream = inputStreamResponse.body();
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
-
-                try {
-                    Object json = new JSONParser().parse(inputStreamReader);
-                    if (json instanceof JSONObject) {
-                        JSONObject jsonObject = (JSONObject) json;
-                        String error = (String) jsonObject.get("error");
-                        String errorMessage = (String) jsonObject.get("errorMessage");
-
-                        throw new RuntimeException("We sent a bad request to Mojang. We got a(n) " + error + " with the following message: " + errorMessage);
-                    } else {
-                        throw new RuntimeException("Expected bad request response json to be a JSON Object, instead we got: " + json);
-                    }
-                } catch (IOException ioe) {
-                    throw new RuntimeException("Could not read http response body", ioe);
-                } catch (ParseException pe) {
-                    throw new RuntimeException("We sent a bad request to Mojang, but Mojang gave us something else than a JSON Object.", pe);
-                }
+                JSONObject json = readJSONObject(response);
+                String id = (String) json.get("id");
+                UUID uuid = UUIDHelper.dashed(id);
+                return Optional.of(uuid);
             }
 
             else {
-                //unknown response code - undocumented behaviour from mojang's api
-                throw new RuntimeException("Unexpected status code from Mojang API: " + statusCode);
+                //not ok
+                return handleNotOk(response);
             }
         });
+    }
+
+    public CompletableFuture<Optional<String>> lookupUserName(UUID uniqueId) {
+        CompletableFuture<HttpResponse<InputStream>> future = httpClient.sendAsync(HttpRequest
+                .newBuilder(URI.create("https://api.mojang.com/user/profiles/" + UUIDHelper.unDashed(uniqueId) + "/names"))
+                .header("Accept", "application/json")
+                .header("User-Agent", "InvSee++/MojangAPI")
+                .timeout(Duration.ofSeconds(5))
+                .build(), HttpResponse.BodyHandlers.ofInputStream());
+
+        return future.thenApply((HttpResponse<InputStream> response) -> {
+           int statusCode = response.statusCode();
+
+           if (statusCode == 200) {
+               //ok!
+               JSONArray json = readJSONArray(response);
+               JSONObject profileJson = (JSONObject) json.get(0);
+               String userName = (String) profileJson.get("name");
+               return Optional.of(userName);
+           }
+
+           else {
+               //not ok
+               return handleNotOk(response);
+           }
+        });
+    }
+
+    private static <T> Optional<T> handleNotOk(HttpResponse<InputStream> response) {
+        int statusCode = response.statusCode();
+
+        if (statusCode == 204) {
+            //no content - a player with that username does not exist.
+            return handleNoContent(response);
+        }
+
+        else if (statusCode == 400) {
+            //bad request
+            return handleBadRequest(response);
+        }
+
+        else {
+            //unknown response code - undocumented behaviour from mojang's api
+            return handleUnknownStatusCode(response);
+        }
+    }
+
+    private static JSONObject readJSONObject(HttpResponse<InputStream> response) {
+        Charset charset = charsetFromHeaders(response.headers());
+        InputStream inputStream = response.body();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
+
+        try {
+            Object json = new JSONParser().parse(inputStreamReader);
+            if (json instanceof JSONObject) {
+                return (JSONObject) json;
+            } else {
+                throw new RuntimeException("Expected response to be represented as a JSON Object, instead we got: " + json);
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException("Could not read http response body", ioe);
+        } catch (ParseException pe) {
+            throw new RuntimeException("Invalid JSON from Mojang api", pe);
+        }
+    }
+
+    private static JSONArray readJSONArray(HttpResponse<InputStream> response) {
+        Charset charset = charsetFromHeaders(response.headers());
+        InputStream inputStream = response.body();
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
+
+        try {
+            Object json = new JSONParser().parse(inputStreamReader);
+            if (json instanceof JSONArray) {
+                return (JSONArray) json;
+            } else {
+                throw new RuntimeException("Expected response to be represented as a JSON Array, instead we got: " + json);
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException("Could not read http response body", ioe);
+        } catch (ParseException pe) {
+            throw new RuntimeException("Invalid JSON from Mojang api", pe);
+        }
+    }
+
+    private static <T> Optional<T> handleNoContent(HttpResponse<InputStream> response) {
+        return Optional.empty();
+    }
+
+    private static <T> Optional<T> handleBadRequest(HttpResponse<InputStream> response) {
+        JSONObject jsonObject = readJSONObject(response);
+
+        String error = (String) jsonObject.get("error");
+        String errorMessage = (String) jsonObject.get("errorMessage");
+
+        throw new RuntimeException("We sent a bad request to Mojang. We got a(n) " + error + " with the following message: " + errorMessage);
+    }
+
+    private static <T> Optional<T> handleUnknownStatusCode(HttpResponse<InputStream> response) {
+        throw new RuntimeException("Unexpected status code from Mojang API: " + response.statusCode());
     }
 
     private static Charset charsetFromHeaders(HttpHeaders headers) {
@@ -130,11 +188,4 @@ public class MojangAPI {
         return StandardCharsets.UTF_8;
     }
 
-    private static UUID dashed(String id) {
-        return UUID.fromString(id.substring(0, 8) + '-' +
-                id.substring(8, 12) + '-' +
-                id.substring(12, 16) + '-' +
-                id.substring(16, 20) + '-' +
-                id.substring(20, 32));
-    }
 }

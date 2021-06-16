@@ -13,7 +13,6 @@ import org.bukkit.craftbukkit.v1_16_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftInventory;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
@@ -31,7 +30,8 @@ public class InvseeImpl extends InvseeAPI {
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
-        uuidResolveStrategies.add(1, new SearchSaveFilesStrategy(plugin));
+        uuidResolveStrategies.add(1, new UUIDSearchSaveFilesStrategy(plugin));
+        nameResolveStrategies.add(1, new NameSearchSaveFilesStrategy(plugin));
     }
 
     @Override
