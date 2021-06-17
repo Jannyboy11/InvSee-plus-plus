@@ -18,6 +18,7 @@ Just drop the InvSee++.jar file in your server's /plugins folder and make sure y
 
 ### Permissions
 
+###### Base permissions:
 - `invseeplusplus.invsee.view` allows access to `/invsee`. By default only for server operators.
 - `invseeplusplus.invsee.edit` allows the player to manipulate the target player's inventory. By default only for server operators.
 - `invseeplusplus.endersee.view` allows access to `/endersee`. By default only for server operators.
@@ -32,7 +33,7 @@ Just drop the InvSee++.jar file in your server's /plugins folder and make sure y
 
 ### Compiling
 
-###### Prerequesites: [JDK-11](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
+###### Prerequisites: [JDK-16](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
 1. Install CraftBukkit into your local repository first by running BuildTools with
     - `java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit`

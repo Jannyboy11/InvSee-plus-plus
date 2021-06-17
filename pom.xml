@@ -10,14 +10,14 @@
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
+        <module>Spigot_Common</module>
         <module>Spigot_Impl_1_15_R1</module>
         <module>Spigot_Impl_1_16_R1</module>
         <module>Spigot_Impl_1_16_R2</module>
         <module>Spigot_Impl_1_16_R3</module>
         <module>Spigot_Impl_1_17_R1</module>
-        <module>Spigot_Common</module>
-        <module>Spigot_Plugin</module>
         <module>Spigot_PerWorldInventory</module>
+        <module>Spigot_Plugin</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -116,6 +116,11 @@ public class FakePlayer implements Player {
     private int arrowsInBody;
     private int arrowCooldown;
     private boolean invisible;
+    private int starvationRate = 80;
+    private int unsaturatedRegenerationRate = 80;
+    private int saturatedRegenerationRate = 10;
+    private boolean visualFire = true;
+    private int freezeTicks;
 
     public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
@@ -230,6 +235,11 @@ public class FakePlayer implements Player {
     @Override
     public InetSocketAddress getAddress() {
         return null;
+    }
+
+    @Override
+    public int getPing() {
+        return 0;
     }
 
     @Override
@@ -416,6 +426,36 @@ public class FakePlayer implements Player {
     @Override
     public void setFireTicks(int i) {
         this.fireTicks = i;
+    }
+
+    @Override
+    public void setVisualFire(boolean b) {
+        this.visualFire = b;
+    }
+
+    @Override
+    public boolean isVisualFire() {
+        return visualFire;
+    }
+
+    @Override
+    public int getFreezeTicks() {
+        return freezeTicks;
+    }
+
+    @Override
+    public int getMaxFreezeTicks() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public void setFreezeTicks(int i) {
+        this.freezeTicks = i;
+    }
+
+    @Override
+    public boolean isFrozen() {
+        return freezeTicks > 0;
     }
 
     @Override
@@ -938,6 +978,10 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void sendBlockDamage(Location location, float damage) {
+    }
+
+    @Override
     public boolean sendChunkChange(@NotNull Location location, int i, int i1, int i2, @NotNull byte[] bytes) {
         return false;
     }
@@ -952,6 +996,11 @@ public class FakePlayer implements Player {
 
     @Override
     public void sendMap(@NotNull MapView mapView) {
+    }
+
+    @Override
+    public boolean breakBlock(Block block) {
+        return block.breakNaturally(getItemInUse());
     }
 
     @Override
@@ -980,7 +1029,7 @@ public class FakePlayer implements Player {
 
     @Override
     public void resetPlayerTime() {
-        this.playerTime = 0;
+        this.playerTime = 0L;
     }
 
     @Override
@@ -1191,6 +1240,36 @@ public class FakePlayer implements Player {
     @Override
     public double getHealthScale() {
         return healthScale;
+    }
+
+    @Override
+    public void setStarvationRate(int rate) {
+        this.starvationRate = rate;
+    }
+
+    @Override
+    public int getStarvationRate() {
+        return starvationRate;
+    }
+
+    @Override
+    public void setUnsaturatedRegenRate(int rate) {
+        this.unsaturatedRegenerationRate = rate;
+    }
+
+    @Override
+    public int getUnsaturatedRegenRate() {
+        return unsaturatedRegenerationRate;
+    }
+    
+    @Override
+    public void setSaturatedRegenRate(int rate) {
+        this.saturatedRegenerationRate = rate;
+    }
+
+    @Override
+    public int getSaturatedRegenRate() {
+        return saturatedRegenerationRate;
     }
 
     @Nullable
@@ -1494,6 +1573,12 @@ public class FakePlayer implements Player {
     @Override
     public boolean isHandRaised() {
         return false;
+    }
+
+    @Nullable
+    @Override
+    public ItemStack getItemInUse() {
+        return null;
     }
 
     @Override
@@ -1838,6 +1923,11 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public boolean isClimbing() {
+        return false;
+    }
+
+    @Override
     public boolean isSwimming() {
         return swimming;
     }
@@ -2144,4 +2234,5 @@ public class FakePlayer implements Player {
         }
         return EntityType.UNKNOWN;
     }
+
 }

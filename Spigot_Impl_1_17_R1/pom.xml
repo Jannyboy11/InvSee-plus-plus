@@ -95,8 +95,14 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Common</artifactId>
-            <version>0.8-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Utils</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

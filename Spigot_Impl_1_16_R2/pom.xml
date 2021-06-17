@@ -56,13 +56,13 @@
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Common</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Utils</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
