@@ -192,7 +192,9 @@ public abstract class InvseeAPI {
         try {
             Constructor<?> ctor = null;
 
-            if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
+            if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_12_R1.CraftServer")) {
+                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_12_R1.InvseeImpl").getConstructor(Plugin.class);
+            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R1.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R1.InvseeImpl").getConstructor(Plugin.class);

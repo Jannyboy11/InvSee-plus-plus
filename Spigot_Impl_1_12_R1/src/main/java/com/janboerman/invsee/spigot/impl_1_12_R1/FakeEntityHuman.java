@@ -1,8 +1,8 @@
-package com.janboerman.invsee.spigot.impl_1_15_R1;
+package com.janboerman.invsee.spigot.impl_1_12_R1;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.v1_15_R1.EntityHuman;
-import net.minecraft.server.v1_15_R1.World;
+import net.minecraft.server.v1_12_R1.EntityHuman;
+import net.minecraft.server.v1_12_R1.World;
 
 class FakeEntityHuman extends EntityHuman {
 
@@ -16,7 +16,7 @@ class FakeEntityHuman extends EntityHuman {
     }
 
     @Override
-    public boolean isCreative() {
+    public boolean z() { //isCreative
         return false;
     }
 

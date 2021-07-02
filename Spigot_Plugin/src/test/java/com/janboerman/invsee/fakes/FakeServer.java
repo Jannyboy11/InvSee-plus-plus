@@ -820,4 +820,14 @@ public class FakeServer implements Server {
     public @NonNull Iterable<? extends Audience> audiences() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void setWhitelistEnforced(boolean force) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isWhitelistEnforced() {
+        throw new UnsupportedOperationException();
+    }
 }

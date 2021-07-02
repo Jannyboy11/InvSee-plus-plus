@@ -6,7 +6,7 @@ description: ${project.description}
 api-version: 1.15
 website: "https://github.com/Jannyboy11/InvSee-plus-plus/"
 prefix: "InvSee++"
-softdepend: [PerWorldInventory]
+softdepend: [PerWorldInventory, Multiverse-Inventories]
 
 commands:
   invsee:

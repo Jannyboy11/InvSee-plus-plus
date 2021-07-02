@@ -262,7 +262,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         private void giveLiveInventoryToSpectators(ProfileKey newProfileKey) {
             //new inventory contents was loaded onto the player.
 
-            //  if there is is an open spectator inventory for the new profile, then
+            //  if there is an open spectator inventory for the new profile, then
             //      close the spectator inventory for all viewers
             //      re-open a live spectator inventory, tied to the same profile key
 
@@ -667,7 +667,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         }
 
         //unreachable
-        return CompletableFuture.completedFuture(Optional.empty());
+        return (CompletableFuture<Optional<S>>) COMPLETED_EMPTY;
     }
 
 }

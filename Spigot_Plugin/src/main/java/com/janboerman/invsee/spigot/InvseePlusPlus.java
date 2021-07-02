@@ -3,6 +3,8 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+//import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
+//import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
@@ -27,14 +29,21 @@ public class InvseePlusPlus extends JavaPlugin {
         this.api = InvseeAPI.setup(this);
         this.offlinePlayerProvider = OfflinePlayerProvider.setup(this);
 
-        //PerWorldInventory interop
-        PerWorldInventoryHook pwiHook = new PerWorldInventoryHook(this);
-        if (pwiHook.trySetup()) {
-            if (pwiHook.pwiManagedInventories() || pwiHook.pwiManagedEnderChests()) {
+        //interop
+        PerWorldInventoryHook pwiHook;
+//        MultiverseInventoriesHook mviHook;
+        if ((pwiHook = new PerWorldInventoryHook(this)).trySetup()) {
+            if (pwiHook.managesEitherInventory()) {
                 this.api = new PerWorldInventorySeeApi(this, api, pwiHook);
                 getLogger().info("Enabled PerWorldInventory integration.");
             }
         }
+//        else if ((mviHook = new MultiverseInventoriesHook(this)).trySetup()) {
+//            if (mviHook.managesEitherInventory()) {
+//                this.api = new MultiverseInventoriesSeeApi(this, api, mviHook);
+//                getLogger().info("Enabled Multiverse-Inventories integration.");
+//            }
+//        }
 
         //commands
         PluginCommand invseeCommand = getCommand("invsee");
@@ -71,6 +80,8 @@ public class InvseePlusPlus extends JavaPlugin {
         metrics.addCustomChart(new SimplePie("Back-end", () -> {
             if (this.api instanceof PerWorldInventorySeeApi) {
                 return "PerWorldInventory";
+//            } else if (this.api instanceof MultiverseInventoriesSeeApi) {
+//                return "Multiverse-Inventories";
             } else {
                 return "Vanilla";
             }

@@ -42,8 +42,23 @@ public class PerWorldInventoryHook {
         this.plugin = plugin;
     }
 
+    public boolean trySetup() {
+        PluginManager pluginManager = plugin.getServer().getPluginManager();
+        Plugin pwi = pluginManager.getPlugin("PerWorldInventory");
+        boolean success = pwi != null && pwi.isEnabled();
+        if (success) {
+            this.perWorldInventory = (PerWorldInventory) pwi;
+            this.api = perWorldInventory.getApi();
+        }
+        return success;
+    }
+
+    public boolean managesEitherInventory() {
+        return pwiManagedInventories() || pwiManagedEnderChests();
+    }
+
     /*
-     * Here is what we need to do
+     * Here is what we need to do:
      *
      * for offline players - save and load their inventories from PWI storage
      *
@@ -58,17 +73,6 @@ public class PerWorldInventoryHook {
      *
      * take into account that PerWorldInventory has settings whether to have inventories per gamemode (and that there is a bypass permission for this too!)
      */
-
-    public boolean trySetup() {
-        PluginManager pluginManager = plugin.getServer().getPluginManager();
-        Plugin pwi = pluginManager.getPlugin("PerWorldInventory");
-        boolean success = pwi != null && pwi.isEnabled();
-        if (success) {
-            this.perWorldInventory = (PerWorldInventory) pwi;
-            this.api = perWorldInventory.getApi();
-        }
-        return success;
-    }
 
     protected PerWorldInventoryAPI getPerWorldInventoryAPI() {
         return api;

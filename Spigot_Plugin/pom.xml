@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>InvSee</artifactId>
-        <version>0.8-SNAPSHOT</version>
+        <version>0.9-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -92,9 +92,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
+            <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <version>1.17-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -117,6 +117,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Spigot_Impl_1_12_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Impl_1_15_R1</artifactId>
@@ -147,7 +153,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>com.janboerman.invsee</groupId>-->
+<!--            <artifactId>Spigot_MultiverseInventories</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_PerWorldInventory</artifactId>
