@@ -13,8 +13,9 @@ Do you like this plugin? Then please leave a rating anda review on [SpigotMC](ht
 Just drop the InvSee++.jar file in your server's /plugins folder and make sure your servers runs on [Java 11](https://openjdk.java.net/projects/jdk/) or newer.
 
 ### Commands
-- `/invsee <userName>|<uniqueId>`
-- `/endersee <userName>|<uniequeId>`
+- `/invsee <userName>|<uniqueId> [PWI{...}]`
+- `/endersee <userName>|<uniequeId> [PWI{...}]`
+Note that for integration with PerWorldInventory, `load-data-on-join` needs to be set to `true` in its config.
 
 ### Permissions
 
