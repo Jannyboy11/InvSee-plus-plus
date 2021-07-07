@@ -187,7 +187,8 @@ public abstract class InvseeAPI {
     }
 
     public static InvseeAPI setup(Plugin plugin) {
-        Server server = plugin.getServer();
+        final Server server = plugin.getServer();
+        final String bukkitVersion = server.getBukkitVersion();
 
         try {
             Constructor<?> ctor = null;
@@ -203,7 +204,12 @@ public abstract class InvseeAPI {
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R3.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
-            	ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_R1.InvseeImpl").getConstructor(Plugin.class);
+                //1.17 and 1.17.1 have different nms method and field names, but their revision is the same! Thanks md_5!
+                if ("1.17-R0.1-SNAPSHOT".equals(bukkitVersion)) {
+                    ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_R1.InvseeImpl").getConstructor(Plugin.class);
+                } else if ("1.17.1-R0.1-SNAPSHOT".equals(bukkitVersion)) {
+                    ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl").getConstructor(Plugin.class);
+                }
             }
             //make a bunch of else-ifs here for future minecraft versions.
 

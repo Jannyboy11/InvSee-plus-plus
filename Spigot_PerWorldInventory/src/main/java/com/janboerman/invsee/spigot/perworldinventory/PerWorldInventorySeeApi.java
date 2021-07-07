@@ -30,6 +30,7 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class PerWorldInventorySeeApi extends InvseeAPI {
@@ -341,25 +342,23 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     @Override
     public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
         ProfileKey profileKey = inventoryKeys.get(inventory);
-        CompletableFuture<Void> wrappedFuture = null;
-        if (profileKey == null) {
-            //spectator inventory is not tied - just use the player's last location
-            Location location = null;
-            Player target = plugin.getServer().getPlayer(inventory.getSpectatedPlayerId());
-            if (target != null) location = target.getLocation();
-            if (location == null) location = pwiHook.getDataSource().getLogout(new FakePlayer(inventory.getSpectatedPlayerId(), inventory.getSpectatedPlayerName(), plugin.getServer()));
-            World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
-            profileKey = new ProfileKey(inventory.getSpectatedPlayerId(), pwiHook.getGroupForWorld(world.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
+        boolean saveVanilla = false;
 
-            wrappedFuture = wrapped.saveInventory(inventory);   //shouldn't I be doing this anyway? technically only necessary for un-tied inventories.
+        Location location = null;
+        Player target = plugin.getServer().getPlayer(inventory.getSpectatedPlayerId());
+        if (target != null) location = target.getLocation();
+        if (location == null) location = pwiHook.getDataSource().getLogout(new FakePlayer(inventory.getSpectatedPlayerId(), inventory.getSpectatedPlayerName(), plugin.getServer()));
+        World logoutWorld = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+
+        if (profileKey == null) {
+            saveVanilla = true;
+            profileKey = new ProfileKey(inventory.getSpectatedPlayerId(), pwiHook.getGroupForWorld(logoutWorld.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
+        } else if (!pwiHook.pwiLoadDataOnJoin()/*&& profileKey.getGroup().containsWorld(logoutWorld.getName())*/) {
+            //the implementation of Group#containsWorld seems bugged - PWI keeps reporting that it creates groups on the fly!
+            saveVanilla = true;
         }
-        
-        CompletableFuture<Void> pwiFuture = saveInventory(inventory, profileKey);
-        if (wrappedFuture != null) {
-            return CompletableFuture.allOf(pwiFuture, wrappedFuture);
-        } else {
-            return pwiFuture;
-        }
+
+        return saveInventory(inventory, profileKey, saveVanilla);
     }
 
     @Override
@@ -398,24 +397,24 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
     @Override
     public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
         ProfileKey profileKey = inventoryKeys.get(enderChest);
-        CompletableFuture<Void> wrappedFuture = null;
+
+        boolean saveVanilla = false;
+
+        Location location = null;
+        Player player = plugin.getServer().getPlayer(enderChest.getSpectatedPlayerId());
+        if (player != null) location = player.getLocation();
+        if (location == null) location = pwiHook.getDataSource().getLogout(new FakePlayer(enderChest.getSpectatedPlayerId(), enderChest.getSpectatedPlayerName(), plugin.getServer()));
+        World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+
         if (profileKey == null) {
-            Location location = null;
-            Player player = plugin.getServer().getPlayer(enderChest.getSpectatedPlayerId());
-            if (player != null) location = player.getLocation();
-            if (location == null) location = pwiHook.getDataSource().getLogout(new FakePlayer(enderChest.getSpectatedPlayerId(), enderChest.getSpectatedPlayerName(), plugin.getServer()));
-            World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+            saveVanilla = true;
             profileKey = new ProfileKey(enderChest.getSpectatedPlayerId(), pwiHook.getGroupForWorld(world.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
-
-            wrappedFuture = wrapped.saveEnderChest(enderChest);   //shouldn't I be doing this anyway? technically only necessary for un-tied inventories.
+        } else if (!pwiHook.pwiLoadDataOnJoin()/*&& profileKey.getGroup().containsWorld(world.getName())*/) {
+            //the implementation of Group#containsWorld seems bugged - PWI keeps reporting that it creates groups on the fly!
+            saveVanilla = true;
         }
 
-        CompletableFuture<Void> pwiFuture = saveEnderChest(enderChest, profileKey);
-        if (wrappedFuture != null) {
-            return CompletableFuture.allOf(pwiFuture, wrappedFuture);
-        } else {
-            return pwiFuture;
-        }
+        return saveEnderChest(enderChest, profileKey, saveVanilla);
     }
 
     public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, ProfileKey profileKey) {
@@ -426,29 +425,39 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         //don't ask the cache because it may contain a live inventory! (and we could get called by asSnapshotInventory!)
 
         //try non-managed
-        CompletableFuture<Optional<MainSpectatorInventory>> nonPwiMainSpectatorFuture = wrapped.createOfflineInventory(playerId, playerName, title);
-        if (!pwiHook.pwiManagedInventories()) return nonPwiMainSpectatorFuture;
+        CompletableFuture<Optional<MainSpectatorInventory>> fromVanillaStorageOfflineInv = wrapped.createOfflineInventory(playerId, playerName, title);
+        if (!pwiHook.pwiManagedInventories()) return fromVanillaStorageOfflineInv;
 
         //create a fake player for PWI so that we can load data onto it!
         FakePlayer player = new FakePlayer(playerId, playerName, plugin.getServer());
         PlayerInventory playerInv = player.getInventory();
 
-        return nonPwiMainSpectatorFuture.thenApplyAsync(optionalSpectatorInv -> {
+        AtomicBoolean loadFromPWI = new AtomicBoolean(true);
+        Location location = pwiHook.getDataSource().getLogout(player);
+        World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+        if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(world.getName())) {
+            loadFromPWI.set(false); //just load from vanilla.
+        }
+
+        return fromVanillaStorageOfflineInv.thenApplyAsync(optionalSpectatorInv -> {
             optionalSpectatorInv.ifPresent(spectatorInv -> {
+
                 //first set the minecraft-saved contents onto the player
                 playerInv.setStorageContents(spectatorInv.getStorageContents());
                 playerInv.setArmorContents(spectatorInv.getArmourContents());
                 playerInv.setExtraContents(spectatorInv.getOffHandContents());
                 player.setItemOnCursor(spectatorInv.getCursorContents());
 
-                //load the data from the player onto the profile, or load the profile from persistent storage
-                PlayerProfile profile = pwiHook.getOrCreateProfile(player, profileKey);
+                if (loadFromPWI.get()) {
+                    //load the data from the player onto the profile, or load the profile from persistent storage
+                    PlayerProfile profile = pwiHook.getOrCreateProfile(player, profileKey);
 
-                //then set it back from the profile
-                spectatorInv.setStorageContents(Arrays.copyOf(profile.getInventory(), 36));
-                spectatorInv.setArmourContents(Arrays.copyOfRange(profile.getInventory(), 36, 40));
-                spectatorInv.setOffHandContents(Arrays.copyOfRange(profile.getInventory(), 40, 41));
-                //PlayerProfile has no getter for the item on the cursor!
+                    //then set it back from the profile
+                    spectatorInv.setStorageContents(Arrays.copyOf(profile.getInventory(), 36));
+                    spectatorInv.setArmourContents(Arrays.copyOfRange(profile.getInventory(), 36, 40));
+                    spectatorInv.setOffHandContents(Arrays.copyOfRange(profile.getInventory(), 40, 41));
+                    //PlayerProfile has no getter for the item on the cursor!
+                }
 
                 //mark inventory as tied to the profile key
                 if (tieToProfile) {
@@ -461,7 +470,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         }, serverThreadExecutor);
     }
 
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory, ProfileKey profileKey) {
+    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory, ProfileKey profileKey, boolean saveVanilla) {
         //if the spectated player is managed by PWI (because its world is managed by PWI)
         //then also save the inventory to PWI's storage
         //that can be done by loading the profile, applying the contents from the MainSpectatorInventory and saving it again
@@ -511,9 +520,9 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                     profile.getBalance());
             pwiHook.getProfileCache().put(profileKey, updatedProfile);
 
-            return CompletableFuture.runAsync(() -> {
-                pwiHook.getDataSource().savePlayer(profileKey, updatedProfile);
-            }, asyncExecutor);
+            CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), asyncExecutor);
+            if (saveVanilla) saveTask = CompletableFuture.allOf(saveTask, wrapped.saveInventory(inventory));
+            return saveTask;
         }
     }
 
@@ -532,16 +541,25 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         FakePlayer player = new FakePlayer(playerId, playerName, plugin.getServer());
         Inventory enderInv = player.getEnderChest();
 
+        AtomicBoolean loadFromPWI = new AtomicBoolean(true);
+        Location location = pwiHook.getDataSource().getLogout(player);
+        World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+        if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(world.getName())) {
+            loadFromPWI.set(false); //just load from vanilla.
+        }
+
         return nonPwiEnderSpectatorFuture.thenApplyAsync(optionalSpectatorInv -> {
             optionalSpectatorInv.ifPresent(spectatorInv -> {
                 //first set the minecraft-saved contents onto the fake player
                 enderInv.setStorageContents(spectatorInv.getStorageContents());
 
-                //load the data from the player onto the profile, or load the profile from persistent storage
-                PlayerProfile profile = pwiHook.getOrCreateProfile(player, profileKey);
+                if (loadFromPWI.get()) {
+                    //load the data from the player onto the profile, or load the profile from persistent storage
+                    PlayerProfile profile = pwiHook.getOrCreateProfile(player, profileKey);
 
-                //then set it back from the profile
-                spectatorInv.setStorageContents(profile.getEnderChest());
+                    //then set it back from the profile
+                    spectatorInv.setStorageContents(profile.getEnderChest());
+                }
 
                 //mark inventory as tied to the profile key
                 if (tieToProfile) {
@@ -554,7 +572,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         }, serverThreadExecutor);
     }
 
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest, ProfileKey profileKey) {
+    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest, ProfileKey profileKey, boolean saveVanilla) {
         //if the spectated player is managed by PWI (because its world is managed by PWI)
         //then also save the inventory to PWI's storage
         //that can be done by loading the profile, applying the contents from the EnderSpectatorInventory and saving it again
@@ -596,7 +614,9 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                     profile.getBalance());
             pwiHook.getProfileCache().put(profileKey, updatedProfile);
 
-            return CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), asyncExecutor);
+            CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), asyncExecutor);
+            if (saveVanilla) saveTask = CompletableFuture.allOf(saveTask, wrapped.saveEnderChest(enderChest));
+            return saveTask;
         }
     }
 
