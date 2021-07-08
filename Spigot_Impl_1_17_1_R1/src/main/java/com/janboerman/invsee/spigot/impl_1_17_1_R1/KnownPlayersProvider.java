@@ -63,7 +63,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
                     }
                 }
             } catch (IOException | ReportedException e) {
-                plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e);
+                plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath());
             }
         }
 
@@ -96,7 +96,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
                     }
                 }
             } catch (IOException | ReportedException e) {
-                //plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e);
+                plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath());
             }
         }
 

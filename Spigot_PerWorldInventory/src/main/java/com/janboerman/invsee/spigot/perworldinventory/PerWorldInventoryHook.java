@@ -49,6 +49,8 @@ public class PerWorldInventoryHook {
         if (success) {
             this.perWorldInventory = (PerWorldInventory) pwi;
             this.api = perWorldInventory.getApi();
+
+            getGroupManager().loadGroups();
         }
         return success;
     }

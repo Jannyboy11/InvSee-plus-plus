@@ -353,7 +353,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         if (profileKey == null) {
             saveVanilla = true;
             profileKey = new ProfileKey(inventory.getSpectatedPlayerId(), pwiHook.getGroupForWorld(logoutWorld.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
-        } else if (!pwiHook.pwiLoadDataOnJoin()/*&& profileKey.getGroup().containsWorld(logoutWorld.getName())*/) {
+        } else if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(logoutWorld.getName())) {
             //the implementation of Group#containsWorld seems bugged - PWI keeps reporting that it creates groups on the fly!
             saveVanilla = true;
         }
@@ -404,12 +404,12 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         Player player = plugin.getServer().getPlayer(enderChest.getSpectatedPlayerId());
         if (player != null) location = player.getLocation();
         if (location == null) location = pwiHook.getDataSource().getLogout(new FakePlayer(enderChest.getSpectatedPlayerId(), enderChest.getSpectatedPlayerName(), plugin.getServer()));
-        World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+        World logoutWorld = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
 
         if (profileKey == null) {
             saveVanilla = true;
-            profileKey = new ProfileKey(enderChest.getSpectatedPlayerId(), pwiHook.getGroupForWorld(world.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
-        } else if (!pwiHook.pwiLoadDataOnJoin()/*&& profileKey.getGroup().containsWorld(world.getName())*/) {
+            profileKey = new ProfileKey(enderChest.getSpectatedPlayerId(), pwiHook.getGroupForWorld(logoutWorld.getName()), GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
+        } else if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(logoutWorld.getName())) {
             //the implementation of Group#containsWorld seems bugged - PWI keeps reporting that it creates groups on the fly!
             saveVanilla = true;
         }
@@ -434,8 +434,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
         AtomicBoolean loadFromPWI = new AtomicBoolean(true);
         Location location = pwiHook.getDataSource().getLogout(player);
-        World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
-        if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(world.getName())) {
+        World logoutWorld = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+        if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(logoutWorld.getName())) {
             loadFromPWI.set(false); //just load from vanilla.
         }
 
@@ -543,8 +543,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
         AtomicBoolean loadFromPWI = new AtomicBoolean(true);
         Location location = pwiHook.getDataSource().getLogout(player);
-        World world = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
-        if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(world.getName())) {
+        World logoutWorld = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+        if (!pwiHook.pwiLoadDataOnJoin() && profileKey.getGroup().containsWorld(logoutWorld.getName())) {
             loadFromPWI.set(false); //just load from vanilla.
         }
 
