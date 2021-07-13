@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.api;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.http.HttpClient;
 import java.util.*;
 import java.util.Map.Entry;
@@ -18,6 +19,7 @@ import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import com.janboerman.invsee.utils.Rethrow;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.UnsafeValues;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.HumanEntity;
@@ -186,9 +188,18 @@ public abstract class InvseeAPI {
         this.openEnderChests = openEnderChests;
     }
 
+    private static String getMappingsVersion(Server server) {
+        UnsafeValues craftMagicNumbers = server.getUnsafe();
+        try {
+            Method method = craftMagicNumbers.getClass().getMethod("getMappingsVersion");
+            return (String) method.invoke(craftMagicNumbers, new Object[0]);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassCastException e) {
+            return null;
+        }
+    }
+
     public static InvseeAPI setup(Plugin plugin) {
         final Server server = plugin.getServer();
-        final String bukkitVersion = server.getBukkitVersion();
 
         try {
             Constructor<?> ctor = null;
@@ -205,9 +216,10 @@ public abstract class InvseeAPI {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
                 //1.17 and 1.17.1 have different nms method and field names, but their revision is the same! Thanks md_5!
-                if ("1.17-R0.1-SNAPSHOT".equals(bukkitVersion)) {
+                String mappingsVersion = getMappingsVersion(server);
+                if ("acd6e6c27e5a0a9440afba70a96c27c9".equals(mappingsVersion)) {
                     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_R1.InvseeImpl").getConstructor(Plugin.class);
-                } else if ("1.17.1-R0.1-SNAPSHOT".equals(bukkitVersion)) {
+                } else if ("f0e3dfc7390de285a4693518dd5bd126".equals(mappingsVersion)) {
                     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl").getConstructor(Plugin.class);
                 }
             }
