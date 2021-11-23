@@ -497,11 +497,11 @@ public abstract class InvseeAPI {
                                 newEnderSpectator = spectateEnderChest(player, enderTitle);
                                 newEnderSpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
                             }
+
+                            online.closeInventory();
+                            online.openInventory(newEnderSpectator);
                         }
                     }
-
-                    online.closeInventory();
-                    online.openInventory(newEnderSpectator);
                 }
             }
 
