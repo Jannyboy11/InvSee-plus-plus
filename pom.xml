@@ -18,6 +18,7 @@
         <module>Spigot_Impl_1_16_R3</module>
         <module>Spigot_Impl_1_17_R1</module>
         <module>Spigot_Impl_1_17_1_R1</module>
+        <module>Spigot_Impl_1_18_R1</module>
 <!--        <module>Spigot_MultiverseInventories</module>-->
         <module>Spigot_PerWorldInventory</module>
         <module>Spigot_Plugin</module>

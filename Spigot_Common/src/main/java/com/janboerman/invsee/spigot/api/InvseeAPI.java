@@ -222,6 +222,8 @@ public abstract class InvseeAPI {
                 } else if ("f0e3dfc7390de285a4693518dd5bd126".equals(mappingsVersion)) {
                     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl").getConstructor(Plugin.class);
                 }
+            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R1.CraftServer")) {
+                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl").getConstructor(Plugin.class);
             }
             //make a bunch of else-ifs here for future minecraft versions.
 

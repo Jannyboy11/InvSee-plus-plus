@@ -24,7 +24,11 @@ public interface OfflinePlayerProvider {
             Class<?> implementationClass;
             try {
                 Constructor<?> ctor;
-                if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
+                if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R1.CraftServer")) {
+                    implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_18_R1.KnownPlayersProvider");
+                    ctor = implementationClass.getConstructor(Plugin.class);
+                    offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
+                } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
                     //1.17 and 1.17.1 have different nms method and field names, but their revision is the same! Thanks md_5!
                     if ("1.17-R0.1-SNAPSHOT".equals(bukkitVersion)) {
                         implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_17_R1.KnownPlayersProvider");

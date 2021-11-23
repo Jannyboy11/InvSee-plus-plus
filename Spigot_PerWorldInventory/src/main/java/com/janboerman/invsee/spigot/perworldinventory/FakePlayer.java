@@ -960,6 +960,10 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void stopAllSounds() {
+    }
+
+    @Override
     public void playEffect(@NotNull Location location, @NotNull Effect effect, int i) {
         getWorld().playEffect(location, effect, i);
     }
@@ -992,6 +996,10 @@ public class FakePlayer implements Player {
 
     @Override
     public void sendSignChange(@NotNull Location location, @Nullable String[] strings, @NotNull DyeColor dyeColor) throws IllegalArgumentException {
+    }
+
+    @Override
+    public void sendSignChange(@NotNull Location location, @Nullable String[] strings, @NotNull DyeColor dyeColor, boolean b) throws IllegalArgumentException {
     }
 
     @Override
