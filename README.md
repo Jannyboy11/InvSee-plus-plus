@@ -10,7 +10,7 @@ Do you like this plugin? Then please leave a rating anda review on [SpigotMC](ht
 
 ### Running the plugin
 
-Just drop the InvSee++.jar file in your server's /plugins folder and make sure your servers runs on [Java 11](https://openjdk.java.net/projects/jdk/) or newer.
+Just drop the InvSee++.jar file in your server's /plugins folder and make sure your servers runs on [Java 17](https://openjdk.java.net/projects/jdk/) or newer.
 
 ### Commands
 - `/invsee <userName>|<uniqueId> [PWI{...}]`
@@ -34,7 +34,7 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 
 ### Compiling
 
-###### Prerequisites: [JDK-16](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
+###### Prerequisites: [JDK-17](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
 1. Install CraftBukkit into your local repository first by running BuildTools with
     - `java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit`
@@ -44,6 +44,7 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
     - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.17 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 1.18-pre5 --compile craftbukkit --remapped`
 3. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
 and running `mvn clean install -DskipTests=true` in its root directory.
 4. Install a maven-shade-plugin into your local repository by downloading [maven-shade-plugin's code](https://github.com/apache/maven-shade-plugin)
