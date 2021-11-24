@@ -75,7 +75,6 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		File playerDirectory = worldNBTStorage.getPlayerDir();
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return Set.of();
-		
 
         Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
 
