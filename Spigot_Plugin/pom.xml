@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>InvSee</artifactId>
-        <version>0.10.3-SNAPSHOT</version>
+        <version>0.10.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -91,6 +91,7 @@
     </repositories>
 
     <dependencies>
+        <!-- second-party minecraft libraries-->
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -98,6 +99,15 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- third-party minecraft libraries -->
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- first-party libraries -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Common</artifactId>
@@ -117,6 +127,7 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- implementations -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Impl_1_12_R1</artifactId>
@@ -178,13 +189,7 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>2.2.1</version>
-            <scope>compile</scope>
-        </dependency>
-
+        <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>

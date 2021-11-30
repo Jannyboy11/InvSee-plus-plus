@@ -223,6 +223,10 @@ public abstract class InvseeAPI {
                     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl").getConstructor(Plugin.class);
                 }
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R1.CraftServer")) {
+                //1.18-pre5 mappings version: f926f0531f0874c1b0bcb6f1f7655751
+				//1.18-pre8 mappings version: cacad4c83144be72fddd1739b88fc3a6
+				//1.18-rc3 mappings version: 9658396dadb575219230b3235b8a9144
+				//1.18 mappings version: 9e9fe6961a80f3e586c25601590b51ec
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl").getConstructor(Plugin.class);
             }
             //make a bunch of else-ifs here for future minecraft versions.
