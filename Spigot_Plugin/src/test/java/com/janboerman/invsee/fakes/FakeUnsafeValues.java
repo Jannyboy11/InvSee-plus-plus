@@ -10,11 +10,14 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.UnsafeValues;
+import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
+import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -141,13 +144,21 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public byte[] serializeItem(ItemStack itemStack) {
-        //this is a Paper extension
         throw new UnsupportedOperationException();
     }
 
     @Override
     public ItemStack deserializeItem(byte[] bytes) {
-        //this is a Paper extension
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public byte[] serializeEntity(Entity entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Entity deserializeEntity(byte[] bytes, World world, boolean b) {
         throw new UnsupportedOperationException();
     }
 
@@ -188,7 +199,7 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public boolean isValidRepairItemStack(@NotNull ItemStack itemStack, @NotNull ItemStack itemStack1) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -200,5 +211,20 @@ public class FakeUnsafeValues implements UnsafeValues {
     public int getProtocolVersion() {
         //CraftUnsafeValues
         return 0;
+    }
+
+    @Override
+    public boolean hasDefaultEntityAttributes(@NotNull NamespacedKey namespacedKey) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Attributable getDefaultEntityAttributes(@NotNull NamespacedKey namespacedKey) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isCollidable(@NotNull Material material) {
+        throw new UnsupportedOperationException();
     }
 }

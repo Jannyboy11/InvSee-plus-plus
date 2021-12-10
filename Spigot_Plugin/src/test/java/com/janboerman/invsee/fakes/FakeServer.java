@@ -51,6 +51,7 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.structure.StructureManager;
 import org.bukkit.util.CachedServerIcon;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -78,16 +79,21 @@ public class FakeServer implements Server {
 
     @Override
     public String getVersion() {
-        return "1.17";
+        return "1.18";
     }
 
     @Override
     public String getBukkitVersion() {
-        return "1.17-R0.1-SNAPSHOT";
+        return "1.18.1-R0.1-SNAPSHOT";
     }
 
     @Override
     public String getMinecraftVersion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull File getPluginsFolder() {
         throw new UnsupportedOperationException();
     }
 
@@ -113,6 +119,11 @@ public class FakeServer implements Server {
 
     @Override
     public int getViewDistance() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getSimulationDistance() {
         throw new UnsupportedOperationException();
     }
 
@@ -203,6 +214,11 @@ public class FakeServer implements Server {
 
     @Override
     public int getTicksPerWaterAmbientSpawns() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getTicksPerWaterUndergroundCreatureSpawns() {
         throw new UnsupportedOperationException();
     }
 
@@ -352,6 +368,16 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public @Nullable Recipe getCraftingRecipe(@NotNull ItemStack[] itemStacks, @NotNull World world) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull ItemStack craftItem(@NotNull ItemStack[] itemStacks, @NotNull World world, @NotNull Player player) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Iterator<Recipe> recipeIterator() {
         throw new UnsupportedOperationException();
     }
@@ -387,6 +413,11 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public boolean getHideOnlinePlayers() {
+        return false;
+    }
+
+    @Override
     public boolean getOnlineMode() {
         throw new UnsupportedOperationException();
     }
@@ -413,12 +444,12 @@ public class FakeServer implements Server {
 
     @Override
     public int broadcast(@NotNull Component component) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int broadcast(@NotNull Component component, @NotNull String s) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -562,6 +593,11 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public int getWaterUndergroundCreatureSpawnLimit() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public int getAmbientSpawnLimit() {
         throw new UnsupportedOperationException();
     }
@@ -583,7 +619,7 @@ public class FakeServer implements Server {
 
     @Override
     public @Nullable Component shutdownMessage() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -738,6 +774,11 @@ public class FakeServer implements Server {
 
     @Override
     public List<Entity> selectEntities(CommandSender commandSender, String s) throws IllegalArgumentException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull StructureManager getStructureManager() {
         throw new UnsupportedOperationException();
     }
 

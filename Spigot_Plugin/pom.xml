@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>InvSee</artifactId>
-        <version>0.10.4-SNAPSHOT</version>
+        <version>0.10.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -60,7 +60,7 @@
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.7.0</version>
+                        <version>5.8.2</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.17-R0.1-SNAPSHOT</version>
+            <version>1.18.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -176,6 +176,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Spigot_Impl_1_18_1_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.janboerman.invsee</groupId>-->
 <!--            <artifactId>Spigot_MultiverseInventories</artifactId>-->
@@ -193,7 +199,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.7.0</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

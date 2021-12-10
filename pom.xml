@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.10.4-SNAPSHOT</version>
+    <version>0.10.5-SNAPSHOT</version>
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
@@ -19,6 +19,7 @@
         <module>Spigot_Impl_1_17_R1</module>
         <module>Spigot_Impl_1_17_1_R1</module>
         <module>Spigot_Impl_1_18_R1</module>
+        <module>Spigot_Impl_1_18_1_R1</module>
 <!--        <module>Spigot_MultiverseInventories</module>-->
         <module>Spigot_PerWorldInventory</module>
         <module>Spigot_Plugin</module>

@@ -1,40 +1,25 @@
 package com.janboerman.invsee.spigot.api;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.net.http.HttpClient;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
+import java.util.concurrent.*;
+import java.util.function.*;
 import java.util.logging.Level;
 
-import com.janboerman.invsee.mojangapi.MojangAPI;
-import com.janboerman.invsee.utils.CaseInsensitiveMap;
-import com.janboerman.invsee.utils.Rethrow;
-import org.bukkit.ChatColor;
-import org.bukkit.Server;
-import org.bukkit.UnsafeValues;
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
+import com.janboerman.invsee.mojangapi.*;
+import com.janboerman.invsee.utils.*;
+import com.janboerman.invsee.spigot.internal.MappingsVersion;
+import org.bukkit.*;
+import org.bukkit.configuration.*;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
+import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.*;
+import org.bukkit.plugin.*;
 
 public abstract class InvseeAPI {
 
@@ -188,15 +173,7 @@ public abstract class InvseeAPI {
         this.openEnderChests = openEnderChests;
     }
 
-    private static String getMappingsVersion(Server server) {
-        UnsafeValues craftMagicNumbers = server.getUnsafe();
-        try {
-            Method method = craftMagicNumbers.getClass().getMethod("getMappingsVersion");
-            return (String) method.invoke(craftMagicNumbers, new Object[0]);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassCastException e) {
-            return null;
-        }
-    }
+
 
     public static InvseeAPI setup(Plugin plugin) {
         final Server server = plugin.getServer();
@@ -215,22 +192,17 @@ public abstract class InvseeAPI {
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R3.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
-                //1.17 and 1.17.1 have different nms method and field names, but their revision is the same! Thanks md_5!
-                String mappingsVersion = getMappingsVersion(server);
-                if ("acd6e6c27e5a0a9440afba70a96c27c9".equals(mappingsVersion)) {
-                    ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_R1.InvseeImpl").getConstructor(Plugin.class);
-                } else if ("f0e3dfc7390de285a4693518dd5bd126".equals(mappingsVersion)) {
-                    ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl").getConstructor(Plugin.class);
+                switch (MappingsVersion.getMappingsVersion(server)) {
+                    case MappingsVersion._1_17:     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_R1.InvseeImpl").getConstructor(Plugin.class);      break;
+                    case MappingsVersion._1_17_1:   ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl").getConstructor(Plugin.class);    break;
                 }
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R1.CraftServer")) {
-                //1.18-pre5 mappings version: f926f0531f0874c1b0bcb6f1f7655751
-				//1.18-pre8 mappings version: cacad4c83144be72fddd1739b88fc3a6
-				//1.18-rc3 mappings version: 9658396dadb575219230b3235b8a9144
-				//1.18 mappings version: 9e9fe6961a80f3e586c25601590b51ec
-                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl").getConstructor(Plugin.class);
+                switch (MappingsVersion.getMappingsVersion(server)) {
+                    case MappingsVersion._1_18:     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl").getConstructor(Plugin.class);      break;
+                    case MappingsVersion._1_18_1:   ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_18_1_R1.InvseeImpl").getConstructor(Plugin.class);    break;
+                }
             }
             //make a bunch of else-ifs here for future minecraft versions.
-
             if (ctor != null) {
                 return InvseeAPI.class.cast(ctor.newInstance(plugin));
             }

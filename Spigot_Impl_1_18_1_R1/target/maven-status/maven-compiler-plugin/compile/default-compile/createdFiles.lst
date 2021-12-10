@@ -1,0 +1,14 @@
+com\janboerman\invsee\spigot\impl_1_18_1_R1\FakeEntityHuman.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\PersonalSlot.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\EnderNmsContainer.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\EnderBukkitInventory.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\MainBukkitInventory.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\NameSearchSaveFilesStrategy.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\UUIDSearchSaveFilesStrategy.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\MainNmsInventory$1.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\MainNmsContainer.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\InaccessibleSlot.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\EnderNmsInventory.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\KnownPlayersProvider.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\MainNmsInventory.class
+com\janboerman\invsee\spigot\impl_1_18_1_R1\InvseeImpl.class

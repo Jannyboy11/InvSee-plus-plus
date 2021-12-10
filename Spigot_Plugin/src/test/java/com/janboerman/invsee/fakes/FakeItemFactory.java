@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -30,6 +31,7 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.inventory.meta.SuspiciousStewMeta;
 import org.bukkit.inventory.meta.TropicalFishBucketMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -72,6 +74,11 @@ public class FakeItemFactory implements ItemFactory {
                 return key;
             }
         };
+    }
+
+    @Override
+    public @Nullable ItemStack getSpawnEgg(@Nullable EntityType entityType) {
+        return entityType == null ? null : new ItemStack(Material.valueOf(entityType.name() + "_SPAWN_EGG"));
     }
 
     @Override
@@ -304,15 +311,14 @@ public class FakeItemFactory implements ItemFactory {
 
     @Override
     public @NotNull HoverEvent<ShowItem> asHoverEvent(@NotNull ItemStack itemStack, @NotNull UnaryOperator<ShowItem> unaryOperator) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NotNull Component displayName(@NotNull ItemStack itemStack) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
-    //Paper extensions
     @Override
     public ItemStack ensureServerConversions(ItemStack itemStack) {
         return itemStack;
@@ -347,4 +353,5 @@ public class FakeItemFactory implements ItemFactory {
     public Content hoverContentOf(Entity entity, BaseComponent[] baseComponents) {
         throw new UnsupportedOperationException();
     }
+
 }
