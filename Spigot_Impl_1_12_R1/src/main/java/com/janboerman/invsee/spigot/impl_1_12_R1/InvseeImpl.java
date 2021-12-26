@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_12_R1.DedicatedPlayerList;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
@@ -28,13 +29,12 @@ import java.util.function.BiFunction;
 
 public class InvseeImpl extends InvseeAPI {
 
-    static CompletableFuture COMPLETED_EMPTY = InvseeAPI.COMPLETED_EMPTY;
     static ItemStack EMPTY_STACK = ItemStack.a;
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
-        uuidResolveStrategies.add(1, new UUIDSearchSaveFilesStrategy(plugin));
-        nameResolveStrategies.add(1, new NameSearchSaveFilesStrategy(plugin));
+        lookup.uuidResolveStrategies.add(2, new UUIDSearchSaveFilesStrategy(plugin));
+        lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
     }
 
     @Override

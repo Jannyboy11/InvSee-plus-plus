@@ -7,10 +7,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
-import com.janboerman.invsee.spigot.api.UUIDResolveStrategy;
+import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -45,7 +46,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 		
 		File playerDirectory = worldNBTStorage.getPlayerDir();
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
-			return InvseeImpl.COMPLETED_EMPTY;
+			return CompletedEmpty.the();
 		
 		return CompletableFuture.supplyAsync(() -> {
 			File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));

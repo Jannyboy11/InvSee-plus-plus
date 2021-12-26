@@ -4,6 +4,10 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.SpectateResponse;
+import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import me.ebonjaeger.perworldinventory.Group;
 import me.ebonjaeger.perworldinventory.data.PlayerProfile;
 import me.ebonjaeger.perworldinventory.data.ProfileKey;
@@ -321,13 +325,17 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         return spectatorInv;
     }
 
-    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileId profileId) {
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileId profileId) {
         Player player = plugin.getServer().getPlayer(playerId);
         ProfileKey profileKey = profileId.profileKey;
         if (player != null && getHook().isMatchedByProfile(player, profileKey))
-            return CompletableFuture.completedFuture(Optional.of(spectateInventory(player, title, profileKey)));
+            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectateInventory(player, title, profileKey)));
 
-        return createOfflineInventory(playerId, playerName, title, profileKey);
+        return createOfflineInventory(playerId, playerName, title, profileKey)
+                .thenApply(optInv -> {
+                    if (optInv.isPresent()) return SpectateResponse.succeed(optInv.get());
+                    else return SpectateResponse.fail(NotCreatedReason.implementationFault(Target.byUniqueId(playerId)));
+                });
     }
 
     @Override
@@ -373,13 +381,17 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         return spectatorInv;
     }
 
-    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title, ProfileId profileId) {
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title, ProfileId profileId) {
         Player player = plugin.getServer().getPlayer(playerId);
         ProfileKey profileKey = profileId.profileKey;
         if (player != null && pwiHook.isMatchedByProfile(player, profileKey))
-            return CompletableFuture.completedFuture(Optional.of(spectateEnderChest(player, title, profileKey)));
+            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectateEnderChest(player, title, profileKey)));
 
-        return createOfflineEnderChest(playerId, playerName, title, profileKey);
+        return createOfflineEnderChest(playerId, playerName, title, profileKey)
+                .thenApply(optional -> {
+                    if (optional.isPresent()) return SpectateResponse.succeed(optional.get());
+                    else return SpectateResponse.fail(NotCreatedReason.implementationFault(Target.byUniqueId(playerId)));
+                });
     }
 
     @Override
@@ -687,7 +699,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         }
 
         //unreachable
-        return (CompletableFuture<Optional<S>>) COMPLETED_EMPTY;
+        return CompletedEmpty.the();
     }
 
 }

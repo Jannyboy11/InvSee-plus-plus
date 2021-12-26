@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_18_1_R1;
 
-import com.janboerman.invsee.spigot.api.UUIDResolveStrategy;
+import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
@@ -43,7 +44,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 		
 		File playerDirectory = worldNBTStorage.getPlayerDir();
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
-			return InvseeImpl.COMPLETED_EMPTY;
+			return CompletedEmpty.the();
 		
 		return CompletableFuture.supplyAsync(() -> {
 			File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));

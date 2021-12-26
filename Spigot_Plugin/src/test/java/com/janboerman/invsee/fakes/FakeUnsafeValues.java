@@ -7,6 +7,7 @@ import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.UnsafeValues;
@@ -40,6 +41,11 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public PlainComponentSerializer plainComponentSerializer() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PlainTextComponentSerializer plainTextSerializer() {
         throw new UnsupportedOperationException();
     }
 
@@ -103,7 +109,7 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public ItemStack modifyItemStack(ItemStack itemStack, String s) {
-        //s == nbt tag as a string
+        //s is a json string that represents an nbt tag
         return itemStack;
     }
 
@@ -155,6 +161,11 @@ public class FakeUnsafeValues implements UnsafeValues {
     @Override
     public byte[] serializeEntity(Entity entity) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Entity deserializeEntity(byte[] data, World world) {
+        return UnsafeValues.super.deserializeEntity(data, world);
     }
 
     @Override
@@ -227,4 +238,5 @@ public class FakeUnsafeValues implements UnsafeValues {
     public boolean isCollidable(@NotNull Material material) {
         throw new UnsupportedOperationException();
     }
+
 }

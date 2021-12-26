@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
-import com.janboerman.invsee.spigot.api.NameResolveStrategy;
+import com.janboerman.invsee.spigot.api.resolve.NameResolveStrategy;
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.WorldNBTStorage;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
@@ -41,7 +42,7 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 
         File playerDirectory = worldNBTStorage.getPlayerDir();
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
-            return InvseeImpl.COMPLETED_EMPTY;
+            return CompletedEmpty.the();
 
         return CompletableFuture.supplyAsync(() -> {
             NBTTagCompound compound = worldNBTStorage.getPlayerData(uniqueId.toString());

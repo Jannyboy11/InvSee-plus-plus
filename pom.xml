@@ -6,15 +6,13 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.10.5-SNAPSHOT</version>
+    <version>0.11.0-SNAPSHOT</version>
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
         <module>Spigot_Common</module>
         <module>Spigot_Impl_1_12_R1</module>
         <module>Spigot_Impl_1_15_R1</module>
-        <module>Spigot_Impl_1_16_R1</module>
-        <module>Spigot_Impl_1_16_R2</module>
         <module>Spigot_Impl_1_16_R3</module>
         <module>Spigot_Impl_1_17_R1</module>
         <module>Spigot_Impl_1_17_1_R1</module>

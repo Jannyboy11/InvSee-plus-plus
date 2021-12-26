@@ -673,6 +673,7 @@ public class FakeServer implements Server {
     }
 
     @Override
+    @Deprecated(forRemoval = true)
     public ChunkData createVanillaChunkData(World world, int i, int i1) {
         throw new UnsupportedOperationException();
     }
@@ -871,4 +872,25 @@ public class FakeServer implements Server {
     public boolean isWhitelistEnforced() {
         throw new UnsupportedOperationException();
     }
+    
+    @Override
+    public boolean isResourcePackRequired() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getResourcePack() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getResourcePackHash() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getResourcePackPrompt() {
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -6,7 +6,7 @@ description: ${project.description}
 api-version: 1.15
 website: "https://github.com/Jannyboy11/InvSee-plus-plus/"
 prefix: "InvSee++"
-softdepend: [PerWorldInventory, Multiverse-Inventories]
+softdepend: [Vault, PerWorldInventory, Multiverse-Inventories]
 
 commands:
   invsee:
@@ -22,17 +22,22 @@ commands:
 
 permissions:
   invseeplusplus.*:
+    description: Grants all permissions of this plugin
+    children:
+      invseeplusplus.invsee.view: true
+      invseeplusplus.invsee.edit: true
+      invseeplusplus.endersee.view: true
+      invseeplusplus.endersee.edit: true
+      invseeplusplus.exempt.invsee: true
+      invseeplusplus.exempt.endersee: true
+
+  invseeplusplus.spectate:
     description: Gives access to view and edit players' inventories and enderchests
     children:
       invseeplusplus.invsee.view: true
       invseeplusplus.invsee.edit: true
       invseeplusplus.endersee.view: true
       invseeplusplus.endersee.edit: true
-
-      invseeplusplus.ginvsee.view: true
-      invseeplusplus.ginvsee.edit: true
-      invseeplusplus.gendersee.view: true
-      invseeplusplus.gendersee.edit: true
 
   invseeplusplus.view:
     description: Gives access to view players' inventories and enderchests
@@ -56,6 +61,12 @@ permissions:
       invseeplusplus.endersee.view: true
       invseeplusplus.endersee.edit: true
 
+  invseeplusplus.exempt:
+    description: Makes it impossible for the owner of this permission to be spectated
+    children:
+      invseeplusplus.exempt.invsee: true
+      invseeplusplus.exempt.endersee: true
+
   invseeplusplus.invsee.view:
     description: Gives access to view a player's inventory
     default: op
@@ -68,3 +79,10 @@ permissions:
   invseeplusplus.endersee.edit:
     description: Gives access to edit a player's enderchest
     default: op
+
+  invseeplusplus.exempt.invsee:
+    default: false
+    description: Makes it impossible for the owner of this permission to be spectated using /invsee
+  invseeplusplus.exempt.endersee:
+    default: false
+    description: Makes it impossible for the owner of this permission to be spectated using /endersee

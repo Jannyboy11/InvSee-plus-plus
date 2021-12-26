@@ -2,18 +2,18 @@ package com.janboerman.invsee.spigot.api;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.*;
-import java.net.http.HttpClient;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.logging.Level;
 
-import com.janboerman.invsee.mojangapi.*;
+import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.SpectateResponse;
+import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.utils.*;
 import com.janboerman.invsee.spigot.internal.MappingsVersion;
 import org.bukkit.*;
-import org.bukkit.configuration.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.inventory.*;
@@ -23,49 +23,17 @@ import org.bukkit.plugin.*;
 
 public abstract class InvseeAPI {
 
-    //static members
-    protected static final boolean SPIGOT;
-    static {
-        boolean configExists;
-        try {
-            Class.forName("org.spigotmc.SpigotConfig");
-            configExists = true;
-        } catch (ClassNotFoundException e) {
-            configExists = false;
-        }
-        SPIGOT = configExists;
-    }
-    protected static final CompletableFuture COMPLETED_EMPTY = CompletableFuture.completedFuture(Optional.empty());
-
-    //instance members
     protected final Plugin plugin;
-
-    protected final List<UUIDResolveStrategy> uuidResolveStrategies;
-    protected final List<NameResolveStrategy> nameResolveStrategies;
-
-
-    private final Map<String, UUID> uuidCache = Collections.synchronizedMap(new CaseInsensitiveMap<>() {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<String, UUID> eldest) {
-            return size() > 200;
-        }
-    });
-    private final Map<String, UUID> uuidCacheView = Collections.unmodifiableMap(uuidCache);
-    private final Map<UUID, String> userNameCache = Collections.synchronizedMap(new LinkedHashMap<>() {
-        @Override
-        protected boolean removeEldestEntry(Entry<UUID, String> eldest) {
-            return size() > 200;
-        }
-    });
-    private final Map<UUID, String> userNameCacheView = Collections.unmodifiableMap(userNameCache);
+    protected final NamesAndUUIDs lookup;
+    protected final Exempt exempt;
 
     private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
-    private final Map<String, CompletableFuture<Optional<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
-    private final Map<UUID, CompletableFuture<Optional<MainSpectatorInventory>>> pendingInventoriesByUuid = new ConcurrentHashMap<>();
+    private final Map<String, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
+    private final Map<UUID, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByUuid = new ConcurrentHashMap<>();
 
     private Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests = Collections.synchronizedMap(new WeakHashMap<>());
-    private final Map<String, CompletableFuture<Optional<EnderSpectatorInventory>>> pendingEnderChestsByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
-    private final Map<UUID, CompletableFuture<Optional<EnderSpectatorInventory>>> pendingEnderChestsByUuid = new ConcurrentHashMap<>();
+    private final Map<String, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
+    private final Map<UUID, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByUuid = new ConcurrentHashMap<>();
 
     private Function<Player, String> mainSpectatorInvTitleProvider = player -> spectateInventoryTitle(player.getName());
     private Function<Player, String> enderSpectatorInvTitleProvider = player -> spectateEnderchestTitle(player.getName());
@@ -79,40 +47,24 @@ public abstract class InvseeAPI {
     protected final PlayerListener playerListener = new PlayerListener();
     protected final InventoryListener inventoryListener = new InventoryListener();
 
-
-
     protected InvseeAPI(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
 
         this.serverThreadExecutor = runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable);
         this.asyncExecutor = runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable);
 
-        MojangAPI mojangApi = new MojangAPI(HttpClient.newBuilder()
-                .executor(asyncExecutor)
-                .build());
-
-        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(4));
-        this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>(4));
-
-        this.uuidResolveStrategies.add(new UUIDInMemoryStrategy(uuidCache));
-        this.nameResolveStrategies.add(new NameInMemoryStrategy(userNameCache));
-
-        if (SPIGOT) {
-            Configuration spigotConfig = plugin.getServer().spigot().getConfig();
-            ConfigurationSection settings = spigotConfig.getConfigurationSection("settings");
-            if (settings != null && settings.getBoolean("bungeecord", false)) {
-                this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin));
-                //there is no BungeeCord plugin message subchannel which can get a player name given a uuid.
-                //the only way to do that currently is to 'get' a list of all players, and for every player in that list
-                //request the uuid. If one matches the argument uuid, then that is the one.
-                //this is too expensive for my tastes so I'm not going to implement a NameBungeeCordStrategy for now.
-            }
-        }
-
-        this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
-        this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi));
+        this.lookup = new NamesAndUUIDs(plugin);
+        this.exempt = new Exempt(plugin.getServer());
 
         registerListeners();
+    }
+
+    public Map<String, UUID> getUuidCache() {
+        return lookup.getUuidCache();
+    }
+
+    public Map<UUID, String> getUserNameCache() {
+        return lookup.getUserNameCache();
     }
 
     public String spectateInventoryTitle(String targetPlayerName) {
@@ -174,7 +126,6 @@ public abstract class InvseeAPI {
     }
 
 
-
     public static InvseeAPI setup(Plugin plugin) {
         final Server server = plugin.getServer();
 
@@ -185,10 +136,6 @@ public abstract class InvseeAPI {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_12_R1.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl").getConstructor(Plugin.class);
-            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R1.CraftServer")) {
-                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R1.InvseeImpl").getConstructor(Plugin.class);
-            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R2.CraftServer")) {
-                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R2.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R3.CraftServer")) {
                 ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl").getConstructor(Plugin.class);
             } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
@@ -216,46 +163,6 @@ public abstract class InvseeAPI {
         throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
     }
 
-    private CompletableFuture<Optional<UUID>> resolveUUID(String userName, Iterator<UUIDResolveStrategy> strategies) {
-        if (strategies.hasNext()) {
-            UUIDResolveStrategy strategy = strategies.next();
-            return strategy.resolveUniqueId(userName).thenCompose((Optional<UUID> optionalUuid) -> {
-                if (optionalUuid.isPresent()) {
-                    uuidCache.put(userName, optionalUuid.get());
-                    return CompletableFuture.completedFuture(optionalUuid);
-                } else {
-                    return resolveUUID(userName, strategies);
-                }
-            });
-        } else {
-            return (CompletableFuture<Optional<UUID>>) COMPLETED_EMPTY;
-        }
-    }
-
-    private CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId, Iterator<NameResolveStrategy> strategies) {
-        if (strategies.hasNext()) {
-            NameResolveStrategy strategy = strategies.next();
-            return strategy.resolveUserName(uniqueId).thenCompose((Optional<String> optionalName) -> {
-               if (optionalName.isPresent()) {
-                   userNameCache.put(uniqueId, optionalName.get());
-                   return CompletableFuture.completedFuture(optionalName);
-               } else {
-                   return resolveUserName(uniqueId, strategies);
-               }
-            });
-        } else {
-            return (CompletableFuture<Optional<String>>) COMPLETED_EMPTY;
-        }
-    }
-
-    public Map<String, UUID> getUuidCache() {
-        return uuidCacheView;
-    }
-
-    public Map<UUID, String> getUserNameCache() {
-        return userNameCacheView;
-    }
-
     public Optional<MainSpectatorInventory> getOpenMainSpectatorInventory(UUID player) {
         return Optional.ofNullable(openInventories.get(player))
                 .flatMap(ref -> Optional.ofNullable(ref.get()));
@@ -266,22 +173,13 @@ public abstract class InvseeAPI {
                 .flatMap(ref -> Optional.ofNullable(ref.get()));
     }
 
-    protected CompletableFuture<Optional<UUID>> resolveUUID(String userName) {
-        return resolveUUID(userName, uuidResolveStrategies.iterator());
-    }
-
     public final CompletableFuture<Optional<UUID>> fetchUniqueId(String userName) {
-        return resolveUUID(userName).thenApplyAsync(Function.identity(), serverThreadExecutor);
-    }
-
-    protected CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId) {
-        return resolveUserName(uniqueId, nameResolveStrategies.iterator());
+        return lookup.resolveUUID(userName).thenApplyAsync(Function.identity(), serverThreadExecutor);
     }
 
     public final CompletableFuture<Optional<String>> fetchUserName(UUID uniqueId) {
-        return resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
+        return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
     }
-
 
     public abstract MainSpectatorInventory spectateInventory(HumanEntity player, String title);
     public abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title);
@@ -291,37 +189,66 @@ public abstract class InvseeAPI {
     public abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
+    /**
+     * @deprecated use {@link #mainSpectatorInventory(String, String)} instead
+     */
+    @Deprecated(forRemoval = true)
     public CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(String userName, String title) {
-        Objects.requireNonNull(userName, "userName cannot be null!");
+        return mainSpectatorInventory(userName, title).thenApply(response -> {
+            if (response.isSuccess()) return Optional.of(response.getInventory());
+            else return Optional.empty();
+        });
+    }
+
+    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
+        Objects.requireNonNull(targetName, "targetName cannot be null!");
 
         //try online
-        Player target = plugin.getServer().getPlayerExact(userName);
-        if (target != null) {
-            MainSpectatorInventory spectatorInventory = spectateInventory(target, title);
-            UUID uuid = target.getUniqueId();
-            uuidCache.put(userName, uuid);
+        Player targetPlayer = plugin.getServer().getPlayerExact(targetName);
+        Target target;
+        if (targetPlayer != null) {
+            target = Target.byPlayer(targetPlayer);
+            if (!exempt.canInventoryBeSpectated(target))
+                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+
+            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title);
+            UUID uuid = targetPlayer.getUniqueId();
+            lookup.cacheNameAndUniqueId(uuid, targetName);
             openInventories.put(uuid, new WeakReference<>(spectatorInventory));
-            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         }
 
+        target = Target.byUsername(targetName);
+        if (!exempt.canInventoryBeSpectated(target))
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+
         //try offline
-        var future = resolveUUID(userName).thenCompose(optUuid -> {
+        CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
             if (optUuid.isPresent()) {
                 UUID uuid = optUuid.get();
-                return spectateInventory(uuid, userName, title);
+                return mainSpectatorInventory(uuid, targetName, title);
             }
 
-            return (CompletableFuture<Optional<MainSpectatorInventory>>) COMPLETED_EMPTY;
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target)));
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
         }, serverThreadExecutor);
-        pendingInventoriesByName.put(userName, future);
-        future.whenComplete((result, error) -> pendingInventoriesByName.remove(userName));
+        pendingInventoriesByName.put(targetName, future);
+        future.whenComplete((result, error) -> pendingInventoriesByName.remove(targetName));
         return future;
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(UUID, String, String)} instead*/
+    @Deprecated(forRemoval = true)
     public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title) {
+        return mainSpectatorInventory(playerId, playerName, title).thenApply(response -> {
+            if (response.isSuccess()) return Optional.of(response.getInventory());
+            else return Optional.empty();
+        });
+    }
+
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
 
@@ -330,22 +257,39 @@ public abstract class InvseeAPI {
         if (alreadyOpen != null) {
             MainSpectatorInventory inv = alreadyOpen.get();
             if (inv != null) {
-                return CompletableFuture.completedFuture(Optional.of(inv));
+                return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
             }
         }
 
         //try online
-        Player target = plugin.getServer().getPlayer(playerId);
-        if (target != null) {
-            MainSpectatorInventory spectatorInventory = spectateInventory(target, title);
+        Player targetPlayer = plugin.getServer().getPlayer(playerId);
+        Target target;
+        if (targetPlayer != null) {
+            target = Target.byPlayer(targetPlayer);
+            if (!exempt.canInventoryBeSpectated(target))
+                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+
+            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title);
+            lookup.cacheNameAndUniqueId(playerId, playerName);
             openInventories.put(playerId, new WeakReference<>(spectatorInventory));
-            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+        }
+
+        target = Target.byUniqueId(playerId);
+        if (!exempt.canInventoryBeSpectated(target)) {
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
         }
 
         //try offline
-        var future = createOfflineInventory(playerId, playerName, title).thenApply(optionalInv -> {
-            optionalInv.ifPresent(inv -> openInventories.put(playerId, new WeakReference<>(inv)));
-            return optionalInv;
+        CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = createOfflineInventory(playerId, playerName, title)
+                .<SpectateResponse<MainSpectatorInventory>>thenApply(optionalInv -> {
+            if (optionalInv.isPresent()) {
+                MainSpectatorInventory inv = optionalInv.get();
+                openInventories.put(playerId, new WeakReference<>(inv));
+                return SpectateResponse.succeed(inv);
+            } else {
+                return SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target));
+            }
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
@@ -355,37 +299,63 @@ public abstract class InvseeAPI {
         return future;
     }
 
+    /** use {@link #enderSpectatorInventory(String, String)} instead */
+    @Deprecated(forRemoval = true)
     public CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(String userName, String title) {
-        Objects.requireNonNull(userName, "userName cannot be null!");
+        return enderSpectatorInventory(userName, title).thenApply(optInv -> {
+            if (optInv.isSuccess()) return Optional.of(optInv.getInventory());
+            else return Optional.empty();
+        });
+    }
+
+    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
+        Objects.requireNonNull(targetName, "targetName cannot be null!");
 
         //try online
-        Player target = plugin.getServer().getPlayerExact(userName);
-        if (target != null) {
-            EnderSpectatorInventory spectatorInventory = spectateEnderChest(target, title);
-            UUID uuid = target.getUniqueId();
-            uuidCache.put(userName, uuid);
+        Player targetPlayer = plugin.getServer().getPlayerExact(targetName);
+        Target target;
+        if (targetPlayer != null) {
+            target = Target.byPlayer(targetPlayer);
+            if (!exempt.canEnderchestBeSpectated(target))
+                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+
+            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title);
+            UUID uuid = targetPlayer.getUniqueId();
+            lookup.cacheNameAndUniqueId(uuid, targetName);
             openEnderChests.put(uuid, new WeakReference<>(spectatorInventory));
-            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         }
 
+        target = Target.byUsername(targetName);
+        if (!exempt.canEnderchestBeSpectated(target))
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+
         //try offline
-        var future = resolveUUID(userName).thenCompose(optUuid -> {
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
             if (optUuid.isPresent()) {
                 UUID uuid = optUuid.get();
-                return spectateEnderChest(uuid, userName, title);
+                return enderSpectatorInventory(uuid, targetName, title);
             }
-
-            return (CompletableFuture<Optional<EnderSpectatorInventory>>) COMPLETED_EMPTY;
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target)));
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
         }, serverThreadExecutor);
-        pendingEnderChestsByName.put(userName, future);
-        future.whenComplete((result, error) -> pendingEnderChestsByName.remove(userName));
+        pendingEnderChestsByName.put(targetName, future);
+        future.whenComplete((result, error) -> pendingEnderChestsByName.remove(targetName));
         return future;
     }
 
+    /** @deprecated use {@link #enderSpectatorInventory(UUID, String, String)} instead */
+    @Deprecated(forRemoval = true)
     public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title) {
+        return enderSpectatorInventory(playerId, playerName, title).thenApply(response -> {
+            if (response.isSuccess()) return Optional.of(response.getInventory());
+            else return Optional.empty();
+        });
+    }
+
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
 
@@ -394,22 +364,37 @@ public abstract class InvseeAPI {
         if (alreadyOpen != null) {
             EnderSpectatorInventory inv = alreadyOpen.get();
             if (inv != null) {
-                return CompletableFuture.completedFuture(Optional.of(inv));
+                return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
             }
         }
 
         //try online
-        Player target = plugin.getServer().getPlayer(playerId);
-        if (target != null) {
-            EnderSpectatorInventory spectatorInventory = spectateEnderChest(target, title);
+        Player targetPlayer = plugin.getServer().getPlayer(playerId);
+        Target target;
+        if (targetPlayer != null) {
+            target = Target.byPlayer(targetPlayer);
+            if (!exempt.canEnderchestBeSpectated(target))
+                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+
+            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title);
+            lookup.cacheNameAndUniqueId(playerId, playerName);
             openEnderChests.put(playerId, new WeakReference<>(spectatorInventory));
-            return CompletableFuture.completedFuture(Optional.of(spectatorInventory));
+            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         }
 
+        target = Target.byUniqueId(playerId);
+        if (!exempt.canEnderchestBeSpectated(target))
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+
         //try offline
-        var future = createOfflineEnderChest(playerId, playerName, title).thenApply(optionalInv -> {
-            optionalInv.ifPresent(inv -> openEnderChests.put(playerId, new WeakReference<>(inv)));
-            return optionalInv;
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = createOfflineEnderChest(playerId, playerName, title)
+                .<SpectateResponse<EnderSpectatorInventory>>thenApply(optionalInv -> {
+            if (optionalInv.isPresent()) {
+                EnderSpectatorInventory inv = optionalInv.get();
+                openEnderChests.put(playerId, new WeakReference<>(inv));
+                return SpectateResponse.succeed(inv);
+            }
+            return SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target));
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
@@ -436,14 +421,14 @@ public abstract class InvseeAPI {
             String enderTitle = enderSpectatorInvTitleProvider.apply(player);
 
             //check if somebody was looking up the player and make sure they get the player's live inventory
-            CompletableFuture<Optional<MainSpectatorInventory>> mainInvNameFuture = pendingInventoriesByName.remove(userName);
-            if (mainInvNameFuture != null) mainInvNameFuture.complete(Optional.of(newInventorySpectator = spectateInventory(player, mainTitle)));
-            CompletableFuture<Optional<MainSpectatorInventory>> mainInvUuidFuture = pendingInventoriesByUuid.remove(uuid);
-            if (mainInvUuidFuture != null) mainInvUuidFuture.complete(Optional.of(newInventorySpectator != null ? newInventorySpectator : (newInventorySpectator = spectateInventory(player, mainTitle))));
-            CompletableFuture<Optional<EnderSpectatorInventory>> enderNameFuture = pendingEnderChestsByName.remove(userName);
-            if (enderNameFuture != null) enderNameFuture.complete(Optional.of(newEnderSpectator = spectateEnderChest(player, enderTitle)));
-            CompletableFuture<Optional<EnderSpectatorInventory>> enderUuidFuture = pendingEnderChestsByUuid.remove(uuid);
-            if (enderUuidFuture != null) enderUuidFuture.complete(Optional.of(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderTitle))));
+            CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvNameFuture = pendingInventoriesByName.remove(userName);
+            if (mainInvNameFuture != null) mainInvNameFuture.complete(SpectateResponse.succeed(newInventorySpectator = spectateInventory(player, mainTitle)));
+            CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvUuidFuture = pendingInventoriesByUuid.remove(uuid);
+            if (mainInvUuidFuture != null) mainInvUuidFuture.complete(SpectateResponse.succeed(newInventorySpectator != null ? newInventorySpectator : (newInventorySpectator = spectateInventory(player, mainTitle))));
+            CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderNameFuture = pendingEnderChestsByName.remove(userName);
+            if (enderNameFuture != null) enderNameFuture.complete(SpectateResponse.succeed(newEnderSpectator = spectateEnderChest(player, enderTitle)));
+            CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderUuidFuture = pendingEnderChestsByUuid.remove(uuid);
+            if (enderUuidFuture != null) enderUuidFuture.complete(SpectateResponse.succeed(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderTitle))));
 
             //check if somebody was looking in the offline inventory and update player's inventory.
             for (Player online : player.getServer().getOnlinePlayers()) {
@@ -482,15 +467,13 @@ public abstract class InvseeAPI {
                     }
                 }
             }
-
-            uuidCache.remove(userName, uuid);
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onQuit(PlayerQuitEvent event) {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
-            uuidCache.put(player.getName(), uuid);
+            lookup.cacheNameAndUniqueId(uuid, player.getName());
 
             WeakReference<MainSpectatorInventory> invRef = openInventories.get(uuid);
             if (invRef != null) {

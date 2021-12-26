@@ -19,7 +19,7 @@ public class MappingsVersion {
 
     /**
      * Get the version of the mappings used by CraftBukkit. Note that this method only works on (forks of) CraftBukkit.
-     * @note org.bukkit.craftbukkit.util.CraftMagicNumbers#getMappingsVersion was only introduced at CraftBukkit 1.14
+     * @note org.bukkit.craftbukkit.util.CraftMagicNumbers#getMappingsVersion() was only introduced at CraftBukkit 1.14
      * @param server the Server instance
      * @return the mappings version (may be used for equality checking only), or null if running on CraftBukkit 1.13.2 or earlier.
      */

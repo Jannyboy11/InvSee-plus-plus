@@ -2,6 +2,12 @@ package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
+import com.janboerman.invsee.spigot.api.response.ImplementationFault;
+import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.SpectateResponse;
+import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
+import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.ProfileId;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
@@ -38,7 +44,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
         String playerNameOrUUID = args[0];
         UUID uuid;
         boolean isUuid;
-        CompletableFuture<Optional<EnderSpectatorInventory>> future = null;
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = null;
         try {
             uuid = UUID.fromString(playerNameOrUUID);
             isUuid = true;
@@ -73,7 +79,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
                             : CompletableFuture.completedFuture(playerNameOrUUID);
                     return userNameFuture.thenCompose(playerName -> pwiApi.spectateEnderChest(uniqueId, playerName, playerName + "'s enderchest", profileId));
                 } else {
-                    return CompletableFuture.completedFuture(Optional.empty());
+                    return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
                 }
             });
         }
@@ -83,15 +89,26 @@ class EnderseeCommandExecutor implements CommandExecutor {
             if (isUuid) {
                 final UUID finalUuid = uuid;
                 future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.spectateEnderChest(finalUuid, userName, playerNameOrUUID + "'s enderchest"));
+                        .thenCompose(userName -> api.enderSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s enderchest"));
             } else {
-                future = api.spectateEnderChest(playerNameOrUUID, playerNameOrUUID + "'s enderchest");
+                future = api.enderSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s enderchest");
             }
         }
 
-        future.whenComplete((optionalSpectatorInv, throwable) -> {
+        future.whenComplete((response, throwable) -> {
             if (throwable == null) {
-                optionalSpectatorInv.ifPresentOrElse(player::openInventory, () -> player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist."));
+                if (response.isSuccess()) {
+                    player.openInventory(response.getInventory());
+                } else {
+                    NotCreatedReason reason = response.getReason();
+                    if (reason instanceof TargetDoesNotExist) {
+                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " does not exist.");
+                    } else if (reason instanceof TargetHasExemptPermission) {
+                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " is exempted from being spectated.");
+                    } else if (reason instanceof ImplementationFault) {
+                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + reason.getTarget() + "'s enderchest.");
+                    }
+                }
             } else {
                 player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s enderchest.");
                 plugin.getLogger().log(Level.SEVERE, "Error while trying to create ender-chest spectator inventory", throwable);

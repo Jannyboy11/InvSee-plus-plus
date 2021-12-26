@@ -52,14 +52,6 @@ public interface OfflinePlayerProvider {
                     implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_15_R1.KnownPlayersProvider");
                     ctor = implementationClass.getConstructor(Plugin.class);
                     offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
-                } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R2.CraftServer")) {
-                    implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R2.KnownPlayersProvider");
-                    ctor = implementationClass.getConstructor(Plugin.class);
-                    offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
-                } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R1.CraftServer")) {
-                    implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R1.KnownPlayersProvider");
-                    ctor = implementationClass.getConstructor(Plugin.class);
-                    offlinePlayerProvider = OfflinePlayerProvider.class.cast(ctor.newInstance(plugin));
                 } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_12_R1.CraftServer")) {
                     implementationClass = Class.forName("com.janboerman.invsee.spigot.impl_1_12_R1.KnownPlayersProvider");
                     ctor = implementationClass.getConstructor(Plugin.class);
@@ -78,7 +70,7 @@ public interface OfflinePlayerProvider {
         return offlinePlayerProvider;
     }
 
-    public static class Dummy implements OfflinePlayerProvider {
+    static class Dummy implements OfflinePlayerProvider {
 
         private static final Dummy INSTANCE = new Dummy();
 

@@ -2,6 +2,8 @@ package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.response.*;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.ProfileId;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
@@ -46,7 +48,7 @@ class InvseeCommandExecutor implements CommandExecutor {
         }
 
         InvseeAPI api = plugin.getApi();
-        CompletableFuture<Optional<MainSpectatorInventory>> future = null;
+        CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = null;
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = args[1];
@@ -73,7 +75,7 @@ class InvseeCommandExecutor implements CommandExecutor {
                             : CompletableFuture.completedFuture(playerNameOrUUID);
                     return userNameFuture.thenCompose(playerName -> pwiApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory", profileId));
                 } else {
-                    return CompletableFuture.completedFuture(Optional.empty());
+                    return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
                 }
             });
         }
@@ -84,16 +86,27 @@ class InvseeCommandExecutor implements CommandExecutor {
                 //playerNameOrUUID is a UUID.
                 final UUID finalUuid = uuid;
                 future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.spectateInventory(finalUuid, userName, playerNameOrUUID + "'s inventory"));
+                        .thenCompose(userName -> api.mainSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s inventory"));
             } else {
                 //playerNameOrUUID is a username.
-                future = api.spectateInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
+                future = api.mainSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
             }
         }
 
-        future.whenComplete((optionalSpectatorInv, throwable) -> {
+        future.whenComplete((response, throwable) -> {
             if (throwable == null) {
-                optionalSpectatorInv.ifPresentOrElse(player::openInventory, () -> player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist."));
+                if (response.isSuccess()) {
+                    player.openInventory(response.getInventory());
+                } else {
+                    NotCreatedReason reason = response.getReason();
+                    if (reason instanceof TargetDoesNotExist) {
+                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " does not exist.");
+                    } else if (reason instanceof TargetHasExemptPermission) {
+                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " is exempted from being spectated.");
+                    } else if (reason instanceof ImplementationFault) {
+                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + reason.getTarget() + "'s inventory.");
+                    }
+                }
             } else {
                 player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s inventory.");
                 plugin.getLogger().log(Level.SEVERE, "Error while trying to create main-inventory spectator inventory", throwable);

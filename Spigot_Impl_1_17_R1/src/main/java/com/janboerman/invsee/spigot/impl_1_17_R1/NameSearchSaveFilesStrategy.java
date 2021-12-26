@@ -5,10 +5,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
-import com.janboerman.invsee.spigot.api.NameResolveStrategy;
+import com.janboerman.invsee.spigot.api.resolve.NameResolveStrategy;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -43,7 +44,7 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 		
 		File playerDirectory = worldNBTStorage.getPlayerDir();
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
-			return InvseeImpl.COMPLETED_EMPTY;
+			return CompletedEmpty.the();
 		
 		return CompletableFuture.supplyAsync(() -> {
 			CompoundTag compound = worldNBTStorage.getPlayerData(uniqueId.toString());

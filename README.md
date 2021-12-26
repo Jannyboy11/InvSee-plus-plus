@@ -24,13 +24,16 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.invsee.edit` allows the player to manipulate the target player's inventory. By default only for server operators.
 - `invseeplusplus.endersee.view` allows access to `/endersee`. By default only for server operators.
 - `invseeplusplus.endersee.edit` allows the player to manipulate the target player's enderchest. By default only for server operators.
+- `invseeplusplus.exempt.invsee` makes it impossible to spectate the inventory of the owner of this permission.
+- `invseeplusplus.exempt.endersee` makes it impossible to spectate the enderchest of the owner of this permission.
 
 ###### Aggregate permissions:
 - `invseeplusplus.invsee` provides `invseeplusplus.invsee.view` and `invseeplusplus.invsee.edit`
 - `invseeplusplus.endersee` provides `invseeplusplus.endersee.view` and `invseeplusplus.endersee.edit`
 - `invseeplusplus.view` provides `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`
 - `invseeplusplus.edit` provides `invseeplusplus.invsee.edit` and `invseeplusplus.endersee.edit`
-- `invseeplusplus.*` provides all four of the base permissions
+- `invseeplusplus.exempt` provides `invseeplusplus.exempt.invsee` and `invseeplusplus.exempt.endersee`
+- `invseeplusplus.*` provides all six of the base permissions
 
 ### Compiling
 
@@ -39,12 +42,11 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 1. Install CraftBukkit into your local repository first by running BuildTools with
     - `java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit`
-    - `java -jar BuildTools.jar --rev 1.16.1 --compile craftbukkit`
-    - `java -jar BuildTools.jar --rev 1.16.3 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.17 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
-    - `java -jar BuildTools.jar --rev 1.18-pre5 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped`
 3. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
 and running `mvn clean install -DskipTests=true` in its root directory.
 4. Install a maven-shade-plugin into your local repository by downloading [maven-shade-plugin's code](https://github.com/apache/maven-shade-plugin)

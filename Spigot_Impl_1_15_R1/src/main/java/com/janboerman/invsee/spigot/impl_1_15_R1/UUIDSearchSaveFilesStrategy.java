@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_15_R1;
 
-import com.janboerman.invsee.spigot.api.UUIDResolveStrategy;
+import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import net.minecraft.server.v1_15_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.WorldNBTStorage;
@@ -45,7 +46,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 
         File playerDirectory = worldNBTStorage.getPlayerDir();
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
-            return InvseeImpl.COMPLETED_EMPTY;
+            return CompletedEmpty.the();
 
         return CompletableFuture.supplyAsync(() -> {
             File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
