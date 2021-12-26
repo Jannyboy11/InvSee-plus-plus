@@ -47,11 +47,9 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped`
-3. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
+2. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
 and running `mvn clean install -DskipTests=true` in its root directory.
-4. Install a maven-shade-plugin into your local repository by downloading [maven-shade-plugin's code](https://github.com/apache/maven-shade-plugin)
-and running `mvn clean install` in its root directory.
-5. In the root directory of this project run `mvn clean package`.
+3. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at Spigot_Plugin/target/InvSee++.jar.
 
 ### License

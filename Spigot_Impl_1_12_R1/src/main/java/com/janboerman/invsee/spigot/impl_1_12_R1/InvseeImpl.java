@@ -122,7 +122,7 @@ public class InvseeImpl extends InvseeAPI {
         CraftWorld world = (CraftWorld) server.getWorlds().get(0);
         GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayerId(), newInventory.getSpectatedPlayerName());
 
-        EntityPlayer fakeEntityPlayer = new EntityPlayer(
+        FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(
                 server.getServer(),
                 world.getHandle(),
                 gameProfile,
@@ -134,7 +134,7 @@ public class InvseeImpl extends InvseeAPI {
                 fakeEntityPlayer.f(playerCompound);   //all entity stuff + player stuff
             } //else: no player save file exists
 
-            CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityPlayer);
+            FakeCraftPlayer craftHumanEntity = fakeEntityPlayer.getBukkitEntity();
             SI currentInv = currentInvProvider.apply(craftHumanEntity, newInventory.getTitle());
 
             transfer.accept(currentInv, newInventory);

@@ -117,29 +117,25 @@ public class InvseeImpl extends InvseeAPI {
     
     private <SI extends SpectatorInventory> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, String, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
     	CraftServer server = (CraftServer) plugin.getServer();
-    	DedicatedPlayerList playerList = server.getHandle();
-    	PlayerDataStorage worldNBTStorage = playerList.playerIo;
-    	
+
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
     	GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayerId(), newInventory.getSpectatedPlayerName());
-    	
-    	ServerPlayer fakeEntityPlayer = new ServerPlayer(
+
+        FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(
     			server.getServer(),
     			world.getHandle(),
     			gameProfile);
     	
     	return CompletableFuture.runAsync(() -> {
-    		CompoundTag playerCompound = worldNBTStorage.load(fakeEntityPlayer);
-    		if (playerCompound != null) {
-    			fakeEntityPlayer.load(playerCompound);		//all entity stuff + player stuff
-    		} //else: no player save file exists
-    		
-    		CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityPlayer);
-    		SI currentInv = currentInvProvider.apply(craftHumanEntity, newInventory.getTitle());
-    		
+            FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
+            fakeCraftPlayer.loadData();
+
+    		SI currentInv = currentInvProvider.apply(fakeCraftPlayer, newInventory.getTitle());
     		transfer.accept(currentInv, newInventory);
-    		
-    		worldNBTStorage.save(fakeEntityPlayer);
+
+            fakeCraftPlayer.saveData();
     	}, asyncExecutor);
     }
+
+
 }
