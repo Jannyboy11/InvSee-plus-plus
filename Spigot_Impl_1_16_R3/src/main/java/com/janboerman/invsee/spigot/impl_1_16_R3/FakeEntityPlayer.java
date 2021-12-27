@@ -16,6 +16,6 @@ public class FakeEntityPlayer extends EntityPlayer {
 
     @Override
     public FakeCraftPlayer getBukkitEntity() {
-        return bukkitEntity == null ? bukkitEntity = new FakeCraftPlayer(level.getCraftServer(), this) : bukkitEntity;
+        return bukkitEntity == null ? bukkitEntity = new FakeCraftPlayer(world.getServer(), this) : bukkitEntity;
     }
 }
