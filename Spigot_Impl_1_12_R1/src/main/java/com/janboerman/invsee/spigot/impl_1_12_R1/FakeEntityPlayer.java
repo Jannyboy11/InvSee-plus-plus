@@ -7,12 +7,15 @@ import net.minecraft.server.v1_12_R1.PlayerInteractManager;
 import net.minecraft.server.v1_12_R1.WorldServer;
 
 public class FakeEntityPlayer extends EntityPlayer {
+
+    private FakeCraftPlayer bukkitEntity;
+
     public FakeEntityPlayer(MinecraftServer minecraftserver, WorldServer worldserver, GameProfile gameprofile, PlayerInteractManager playerInteractManager) {
         super(minecraftserver, worldserver, gameprofile, playerInteractManager);
     }
 
     @Override
     public FakeCraftPlayer getBukkitEntity() {
-        return new FakeCraftPlayer(world.getServer(), this);
+        return bukkitEntity == null ? bukkitEntity = new FakeCraftPlayer(world.getServer(), this) : bukkitEntity;
     }
 }
