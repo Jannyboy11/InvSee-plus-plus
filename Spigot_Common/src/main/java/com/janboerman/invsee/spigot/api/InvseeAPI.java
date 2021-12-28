@@ -228,8 +228,12 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        // don't check whether this target is exempted:
-        // https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
+        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
+        if (!plugin.getServer().isPrimaryThread()) {
+            if (exempt.isExemptedFromHavingMainInventorySpectated(target)) {
+                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+            }
+        }
 
         //try offline
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
@@ -345,8 +349,12 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        // don't check whether this target is exempted:
-        // https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
+        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
+        if (!plugin.getServer().isPrimaryThread()) {
+            if (exempt.isExemptedFromHavingEnderchestSpectated(target)) {
+                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+            }
+        }
 
         //try offline
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
