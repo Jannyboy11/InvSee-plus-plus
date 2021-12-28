@@ -37,9 +37,9 @@ public class Exempt {
         return permission != null && permission.isEnabled();
     }
 
-    public boolean canInventoryBeSpectated(Target target) {
+    public boolean isExemptedFromHavingMainInventorySpectated(Target target) {
         if (target instanceof PlayerTarget) {
-            return !((PlayerTarget) target).getPlayer().hasPermission(EXEMPT_INVENTORY);
+            return ((PlayerTarget) target).getPlayer().hasPermission(EXEMPT_INVENTORY);
         }
 
         if (vaultPermissionEnabled()) {
@@ -53,9 +53,9 @@ public class Exempt {
         return true;
     }
 
-    public boolean canEnderchestBeSpectated(Target target) {
+    public boolean isExemptedFromHavingEnderchestSpectated(Target target) {
         if (target instanceof PlayerTarget) {
-            return !((PlayerTarget) target).getPlayer().hasPermission(EXEMPT_ENDERCHEST);
+            return ((PlayerTarget) target).getPlayer().hasPermission(EXEMPT_ENDERCHEST);
         }
 
         if (vaultPermissionEnabled()) {

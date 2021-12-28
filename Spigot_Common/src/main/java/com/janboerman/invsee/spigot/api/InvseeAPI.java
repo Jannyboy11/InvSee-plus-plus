@@ -191,7 +191,7 @@ public abstract class InvseeAPI {
 
     public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity player, String title) {
         Target target = Target.byPlayer(player);
-        if (!exempt.canInventoryBeSpectated(target)) {
+        if (exempt.isExemptedFromHavingMainInventorySpectated(target)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target));
         } else {
             return SpectateResponse.succeed(spectateInventory(player, title));
@@ -217,7 +217,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (!exempt.canInventoryBeSpectated(target))
+            if (exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title);
@@ -228,9 +228,8 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-//        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
-//        if (!exempt.canInventoryBeSpectated(target))
-//            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+        // don't check whether this target is exempted:
+        // https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
 
         //try offline
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
@@ -276,7 +275,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (!exempt.canInventoryBeSpectated(target))
+            if (exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title);
@@ -286,7 +285,7 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUniqueId(playerId);
-        if (!exempt.canInventoryBeSpectated(target)) {
+        if (exempt.isExemptedFromHavingMainInventorySpectated(target)) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
         }
 
@@ -311,7 +310,7 @@ public abstract class InvseeAPI {
 
     public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity player, String title) {
         Target target = Target.byPlayer(player);
-        if (!exempt.canInventoryBeSpectated(target)) {
+        if (exempt.isExemptedFromHavingEnderchestSpectated(target)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target));
         } else {
             return SpectateResponse.succeed(spectateEnderChest(player, title));
@@ -335,7 +334,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (!exempt.canEnderchestBeSpectated(target))
+            if (exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title);
@@ -346,9 +345,8 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
-//        if (!exempt.canEnderchestBeSpectated(target))
-//            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+        // don't check whether this target is exempted:
+        // https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
 
         //try offline
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
@@ -393,7 +391,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (!exempt.canEnderchestBeSpectated(target))
+            if (exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title);
@@ -403,7 +401,7 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUniqueId(playerId);
-        if (!exempt.canEnderchestBeSpectated(target))
+        if (exempt.isExemptedFromHavingEnderchestSpectated(target))
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
         //try offline
