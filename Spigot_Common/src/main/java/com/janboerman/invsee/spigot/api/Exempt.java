@@ -50,7 +50,7 @@ public class Exempt {
             }
         }
 
-        return true;
+        return false;
     }
 
     public boolean isExemptedFromHavingEnderchestSpectated(Target target) {
@@ -66,7 +66,7 @@ public class Exempt {
             }
         }
 
-        return true;
+        return false;
     }
 
     private boolean vaultHasPermission(UUID uniqueId, String permission) {
