@@ -189,6 +189,15 @@ public abstract class InvseeAPI {
     public abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
+    public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity player, String title) {
+        Target target = Target.byPlayer(player);
+        if (!exempt.canInventoryBeSpectated(target)) {
+            return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target));
+        } else {
+            return SpectateResponse.succeed(spectateInventory(player, title));
+        }
+    }
+
     /**
      * @deprecated use {@link #mainSpectatorInventory(String, String)} instead
      */
@@ -219,8 +228,9 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        if (!exempt.canInventoryBeSpectated(target))
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+//        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
+//        if (!exempt.canInventoryBeSpectated(target))
+//            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
         //try offline
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
@@ -299,6 +309,15 @@ public abstract class InvseeAPI {
         return future;
     }
 
+    public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity player, String title) {
+        Target target = Target.byPlayer(player);
+        if (!exempt.canInventoryBeSpectated(target)) {
+            return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target));
+        } else {
+            return SpectateResponse.succeed(spectateEnderChest(player, title));
+        }
+    }
+
     /** use {@link #enderSpectatorInventory(String, String)} instead */
     @Deprecated(forRemoval = true)
     public CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(String userName, String title) {
@@ -327,8 +346,9 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        if (!exempt.canEnderchestBeSpectated(target))
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
+//        if (!exempt.canEnderchestBeSpectated(target))
+//            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
         //try offline
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {

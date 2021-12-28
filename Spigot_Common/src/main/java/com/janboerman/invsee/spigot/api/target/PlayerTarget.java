@@ -1,18 +1,18 @@
 package com.janboerman.invsee.spigot.api.target;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.HumanEntity;
 
 import java.util.Objects;
 
 public class PlayerTarget implements Target {
 
-    private final Player player;
+    private final HumanEntity player;
 
-    public PlayerTarget(Player player) {
+    public PlayerTarget(HumanEntity player) {
         this.player = Objects.requireNonNull(player);
     }
 
-    public Player getPlayer() {
+    public HumanEntity getPlayer() {
         return player;
     }
 

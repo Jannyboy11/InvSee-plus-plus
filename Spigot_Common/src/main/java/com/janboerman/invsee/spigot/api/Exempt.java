@@ -73,6 +73,7 @@ public class Exempt {
         return this.permission.playerHas(server.getWorlds().get(0).getName(), server.getOfflinePlayer(uniqueId), permission);
     }
 
+    @Deprecated
     private boolean vaultHasPermission(String username, String permission) {
         return this.permission.playerHas(server.getWorlds().get(0).getName(), username, permission);
     }

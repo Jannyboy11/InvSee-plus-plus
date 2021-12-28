@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.api.target;
 
-import org.bukkit.entity.Player;
+import org.bukkit.entity.HumanEntity;
 
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ public interface Target {
         return new UniqueIdTarget(uniqueId);
     }
 
-    public static Target byPlayer(Player player) {
+    public static Target byPlayer(HumanEntity player) {
         return new PlayerTarget(player);
     }
 
