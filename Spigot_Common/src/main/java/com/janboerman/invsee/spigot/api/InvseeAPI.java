@@ -248,7 +248,7 @@ public abstract class InvseeAPI {
             }
         });
 
-        //try offline
+        //map to SpectateResponse
         final CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = combinedFuture.thenCompose(eitherReasonOrUuid -> {
             if (eitherReasonOrUuid.isRight()) {
                 UUID uuid = eitherReasonOrUuid.getRight();
@@ -328,7 +328,7 @@ public abstract class InvseeAPI {
             }
         });
 
-        //try offline
+        //map to SpectateResponse and cache if success
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = combinedFuture.<SpectateResponse<MainSpectatorInventory>>thenApply(eitherReasonOrInventory -> {
             if (eitherReasonOrInventory.isRight()) {
                 MainSpectatorInventory inventory = eitherReasonOrInventory.getRight();
@@ -404,7 +404,7 @@ public abstract class InvseeAPI {
             }
         });
 
-        //map to SpectateResult and cache if success
+        //map to SpectateResponse and cache if success
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = combinedFuture.thenCompose(eitherReasonOrUuid -> {
             if (eitherReasonOrUuid.isRight()) {
                 UUID uuid = eitherReasonOrUuid.getRight();
