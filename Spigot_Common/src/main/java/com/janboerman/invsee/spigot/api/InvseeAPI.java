@@ -313,7 +313,7 @@ public abstract class InvseeAPI {
             }
         });
 
-        //fuck, I really need monad transformers to make this cleaner.
+        //I really need monad transformers to make this cleaner.
         final CompletableFuture<Either<NotCreatedReason, MainSpectatorInventory>> combinedFuture = reasonFuture.thenCompose(maybeReason -> {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(Either.left(maybeReason.get()));
@@ -469,7 +469,7 @@ public abstract class InvseeAPI {
             }
         });
 
-        //fuck, I really need monad transformers to make this cleaner.
+        //I really need monad transformers to make this cleaner.
         final CompletableFuture<Either<NotCreatedReason, EnderSpectatorInventory>> combinedFuture = reasonFuture.thenCompose(maybeReason -> {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(Either.left(maybeReason.get()));
