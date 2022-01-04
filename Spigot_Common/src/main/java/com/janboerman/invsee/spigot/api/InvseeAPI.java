@@ -215,7 +215,7 @@ public abstract class InvseeAPI {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
 
         //try online
-        Player targetPlayer = plugin.getServer().getPlayerExact(targetName);
+        final Player targetPlayer = plugin.getServer().getPlayerExact(targetName);
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
@@ -230,21 +230,33 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
-        if (!plugin.getServer().isPrimaryThread()) {
-            if (exempt.isExemptedFromHavingMainInventorySpectated(target)) {
-                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+        //make LuckPerms happy by doing the permission lookup async. (https://github.com/Jannyboy11/InvSee-plus-plus/issues/15)
+        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+        final CompletableFuture<Optional<UUID>> uuidFuture = fetchUniqueId(targetName);
+
+        final CompletableFuture<Either<NotCreatedReason, UUID>> combinedFuture = isExemptedFuture.thenCompose(isExempted -> {
+            if (isExempted) {
+                return CompletableFuture.completedFuture(Either.left(NotCreatedReason.targetHasExemptPermission(target)));
+            } else {
+                return uuidFuture.thenApply(optionalUuid -> {
+                    if (optionalUuid.isPresent()) {
+                        return Either.right(optionalUuid.get());
+                    } else {
+                        return Either.left(NotCreatedReason.targetDoesNotExists(target));
+                    }
+                });
             }
-        }
+        });
 
         //try offline
-        CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
-            if (optUuid.isPresent()) {
-                UUID uuid = optUuid.get();
+        final CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = combinedFuture.thenCompose(eitherReasonOrUuid -> {
+            if (eitherReasonOrUuid.isRight()) {
+                UUID uuid = eitherReasonOrUuid.getRight();
                 return mainSpectatorInventory(uuid, targetName, title);
+            } else {
+                NotCreatedReason reason = eitherReasonOrUuid.getLeft();
+                return CompletableFuture.completedFuture(SpectateResponse.fail(reason));
             }
-
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target)));
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
@@ -291,19 +303,40 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUniqueId(playerId);
-        if (exempt.isExemptedFromHavingMainInventorySpectated(target)) {
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
-        }
+        //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
+        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+        final CompletableFuture<Optional<NotCreatedReason>> reasonFuture = isExemptedFuture.thenApply(isExempted -> {
+            if (isExempted) {
+                return Optional.of(NotCreatedReason.targetHasExemptPermission(target));
+            } else {
+                return Optional.empty();
+            }
+        });
+
+        //fuck, I really need monad transformers to make this cleaner.
+        final CompletableFuture<Either<NotCreatedReason, MainSpectatorInventory>> combinedFuture = reasonFuture.thenCompose(maybeReason -> {
+            if (maybeReason.isPresent()) {
+                return CompletableFuture.completedFuture(Either.left(maybeReason.get()));
+            } else {
+                return createOfflineInventory(playerId, playerName, title).thenApply(maybeInventory -> {
+                    if (maybeInventory.isPresent()) {
+                        return Either.right(maybeInventory.get());
+                    } else {
+                        return Either.left(NotCreatedReason.targetDoesNotExists(target));
+                    }
+                });
+            }
+        });
 
         //try offline
-        CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = createOfflineInventory(playerId, playerName, title)
-                .<SpectateResponse<MainSpectatorInventory>>thenApply(optionalInv -> {
-            if (optionalInv.isPresent()) {
-                MainSpectatorInventory inv = optionalInv.get();
-                openInventories.put(playerId, new WeakReference<>(inv));
-                return SpectateResponse.succeed(inv);
+        CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = combinedFuture.<SpectateResponse<MainSpectatorInventory>>thenApply(eitherReasonOrInventory -> {
+            if (eitherReasonOrInventory.isRight()) {
+                MainSpectatorInventory inventory = eitherReasonOrInventory.getRight();
+                openInventories.put(playerId, new WeakReference<>(inventory));
+                return SpectateResponse.succeed(inventory);
             } else {
-                return SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target));
+                NotCreatedReason reason = eitherReasonOrInventory.getLeft();
+                return SpectateResponse.fail(reason);
             }
         }).handleAsync((success, error) -> {
             if (error == null) return success;
@@ -353,20 +386,33 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        //https://github.com/Jannyboy11/InvSee-plus-plus/issues/15
-        if (!plugin.getServer().isPrimaryThread()) {
-            if (exempt.isExemptedFromHavingEnderchestSpectated(target)) {
-                return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
-            }
-        }
+        //make LuckPerms happy by doing the permission lookup async. (https://github.com/Jannyboy11/InvSee-plus-plus/issues/15)
+        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+        final CompletableFuture<Optional<UUID>> uuidFuture = fetchUniqueId(targetName);
 
-        //try offline
-        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = fetchUniqueId(targetName).thenCompose(optUuid -> {
-            if (optUuid.isPresent()) {
-                UUID uuid = optUuid.get();
-                return enderSpectatorInventory(uuid, targetName, title);
+        final CompletableFuture<Either<NotCreatedReason, UUID>> combinedFuture = isExemptedFuture.thenCompose(isExempted -> {
+            if (isExempted) {
+                return CompletableFuture.completedFuture(Either.left(NotCreatedReason.targetHasExemptPermission(target)));
+            } else {
+                return uuidFuture.thenApply(optionalUuid -> {
+                    if (optionalUuid.isPresent()) {
+                        return Either.right(optionalUuid.get());
+                    } else {
+                        return Either.left(NotCreatedReason.targetDoesNotExists(target));
+                    }
+                });
             }
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target)));
+        });
+
+        //map to SpectateResult and cache if success
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = combinedFuture.thenCompose(eitherReasonOrUuid -> {
+            if (eitherReasonOrUuid.isRight()) {
+                UUID uuid = eitherReasonOrUuid.getRight();
+                return enderSpectatorInventory(uuid, targetName, title);
+            } else {
+                NotCreatedReason reason = eitherReasonOrUuid.getLeft();
+                return CompletableFuture.completedFuture(SpectateResponse.fail(reason));
+            }
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
@@ -413,18 +459,41 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUniqueId(playerId);
-        if (exempt.isExemptedFromHavingEnderchestSpectated(target))
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+        //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
+        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+        final CompletableFuture<Optional<NotCreatedReason>> reasonFuture = isExemptedFuture.thenApply(isExempted -> {
+            if (isExempted) {
+                return Optional.of(NotCreatedReason.targetHasExemptPermission(target));
+            } else {
+                return Optional.empty();
+            }
+        });
 
-        //try offline
-        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = createOfflineEnderChest(playerId, playerName, title)
-                .<SpectateResponse<EnderSpectatorInventory>>thenApply(optionalInv -> {
-            if (optionalInv.isPresent()) {
-                EnderSpectatorInventory inv = optionalInv.get();
+        //fuck, I really need monad transformers to make this cleaner.
+        final CompletableFuture<Either<NotCreatedReason, EnderSpectatorInventory>> combinedFuture = reasonFuture.thenCompose(maybeReason -> {
+            if (maybeReason.isPresent()) {
+                return CompletableFuture.completedFuture(Either.left(maybeReason.get()));
+            } else {
+                return createOfflineEnderChest(playerId, playerName, title).thenApply(maybeInventory -> {
+                    if (maybeInventory.isPresent()) {
+                        return Either.right(maybeInventory.get());
+                    } else {
+                        return Either.left(NotCreatedReason.targetDoesNotExists(target));
+                    }
+                });
+            }
+        });
+
+        //map to SpectateResult and cache if success
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = combinedFuture.<SpectateResponse<EnderSpectatorInventory>>thenApply(eitherReasonOrInventory -> {
+            if (eitherReasonOrInventory.isRight()) {
+                EnderSpectatorInventory inv = eitherReasonOrInventory.getRight();
                 openEnderChests.put(playerId, new WeakReference<>(inv));
                 return SpectateResponse.succeed(inv);
+            } else {
+                NotCreatedReason reason = eitherReasonOrInventory.getLeft();
+                return SpectateResponse.fail(reason);
             }
-            return SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target));
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
