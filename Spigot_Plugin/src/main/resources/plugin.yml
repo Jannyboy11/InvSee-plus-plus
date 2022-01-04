@@ -30,6 +30,7 @@ permissions:
       invseeplusplus.endersee.edit: true
       invseeplusplus.exempt.invsee: true
       invseeplusplus.exempt.endersee: true
+    default: false
 
   invseeplusplus.spectate:
     description: Gives access to view and edit players' inventories and enderchests
@@ -66,6 +67,7 @@ permissions:
     children:
       invseeplusplus.exempt.invsee: true
       invseeplusplus.exempt.endersee: true
+    default: false
 
   invseeplusplus.invsee.view:
     description: Gives access to view a player's inventory
