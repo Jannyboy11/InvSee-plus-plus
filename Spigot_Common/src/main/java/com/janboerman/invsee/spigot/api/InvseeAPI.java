@@ -189,6 +189,8 @@ public abstract class InvseeAPI {
     public abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
+    // ================================== API methods: Main Inventory ==================================
+
     public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity player, String title) {
         Target target = Target.byPlayer(player);
         if (exempt.isExemptedFromHavingMainInventorySpectated(target)) {
@@ -311,6 +313,8 @@ public abstract class InvseeAPI {
         future.whenComplete((result, error) -> pendingInventoriesByUuid.remove(playerId));
         return future;
     }
+
+    // ================================== API methods: Enderchest ==================================
 
     public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity player, String title) {
         Target target = Target.byPlayer(player);

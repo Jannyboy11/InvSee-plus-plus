@@ -235,6 +235,11 @@ public class FakeUnsafeValues implements UnsafeValues {
     }
 
     @Override
+    public @NotNull Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(@NotNull Material material, @NotNull EquipmentSlot equipmentSlot) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isCollidable(@NotNull Material material) {
         throw new UnsupportedOperationException();
     }

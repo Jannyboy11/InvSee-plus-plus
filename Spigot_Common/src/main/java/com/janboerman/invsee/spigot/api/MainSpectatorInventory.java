@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * A spectator inventory that contains all the items of the target player's 'normal' inventory.
+ * This includes the player's armour, items in his crafting grid, and even the item on his cursor!
  */
 public interface MainSpectatorInventory extends SpectatorInventory {
 

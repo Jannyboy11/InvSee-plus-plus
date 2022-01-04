@@ -19,14 +19,16 @@ public class FakeCraftPlayer extends CraftPlayer {
         super.setExtraData(tag);
 
         CompoundTag freshlyLoaded = loadPlayerTag();
-        CompoundTag loadedBukkit = freshlyLoaded.getCompound("bukkit");
-        CompoundTag loadedPaper = freshlyLoaded.getCompound("Paper");
+        if (freshlyLoaded != null) { //can be null if the player hasn't played before.
+            CompoundTag loadedBukkit = freshlyLoaded.getCompound("bukkit");
+            CompoundTag loadedPaper = freshlyLoaded.getCompound("Paper");
 
-        //populate using bukkit's and paper's old values
-        if (tag.contains("bukkit", Tag.TAG_COMPOUND) && loadedBukkit != null && !loadedBukkit.isEmpty())
-            tag.getCompound("bukkit").putLong("lastPlayed", loadedBukkit.getLong("lastPlayed"));
-        if (tag.contains("Paper", Tag.TAG_COMPOUND) && loadedPaper != null && !loadedPaper.isEmpty())
-            tag.getCompound("Paper").putLong("lastSeen", loadedPaper.getLong("LastSeen"));
+            //populate using bukkit's and paper's old values
+            if (tag.contains("bukkit", Tag.TAG_COMPOUND) && loadedBukkit != null && !loadedBukkit.isEmpty())
+                tag.getCompound("bukkit").putLong("lastPlayed", loadedBukkit.getLong("lastPlayed"));
+            if (tag.contains("Paper", Tag.TAG_COMPOUND) && loadedPaper != null && !loadedPaper.isEmpty())
+                tag.getCompound("Paper").putLong("lastSeen", loadedPaper.getLong("LastSeen"));
+        }
     }
 
     private CompoundTag loadPlayerTag() {
