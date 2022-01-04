@@ -46,4 +46,5 @@ public class InAccessibleSlot extends Slot {
     public boolean isAllowed(EntityHuman player) {
         return false;
     }
+
 }

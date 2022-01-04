@@ -29,14 +29,11 @@ import java.util.function.BiFunction;
 
 public class InvseeImpl extends InvseeAPI {
 
-    static final ItemStack EMPTY_STACK = ItemStack.EMPTY;
-
     public InvseeImpl(Plugin plugin) {
         super(plugin);
         lookup.uuidResolveStrategies.add(2, new UUIDSearchSaveFilesStrategy(plugin));
         lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
     }
-
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {

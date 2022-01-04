@@ -1,6 +1,5 @@
 package com.janboerman.invsee.spigot.impl_1_18_1_R1;
 
-import static com.janboerman.invsee.spigot.impl_1_18_1_R1.InvseeImpl.EMPTY_STACK;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
@@ -106,7 +105,7 @@ class MainNmsInventory implements Container, MenuProvider {
 		storageContents.clear();
 		armourContents.clear();
 		offHand.clear();
-		onCursor.set(EMPTY_STACK);
+		onCursor.set(ItemStack.EMPTY);
 		personalContents.clear();
 		if (craftingContents != personalContents) {
 			craftingContents.clear();
@@ -132,7 +131,7 @@ class MainNmsInventory implements Container, MenuProvider {
 	@Override
 	public List<ItemStack> getContents() {
 		List<ItemStack> paddingOne = NonNullList.withSize(45 - storageContents.size() - armourContents.size() - offHand.size() - 1, ItemStack.EMPTY);
-		List<ItemStack> paddingTwo = NonNullList.withSize(9 - personalContents.size(), EMPTY_STACK);
+		List<ItemStack> paddingTwo = NonNullList.withSize(9 - personalContents.size(), ItemStack.EMPTY);
 		
 		return new ConcatList<>(storageContents,
 				new ConcatList<>(armourContents,
@@ -146,7 +145,7 @@ class MainNmsInventory implements Container, MenuProvider {
 	@Override
 	public ItemStack getItem(int slot) {
 		var ref = decideWhichItem(slot);
-		if (ref == null) return EMPTY_STACK;
+		if (ref == null) return ItemStack.EMPTY;
 		
 		return ref.get();
 	}
@@ -203,7 +202,7 @@ class MainNmsInventory implements Container, MenuProvider {
 	@Override
 	public ItemStack removeItem(int slot, int amount) {
 		var ref = decideWhichItem(slot);
-		if (ref == null) return EMPTY_STACK;
+		if (ref == null) return ItemStack.EMPTY;
 		
 		ItemStack stack = ref.get();
 		if (!stack.isEmpty() && amount > 0) {
@@ -213,20 +212,20 @@ class MainNmsInventory implements Container, MenuProvider {
 			}
 			return oldStackCopy;
 		} else {
-			return EMPTY_STACK;
+			return ItemStack.EMPTY;
 		}
 	}
 
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
 		var ref = decideWhichItem(slot);
-		if (ref == null) return EMPTY_STACK;
+		if (ref == null) return ItemStack.EMPTY;
 		
 		ItemStack stack = ref.get();
 		if (stack.isEmpty()) {
-			return EMPTY_STACK;
+			return ItemStack.EMPTY;
 		} else {
-			ref.set(EMPTY_STACK);
+			ref.set(ItemStack.EMPTY);
 			return stack;
 		}
 	}

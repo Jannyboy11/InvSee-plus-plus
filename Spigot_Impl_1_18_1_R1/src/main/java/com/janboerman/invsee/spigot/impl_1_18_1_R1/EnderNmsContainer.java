@@ -89,7 +89,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 		//returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
         //remember that we are called from inside the body of a loop!
 
-		ItemStack itemStack = InvseeImpl.EMPTY_STACK;
+		ItemStack itemStack = ItemStack.EMPTY;
 		Slot slot = this.getSlot(rawIndex);
 		
 		if (slot != null && slot.hasItem()) {
@@ -99,17 +99,17 @@ class EnderNmsContainer extends AbstractContainerMenu {
 			if (rawIndex < topRows * 9) {
 				//clicked in the top inventory
 				if (!moveItemStackTo(clickedSlotItem, topRows * 9, this.slots.size(), true)) {
-					return InvseeImpl.EMPTY_STACK;
+					return ItemStack.EMPTY;
 				}
 			} else {
 				//clicked in the bottom inventory
 				if (!moveItemStackTo(clickedSlotItem, 0, topRows * 9, false)) {
-					return InvseeImpl.EMPTY_STACK;
+					return ItemStack.EMPTY;
 				}
 			}
 			
 			if (clickedSlotItem.isEmpty()) {
-				slot.set(InvseeImpl.EMPTY_STACK);
+				slot.set(ItemStack.EMPTY);
 			} else {
 				slot.setChanged();
 			}

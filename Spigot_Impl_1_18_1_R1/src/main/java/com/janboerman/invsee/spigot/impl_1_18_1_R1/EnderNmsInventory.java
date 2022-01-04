@@ -71,7 +71,7 @@ class EnderNmsInventory implements Container, MenuProvider {
 
 	@Override
 	public ItemStack getItem(int slot) {
-		if (slot < 0 || slot >= getContainerSize()) return InvseeImpl.EMPTY_STACK;
+		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
 		
 		return storageContents.get(slot);
 	}
@@ -116,7 +116,7 @@ class EnderNmsInventory implements Container, MenuProvider {
 
 	@Override
 	public ItemStack removeItem(int slot, int amount) {
-		if (slot < 0 || slot >= getContainerSize()) return InvseeImpl.EMPTY_STACK;
+		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
 		
 		ItemStack stack = ContainerHelper.removeItem(storageContents, slot, amount);
 		if (!stack.isEmpty()) {
@@ -127,13 +127,13 @@ class EnderNmsInventory implements Container, MenuProvider {
 
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
-		if (slot < 0 || slot >= getContainerSize()) return InvseeImpl.EMPTY_STACK;
+		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
 		
 		ItemStack stack = storageContents.get(slot);
 		if (stack.isEmpty()) {
-			return InvseeImpl.EMPTY_STACK;
+			return ItemStack.EMPTY;
 		} else {
-			storageContents.set(slot, InvseeImpl.EMPTY_STACK);
+			storageContents.set(slot, ItemStack.EMPTY);
 			return stack;
 		}
 	}

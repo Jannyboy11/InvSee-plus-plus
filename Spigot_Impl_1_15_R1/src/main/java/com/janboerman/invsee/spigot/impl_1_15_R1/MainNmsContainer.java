@@ -9,6 +9,7 @@ public class MainNmsContainer extends Container {
     private final EntityHuman player;
     private final MainNmsInventory top;
     private final PlayerInventory bottom;
+    private final boolean spectatingOwnInventory;
 
     private InventoryView bukkitView;
 
@@ -18,11 +19,12 @@ public class MainNmsContainer extends Container {
         this.bottom = playerInventory;
         this.player = player;
         //setTitle(nmsInventory.getScoreboardDisplayName()); //setTitle is actually called when the thing actually opens. or something.
+        this.spectatingOwnInventory = player.getUniqueID().equals(playerInventory.player.getUniqueID());
 
         int firstFiveRows = top.storageContents.size()
                 + top.armourContents.size()
                 + top.offHand.size()
-                + 1 /*cursor*/;
+                + (spectatingOwnInventory ? 0 : 1); //only include cursor when not spectating yourself
 
         //top inventory slots
         for (int yPos = 0; yPos < 6; yPos++) {
@@ -79,6 +81,9 @@ public class MainNmsContainer extends Container {
     public ItemStack shiftClick(EntityHuman entityhuman, int rawIndex) {
         //returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
         //remember that we are called inside the body of a loop!
+
+        if (spectatingOwnInventory)
+            return InvseeImpl.EMPTY_STACK;
 
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
         Slot slot = this.slots.get(rawIndex);

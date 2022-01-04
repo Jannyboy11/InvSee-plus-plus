@@ -45,5 +45,10 @@ class InaccessibleSlot extends Slot {
         return false;
     }
 
+    @Override
+    public ItemStack getItem() {
+        return InvseeImpl.EMPTY_STACK;
+    }
+
 }
 

@@ -14,6 +14,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 	private final Player player;
 	private final MainNmsInventory top;
 	private final Inventory bottom;
+	private final boolean spectatingOwnInventory;
 	
 	private InventoryView bukkitView;
 	
@@ -23,11 +24,12 @@ class MainNmsContainer extends AbstractContainerMenu {
 		this.top = nmsInventory;
 		this.bottom = playerInventory;
 		this.player = player;
+		this.spectatingOwnInventory = player.getUUID().equals(playerInventory.player.getUUID());
 		
-		int firstFiveRows = top.storageContents.size()
+		final int firstFiveRows = top.storageContents.size()
 				+ top.armourContents.size()
 				+ top.offHand.size()
-				+ 1 /*cursor*/;
+				+ (spectatingOwnInventory ? 0 : 1); //only include cursor when not spectating yourself
 		
 		//top inventory slots
 		for (int yPos = 0; yPos < 6; yPos++) {
@@ -82,11 +84,16 @@ class MainNmsContainer extends AbstractContainerMenu {
 	
 	@Override
 	public ItemStack quickMoveStack(Player entityHuman, int rawIndex) {
-        //returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
+        //returns ItemStack.EMPTY when we are done transferring the itemstack on the rawIndex
         //remember that we are called inside the body of a loop!
+
+		//is entityHuman ever not equal to the viewer that we got instantiated with?
+		//in any case, let's just do this first: prevent shift-clicking when spectating your own inventory
+		if (spectatingOwnInventory)
+			return ItemStack.EMPTY;
 		
-		ItemStack itemStack = InvseeImpl.EMPTY_STACK;
-		Slot slot = getSlot(rawIndex);
+		ItemStack itemStack = ItemStack.EMPTY;
+		final Slot slot = getSlot(rawIndex);
 		final int topRows = 6;
 		
 		if (slot != null && slot.hasItem()) {
@@ -96,17 +103,17 @@ class MainNmsContainer extends AbstractContainerMenu {
 			if (rawIndex < topRows * 9) {
 				//clicked in the top inventory
 				if (!moveItemStackTo(clickedSlotItem, topRows * 9, this.slots.size(), true)) {
-					return InvseeImpl.EMPTY_STACK;
+					return ItemStack.EMPTY;
 				}
 			} else {
 				//clicked in the bottom inventory
 				if (!moveItemStackTo(clickedSlotItem, 0, topRows * 9, false)) {
-					return InvseeImpl.EMPTY_STACK;
+					return ItemStack.EMPTY;
 				}
 			}
 			
 			if (clickedSlotItem.isEmpty()) {
-				slot.set(InvseeImpl.EMPTY_STACK);
+				slot.set(ItemStack.EMPTY);
 			} else {
 				slot.setChanged();
 			}

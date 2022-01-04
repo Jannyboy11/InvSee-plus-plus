@@ -44,7 +44,7 @@ class PersonalSlot extends Slot {
 	@Override
 	public ItemStack remove(int subtractAmount) {
 		if (!works()) {
-			return InvseeImpl.EMPTY_STACK;
+			return ItemStack.EMPTY;
 		} else {
 			return super.remove(subtractAmount);
 		}

@@ -32,7 +32,7 @@ class InaccessibleSlot extends Slot {
 	
 	@Override
 	public ItemStack remove(int subtractAmount) {
-		return InvseeImpl.EMPTY_STACK;
+		return ItemStack.EMPTY;
 	}
 	
 	@Override
@@ -43,6 +43,11 @@ class InaccessibleSlot extends Slot {
 	@Override
 	public boolean mayPickup(Player player) {
 		return false;
+	}
+
+	@Override
+	public ItemStack getItem() {
+		return ItemStack.EMPTY;
 	}
 
 }
