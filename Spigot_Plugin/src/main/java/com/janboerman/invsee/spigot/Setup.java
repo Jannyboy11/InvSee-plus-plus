@@ -71,11 +71,11 @@ class SetupImpl implements Setup {
 
     @Override
     public InvseeAPI api() {
-        return null;
+        return api;
     }
 
     @Override
     public OfflinePlayerProvider offlinePlayerProvider() {
-        return null;
+        return offlinePlayerProvider;
     }
 }
