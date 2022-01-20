@@ -1,7 +1,6 @@
 package com.janboerman.invsee.spigot.api;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
@@ -12,7 +11,6 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.utils.*;
-import com.janboerman.invsee.spigot.internal.MappingsVersion;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -123,44 +121,6 @@ public abstract class InvseeAPI {
 
     protected void setOpenEnderChests(Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests) {
         this.openEnderChests = openEnderChests;
-    }
-
-
-    public static InvseeAPI setup(Plugin plugin) {
-        final Server server = plugin.getServer();
-
-        try {
-            Constructor<?> ctor = null;
-
-            if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_12_R1.CraftServer")) {
-                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_12_R1.InvseeImpl").getConstructor(Plugin.class);
-            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
-                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl").getConstructor(Plugin.class);
-            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R3.CraftServer")) {
-                ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl").getConstructor(Plugin.class);
-            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
-                switch (MappingsVersion.getMappingsVersion(server)) {
-                    case MappingsVersion._1_17:     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_R1.InvseeImpl").getConstructor(Plugin.class);      break;
-                    case MappingsVersion._1_17_1:   ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl").getConstructor(Plugin.class);    break;
-                }
-            } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R1.CraftServer")) {
-                switch (MappingsVersion.getMappingsVersion(server)) {
-                    case MappingsVersion._1_18:     ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl").getConstructor(Plugin.class);      break;
-                    case MappingsVersion._1_18_1:   ctor = Class.forName("com.janboerman.invsee.spigot.impl_1_18_1_R1.InvseeImpl").getConstructor(Plugin.class);    break;
-                }
-            }
-            //make a bunch of else-ifs here for future minecraft versions.
-            if (ctor != null) {
-                return InvseeAPI.class.cast(ctor.newInstance(plugin));
-            }
-        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException("InvseeAPI implementation class needs a public constructor that accepts just one argument; the bukkit Plugin instance.", e);
-        } catch (ClassNotFoundException cnfe) {
-            //should not occur, this is our own class.
-            throw new RuntimeException(cnfe);
-        }
-
-        throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
     }
 
     public Optional<MainSpectatorInventory> getOpenMainSpectatorInventory(UUID player) {

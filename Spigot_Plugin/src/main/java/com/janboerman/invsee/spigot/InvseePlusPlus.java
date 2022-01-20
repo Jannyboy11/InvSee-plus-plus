@@ -26,8 +26,9 @@ public class InvseePlusPlus extends JavaPlugin {
         saveDefaultConfig();
 
         //initialisation
-        this.api = InvseeAPI.setup(this);
-        this.offlinePlayerProvider = OfflinePlayerProvider.setup(this);
+        Setup setup = Setup.setup(this);
+        this.api = setup.api();
+        this.offlinePlayerProvider = setup.offlinePlayerProvider();
 
         //interop
         PerWorldInventoryHook pwiHook;
