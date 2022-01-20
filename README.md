@@ -43,7 +43,6 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
     - `java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
-    - `java -jar BuildTools.jar --rev 1.17 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped`
