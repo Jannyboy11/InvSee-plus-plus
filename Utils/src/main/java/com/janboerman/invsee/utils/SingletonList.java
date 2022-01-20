@@ -195,12 +195,12 @@ public class SingletonList<T> implements List<T>, RandomAccess {
 
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        if (fromIndex != 0)
-            throw new IllegalArgumentException("fromIndex must be 0", new IndexOutOfBoundsException(fromIndex));
+        if (!(fromIndex == 0 || fromIndex == 1))
+            throw new IllegalArgumentException("fromIndex must be 0 or 1", new IndexOutOfBoundsException(fromIndex));
         if (!(toIndex == 0 || toIndex == 1))
             throw new IllegalArgumentException("toIndex must be 0 or 1", new IndexOutOfBoundsException(toIndex));
 
-        if (toIndex == 0)
+        if (toIndex == 0 || fromIndex == toIndex)
             return List.of();
         else
             return this;
