@@ -18,13 +18,13 @@ class MainNmsContainer extends AbstractContainerMenu {
 	
 	private InventoryView bukkitView;
 	
-	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory playerInventory, Player player) {
+	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory bottomInventory, Player spectator) {
 		super(MenuType.GENERIC_9x6, id);
 		
 		this.top = nmsInventory;
-		this.bottom = playerInventory;
-		this.player = player;
-		this.spectatingOwnInventory = player.getUUID().equals(playerInventory.player.getUUID());
+		this.bottom = bottomInventory;
+		this.player = spectator;
+		this.spectatingOwnInventory = spectator.getUUID().equals(nmsInventory.targetPlayerUuid);
 		
 		final int firstFiveRows = top.storageContents.size()
 				+ top.armourContents.size()
@@ -56,7 +56,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 				int index = xPos + yPos * 9;
 				int magicX = 8 + xPos * 18;
 				int magicY = 103 + yPos * 18 + magicAddY;
-				addSlot(new Slot(playerInventory, index, magicX, magicY));
+				addSlot(new Slot(bottomInventory, index, magicX, magicY));
 			}
 		}
 		
@@ -65,7 +65,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 			int index = xPos;
 			int magicX = 8 + xPos * 18;
 			int magicY = 161 + magicAddY;
-			addSlot(new Slot(playerInventory, index, magicX, magicY));
+			addSlot(new Slot(bottomInventory, index, magicX, magicY));
 		}
 	}
 
