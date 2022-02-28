@@ -40,10 +40,10 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 ###### Prerequisites: [JDK-17](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
 1. Install CraftBukkit into your local repository first by running BuildTools with
-    - `java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit`
-    - `java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit`
-    - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
-    - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 1573-k --compile craftbukkit` (1.12.2)
+    - `java -jar BuildTools.jar --rev 2703-a --compile craftbukkit` (1.15.2)
+    - `java -jar BuildTools.jar --rev 3096-a --compile craftbukkit` (1.16.5)
+    - `java -jar BuildTools.jar --rev 3284-a --compile craftbukkit --remapped` (1.17.1)
     - `java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped`
