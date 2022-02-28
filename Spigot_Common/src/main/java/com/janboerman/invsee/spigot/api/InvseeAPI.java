@@ -190,8 +190,17 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        //make LuckPerms happy by doing the permission lookup async. (https://github.com/Jannyboy11/InvSee-plus-plus/issues/15)
-        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+
+        // Work around a LuckPerms bug where it can't perform a permission check for players who haven't logged into the server yet,
+        // because it tries to find the player's UUID in its database. How silly - it could just return whether the default group has that permission or not.
+        // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
+        final CompletableFuture<Boolean> isExemptedFuture;
+        if (plugin.getServer().getPluginManager().isPluginEnabled("LuckPerms")) {
+            isExemptedFuture = CompletableFuture.completedFuture(false);
+        } else {
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+        }
+
         final CompletableFuture<Optional<UUID>> uuidFuture = fetchUniqueId(targetName);
 
         final CompletableFuture<Either<NotCreatedReason, UUID>> combinedFuture = isExemptedFuture.thenCompose(isExempted -> {
@@ -346,8 +355,17 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byUsername(targetName);
-        //make LuckPerms happy by doing the permission lookup async. (https://github.com/Jannyboy11/InvSee-plus-plus/issues/15)
-        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+
+        // Work around a LuckPerms bug where it can't perform a permission check for players who haven't logged into the server yet,
+        // because it tries to find the player's UUID in its database. How silly - it could just return whether the default group has that permission or not.
+        // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
+        final CompletableFuture<Boolean> isExemptedFuture;
+        if (plugin.getServer().getPluginManager().isPluginEnabled("LuckPerms")) {
+            isExemptedFuture = CompletableFuture.completedFuture(false);
+        } else {
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+        }
+
         final CompletableFuture<Optional<UUID>> uuidFuture = fetchUniqueId(targetName);
 
         final CompletableFuture<Either<NotCreatedReason, UUID>> combinedFuture = isExemptedFuture.thenCompose(isExempted -> {

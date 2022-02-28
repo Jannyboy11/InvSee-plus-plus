@@ -47,6 +47,13 @@ public interface Setup {
                     offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_18_1_R1.KnownPlayersProvider(plugin);
                     break;
             }
+        } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R2.CraftServer")) {
+            switch (MappingsVersion.getMappingsVersion(server)) {
+                case MappingsVersion._1_18_2:
+                    api = new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin);
+                    offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin);
+                    break;
+            }
         }
 
         if (api != null) {

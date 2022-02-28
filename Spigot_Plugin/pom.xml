@@ -110,7 +110,7 @@
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>2.2.1</version>
+            <version>3.0.0</version>
             <scope>compile</scope>
         </dependency>
 
@@ -168,6 +168,12 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Impl_1_18_1_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Spigot_Impl_1_18_2_R2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

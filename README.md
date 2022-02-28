@@ -46,6 +46,7 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped`
 2. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
 and running `mvn clean install -DskipTests=true` in its root directory.
 3. In the root directory of this project run `mvn clean package`.

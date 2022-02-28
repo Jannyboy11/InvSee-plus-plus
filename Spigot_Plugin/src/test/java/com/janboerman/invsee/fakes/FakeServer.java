@@ -34,6 +34,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator.ChunkData;
 import org.bukkit.help.HelpMap;
@@ -49,6 +50,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.messaging.Messenger;
+import org.bukkit.potion.PotionBrewer;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.structure.StructureManager;
@@ -79,12 +81,12 @@ public class FakeServer implements Server {
 
     @Override
     public String getVersion() {
-        return "1.18";
+        return "1.18.2";
     }
 
     @Override
     public String getBukkitVersion() {
-        return "1.18.1-R0.1-SNAPSHOT";
+        return "1.18.2-R0.1-SNAPSHOT";
     }
 
     @Override
@@ -224,6 +226,11 @@ public class FakeServer implements Server {
 
     @Override
     public int getTicksPerAmbientSpawns() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getTicksPerSpawns(@NotNull SpawnCategory spawnCategory) {
         throw new UnsupportedOperationException();
     }
 
@@ -414,7 +421,7 @@ public class FakeServer implements Server {
 
     @Override
     public boolean getHideOnlinePlayers() {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -468,6 +475,21 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public org.bukkit.profile.@NotNull PlayerProfile createPlayerProfile(@Nullable UUID uuid, @Nullable String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public org.bukkit.profile.@NotNull PlayerProfile createPlayerProfile(@NotNull UUID uuid) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public org.bukkit.profile.@NotNull PlayerProfile createPlayerProfile(@NotNull String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Set<String> getIPBans() {
         throw new UnsupportedOperationException();
     }
@@ -509,6 +531,11 @@ public class FakeServer implements Server {
 
     @Override
     public ConsoleCommandSender getConsoleSender() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull CommandSender createCommandSender(@NotNull Consumer<? super Component> consumer) {
         throw new UnsupportedOperationException();
     }
 
@@ -599,6 +626,11 @@ public class FakeServer implements Server {
 
     @Override
     public int getAmbientSpawnLimit() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getSpawnLimit(@NotNull SpawnCategory spawnCategory) {
         throw new UnsupportedOperationException();
     }
 
@@ -845,6 +877,11 @@ public class FakeServer implements Server {
 
     @Override
     public @NotNull DatapackManager getDatapackManager() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull PotionBrewer getPotionBrewer() {
         throw new UnsupportedOperationException();
     }
 
