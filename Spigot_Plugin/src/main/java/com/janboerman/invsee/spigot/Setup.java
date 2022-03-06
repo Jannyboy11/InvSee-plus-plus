@@ -16,55 +16,84 @@ public interface Setup {
 
     public static Setup setup(Plugin plugin) {
         final Server server = plugin.getServer();
+        final String serverClassName = server.getClass().getName();
 
-        InvseeAPI api = null;
-        OfflinePlayerProvider offlinePlayerProvider = null;
-
-        if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_12_R1.CraftServer")) {
-            api = new com.janboerman.invsee.spigot.impl_1_12_R1.InvseeImpl(plugin);
-            offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_12_R1.KnownPlayersProvider(plugin);
-        } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_15_R1.CraftServer")) {
-            api = new com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl(plugin);
-            offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_15_R1.KnownPlayersProvider(plugin);
-        } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_16_R3.CraftServer")) {
-            api = new com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl(plugin);
-            offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_16_R3.KnownPlayersProvider(plugin);
-        } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_17_R1.CraftServer")) {
+        if ("org.bukkit.craftbukkit.v1_12_R1.CraftServer".equals(serverClassName)) {
+            return new Impl_1_12_2(plugin);
+        } else if ("org.bukkit.craftbukkit.v1_15_R1.CraftServer".equals(serverClassName)) {
+            return new Impl_1_15_2(plugin);
+        } else if ("org.bukkit.craftbukkit.v1_16_R3.CraftServer".equals(serverClassName)) {
+            return new Impl_1_16_5(plugin);
+        } else if ("org.bukkit.craftbukkit.v1_17_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_17_1:
-                    api = new com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl(plugin);
-                    offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_17_1_R1.KnownPlayersProvider(plugin);
-                    break;
+                    return new Impl_1_17_1(plugin);
             }
-        } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R1.CraftServer")) {
+        } else if ("org.bukkit.craftbukkit.v1_18_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_18:
-                    api = new com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl(plugin);
-                    offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_18_R1.KnownPlayersProvider(plugin);
-                    break;
+                    return new Impl_1_18(plugin);
                 case MappingsVersion._1_18_1:
-                    api = new com.janboerman.invsee.spigot.impl_1_18_1_R1.InvseeImpl(plugin);
-                    offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_18_1_R1.KnownPlayersProvider(plugin);
-                    break;
+                    return new Impl_1_18_1(plugin);
             }
-        } else if (server.getClass().getName().equals("org.bukkit.craftbukkit.v1_18_R2.CraftServer")) {
+        } else if ("org.bukkit.craftbukkit.v1_18_R2.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_18_2:
-                    api = new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin);
-                    offlinePlayerProvider = new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin);
-                    break;
+                    return new Impl_1_18_2(plugin);
             }
-        }
-
-        if (api != null) {
-            assert offlinePlayerProvider != null : "offlinePlayerProvider is not null, while api is.";
-            return new SetupImpl(api, offlinePlayerProvider);
         }
 
         throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
     }
 
 }
+
+//we use separate classes per implementation, to prevent classloading of an incorrect version.
+//previously, the Setup#setup(Plugin) method tried to load all implementation classes, even before any of them was needed.
+
+class Impl_1_12_2 extends SetupImpl {
+    Impl_1_12_2(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_12_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_12_R1.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_15_2 extends SetupImpl {
+    Impl_1_15_2(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_15_R1.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_16_5 extends SetupImpl {
+    Impl_1_16_5(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_16_R3.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_17_1 extends SetupImpl {
+    Impl_1_17_1(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_17_1_R1.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_18 extends SetupImpl {
+    Impl_1_18(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_R1.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_18_1 extends SetupImpl {
+    Impl_1_18_1(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_18_1_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_1_R1.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_18_2 extends SetupImpl {
+    Impl_1_18_2(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin));
+    }
+}
+
+//
 
 class SetupImpl implements Setup {
 

@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.11.7-SNAPSHOT</version>
+    <version>0.11.8-SNAPSHOT</version>
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
@@ -38,7 +38,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.10.0</version>
                 <configuration>
                     <release>11</release>
                 </configuration>
