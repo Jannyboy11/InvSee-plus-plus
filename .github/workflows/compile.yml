@@ -13,9 +13,9 @@ jobs:
       - name: Install JDK 8
         uses: actions/setup-java@v3
         with:
-          - distribution: 'temurin'
-          - java-version: '8'
-          - cache: 'maven'
+          distribution: 'temurin'
+          java-version: '8'
+          cache: 'maven'
       - name: Install CraftBukkit 1.12.2
         run: >
           - java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit
