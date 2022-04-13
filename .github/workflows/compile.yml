@@ -10,15 +10,23 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set up BuildTools
         run: wget -O BuildTools.jar https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+      - name: Install JDK 8
+        uses: actions/setup-java@v3
+        with:
+          - distribution: 'temurin'
+          - java-version: '8'
+          - cache: 'maven'
+      - name: Install CraftBukkit 1.12.2
+        run: >
+          - java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit
       - name: Install JDK 11
         uses: actions/setup-java@v3
         with:
           distribution: 'microsoft'
           java-version: '11'
           cache: 'maven'
-      - name: Install CraftBukkit 1.12.2, 1.15.2, 1.16.5
+      - name: Install CraftBukkit 1.15.2, 1.16.5
         run: >
-          java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit && \
           java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit && \
           java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit
       - name: Install JDK 17
