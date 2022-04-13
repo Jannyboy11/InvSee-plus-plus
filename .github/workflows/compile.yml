@@ -44,6 +44,6 @@ jobs:
       - name: Install PerWorldInventory
         run: |
           git clone https://github.com/Jannyboy11/perworldinventory-kt.git
-          mvn -f perworldinventory-ki/pom.xml clean install -DskipTests=true
+          mvn --file perworldinventory-kt/pom.xml clean install -DskipTests=true
       - name: Compile InvSee++
         run: mvn --batch-mode --update-snapshots verify
