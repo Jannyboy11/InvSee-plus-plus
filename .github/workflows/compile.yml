@@ -17,7 +17,7 @@ jobs:
           java-version: '8'
           cache: 'maven'
       - name: Install CraftBukkit 1.12.2
-        run: >
+        run: |
           java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit
       - name: Install JDK 11
         uses: actions/setup-java@v3
@@ -26,8 +26,8 @@ jobs:
           java-version: '11'
           cache: 'maven'
       - name: Install CraftBukkit 1.15.2, 1.16.5
-        run: >
-          java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit && \
+        run: |
+          java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit
           java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit
       - name: Install JDK 17
         uses: actions/setup-java@v3
@@ -36,10 +36,10 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - name: Install CraftBukkit 1.17.1, 1.18, 1.18.1, 1.18.2
-        run: >
-          java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped && \
-          java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped && \
-          java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped && \
+        run: |
+          java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped
       - name: Compile InvSee++
         run: mvn --batch-mode --update-snapshots verify
