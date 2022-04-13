@@ -9,6 +9,7 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.PistonMoveReaction;
+import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
@@ -29,6 +30,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.profile.PlayerProfile;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
@@ -121,6 +123,10 @@ public class FakePlayer implements Player {
     private int saturatedRegenerationRate = 10;
     private boolean visualFire = true;
     private int freezeTicks;
+    private boolean gravity;
+    private GameMode previousGameMode;
+    private final WeakHashMap<Plugin, Set<Entity>> hiddenEntities = new WeakHashMap<>();
+    private WorldBorder worldBorder;
 
     public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
@@ -593,6 +599,12 @@ public class FakePlayer implements Player {
         return uuid;
     }
 
+    @NotNull
+    @Override
+    public PlayerProfile getPlayerProfile() {
+        return new FakePlayerProfile(this);
+    }
+
     @Override
     public int getTicksLived() {
         return ticksLived;
@@ -673,11 +685,12 @@ public class FakePlayer implements Player {
 
     @Override
     public boolean hasGravity() {
-        return false;
+        return gravity;
     }
 
     @Override
     public void setGravity(boolean b) {
+        this.gravity = b;
     }
 
     @Override
@@ -722,6 +735,12 @@ public class FakePlayer implements Player {
     @Override
     public Pose getPose() {
         return Pose.STANDING;
+    }
+
+    @NotNull
+    @Override
+    public SpawnCategory getSpawnCategory() {
+        return SpawnCategory.MISC;
     }
 
     @Override
@@ -944,6 +963,14 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void playSound(@NotNull Entity entity, @NotNull Sound sound, float v, float v1) {
+    }
+
+    @Override
+    public void playSound(@NotNull Entity entity, @NotNull Sound sound, @NotNull SoundCategory soundCategory, float v, float v1) {
+    }
+
+    @Override
     public void stopSound(@NotNull Sound sound) {
     }
 
@@ -986,6 +1013,9 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void sendEquipmentChange(@NotNull LivingEntity livingEntity, @NotNull EquipmentSlot equipmentSlot, @NotNull ItemStack itemStack) {
+    }
+
     public boolean sendChunkChange(@NotNull Location location, int i, int i1, int i2, @NotNull byte[] bytes) {
         return false;
     }
@@ -1013,6 +1043,12 @@ public class FakePlayer implements Player {
 
     @Override
     public void updateInventory() {
+    }
+
+    @Nullable
+    @Override
+    public GameMode getPreviousGameMode() {
+        return this.previousGameMode;
     }
 
     @Override
@@ -1174,6 +1210,22 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void hideEntity(@NotNull Plugin plugin, @NotNull Entity entity) {
+        hiddenEntities.computeIfAbsent(plugin, k -> new HashSet<>()).add(entity);
+    }
+
+    @Override
+    public void showEntity(@NotNull Plugin plugin, @NotNull Entity entity) {
+        Set<Entity> hiddenEntities = this.hiddenEntities.get(plugin);
+        if (hiddenEntities != null) hiddenEntities.remove(entity);
+    }
+
+    @Override
+    public boolean canSee(@NotNull Entity entity) {
+        return hiddenEntities.values().stream().noneMatch(set -> set.contains(entity));
+    }
+
+    @Override
     public boolean isFlying() {
         return flying;
     }
@@ -1213,6 +1265,18 @@ public class FakePlayer implements Player {
 
     @Override
     public void setResourcePack(@NotNull String s, @NotNull byte[] bytes) {
+    }
+
+    @Override
+    public void setResourcePack(@NotNull String s, @Nullable byte[] bytes, @Nullable String s1) {
+    }
+
+    @Override
+    public void setResourcePack(@NotNull String s, @Nullable byte[] bytes, boolean b) {
+    }
+
+    @Override
+    public void setResourcePack(@NotNull String s, @Nullable byte[] bytes, @Nullable String s1, boolean b) {
     }
 
     @NotNull
@@ -1386,6 +1450,19 @@ public class FakePlayer implements Player {
 
     @Override
     public void openBook(@NotNull ItemStack itemStack) {
+    }
+
+    @Override
+    public void openSign(@NotNull Sign sign) {
+    }
+
+    @Override
+    public void showDemoScreen() {
+    }
+
+    @Override
+    public boolean isAllowingServerListings() {
+        return true;
     }
 
     @NotNull
@@ -1570,6 +1647,7 @@ public class FakePlayer implements Player {
 
     @Override
     public void setGameMode(@NotNull GameMode gameMode) {
+        this.previousGameMode = this.gameMode;
         this.gameMode = gameMode;
     }
 
@@ -2241,6 +2319,17 @@ public class FakePlayer implements Player {
             return EntityType.WITHER_SKULL;
         }
         return EntityType.UNKNOWN;
+    }
+
+    @Override
+    public void setWorldBorder(WorldBorder worldBorder) {
+        this.worldBorder = worldBorder;
+    }
+
+    @Override
+    public WorldBorder getWorldBorder() {
+        if (worldBorder == null) worldBorder = getWorld().getWorldBorder();
+        return worldBorder;
     }
 
 }
