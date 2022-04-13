@@ -38,7 +38,7 @@ jobs:
       - name: Install CraftBukkit 1.17.1, 1.18, 1.18.1, 1.18.2
         run: >
           java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped && \
-          java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remaped && \
+          java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped && \
           java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped && \
           java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped
       - name: Compile InvSee++
