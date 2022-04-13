@@ -41,5 +41,9 @@ jobs:
           java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped
+      - name: Install PerWorldInventory
+        run: |
+          git clone https://github.com/Jannyboy11/perworldinventory-kt.git
+          mvn -f perworldinventory-ki/pom.xml clean install -DskipTests=true
       - name: Compile InvSee++
         run: mvn --batch-mode --update-snapshots verify
