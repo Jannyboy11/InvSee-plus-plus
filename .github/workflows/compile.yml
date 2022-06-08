@@ -49,3 +49,11 @@ jobs:
           mvn --batch-mode --update-snapshots clean package install -DskipTests=true
       - name: Compile InvSee++
         run: mvn --batch-mode --update-snapshots verify
+      - name: Create tagged release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+          with:
+            files: |
+              Spigot_Plugin/target/InvSee++.jar
