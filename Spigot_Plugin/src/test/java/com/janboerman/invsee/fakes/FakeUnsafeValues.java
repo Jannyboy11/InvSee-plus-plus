@@ -8,8 +8,10 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.UnsafeValues;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
@@ -20,6 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.CreativeCategory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -199,6 +202,16 @@ public class FakeUnsafeValues implements UnsafeValues {
     }
 
     @Override
+    public @NotNull <T extends Keyed> Registry<T> registryFor(Class<T> aClass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull String getMainLevelName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ItemRarity getItemRarity(Material material) {
         throw new UnsupportedOperationException();
     }
@@ -236,6 +249,11 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public @NotNull Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(@NotNull Material material, @NotNull EquipmentSlot equipmentSlot) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CreativeCategory getCreativeCategory(Material material) {
         throw new UnsupportedOperationException();
     }
 

@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -277,6 +278,11 @@ public class FakeItemMeta implements ItemMeta, Damageable {
     @Override
     public boolean removeAttributeModifier(Attribute attribute, AttributeModifier attributeModifier) {
         return attributes.remove(attribute, attributeModifier);
+    }
+
+    @Override
+    public @NotNull String getAsString() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
