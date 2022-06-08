@@ -35,10 +35,9 @@ jobs:
           distribution: 'microsoft'
           java-version: '17'
           cache: 'maven'
-      - name: Install CraftBukkit 1.17.1, 1.18, 1.18.1, 1.18.2, 1.19
+      - name: Install CraftBukkit 1.17.1, 1.18.1, 1.18.2, 1.19
         run: |
           java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped
-          java -jar BuildTools.jar --rev 1.18 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.19 --compile craftbukkit --remapped

@@ -31,8 +31,6 @@ public interface Setup {
             }
         } else if ("org.bukkit.craftbukkit.v1_18_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_18:
-                    return new Impl_1_18(plugin);
                 case MappingsVersion._1_18_1:
                     return new Impl_1_18_1(plugin);
             }
@@ -77,12 +75,6 @@ class Impl_1_16_5 extends SetupImpl {
 class Impl_1_17_1 extends SetupImpl {
     Impl_1_17_1(Plugin plugin) {
         super(new com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_17_1_R1.KnownPlayersProvider(plugin));
-    }
-}
-
-class Impl_1_18 extends SetupImpl {
-    Impl_1_18(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_18_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_R1.KnownPlayersProvider(plugin));
     }
 }
 
