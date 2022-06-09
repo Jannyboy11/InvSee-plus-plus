@@ -4,21 +4,15 @@ import com.janboerman.invsee.spigot.api.target.Target;
 
 import java.util.Objects;
 
-public class TargetHasExemptPermission implements NotCreatedReason {
-
-    private final Target target;
+public class TargetHasExemptPermission extends AbstractNotCreatedReason {
 
     TargetHasExemptPermission(Target target) {
-        this.target = Objects.requireNonNull(target);
-    }
-
-    public Target getTarget() {
-        return target;
+        super(target);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(target);
+        return Objects.hashCode(getTarget());
     }
 
     @Override

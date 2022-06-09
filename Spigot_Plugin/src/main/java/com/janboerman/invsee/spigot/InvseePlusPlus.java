@@ -33,13 +33,13 @@ public class InvseePlusPlus extends JavaPlugin {
         //interop
         PerWorldInventoryHook pwiHook;
 //        MultiverseInventoriesHook mviHook;
-        if ((pwiHook = new PerWorldInventoryHook(this)).trySetup()) {
+        if (offlinePlayerSupport() && (pwiHook = new PerWorldInventoryHook(this)).trySetup()) {
             if (pwiHook.managesEitherInventory()) {
                 this.api = new PerWorldInventorySeeApi(this, api, pwiHook);
                 getLogger().info("Enabled PerWorldInventory integration.");
             }
         }
-//        else if ((mviHook = new MultiverseInventoriesHook(this)).trySetup()) {
+//        else if (offlinePlayerSupport() && (mviHook = new MultiverseInventoriesHook(this)).trySetup()) {
 //            if (mviHook.managesEitherInventory()) {
 //                this.api = new MultiverseInventoriesSeeApi(this, api, mviHook);
 //                getLogger().info("Enabled Multiverse-Inventories integration.");
@@ -61,7 +61,7 @@ public class InvseePlusPlus extends JavaPlugin {
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
 
-        if (tabCompleteOfflinePlayers()) {
+        if (offlinePlayerSupport() && tabCompleteOfflinePlayers()) {
             try {
                 Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
                 pluginManager.registerEvents(new AsyncTabCompleter(this), this);
@@ -99,5 +99,9 @@ public class InvseePlusPlus extends JavaPlugin {
 
     public boolean tabCompleteOfflinePlayers() {
         return getConfig().getBoolean("tabcomplete-offline-players", true);
+    }
+
+    public boolean offlinePlayerSupport() {
+        return getConfig().getBoolean("enable-offline-player-support", true);
     }
 }

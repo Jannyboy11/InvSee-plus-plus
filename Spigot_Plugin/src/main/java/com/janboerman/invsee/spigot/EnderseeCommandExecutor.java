@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.OfflineSupportDisabled;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
 import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
@@ -89,9 +90,9 @@ class EnderseeCommandExecutor implements CommandExecutor {
             if (isUuid) {
                 final UUID finalUuid = uuid;
                 future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.enderSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s enderchest"));
+                        .thenCompose(userName -> api.enderSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s enderchest", plugin.offlinePlayerSupport()));
             } else {
-                future = api.enderSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s enderchest");
+                future = api.enderSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s enderchest", plugin.offlinePlayerSupport());
             }
         }
 
@@ -102,11 +103,16 @@ class EnderseeCommandExecutor implements CommandExecutor {
                 } else {
                     NotCreatedReason reason = response.getReason();
                     if (reason instanceof TargetDoesNotExist) {
-                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " does not exist.");
+                        var targetDoesNotExist = (TargetDoesNotExist) reason;
+                        player.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
                     } else if (reason instanceof TargetHasExemptPermission) {
-                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " is exempted from being spectated.");
+                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
+                        player.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
                     } else if (reason instanceof ImplementationFault) {
-                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + reason.getTarget() + "'s enderchest.");
+                        var implementationFault = (ImplementationFault) reason;
+                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
+                    } else if (reason instanceof OfflineSupportDisabled) {
+                        player.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
                     }
                 }
             } else {

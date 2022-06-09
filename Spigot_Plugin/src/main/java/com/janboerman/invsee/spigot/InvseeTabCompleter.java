@@ -34,7 +34,7 @@ public class InvseeTabCompleter implements TabCompleter {
                 onlineNames.add(onlinePlayer.getName());
             }
 
-            if (plugin.tabCompleteOfflinePlayers()) {
+            if (plugin.offlinePlayerSupport() && plugin.tabCompleteOfflinePlayers()) {
                 Set<String> offlineNames = api.getUuidCache().keySet();
 
                 SortedSet<String> allNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -57,7 +57,7 @@ public class InvseeTabCompleter implements TabCompleter {
                 }
             }
 
-            if (plugin.tabCompleteOfflinePlayers()) {
+            if (plugin.offlinePlayerSupport() && plugin.tabCompleteOfflinePlayers()) {
                 SortedSet<String> allNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
                 allNames.addAll(onlineNames);
                 for (String offlineName : api.getUuidCache().keySet()) {

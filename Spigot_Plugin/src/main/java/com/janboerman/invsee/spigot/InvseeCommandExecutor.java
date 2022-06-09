@@ -86,10 +86,10 @@ class InvseeCommandExecutor implements CommandExecutor {
                 //playerNameOrUUID is a UUID.
                 final UUID finalUuid = uuid;
                 future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.mainSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s inventory"));
+                        .thenCompose(userName -> api.mainSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s inventory", plugin.offlinePlayerSupport()));
             } else {
                 //playerNameOrUUID is a username.
-                future = api.mainSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory");
+                future = api.mainSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory", plugin.offlinePlayerSupport());
             }
         }
 
@@ -100,11 +100,16 @@ class InvseeCommandExecutor implements CommandExecutor {
                 } else {
                     NotCreatedReason reason = response.getReason();
                     if (reason instanceof TargetDoesNotExist) {
-                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " does not exist.");
+                        var targetDoesNotExist = (TargetDoesNotExist) reason;
+                        player.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
                     } else if (reason instanceof TargetHasExemptPermission) {
-                        player.sendMessage(ChatColor.RED + "Player " + reason.getTarget() + " is exempted from being spectated.");
+                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
+                        player.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
                     } else if (reason instanceof ImplementationFault) {
-                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + reason.getTarget() + "'s inventory.");
+                        var implementationFault = (ImplementationFault) reason;
+                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s inventory.");
+                    } else if (reason instanceof OfflineSupportDisabled) {
+                        player.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
                     }
                 }
             } else {

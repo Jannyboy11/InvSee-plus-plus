@@ -160,18 +160,11 @@ public abstract class InvseeAPI {
         }
     }
 
-    /**
-     * @deprecated use {@link #mainSpectatorInventory(String, String)} instead
-     */
-    @Deprecated(forRemoval = true)
-    public CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(String userName, String title) {
-        return mainSpectatorInventory(userName, title).thenApply(response -> {
-            if (response.isSuccess()) return Optional.of(response.getInventory());
-            else return Optional.empty();
-        });
+    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
+        return mainSpectatorInventory(targetName, title, true);
     }
 
-    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
+    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
 
         //try online
@@ -187,6 +180,8 @@ public abstract class InvseeAPI {
             lookup.cacheNameAndUniqueId(uuid, targetName);
             openInventories.put(uuid, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+        } else if (!offlineSupport) {
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
 
         target = Target.byUsername(targetName);
@@ -235,16 +230,11 @@ public abstract class InvseeAPI {
         return future;
     }
 
-    /** @deprecated use {@link #mainSpectatorInventory(UUID, String, String)} instead*/
-    @Deprecated(forRemoval = true)
-    public final CompletableFuture<Optional<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title) {
-        return mainSpectatorInventory(playerId, playerName, title).thenApply(response -> {
-            if (response.isSuccess()) return Optional.of(response.getInventory());
-            else return Optional.empty();
-        });
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
+        return mainSpectatorInventory(playerId, playerName, title, true);
     }
 
-    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
 
@@ -269,6 +259,8 @@ public abstract class InvseeAPI {
             lookup.cacheNameAndUniqueId(playerId, playerName);
             openInventories.put(playerId, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+        } else if (!offlineSupport) {
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
 
         target = Target.byUniqueId(playerId);
@@ -327,16 +319,11 @@ public abstract class InvseeAPI {
         }
     }
 
-    /** use {@link #enderSpectatorInventory(String, String)} instead */
-    @Deprecated(forRemoval = true)
-    public CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(String userName, String title) {
-        return enderSpectatorInventory(userName, title).thenApply(optInv -> {
-            if (optInv.isSuccess()) return Optional.of(optInv.getInventory());
-            else return Optional.empty();
-        });
+    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
+        return enderSpectatorInventory(targetName, title, true);
     }
 
-    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
+    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
 
         //try online
@@ -352,6 +339,8 @@ public abstract class InvseeAPI {
             lookup.cacheNameAndUniqueId(uuid, targetName);
             openEnderChests.put(uuid, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+        } else if (!offlineSupport) {
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
 
         target = Target.byUsername(targetName);
@@ -400,16 +389,11 @@ public abstract class InvseeAPI {
         return future;
     }
 
-    /** @deprecated use {@link #enderSpectatorInventory(UUID, String, String)} instead */
-    @Deprecated(forRemoval = true)
-    public final CompletableFuture<Optional<EnderSpectatorInventory>> spectateEnderChest(UUID playerId, String playerName, String title) {
-        return enderSpectatorInventory(playerId, playerName, title).thenApply(response -> {
-            if (response.isSuccess()) return Optional.of(response.getInventory());
-            else return Optional.empty();
-        });
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
+        return enderSpectatorInventory(playerId, playerName, title, true);
     }
 
-    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
 
@@ -434,6 +418,8 @@ public abstract class InvseeAPI {
             lookup.cacheNameAndUniqueId(playerId, playerName);
             openEnderChests.put(playerId, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+        } else if (!offlineSupport) {
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
 
         target = Target.byUniqueId(playerId);
