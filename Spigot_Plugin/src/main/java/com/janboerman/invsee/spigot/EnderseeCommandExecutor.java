@@ -112,7 +112,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
                         var implementationFault = (ImplementationFault) reason;
                         player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
                     } else if (reason instanceof OfflineSupportDisabled) {
-                        player.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
+                        player.sendMessage(ChatColor.RED + "Spectating offline players' enderchests is disabled.");
                     }
                 }
             } else {
