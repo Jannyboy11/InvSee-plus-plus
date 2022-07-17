@@ -230,6 +230,9 @@ public abstract class InvseeAPI {
         return future;
     }
 
+
+
+
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
         return mainSpectatorInventory(playerId, playerName, title, true);
     }

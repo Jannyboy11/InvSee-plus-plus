@@ -1,0 +1,3 @@
+# If not all items could be added to the target player's inventory,
+# should the player's save file still be udpated to include these partial changes?
+save-partial-inventories: true

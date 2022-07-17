@@ -35,6 +35,12 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.exempt` provides `invseeplusplus.exempt.invsee` and `invseeplusplus.exempt.endersee`
 - `invseeplusplus.*` provides all six of the base permissions
 
+### Contact
+
+Bugs & Feature requests: [GitHub issues](https://github.com/Jannyboy11/InvSee-plus-plus/issues)
+Anything else can be discussed via the [discussion thread on SpigotMC](https://www.spigotmc.org/threads/invsee.456148/) or via
+[Discord](https://discord.gg/Z8WCDHHcdJ).
+
 ### Compiling
 
 ###### Prerequisites: [JDK-17](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).

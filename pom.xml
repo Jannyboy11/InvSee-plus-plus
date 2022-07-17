@@ -21,6 +21,7 @@
         <module>Spigot_MultiverseInventories</module>
         <module>Spigot_PerWorldInventory</module>
         <module>Spigot_Plugin</module>
+        <module>Spigot_Addon_Give</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -5,6 +5,7 @@
 #Maven
 target/*
 Mojang_API/target/*
+Spigot_Addon_Give/target/*
 Spigot_Common/target/*
 Spigot_PerWorldInventory/target/*
 Spigot_MultiverseInventories/target/*
