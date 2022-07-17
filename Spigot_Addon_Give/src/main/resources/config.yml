@@ -1,3 +1,7 @@
 # If not all items could be added to the target player's inventory,
 # should the player's save file still be udpated to include these partial changes?
 save-partial-inventories: true
+
+# Whether items that could not be added to the player's inventory
+# Should be added to a queue that is polled every time the player logs in if the queue is non-empty.
+queue-remaining-items: true

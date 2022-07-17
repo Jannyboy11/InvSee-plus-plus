@@ -9,7 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.*;
 
-public class GiveTabCompleter implements TabCompleter {
+class GiveTabCompleter implements TabCompleter {
+
+    GiveTabCompleter() {}
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

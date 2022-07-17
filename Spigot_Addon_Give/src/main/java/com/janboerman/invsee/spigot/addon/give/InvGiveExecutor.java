@@ -17,10 +17,12 @@ class InvGiveExecutor implements CommandExecutor {
 
     private final GivePlugin plugin;
     private final InvseeAPI api;
+    private final ItemQueueManager queueManager;
 
-    InvGiveExecutor(GivePlugin plugin, InvseeAPI api) {
+    InvGiveExecutor(GivePlugin plugin, InvseeAPI api, ItemQueueManager queueManager) {
         this.plugin = plugin;
         this.api = api;
+        this.queueManager = queueManager;
     }
 
     @Override
@@ -62,6 +64,8 @@ class InvGiveExecutor implements CommandExecutor {
         }
         ItemStack items = new ItemStack(material, amount);
 
+        //TODO args[3] NBT tag!
+
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
                 sender.sendMessage(ChatColor.RED + "Unknown player: " + inputPlayer);
@@ -73,6 +77,8 @@ class InvGiveExecutor implements CommandExecutor {
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();
+                        inventory.setMaxStackSize(Integer.MAX_VALUE);
+                        final ItemStack originalItems = items.clone();
                         Map<Integer, ItemStack> map = inventory.addItem(items);
                         if (map.isEmpty()) {
                             //success!!
@@ -82,33 +88,15 @@ class InvGiveExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s inventory!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
-                            inventory.setMaxStackSize(Integer.MAX_VALUE);
-                            ItemStack[] storgeContents = inventory.getStorageContents();
                             int remainder = amount - map.get(0).getAmount();
-                            boolean fallbackSuccess = false;
-                            for (int idx = 0; idx < storgeContents.length; idx++) {
-                                ItemStack existingItem = storgeContents[idx];
-                                if (existingItem == null) {
-                                    items.setAmount(remainder);
-                                    storgeContents[idx] = items;
-                                    fallbackSuccess = true;
-                                } else if (existingItem.isSimilar(items)) {
-                                    existingItem.setAmount(existingItem.getAmount() + remainder);
-                                    fallbackSuccess = true;
-                                }
-                                if (fallbackSuccess) {
-                                    inventory.setStorageContents(storgeContents);
-                                    break;
-                                }
-                            }
 
-                            if (fallbackSuccess) {
-                                items.setAmount(amount);
-                                sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s inventory!");
+                            items.setAmount(remainder);
+
+                            if (plugin.queueRemainingItems()) {
+                                sender.sendMessage(ChatColor.YELLOW + "Could not add the following items to the player's inventory: " + items + ", enqueuing..");
+                                queueManager.enqueueInventory(uuid, plugin.savePartialInventories() ? items : originalItems);
                             } else {
-                                items.setAmount(remainder);
                                 sender.sendMessage(ChatColor.RED + "Could not add the following items to the player's inventory: " + items);
-                                //TODO queue the items to be inserted again once possible?
                             }
 
                             if (plugin.getServer().getPlayer(uuid) == null && plugin.savePartialInventories())
