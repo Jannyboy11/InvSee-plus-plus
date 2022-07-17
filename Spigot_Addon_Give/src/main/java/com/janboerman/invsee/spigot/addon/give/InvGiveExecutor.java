@@ -76,7 +76,7 @@ class InvGiveExecutor implements CommandExecutor {
                         Map<Integer, ItemStack> map = inventory.addItem(items);
                         if (map.isEmpty()) {
                             //success!!
-                            if (plugin.getServer().getPlayer(uuid) != null)
+                            if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
                                 api.saveInventory(inventory);
                         } else {
@@ -98,7 +98,7 @@ class InvGiveExecutor implements CommandExecutor {
                                 //TODO queue the items to be inserted again once possible?
                             }
 
-                            if (plugin.getServer().getPlayer(uuid) != null && plugin.savePartialInventories())
+                            if (plugin.getServer().getPlayer(uuid) == null && plugin.savePartialInventories())
                                 api.saveInventory(inventory);
                         }
                     } else {
