@@ -87,7 +87,8 @@ public class EnderGiveExecutor implements CommandExecutor {
                                 api.saveEnderChest(inventory);
                             sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s enderchest!");
                         } else {
-                            //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the max stack size!
+                            //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
+                            inventory.setMaxStackSize(Integer.MAX_VALUE);
                             int remainder = amount - map.get(0).getAmount();
                             boolean fallbackSuccess = false;
                             for (int idx = 0; idx < inventory.getSize(); idx++) {
