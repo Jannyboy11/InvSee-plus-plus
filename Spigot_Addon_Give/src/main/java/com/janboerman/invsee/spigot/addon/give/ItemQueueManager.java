@@ -28,14 +28,17 @@ class ItemQueueManager {
     void load() {
         try {
             if (!saveFolder.exists()) saveFolder.createNewFile();
-            for (File saveFile : saveFolder.listFiles((dir, name) -> name.endsWith(".yml"))) {
-                YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(saveFile);
-                String fileName = saveFile.getName();
-                UUID uuid = UUID.fromString(fileName.substring(0, fileName.length() - 4));
-                ItemQueue inventoryQueue = (ItemQueue) yamlConfiguration.get(INVENTORY_QUEUE);
-                ItemQueue enderchestQueue = (ItemQueue) yamlConfiguration.get(ENDERCHEST_QUEUE);
-                this.inventoryQueues.put(uuid, inventoryQueue);
-                this.enderchestQueues.put(uuid, enderchestQueue);
+            File[] saveFiles = saveFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+            if (saveFiles != null) {
+                for (File saveFile : saveFiles) {
+                    YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(saveFile);
+                    String fileName = saveFile.getName();
+                    UUID uuid = UUID.fromString(fileName.substring(0, fileName.length() - 4));
+                    ItemQueue inventoryQueue = (ItemQueue) yamlConfiguration.get(INVENTORY_QUEUE);
+                    ItemQueue enderchestQueue = (ItemQueue) yamlConfiguration.get(ENDERCHEST_QUEUE);
+                    this.inventoryQueues.put(uuid, inventoryQueue);
+                    this.enderchestQueues.put(uuid, enderchestQueue);
+                }
             }
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not create item queue save folder", e);
