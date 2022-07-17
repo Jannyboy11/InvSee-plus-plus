@@ -81,6 +81,23 @@ class MainBukkitInventory extends CraftInventory implements MainSpectatorInvento
 	}
 
 	@Override
+	public ItemStack[] getStorageContents() {
+		return getInventory().storageContents.stream().map(CraftItemStack::asCraftMirror).toArray(ItemStack[]::new);
+	}
+
+	@Override
+	public void setStorageContents(ItemStack[] storageContents) {
+		Objects.requireNonNull(storageContents, "storageContents cannot be null");
+		int storageContentsSize = getInventory().storageContents.size();
+		if (storageContents.length != storageContentsSize)
+			throw new IllegalArgumentException("storage contents must be of length " + storageContentsSize);
+
+		for (int i = 0; i < storageContentsSize; i++) {
+			getInventory().storageContents.set(i, CraftItemStack.asNMSCopy(storageContents[i]));
+		}
+	}
+
+	@Override
 	public ItemStack[] getArmourContents() {
 		return getInventory().armourContents.stream().map(CraftItemStack::asCraftMirror).toArray(ItemStack[]::new);
 	}
@@ -93,9 +110,8 @@ class MainBukkitInventory extends CraftInventory implements MainSpectatorInvento
 			throw new IllegalArgumentException("armour contents must be of length " + armourContentsSize);
 		
 		for (int i = 0; i < armourContentsSize; i++) {
-			getInventory().armourContents.set(i,  CraftItemStack.asNMSCopy(armourContents[i]));
+			getInventory().armourContents.set(i, CraftItemStack.asNMSCopy(armourContents[i]));
 		}
-		
 	}
 
 	@Override

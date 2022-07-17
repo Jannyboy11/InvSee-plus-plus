@@ -47,23 +47,6 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
     }
 
     @Override
-    public ItemStack[] getStorageContents() {
-        return getInventory().storageContents.stream().map(CraftItemStack::asCraftMirror).toArray(ItemStack[]::new);
-    }
-
-    @Override
-    public void setStorageContents(ItemStack[] storageContents) {
-        Objects.requireNonNull(storageContents, "storageContents cannot be null");
-        int storageContentsSize = getInventory().storageContents.size();
-        if (storageContents.length != storageContentsSize)
-            throw new IllegalArgumentException("storageContents must be of length " + storageContentsSize);
-
-        for (int i = 0; i < storageContentsSize; i++) {
-            getInventory().storageContents.set(i, CraftItemStack.asNMSCopy(storageContents[i]));
-        }
-    }
-
-    @Override
     public void watch(InventoryView targetPlayerView) {
         Objects.requireNonNull(targetPlayerView, "targetPlayerView cannot be null");
 
@@ -102,6 +85,23 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
             if (viewer instanceof Player) {
                 ((Player) viewer).updateInventory();
             }
+        }
+    }
+
+    @Override
+    public ItemStack[] getStorageContents() {
+        return getInventory().storageContents.stream().map(CraftItemStack::asCraftMirror).toArray(ItemStack[]::new);
+    }
+
+    @Override
+    public void setStorageContents(ItemStack[] storageContents) {
+        Objects.requireNonNull(storageContents, "storageContents cannot be null");
+        int storageContentsSize = getInventory().storageContents.size();
+        if (storageContents.length != storageContentsSize)
+            throw new IllegalArgumentException("storage contents must be of length " + storageContentsSize);
+
+        for (int i = 0; i < storageContentsSize; i++) {
+            getInventory().storageContents.set(i, CraftItemStack.asNMSCopy(storageContents[i]));
         }
     }
 
