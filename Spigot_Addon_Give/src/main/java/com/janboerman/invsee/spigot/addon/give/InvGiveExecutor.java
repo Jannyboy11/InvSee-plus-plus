@@ -79,7 +79,6 @@ class InvGiveExecutor implements CommandExecutor {
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();
-                        //inventory.setMaxStackSize(Integer.MAX_VALUE);
                         final ItemStack originalItems = items.clone();
                         Map<Integer, ItemStack> map = inventory.addItem(items);
                         if (map.isEmpty()) {
