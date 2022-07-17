@@ -2,6 +2,7 @@ name: InvSeePlusPlus_Give
 version: ${project.version}
 main: com.janboerman.invsee.spigot.addon.give.GivePlugin
 depend: [InvSeePlusPlus]
+api-version: 1.13
 
 permissions:
   invseeplusplus.give.inventory:
