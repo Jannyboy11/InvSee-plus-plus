@@ -56,3 +56,4 @@ jobs:
         with:
           files: |
             Spigot_Plugin/target/InvSee++.jar
+            Spigot_Addon_Give/target/InvSee++_Give.jar

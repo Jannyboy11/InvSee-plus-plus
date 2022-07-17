@@ -79,6 +79,7 @@ class InvGiveExecutor implements CommandExecutor {
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
                                 api.saveInventory(inventory);
+                            sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s inventory!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the max stack size!
                             int remainder = amount - map.get(0).getAmount();
@@ -92,7 +93,9 @@ class InvGiveExecutor implements CommandExecutor {
                                 }
                             }
 
-                            if (!fallbackSuccess) {
+                            if (fallbackSuccess) {
+                                sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s inventory!");
+                            } else {
                                 items.setAmount(remainder);
                                 sender.sendMessage(ChatColor.RED + "Could not add the following items to the player's inventory: " + items);
                                 //TODO queue the items to be inserted again once possible?
