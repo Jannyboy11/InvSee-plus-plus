@@ -28,10 +28,10 @@ public class GiveTabCompleter implements TabCompleter {
         }
 
         else if (args.length == 2) {
-            final String inputMaterial = args[1];
-            Stream<String> materialNames = Arrays.stream(Material.values()).map(Material::name);
+            final String inputMaterial = args[1].toLowerCase();
+            Stream<String> materialNames = Arrays.stream(Material.values()).map(material -> material.name().toLowerCase());
             if (!inputMaterial.isEmpty()) {
-                materialNames = materialNames.filter(name -> StringHelper.startsWithIgnoreCase(name, inputMaterial));
+                materialNames = materialNames.filter(name -> name.startsWith(inputMaterial));
             }
             return materialNames.collect(Collectors.toList());
         }
