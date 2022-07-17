@@ -1,7 +1,6 @@
 package com.janboerman.invsee.spigot.addon.give;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
@@ -9,13 +8,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
 @SerializableAs("ItemQueue")
-class ItemQueue implements ConfigurationSerializable {
+public class ItemQueue implements ConfigurationSerializable {
 
     private Deque<ItemStack> queue;
 
@@ -69,7 +69,7 @@ class ItemQueue implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        return Map.of("queue", queue);
+        return Map.of("queue", new ArrayList<>(queue));
     }
 
     public static ItemQueue deserialize(Map<String, Object> map) {

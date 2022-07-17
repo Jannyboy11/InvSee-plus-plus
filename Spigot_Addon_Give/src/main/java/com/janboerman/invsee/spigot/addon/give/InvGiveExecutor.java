@@ -65,6 +65,8 @@ class InvGiveExecutor implements CommandExecutor {
         ItemStack items = new ItemStack(material, amount);
 
         //TODO args[3] NBT tag!
+        //TODO can I use SNBT from https://github.com/Querz/NBT ? There seems to be a problem with booleans tho: https://github.com/Querz/NBT/issues/63)
+        //TODO or maybe use: https://github.com/TheNullicorn/Nedit
 
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
@@ -77,7 +79,7 @@ class InvGiveExecutor implements CommandExecutor {
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();
-                        inventory.setMaxStackSize(Integer.MAX_VALUE);
+                        //inventory.setMaxStackSize(Integer.MAX_VALUE);
                         final ItemStack originalItems = items.clone();
                         Map<Integer, ItemStack> map = inventory.addItem(items);
                         if (map.isEmpty()) {
@@ -85,10 +87,11 @@ class InvGiveExecutor implements CommandExecutor {
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
                                 api.saveInventory(inventory);
+                            items.setAmount(amount);
                             sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s inventory!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
-                            int remainder = amount - map.get(0).getAmount();
+                            int remainder = map.get(0).getAmount();
 
                             items.setAmount(remainder);
 

@@ -83,7 +83,7 @@ class EnderGiveExecutor implements CommandExecutor {
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();
-                        inventory.setMaxStackSize(Integer.MAX_VALUE);
+                        //inventory.setMaxStackSize(Integer.MAX_VALUE);
                         final ItemStack originalItems = items.clone();
                         Map<Integer, ItemStack> map = inventory.addItem(items);
                         if (map.isEmpty()) {
@@ -91,10 +91,11 @@ class EnderGiveExecutor implements CommandExecutor {
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
                                 api.saveEnderChest(inventory);
+                            items.setAmount(amount);
                             sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s enderchest!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
-                            int remainder = amount - map.get(0).getAmount();
+                            int remainder = map.get(0).getAmount();
 
                             items.setAmount(remainder);
                             if (plugin.queueRemainingItems()) {

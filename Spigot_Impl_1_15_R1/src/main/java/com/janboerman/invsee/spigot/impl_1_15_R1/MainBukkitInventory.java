@@ -309,24 +309,26 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
         return itemStack;
     }
 
-    private static void addItem(final ItemStack[] contents, final ItemStack itemStack, final int inventoryMaxStackSize) {
+    private static void addItem(final ItemStack[] contents, final ItemStack itemStack, final int maxStackSize) {
         assert contents != null && itemStack != null;
 
         //merge with existing similar item stacks
         for (int i = 0; i < contents.length; i++) {
             ItemStack existingStack = contents[i];
             if (existingStack != null) {
-                if (existingStack.isSimilar(itemStack) && existingStack.getAmount() < inventoryMaxStackSize) {
-                    //how many can we merge?
-                    int maxMergeAmount = inventoryMaxStackSize - existingStack.getAmount();
-                    if (itemStack.getAmount() <= maxMergeAmount) {
-                        //full merge
-                        existingStack.setAmount(existingStack.getAmount() + itemStack.getAmount());
-                        itemStack.setAmount(0);
-                    } else {
-                        //partial merge
-                        existingStack.setAmount(inventoryMaxStackSize);
-                        itemStack.setAmount(itemStack.getAmount() - maxMergeAmount);
+                if (existingStack.isSimilar(itemStack) && existingStack.getAmount() < maxStackSize) {
+                    //how many can we merge (at most)?
+                    int maxMergeAmount = Math.min(maxStackSize - existingStack.getAmount(), itemStack.getAmount());
+                    if (maxMergeAmount > 0) {
+                        if (itemStack.getAmount() <= maxMergeAmount) {
+                            //full merge
+                            existingStack.setAmount(existingStack.getAmount() + itemStack.getAmount());
+                            itemStack.setAmount(0);
+                        } else {
+                            //partial merge
+                            existingStack.setAmount(maxStackSize);
+                            itemStack.setAmount(itemStack.getAmount() - maxMergeAmount);
+                        }
                     }
                 }
             }
@@ -337,16 +339,16 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
         //merge with empty slots
         if (itemStack.getAmount() > 0) {
             for (int i = 0; i < contents.length; i++) {
-                if (contents[i] == null) {
-                    if (itemStack.getAmount() <= inventoryMaxStackSize) {
+                if (contents[i] == null || contents[i].getAmount() == 0 || contents[i].getType() == Material.AIR) {
+                    if (itemStack.getAmount() <= maxStackSize) {
                         //full merge
                         contents[i] = itemStack.clone();
                         itemStack.setAmount(0);
                     } else {
                         //partial merge
-                        ItemStack clone = itemStack.clone(); clone.setAmount(inventoryMaxStackSize);
+                        ItemStack clone = itemStack.clone(); clone.setAmount(maxStackSize);
                         contents[i] = clone;
-                        itemStack.setAmount(itemStack.getAmount() - inventoryMaxStackSize);
+                        itemStack.setAmount(itemStack.getAmount() - maxStackSize);
                     }
                 }
 
