@@ -47,30 +47,4 @@ class Convert {
         }
     }
 
-    /*
-    static Either<String, ItemStack[]> convertItems(Material itemType, String input) {
-        assert itemType != null && input != null;
-
-        Either<String, Integer> eitherAmount = convertAmount(input);
-        if (eitherAmount.isLeft()) return (Either<String, ItemStack[]>) (Either) eitherAmount;
-        assert eitherAmount.isRight() && eitherAmount.getRight() != null;
-        int amount = eitherAmount.getRight();
-
-        int maxStackSizeForMaterial = itemType.getMaxStackSize();
-        int amountOfStacks = amount / maxStackSizeForMaterial;
-        int remainder = amount % maxStackSizeForMaterial;
-        if (remainder != 0) {
-            amountOfStacks += 1;
-        }
-        ItemStack[] stacks = new ItemStack[amountOfStacks];
-        for (int i = 0; i < amountOfStacks; i++) {
-            stacks[i] = new ItemStack(itemType, maxStackSizeForMaterial);
-        }
-        if (remainder != 0) {
-            stacks[stacks.length - 1] = new ItemStack(itemType, remainder);
-        }
-        return Either.right(stacks);
-    }
-     */
-
 }

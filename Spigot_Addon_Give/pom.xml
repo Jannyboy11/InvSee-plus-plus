@@ -12,7 +12,7 @@
     <artifactId>Spigot_Addon_Give</artifactId>
 
     <build>
-        <finalName>InvSee++_Addon_Give</finalName>
+        <finalName>InvSee++_Give</finalName>
 
         <resources>
             <resource>
@@ -54,11 +54,6 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.janboerman.invsee</groupId>-->
-<!--            <artifactId>Spigot_Plugin</artifactId>-->
-<!--            <version>0.6-SNAPSHOT</version>-->
-<!--        </dependency>-->
     </dependencies>
 
 </project>
