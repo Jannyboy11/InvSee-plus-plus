@@ -88,10 +88,16 @@ class InvGiveExecutor implements CommandExecutor {
                             boolean fallbackSuccess = false;
                             for (int idx = 0; idx < storgeContents.length; idx++) {
                                 ItemStack existingItem = storgeContents[idx];
-                                if (existingItem.isSimilar(items)) {
-                                    existingItem.setAmount(existingItem.getAmount() + remainder);
-                                    inventory.setStorageContents(storgeContents);
+                                if (existingItem == null) {
+                                    items.setAmount(remainder);
+                                    storgeContents[idx] = items;
                                     fallbackSuccess = true;
+                                } else if (existingItem.isSimilar(items)) {
+                                    existingItem.setAmount(existingItem.getAmount() + remainder);
+                                    fallbackSuccess = true;
+                                }
+                                if (fallbackSuccess) {
+                                    inventory.setStorageContents(storgeContents);
                                     break;
                                 }
                             }

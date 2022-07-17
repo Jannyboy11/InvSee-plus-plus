@@ -89,14 +89,21 @@ public class EnderGiveExecutor implements CommandExecutor {
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
                             inventory.setMaxStackSize(Integer.MAX_VALUE);
+                            ItemStack[] storgeContents = inventory.getStorageContents();
                             int remainder = amount - map.get(0).getAmount();
                             boolean fallbackSuccess = false;
-                            for (int idx = 0; idx < inventory.getSize(); idx++) {
-                                ItemStack existingItem = inventory.getItem(idx);
-                                if (existingItem.isSimilar(items)) {
-                                    existingItem.setAmount(existingItem.getAmount() + remainder);
-                                    inventory.setItem(idx, existingItem);
+                            for (int idx = 0; idx < storgeContents.length; idx++) {
+                                ItemStack existingItem = storgeContents[idx];
+                                if (existingItem == null) {
+                                    items.setAmount(remainder);
+                                    storgeContents[idx] = items;
                                     fallbackSuccess = true;
+                                } else if (existingItem.isSimilar(items)) {
+                                    existingItem.setAmount(existingItem.getAmount() + remainder);
+                                    fallbackSuccess = true;
+                                }
+                                if (fallbackSuccess) {
+                                    inventory.setStorageContents(storgeContents);
                                     break;
                                 }
                             }
