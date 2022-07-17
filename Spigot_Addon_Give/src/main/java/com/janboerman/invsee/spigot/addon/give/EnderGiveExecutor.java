@@ -94,12 +94,14 @@ public class EnderGiveExecutor implements CommandExecutor {
                                 ItemStack existingItem = inventory.getItem(idx);
                                 if (existingItem.isSimilar(items)) {
                                     existingItem.setAmount(existingItem.getAmount() + remainder);
+                                    inventory.setItem(idx, existingItem);
                                     fallbackSuccess = true;
                                     break;
                                 }
                             }
 
                             if (fallbackSuccess) {
+                                items.setAmount(amount);
                                 sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s enderchest!");
                             } else {
                                 items.setAmount(remainder);
