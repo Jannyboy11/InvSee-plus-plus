@@ -246,19 +246,19 @@ class MainBukkitInventory extends CraftInventory implements MainSpectatorInvento
 
 		ItemStack[] storageContents = getStorageContents();
 		for (int i = 0; i < storageContents.length; i++) {
-			if (storageContents[i] == null)
+			if (storageContents[i] == null || storageContents[i].getAmount() == 0)
 				return i;
 		}
 
 		ItemStack[] armourContents = getArmourContents();
 		for (int i = 0; i < armourContents.length; i++) {
-			if (armourContents[i] == null)
+			if (armourContents[i] == null || armourContents[i].getAmount() == 0)
 				return i + storageContents.length;
 		}
 
 		ItemStack[] offHandContents = getOffHandContents();
 		for (int i = 0; i < offHandContents.length; i++) {
-			if (offHandContents[i] == null)
+			if (offHandContents[i] == null || offHandContents[i].getAmount() == 0)
 				return i + storageContents.length + armourContents.length;
 		}
 
