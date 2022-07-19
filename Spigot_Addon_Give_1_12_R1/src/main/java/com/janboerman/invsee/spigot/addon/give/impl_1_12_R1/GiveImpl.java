@@ -4,7 +4,7 @@ import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import com.janboerman.invsee.spigot.addon.give.common.NeditImpl;
 import me.nullicorn.nedit.type.NBTCompound;
-import me.nullicorn.nedit.type.NBTList; //explicit import needed because of name clash
+import me.nullicorn.nedit.type.NBTList;
 
 import java.util.Map.Entry;
 
