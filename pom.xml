@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.12.1-SNAPSHOT</version>
+    <version>0.12.2-SNAPSHOT</version>
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
@@ -23,7 +23,12 @@
         <module>Spigot_Plugin</module>
         <module>Spigot_Addon_Give</module>
         <module>Spigot_Addon_Give_Common</module>
-        <module>Spgiot_Addon_Give_1_19_R1</module>
+        <module>Spigot_Addon_Give_1_12_R1</module>
+        <module>Spigot_Addon_Give_1_15_R1</module>
+        <module>Spigot_Addon_Give_1_16_R3</module>
+        <module>Spigot_Addon_Give_1_17_1_R1</module>
+        <module>Spigot_Addon_Give_1_18_2_R2</module>
+        <module>Spigot_Addon_Give_1_19_R1</module>
     </modules>
     <packaging>pom</packaging>
 

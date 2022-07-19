@@ -11,8 +11,6 @@ public abstract class NeditImpl implements GiveApi {
     protected NeditImpl() {
     }
 
-    protected abstract ItemStack applyTag(ItemStack stack, NBTCompound tag);
-
     @Override
     public final ItemStack applyTag(ItemStack stack, String tag) {
         try {
@@ -21,5 +19,7 @@ public abstract class NeditImpl implements GiveApi {
             throw new IllegalArgumentException("Invalid nbt: " + tag);
         }
     }
+
+    protected abstract ItemStack applyTag(ItemStack stack, NBTCompound tag);
 
 }

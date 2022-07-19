@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.*;
 
 class GiveTabCompleter implements TabCompleter {
@@ -47,6 +48,14 @@ class GiveTabCompleter implements TabCompleter {
                 amounts = amounts.filter(amount -> amount.startsWith(inputAmount));
             }
             return amounts.collect(Collectors.toList());
+        }
+
+        else if (args.length >= 4) {
+            final StringJoiner sj = new StringJoiner(" ");
+            for (int i = 0; i < args.length; i++) sj.add(args[i]);
+            final String inputTag = sj.toString();
+            if (inputTag.length() == 0) return List.of("{");
+            //else: how to tabcomplete an nbt tag?
         }
 
         return List.of();
