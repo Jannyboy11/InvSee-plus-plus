@@ -30,6 +30,7 @@ permissions:
       invseeplusplus.endersee.edit: true
       invseeplusplus.exempt.invsee: true
       invseeplusplus.exempt.endersee: true
+      invseeplusplus.give.*: true
     default: false
 
   invseeplusplus.spectate:

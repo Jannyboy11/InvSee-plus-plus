@@ -28,12 +28,25 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.exempt.endersee` makes it impossible to spectate the enderchest of the owner of this permission.
 
 ###### Aggregate permissions:
-- `invseeplusplus.invsee` provides `invseeplusplus.invsee.view` and `invseeplusplus.invsee.edit`
-- `invseeplusplus.endersee` provides `invseeplusplus.endersee.view` and `invseeplusplus.endersee.edit`
-- `invseeplusplus.view` provides `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`
-- `invseeplusplus.edit` provides `invseeplusplus.invsee.edit` and `invseeplusplus.endersee.edit`
-- `invseeplusplus.exempt` provides `invseeplusplus.exempt.invsee` and `invseeplusplus.exempt.endersee`
-- `invseeplusplus.*` provides all six of the base permissions
+- `invseeplusplus.invsee` provides `invseeplusplus.invsee.view` and `invseeplusplus.invsee.edit`.
+- `invseeplusplus.endersee` provides `invseeplusplus.endersee.view` and `invseeplusplus.endersee.edit`.
+- `invseeplusplus.view` provides `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`.
+- `invseeplusplus.edit` provides `invseeplusplus.invsee.edit` and `invseeplusplus.endersee.edit`.
+- `invseeplusplus.exempt` provides `invseeplusplus.exempt.invsee` and `invseeplusplus.exempt.endersee`.
+- `invseeplusplus.*` provides all six of the base permissions.
+
+
+## Addons
+
+#### InvSee++_Give
+###### Commands:
+- `/invgive <player> <item type> <amount>? <nbt tag>?`
+- `/endergive <player> <item type> <amount>? <nbt tag>?`
+###### Permissions:
+- `invseeplusplus.give.*` provides `invseeplusplus.give.inventory` and `invseeplusplus.give.enderchest`.
+- `invseeplusplus.give.inventory` allows access to `/invgive`.
+- `invseeplusplus.give.enderchest` allows access to `/endergive`.
+
 
 ### Contact
 

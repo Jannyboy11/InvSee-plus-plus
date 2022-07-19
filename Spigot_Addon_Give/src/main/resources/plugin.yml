@@ -6,6 +6,12 @@ api-version: 1.13
 prefix: "InvSee++_Give"
 
 permissions:
+  invseeplusplus.give.*:
+    description: Grants all permissions for the InvSee++ Give addon
+    children:
+      - invseeplusplus.give.inventory
+      - invseeplusplus.give.enderchest
+    default: false
   invseeplusplus.give.inventory:
     description: "Allows you to use /invgive"
     default: op
