@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.addon.give;
 
+import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,11 +25,13 @@ class EnderGiveExecutor implements CommandExecutor {
 
     private final GivePlugin plugin;
     private final InvseeAPI api;
+    private final GiveApi giveApi;
     private final ItemQueueManager queueManager;
 
-    EnderGiveExecutor(GivePlugin plugin, InvseeAPI api, ItemQueueManager queueManager) {
+    EnderGiveExecutor(GivePlugin plugin, InvseeAPI api, GiveApi giveApi, ItemQueueManager queueManager) {
         this.plugin = plugin;
         this.api = api;
+        this.giveApi = giveApi;
         this.queueManager = queueManager;
     }
 
@@ -60,7 +64,6 @@ class EnderGiveExecutor implements CommandExecutor {
         int amount;
         if (args.length > 2) {
             String inputAmount = args[2];
-            //var eitherItems = Convert.convertItems(material, inputAmount);
             var eitherItems = Convert.convertAmount(inputAmount);
             if (eitherItems.isLeft()) { sender.sendMessage(ChatColor.RED + eitherItems.getLeft()); return true; }
             assert eitherItems.isRight();
@@ -70,7 +73,18 @@ class EnderGiveExecutor implements CommandExecutor {
         }
         ItemStack items = new ItemStack(material, amount);
 
-        //TODO args[3] NBT tag!
+        if (args.length > 3) {
+            StringJoiner inputTag = new StringJoiner(" ");
+            for (int i = 3; i < args.length; i++) inputTag.add(args[i]);
+            try {
+                items = giveApi.applyTag(items, inputTag.toString());
+            } catch (IllegalArgumentException e) {
+                sender.sendMessage(ChatColor.RED + e.getMessage());
+                return true;
+            }
+        }
+
+        final ItemStack finalItems = items;
 
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
@@ -83,25 +97,24 @@ class EnderGiveExecutor implements CommandExecutor {
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();
-                        final ItemStack originalItems = items.clone();
-                        Map<Integer, ItemStack> map = inventory.addItem(items);
+                        final ItemStack originalItems = finalItems.clone();
+                        Map<Integer, ItemStack> map = inventory.addItem(finalItems);
                         if (map.isEmpty()) {
                             //success!!
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
                                 api.saveEnderChest(inventory);
-                            items.setAmount(amount);
-                            sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s enderchest!");
+                            sender.sendMessage(ChatColor.GREEN + "Added " + originalItems + " to " + userName + "'s enderchest!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
                             int remainder = map.get(0).getAmount();
 
-                            items.setAmount(remainder);
+                            finalItems.setAmount(remainder);
                             if (plugin.queueRemainingItems()) {
-                                sender.sendMessage(ChatColor.YELLOW + "Could not add the following items to the player's enderchest: " + items + ", enqueuing..");
-                                queueManager.enqueueEnderchest(uuid, plugin.savePartialInventories() ? items : originalItems);
+                                sender.sendMessage(ChatColor.YELLOW + "Could not add the following items to the player's enderchest: " + finalItems + ", enqueuing..");
+                                queueManager.enqueueEnderchest(uuid, plugin.savePartialInventories() ? finalItems : originalItems);
                             } else {
-                                sender.sendMessage(ChatColor.RED + "Could not add the following items to the player's enderchest: " + items);
+                                sender.sendMessage(ChatColor.RED + "Could not add the following items to the player's enderchest: " + finalItems);
                             }
 
                             if (plugin.getServer().getPlayer(uuid) == null && plugin.savePartialInventories())

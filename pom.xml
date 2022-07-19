@@ -22,6 +22,8 @@
         <module>Spigot_PerWorldInventory</module>
         <module>Spigot_Plugin</module>
         <module>Spigot_Addon_Give</module>
+        <module>Spigot_Addon_Give_Common</module>
+        <module>Spgiot_Addon_Give_1_19_R1</module>
     </modules>
     <packaging>pom</packaging>
 

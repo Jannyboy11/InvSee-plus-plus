@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.addon.give;
 
+import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
@@ -10,18 +11,21 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 class InvGiveExecutor implements CommandExecutor {
 
     private final GivePlugin plugin;
-    private final InvseeAPI api;
+    private final InvseeAPI invseeApi;
+    private final GiveApi giveApi;
     private final ItemQueueManager queueManager;
 
-    InvGiveExecutor(GivePlugin plugin, InvseeAPI api, ItemQueueManager queueManager) {
+    InvGiveExecutor(GivePlugin plugin, InvseeAPI invseeApi, GiveApi giveApi, ItemQueueManager queueManager) {
         this.plugin = plugin;
-        this.api = api;
+        this.invseeApi = invseeApi;
+        this.giveApi = giveApi;
         this.queueManager = queueManager;
     }
 
@@ -38,12 +42,12 @@ class InvGiveExecutor implements CommandExecutor {
         if (eitherPlayer.isLeft()) {
             UUID uuid = eitherPlayer.getLeft();
             uuidFuture = CompletableFuture.completedFuture(Optional.of(uuid));
-            userNameFuture = api.fetchUserName(uuid);
+            userNameFuture = invseeApi.fetchUserName(uuid);
         } else {
             assert eitherPlayer.isRight();
             String userName = eitherPlayer.getRight();
             userNameFuture = CompletableFuture.completedFuture(Optional.of(userName));
-            uuidFuture = api.fetchUniqueId(userName);
+            uuidFuture = invseeApi.fetchUniqueId(userName);
         }
 
         var eitherMaterial = Convert.convertItemType(inputItemType);
@@ -54,7 +58,6 @@ class InvGiveExecutor implements CommandExecutor {
         int amount;
         if (args.length > 2) {
             String inputAmount = args[2];
-            //var eitherItems = Convert.convertItems(material, inputAmount);
             var eitherItems = Convert.convertAmount(inputAmount);
             if (eitherItems.isLeft()) { sender.sendMessage(ChatColor.RED + eitherItems.getLeft()); return true; }
             assert eitherItems.isRight();
@@ -62,11 +65,21 @@ class InvGiveExecutor implements CommandExecutor {
         } else {
             amount = 1;
         }
+
         ItemStack items = new ItemStack(material, amount);
 
-        //TODO args[3] NBT tag!
-        //TODO can I use SNBT from https://github.com/Querz/NBT ? There seems to be a problem with booleans tho: https://github.com/Querz/NBT/issues/63)
-        //TODO or maybe use: https://github.com/TheNullicorn/Nedit
+        if (args.length > 3) {
+            StringJoiner inputTag = new StringJoiner(" ");
+            for (int i = 3; i < args.length; i++) inputTag.add(args[i]);
+            try {
+                items = giveApi.applyTag(items, inputTag.toString());
+            } catch (IllegalArgumentException e) {
+                sender.sendMessage(ChatColor.RED + e.getMessage());
+                return true;
+            }
+        }
+
+        final ItemStack finalItems = items;
 
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
@@ -75,34 +88,33 @@ class InvGiveExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.mainSpectatorInventory(uuid, userName, userName + "s inventory");
+                var responseFuture = invseeApi.mainSpectatorInventory(uuid, userName, userName + "s inventory");
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();
-                        final ItemStack originalItems = items.clone();
-                        Map<Integer, ItemStack> map = inventory.addItem(items);
+                        final ItemStack originalItems = finalItems.clone();
+                        Map<Integer, ItemStack> map = inventory.addItem(finalItems);
                         if (map.isEmpty()) {
                             //success!!
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
-                                api.saveInventory(inventory);
-                            items.setAmount(amount);
-                            sender.sendMessage(ChatColor.GREEN + "Added " + items + " to " + userName + "'s inventory!");
+                                invseeApi.saveInventory(inventory);
+                            sender.sendMessage(ChatColor.GREEN + "Added " + originalItems + " to " + userName + "'s inventory!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
                             int remainder = map.get(0).getAmount();
 
-                            items.setAmount(remainder);
+                            finalItems.setAmount(remainder);
 
                             if (plugin.queueRemainingItems()) {
-                                sender.sendMessage(ChatColor.YELLOW + "Could not add the following items to the player's inventory: " + items + ", enqueuing..");
-                                queueManager.enqueueInventory(uuid, plugin.savePartialInventories() ? items : originalItems);
+                                sender.sendMessage(ChatColor.YELLOW + "Could not add the following items to the player's inventory: " + finalItems + ", enqueuing..");
+                                queueManager.enqueueInventory(uuid, plugin.savePartialInventories() ? finalItems : originalItems);
                             } else {
-                                sender.sendMessage(ChatColor.RED + "Could not add the following items to the player's inventory: " + items);
+                                sender.sendMessage(ChatColor.RED + "Could not add the following items to the player's inventory: " + finalItems);
                             }
 
                             if (plugin.getServer().getPlayer(uuid) == null && plugin.savePartialInventories())
-                                api.saveInventory(inventory);
+                                invseeApi.saveInventory(inventory);
                         }
                     } else {
                         NotCreatedReason reason = response.getReason();
@@ -119,11 +131,11 @@ class InvGiveExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
                         }
                     }
-                }, api.serverThreadExecutor);
+                }, invseeApi.serverThreadExecutor);
             }
 
             return null;
-        }, api.serverThreadExecutor);
+        }, invseeApi.serverThreadExecutor);
 
         return true;
     }

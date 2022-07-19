@@ -6,6 +6,8 @@
 target/*
 Mojang_API/target/*
 Spigot_Addon_Give/target/*
+Spigot_Addon_Give_Common/target/*
+Spgiot_Addon_Give_1_19_R1/target/
 Spigot_Common/target/*
 Spigot_PerWorldInventory/target/*
 Spigot_MultiverseInventories/target/*
