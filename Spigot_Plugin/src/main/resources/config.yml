@@ -3,6 +3,5 @@
 # causing less stress on the server's main thread, thus preventing lag.
 tabcomplete-offline-players: false
 
-
 # Whether InvSee++ will let you spectate inventories of players who are offline.
 enable-offline-player-support: true

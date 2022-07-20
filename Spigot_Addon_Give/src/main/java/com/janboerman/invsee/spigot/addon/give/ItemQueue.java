@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SerializableAs("ItemQueue")
 public class ItemQueue implements ConfigurationSerializable {
@@ -42,6 +43,7 @@ public class ItemQueue implements ConfigurationSerializable {
      * @param inventory the inventory to fill
      * @param targetUsername the username of the target player
      * @param console the console to log to
+	 * @param inventoryType "inventory" or "enderchest"
      * @return true if the queue was emptied, false otherwise.
      */
     boolean process(Inventory inventory, ConsoleCommandSender console, String targetUsername, String inventoryType) {
@@ -54,6 +56,9 @@ public class ItemQueue implements ConfigurationSerializable {
             success = map.isEmpty();
             if (!success) {
                 last = map.get(0);
+				console.sendMessage(ChatColor.YELLOW + "[Queue] Could not add all of " + clone + " to " + targetUsername + "'s " + inventoryType + ".");
+				console.sendMessage(ChatColor.YELLOW + "[Queue] Remaining: " + last + (queue.isEmpty() ? "" : (" and " + 
+					queue.stream().map(ItemStack::toString).collect(Collectors.joining(", ")))) + ".");
             } else {
                 console.sendMessage(ChatColor.GREEN + "[Queue] Added " + clone + " to " + targetUsername + "'s " + inventoryType + "!");
             }

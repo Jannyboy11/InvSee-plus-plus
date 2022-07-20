@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_16_R3;
 
 import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
+import com.janboerman.invsee.spigot.internal.LogRecord;
 import net.minecraft.server.v1_16_R3.NBTCompressedStreamTools;
 
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
@@ -13,6 +14,8 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -52,28 +55,41 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 
         return CompletableFuture.supplyAsync(() -> {
             File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
-            for (File playerFile : playerFiles) {
-                try {
-                    NBTTagCompound compound = NBTCompressedStreamTools.a(new FileInputStream(playerFile));
-                    if (compound.hasKeyOfType("bukkit", TAG_COMPOUND)) {
-                        NBTTagCompound bukkit = compound.getCompound("bukkit");
-                        if (bukkit.hasKeyOfType("lastKnownName", TAG_STRING)) {
-                            String lastKnownName = bukkit.getString("lastKnownName");
-                            if (lastKnownName.equalsIgnoreCase(userName)) {
-                                String fileName = playerFile.getName();
-                                String uuid = fileName.substring(0, fileName.length() - 4);
-                                if (uuid.startsWith("-")) uuid = uuid.substring(1);
-                                try {
-                                    UUID uniqueId = UUID.fromString(uuid);
-                                    return Optional.of(uniqueId);
-                                } catch (IllegalArgumentException e) {
-                                    plugin.getLogger().log(Level.WARNING, "Encountered player save file name that is not a uuid: " + fileName, e);
+            if (playerFiles != null) {
+                List<LogRecord> warnings = null;
+
+                //search through the save files, find the save file which has the lastKnownName of the quested player.
+                for (File playerFile : playerFiles) {
+                    try {
+                        NBTTagCompound compound = NBTCompressedStreamTools.a(new FileInputStream(playerFile));
+                        if (compound.hasKeyOfType("bukkit", TAG_COMPOUND)) {
+                            NBTTagCompound bukkit = compound.getCompound("bukkit");
+                            if (bukkit.hasKeyOfType("lastKnownName", TAG_STRING)) {
+                                String lastKnownName = bukkit.getString("lastKnownName");
+                                if (lastKnownName.equalsIgnoreCase(userName)) {
+                                    String fileName = playerFile.getName();
+                                    String uuid = fileName.substring(0, fileName.length() - 4);
+                                    if (uuid.startsWith("-")) uuid = uuid.substring(1);
+                                    try {
+                                        UUID uniqueId = UUID.fromString(uuid);
+                                        return Optional.of(uniqueId);
+                                    } catch (IllegalArgumentException e) {
+                                        //log exception only later in case the *correct* player file couldn't be found.
+                                        if (warnings == null) warnings = new ArrayList<>(1);
+                                        warnings.add(new LogRecord(Level.WARNING, "Encountered player save file name that is not a uuid: " + fileName, e));
+                                    }
                                 }
                             }
                         }
+                    } catch (IOException e) {
+                        plugin.getLogger().log(Level.WARNING, "Error reading player's save file: " + playerFile.getAbsolutePath(), e);
                     }
-                } catch (IOException e) {
-                    plugin.getLogger().log(Level.WARNING, "Error reading player's save file: " + playerFile.getAbsolutePath(), e);
+                }
+
+                //log warnings only if the *correct* player file was missing.
+                if (warnings != null) {
+                    for (LogRecord warning : warnings)
+                        plugin.getLogger().log(warning.level, warning.message, warning.cause);
                 }
             }
             return Optional.empty();
