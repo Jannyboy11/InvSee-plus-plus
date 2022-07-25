@@ -52,15 +52,14 @@ permissions:
       invseeplusplus.invsee.edit: true
       invseeplusplus.endersee.edit: true
 
+  # TODO these are no longer necessesary. Delete in version 0.13
   invseeplusplus.invsee:
     description: Gives access to view and edit a player's inventory
     children:
-      invseeplusplus.invsee.view: true
       invseeplusplus.invsee.edit: true
   invseeplusplus.endersee:
     description: Gives access to view and edit a player's enderchest
     children:
-      invseeplusplus.endersee.view: true
       invseeplusplus.endersee.edit: true
 
   invseeplusplus.exempt:
@@ -76,12 +75,16 @@ permissions:
   invseeplusplus.invsee.edit:
     description: Gives access to edit a player's inventory
     default: op
+    children:
+      invseeplusplus.invsee.view: true
   invseeplusplus.endersee.view:
     description: Gives access to view a player's enderchest
     default: op
   invseeplusplus.endersee.edit:
     description: Gives access to edit a player's enderchest
     default: op
+    children:
+      invseeplusplus.endersee.view: true
 
   invseeplusplus.exempt.invsee:
     default: false
