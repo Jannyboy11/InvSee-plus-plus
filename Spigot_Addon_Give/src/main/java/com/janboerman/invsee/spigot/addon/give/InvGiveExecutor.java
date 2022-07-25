@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 class InvGiveExecutor implements CommandExecutor {
 
@@ -98,7 +99,9 @@ class InvGiveExecutor implements CommandExecutor {
                             //success!!
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
-                                invseeApi.saveInventory(inventory);
+                                invseeApi.saveInventory(inventory).whenComplete((v, e) -> {
+                                    if (e != null) plugin.getLogger().log(Level.SEVERE, "Could not save inventory", e);
+                                });
                             sender.sendMessage(ChatColor.GREEN + "Added " + originalItems + " to " + userName + "'s inventory!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
@@ -114,7 +117,9 @@ class InvGiveExecutor implements CommandExecutor {
                             }
 
                             if (plugin.getServer().getPlayer(uuid) == null && plugin.savePartialInventories())
-                                invseeApi.saveInventory(inventory);
+                                invseeApi.saveInventory(inventory).whenComplete((v, e) -> {
+                                    if (e != null) plugin.getLogger().log(Level.SEVERE, "Could not save inventory", e);
+                                });
                         }
                     } else {
                         NotCreatedReason reason = response.getReason();

@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 class EnderGiveExecutor implements CommandExecutor {
 
@@ -103,7 +104,9 @@ class EnderGiveExecutor implements CommandExecutor {
                             //success!!
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
-                                api.saveEnderChest(inventory);
+                                api.saveEnderChest(inventory).whenComplete((v, e) -> {
+                                    if (e != null) plugin.getLogger().log(Level.SEVERE, "Could not save inventory", e);
+                                });
                             sender.sendMessage(ChatColor.GREEN + "Added " + originalItems + " to " + userName + "'s enderchest!");
                         } else {
                             //no success. for all the un-merged items, find an item in the player's inventory, and just exceed the material's max stack size!
@@ -118,7 +121,9 @@ class EnderGiveExecutor implements CommandExecutor {
                             }
 
                             if (plugin.getServer().getPlayer(uuid) == null && plugin.savePartialInventories())
-                                api.saveEnderChest(inventory);
+                                api.saveEnderChest(inventory).whenComplete((v, e) -> {
+                                    if (e != null) plugin.getLogger().log(Level.SEVERE, "Could not save enderchest", e);
+                                });
                         }
                     } else {
                         NotCreatedReason reason = response.getReason();
