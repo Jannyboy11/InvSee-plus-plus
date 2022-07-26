@@ -83,8 +83,10 @@ public class NamesAndUUIDs {
             }
         }
 
-        this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
-        this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi));
+        if (plugin.getServer().getOnlineMode()) {
+            this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
+            this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi));
+        }
     }
 
     public Map<String, UUID> getUuidCache() {
