@@ -83,6 +83,12 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Spigot_Addon_Give_1_19_1_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Addon_Give_1_19_R1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

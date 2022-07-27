@@ -1,10 +1,10 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 
 public class FakeCraftPlayer extends CraftPlayer {
     public FakeCraftPlayer(CraftServer server, ServerPlayer entity) {

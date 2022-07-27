@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -10,8 +10,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 

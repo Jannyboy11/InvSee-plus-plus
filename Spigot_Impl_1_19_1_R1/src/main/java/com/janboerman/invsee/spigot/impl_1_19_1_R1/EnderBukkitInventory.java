@@ -1,7 +1,7 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventory;
 
 import java.util.UUID;
 

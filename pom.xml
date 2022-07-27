@@ -15,9 +15,9 @@
         <module>Spigot_Impl_1_15_R1</module>
         <module>Spigot_Impl_1_16_R3</module>
         <module>Spigot_Impl_1_17_1_R1</module>
-        <module>Spigot_Impl_1_18_1_R1</module>
         <module>Spigot_Impl_1_18_2_R2</module>
         <module>Spigot_Impl_1_19_R1</module>
+        <module>Spigot_Impl_1_19_1_R1</module>
         <module>Spigot_MultiverseInventories</module>
         <module>Spigot_PerWorldInventory</module>
         <module>Spigot_Plugin</module>
@@ -29,6 +29,7 @@
         <module>Spigot_Addon_Give_1_17_1_R1</module>
         <module>Spigot_Addon_Give_1_18_2_R2</module>
         <module>Spigot_Addon_Give_1_19_R1</module>
+        <module>Spigot_Addon_Give_1_19_1_R1</module>
     </modules>
     <packaging>pom</packaging>
 

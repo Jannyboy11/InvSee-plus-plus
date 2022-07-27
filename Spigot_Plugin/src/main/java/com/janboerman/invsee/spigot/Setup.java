@@ -29,11 +29,6 @@ public interface Setup {
                 case MappingsVersion._1_17_1:
                     return new Impl_1_17_1(plugin);
             }
-        } else if ("org.bukkit.craftbukkit.v1_18_R1.CraftServer".equals(serverClassName)) {
-            switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_18_1:
-                    return new Impl_1_18_1(plugin);
-            }
         } else if ("org.bukkit.craftbukkit.v1_18_R2.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_18_2:
@@ -43,6 +38,8 @@ public interface Setup {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_19:
                     return new Impl_1_19(plugin);
+                case MappingsVersion._1_19_1:
+                    return new Impl_1_19_1(plugin);
             }
         }
 
@@ -78,12 +75,6 @@ class Impl_1_17_1 extends SetupImpl {
     }
 }
 
-class Impl_1_18_1 extends SetupImpl {
-    Impl_1_18_1(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_18_1_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_1_R1.KnownPlayersProvider(plugin));
-    }
-}
-
 class Impl_1_18_2 extends SetupImpl {
     Impl_1_18_2(Plugin plugin) {
         super(new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin));
@@ -93,6 +84,12 @@ class Impl_1_18_2 extends SetupImpl {
 class Impl_1_19 extends SetupImpl {
     Impl_1_19(Plugin plugin) {
         super(new com.janboerman.invsee.spigot.impl_1_19_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_R1.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_19_1 extends SetupImpl {
+    Impl_1_19_1(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_19_1_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_1_R1.KnownPlayersProvider(plugin));
     }
 }
 

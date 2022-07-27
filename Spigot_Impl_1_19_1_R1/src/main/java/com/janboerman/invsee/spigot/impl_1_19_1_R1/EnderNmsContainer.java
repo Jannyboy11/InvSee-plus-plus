@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -6,49 +6,51 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventoryView;
 import org.bukkit.inventory.InventoryView;
 
-class MainNmsContainer extends AbstractContainerMenu {
-
+class EnderNmsContainer extends AbstractContainerMenu {
+	
 	private final Player player;
-	private final MainNmsInventory top;
+	private final EnderNmsInventory top;
 	private final Inventory bottom;
-	private final boolean spectatingOwnInventory;
+	private final int topRows;	//in Purpur, this is not always 3.
 	
 	private InventoryView bukkitView;
 	
-	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory playerInventory, Player player) {
-		super(MenuType.GENERIC_9x6, id);
+	private static MenuType<?> determineMenuType(EnderNmsInventory inv) {
+		return switch(inv.getContainerSize()) {
+			case 9 -> MenuType.GENERIC_9x1;
+			case 18 -> MenuType.GENERIC_9x2;
+			case 27 -> MenuType.GENERIC_9x3;
+			case 36 -> MenuType.GENERIC_9x4;
+			case 45 -> MenuType.GENERIC_9x5;
+			case 54 -> MenuType.GENERIC_9x6;
+			default -> MenuType.GENERIC_9x3;
+		};
+	}
+
+	public EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player) {
+		super(determineMenuType(nmsInventory), containerId);
 		
+		this.topRows = nmsInventory.getContainerSize() / 9;
+		this.player = player;
 		this.top = nmsInventory;
 		this.bottom = playerInventory;
-		this.player = player;
-		this.spectatingOwnInventory = player.getUUID().equals(playerInventory.player.getUUID());
-		
-		final int firstFiveRows = top.storageContents.size()
-				+ top.armourContents.size()
-				+ top.offHand.size()
-				+ (spectatingOwnInventory ? 0 : 1); //only include cursor when not spectating yourself
-		
+		//nmsInventory.startOpen(player);
+
 		//top inventory slots
-		for (int yPos = 0; yPos < 6; yPos++) {
+		for (int yPos = 0; yPos < topRows; yPos++) {
 			for (int xPos = 0; xPos < 9; xPos++) {
 				int index = xPos + yPos * 9;
 				int magicX = 8 + xPos * 18;
 				int magicY = 18 + yPos * 18;
-				if (index < firstFiveRows) {
-					addSlot(new Slot(top, index, magicX, magicY));
-				} else if (45 <= index && index < 54) {
-					addSlot(new PersonalSlot(top, index, magicX, magicY));
-				} else {
-					addSlot(new InaccessibleSlot(top, index, magicX, magicY));
-				}
+				this.addSlot(new Slot(top, index, magicX, magicY));
 			}
 		}
 		
 		//bottom inventory slots
-		int magicAddY = (6 /*6 for 6 rows of the top inventory*/ - 4 /*4 for 4 rows of the bottom inventory*/) * 18;
+		int magicAddY = (topRows - 4 /*4 because the bottom inventory has 4 rows*/) * 18;
 		
 		//player 'storage'
 		for (int yPos = 1; yPos < 4; yPos++) {
@@ -56,7 +58,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 				int index = xPos + yPos * 9;
 				int magicX = 8 + xPos * 18;
 				int magicY = 103 + yPos * 18 + magicAddY;
-				addSlot(new Slot(playerInventory, index, magicX, magicY));
+				this.addSlot(new Slot(bottom, index, magicX, magicY));
 			}
 		}
 		
@@ -65,7 +67,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 			int index = xPos;
 			int magicX = 8 + xPos * 18;
 			int magicY = 161 + magicAddY;
-			addSlot(new Slot(playerInventory, index, magicX, magicY));
+			this.addSlot(new Slot(bottom, index, magicX, magicY));
 		}
 	}
 
@@ -81,20 +83,14 @@ class MainNmsContainer extends AbstractContainerMenu {
 	public boolean stillValid(Player player) {
 		return true;
 	}
-	
-	@Override
-	public ItemStack quickMoveStack(Player entityHuman, int rawIndex) {
-        //returns ItemStack.EMPTY when we are done transferring the itemstack on the rawIndex
-        //remember that we are called inside the body of a loop!
 
-		//is entityHuman ever not equal to the viewer that we got instantiated with?
-		//in any case, let's just do this first: prevent shift-clicking when spectating your own inventory
-		if (spectatingOwnInventory)
-			return ItemStack.EMPTY;
-		
+	@Override
+	public ItemStack quickMoveStack(Player player, int rawIndex) {
+		//returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
+        //remember that we are called from inside the body of a loop!
+
 		ItemStack itemStack = ItemStack.EMPTY;
-		final Slot slot = getSlot(rawIndex);
-		final int topRows = 6;
+		Slot slot = this.getSlot(rawIndex);
 		
 		if (slot != null && slot.hasItem()) {
 			ItemStack clickedSlotItem = slot.getItem();
@@ -121,5 +117,4 @@ class MainNmsContainer extends AbstractContainerMenu {
 		
 		return itemStack;
 	}
-
 }

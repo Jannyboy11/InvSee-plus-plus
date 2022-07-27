@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;

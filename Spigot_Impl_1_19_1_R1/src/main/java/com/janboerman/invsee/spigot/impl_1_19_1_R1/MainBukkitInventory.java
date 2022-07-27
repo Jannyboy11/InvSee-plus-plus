@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import net.minecraft.world.Container;
@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.*;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.*;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -112,9 +112,8 @@ class MainBukkitInventory extends CraftInventory implements MainSpectatorInvento
 			throw new IllegalArgumentException("armour contents must be of length " + armourContentsSize);
 		
 		for (int i = 0; i < armourContentsSize; i++) {
-			getInventory().armourContents.set(i,  CraftItemStack.asNMSCopy(armourContents[i]));
+			getInventory().armourContents.set(i, CraftItemStack.asNMSCopy(armourContents[i]));
 		}
-		
 	}
 
 	@Override
@@ -283,20 +282,22 @@ class MainBukkitInventory extends CraftInventory implements MainSpectatorInvento
 	private ItemStack addItem(ItemStack itemStack) {
 		if (itemStack == null || itemStack.getAmount() == 0) return null;
 
+		final int maxStackSize = Math.min(itemStack.getMaxStackSize(), getMaxStackSize());
+
 		ItemStack[] storageContents = getStorageContents();
-		addItem(storageContents, itemStack, getMaxStackSize());
+		addItem(storageContents, itemStack, maxStackSize);
 		setStorageContents(storageContents);
 
 		if (itemStack.getAmount() == 0) return null;
 
 		ItemStack[] armourContents = getArmourContents();
-		addItem(armourContents, itemStack, getMaxStackSize());
+		addItem(armourContents, itemStack, maxStackSize);
 		setArmourContents(armourContents);
 
 		if (itemStack.getAmount() == 0) return null;
 
 		ItemStack[] offHand = getOffHandContents();
-		addItem(offHand, itemStack, getMaxStackSize());
+		addItem(offHand, itemStack, maxStackSize);
 		setOffHandContents(offHand);
 
 		return itemStack;

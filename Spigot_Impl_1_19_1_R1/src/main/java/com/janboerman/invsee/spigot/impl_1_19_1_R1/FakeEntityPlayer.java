@@ -1,16 +1,17 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.ProfilePublicKey;
 
 public class FakeEntityPlayer extends ServerPlayer {
 
     private FakeCraftPlayer bukkitEntity;
 
-    public FakeEntityPlayer(MinecraftServer minecraftserver, ServerLevel worldserver, GameProfile gameprofile) {
-        super(minecraftserver, worldserver, gameprofile);
+    public FakeEntityPlayer(MinecraftServer minecraftserver, ServerLevel worldserver, GameProfile gameprofile, ProfilePublicKey profilePublicKey) {
+        super(minecraftserver, worldserver, gameprofile, profilePublicKey);
     }
 
     @Override

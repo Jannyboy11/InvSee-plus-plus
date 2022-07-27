@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
@@ -8,15 +8,14 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.ProfilePublicKey;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
@@ -92,14 +91,16 @@ public class InvseeImpl extends InvseeAPI {
     	
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
     	Location spawn = world.getSpawnLocation();
-    	float yaw = 0F;
+    	float yaw = spawn.getYaw();
     	GameProfile gameProfile = new GameProfile(player, name);
+        ProfilePublicKey profilePublicKey = null; //what is the contract for profilePublicKey? when is it required to be not-null?
     	
     	FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
     			world.getHandle(),
     			new BlockPos(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()),
     			yaw,
-    			gameProfile);
+    			gameProfile,
+                profilePublicKey);
     	
     	return CompletableFuture.supplyAsync(() -> {
     		CompoundTag playerCompound = worldNBTStorage.load(fakeEntityHuman);
@@ -117,11 +118,13 @@ public class InvseeImpl extends InvseeAPI {
 
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
     	GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayerId(), newInventory.getSpectatedPlayerName());
+        ProfilePublicKey profilePublicKey = null; //when it this required to be not-null?
 
         FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(
     			server.getServer(),
     			world.getHandle(),
-    			gameProfile);
+    			gameProfile,
+                profilePublicKey);
     	
     	return CompletableFuture.runAsync(() -> {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();

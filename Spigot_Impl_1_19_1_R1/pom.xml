@@ -9,7 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_Impl_1_18_1_R1</artifactId>
+    <artifactId>Spigot_Impl_1_19_1_R1</artifactId>
+
+
+    <properties>
+        <bukkit.version>1.19.1-R0.1-SNAPSHOT</bukkit.version>
+    </properties>
 
     <pluginRepositories>
         <pluginRepository>
@@ -58,7 +63,7 @@
             <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.3</version>
+                <version>1.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -67,9 +72,9 @@
                         </goals>
                         <id>remap-obf</id>
                         <configuration>
-                            <srgIn>org.spigotmc:minecraft-server:1.18.1-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
+                            <srgIn>org.spigotmc:minecraft-server:${bukkit.version}:txt:maps-mojang</srgIn>
                             <reverse>true</reverse>
-                            <remappedDependencies>org.bukkit:craftbukkit:1.18.1-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
+                            <remappedDependencies>org.bukkit:craftbukkit:${bukkit.version}:jar:remapped-mojang</remappedDependencies>
                             <remappedArtifactAttached>true</remappedArtifactAttached>
                             <remappedClassifierName>remapped-obf</remappedClassifierName>
                         </configuration>
@@ -82,8 +87,8 @@
                         <id>remap-spigot</id>
                         <configuration>
                             <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
-                            <srgIn>org.spigotmc:minecraft-server:1.18.1-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
-                            <remappedDependencies>org.bukkit:craftbukkit:1.18.1-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
+                            <srgIn>org.spigotmc:minecraft-server:${bukkit.version}:csrg:maps-spigot</srgIn>
+                            <remappedDependencies>org.bukkit:craftbukkit:${bukkit.version}:jar:remapped-obf</remappedDependencies>
                         </configuration>
                     </execution>
                 </executions>
@@ -95,7 +100,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.18.1-R0.1-SNAPSHOT</version>
+            <version>${bukkit.version}</version>
             <classifier>remapped-mojang</classifier>
             <scope>provided</scope>
         </dependency>

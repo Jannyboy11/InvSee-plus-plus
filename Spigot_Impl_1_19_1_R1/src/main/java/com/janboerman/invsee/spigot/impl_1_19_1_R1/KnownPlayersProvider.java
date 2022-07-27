@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.utils.StringHelper;
@@ -6,7 +6,7 @@ import net.minecraft.ReportedException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.storage.PlayerDataStorage;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;

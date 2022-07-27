@@ -1,10 +1,10 @@
-package com.janboerman.invsee.spigot.impl_1_18_1_R1;
+package com.janboerman.invsee.spigot.impl_1_19_1_R1;
 
 import com.janboerman.invsee.spigot.api.resolve.NameResolveStrategy;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
