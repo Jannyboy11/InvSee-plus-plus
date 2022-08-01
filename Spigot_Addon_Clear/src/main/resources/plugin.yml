@@ -22,11 +22,11 @@ permissions:
 commands:
   invclear:
     description: "Clear a(n) (offline) player's inventory"
-    usage: /<command> <target player> <item type> <amount>? <tag>?
+    usage: /<command> <target player>
     permission: invseeplusplus.clear.inventory
     aliases: [inventoryclear, iclear]
   enderclear:
     description: "Clear a(n) (offline) player's enderchest"
-    usage: /<command> <target player> <item type> <amount>? <tag>?
+    usage: /<command> <target player>
     permission: invseeplusplus.clear.enderchest
     aliases: [enderchestclear, eclear]
