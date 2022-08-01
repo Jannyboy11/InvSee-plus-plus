@@ -31,6 +31,7 @@ permissions:
       invseeplusplus.exempt.invsee: true
       invseeplusplus.exempt.endersee: true
       invseeplusplus.give.*: true
+      invseeplusplus.clear.*: true
     default: false
 
   invseeplusplus.spectate:
