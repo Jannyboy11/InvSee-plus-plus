@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.12.4-SNAPSHOT</version>
+    <version>0.12.5-SNAPSHOT</version>
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
