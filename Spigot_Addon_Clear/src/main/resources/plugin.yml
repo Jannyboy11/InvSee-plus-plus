@@ -1,0 +1,32 @@
+name: InvSeePlusPlus_Clear
+version: ${project.version}
+main: com.janboerman.invsee.spigot.addon.clear.ClearPlugin
+depend: [InvSeePlusPlus]
+api-version: 1.13
+prefix: "InvSee++_Clear"
+
+permissions:
+  invseeplusplus.clear.*:
+    description: Grants all permissions for the InvSee++ Clear addon
+    children:
+      - invseeplusplus.clear.inventory
+      - invseeplusplus.clear.enderchest
+    default: false
+  invseeplusplus.clear.inventory:
+    description: "Allows you to use /invclear"
+    default: op
+  invseeplusplus.clear.enderchest:
+    description: "Allows you to use /enderclear"
+    default: op
+
+commands:
+  invclear:
+    description: "Clear a(n) (offline) player's inventory"
+    usage: /<command> <target player> <item type> <amount>? <tag>?
+    permission: invseeplusplus.clear.inventory
+    aliases: [inventoryclear, iclear]
+  enderclear:
+    description: "Clear a(n) (offline) player's enderchest"
+    usage: /<command> <target player> <item type> <amount>? <tag>?
+    permission: invseeplusplus.clear.enderchest
+    aliases: [enderchestclear, eclear]

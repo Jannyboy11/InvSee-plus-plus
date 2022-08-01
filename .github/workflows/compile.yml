@@ -49,3 +49,4 @@ jobs:
           files: |
             Spigot_Plugin/target/InvSee++.jar
             Spigot_Addon_Give/target/InvSee++_Give.jar
+            Spigot_Addon_Clear/target/InvSee++_Clear.jar
