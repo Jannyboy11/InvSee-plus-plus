@@ -93,7 +93,9 @@ public class InvseeImpl extends InvseeAPI {
     	Location spawn = world.getSpawnLocation();
     	float yaw = spawn.getYaw();
     	GameProfile gameProfile = new GameProfile(player, name);
-        ProfilePublicKey profilePublicKey = null; //what is the contract for profilePublicKey? when is it required to be not-null?
+        ProfilePublicKey profilePublicKey = null;
+        //ProfilePublicKey is only ever non-null for 'real' online players, used for the new chat reporting system.
+        //For the purposes of loading nbt data, it is fine to leave this null.
     	
     	FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
     			world.getHandle(),
@@ -105,12 +107,12 @@ public class InvseeImpl extends InvseeAPI {
     	return CompletableFuture.supplyAsync(() -> {
     		CompoundTag playerCompound = worldNBTStorage.load(fakeEntityHuman);
     		if (playerCompound != null) {
-    			fakeEntityHuman.readAdditionalSaveData(playerCompound);		//only player-specific stuff
+    			fakeEntityHuman.readAdditionalSaveData(playerCompound);
     		} //else: player save file exists.
     		
     		CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
     		return Optional.of(invCreator.apply(craftHumanEntity, title));
-    	}, asyncExecutor);
+    	}, serverThreadExecutor);   //loading must occur on the main thread.
     }
     
     private <SI extends SpectatorInventory> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, String, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
@@ -118,7 +120,9 @@ public class InvseeImpl extends InvseeAPI {
 
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
     	GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayerId(), newInventory.getSpectatedPlayerName());
-        ProfilePublicKey profilePublicKey = null; //when it this required to be not-null?
+        ProfilePublicKey profilePublicKey = null;
+        //ProfilePublicKey is only ever non-null for 'real' online players, used for the new chat reporting system.
+        //For the purposes of saving player data, it is fine to leave this null.
 
         FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(
     			server.getServer(),
@@ -134,7 +138,7 @@ public class InvseeImpl extends InvseeAPI {
     		transfer.accept(currentInv, newInventory);
 
             fakeCraftPlayer.saveData();
-    	}, asyncExecutor);
+    	}, serverThreadExecutor);   //saving must occur on the main thread.
     }
 
 

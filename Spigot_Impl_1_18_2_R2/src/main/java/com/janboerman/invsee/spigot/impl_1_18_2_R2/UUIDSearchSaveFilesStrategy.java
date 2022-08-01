@@ -1,81 +1,96 @@
 package com.janboerman.invsee.spigot.impl_1_18_2_R2;
 
-import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
-import com.janboerman.invsee.spigot.internal.CompletedEmpty;
-import com.janboerman.invsee.spigot.internal.LogRecord;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.plugin.Plugin;
 
+import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
+import com.janboerman.invsee.spigot.internal.CompletedEmpty;
+import com.janboerman.invsee.spigot.internal.LogRecord;
+import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 
 public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
-	
-    private static final int TAG_END = 0;
-    private static final int TAG_BYTE = 1;
-    private static final int TAG_SHORT = 2;
-    private static final int TAG_INT = 3;
-    private static final int TAG_LONG = 4;
-    private static final int TAG_FLOAT = 5;
-    private static final int TAG_DOUBLE = 6;
-    private static final int TAG_BYTE_ARRAY = 7;
-    private static final int TAG_STRING = 8;
-    private static final int TAG_LIST = 9;
-    private static final int TAG_COMPOUND = 10;
-    private static final int TAG_INT_ARRAY = 11;
-    private static final int TAG_LONG_ARRAY = 12;
-    private static final int TAG_UNKNOWN = 99;
 
-    private final Plugin plugin;
+	private final Plugin plugin;
 
-    public UUIDSearchSaveFilesStrategy(Plugin plugin) {
-        this.plugin = plugin;
-    }
+	public UUIDSearchSaveFilesStrategy(Plugin plugin) {
+		this.plugin = plugin;
+	}
+
+	private Executor serverThreadExecutor() {
+		return runnable -> {
+			if (plugin.getServer().isPrimaryThread()) { runnable.run(); }
+			else { plugin.getServer().getScheduler().runTask(plugin, runnable); }
+		};
+	}
+
+	private Executor asyncExecutor() {
+		return runnable -> {
+			if (plugin.getServer().isPrimaryThread()) { plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable); }
+			else runnable.run();
+		};
+	}
 
 	@Override
 	public CompletableFuture<Optional<UUID>> resolveUniqueId(String userName) {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
-		
+
 		File playerDirectory = worldNBTStorage.getPlayerDir();
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return CompletedEmpty.the();
-		
+
 		return CompletableFuture.supplyAsync(() -> {
 			File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
 			if (playerFiles != null) {
-				List<LogRecord> warnings = null;
+				List<LogRecord> errors = new CopyOnWriteArrayList<>();
 
 				//search through the save files, find the save file which has the lastKnownName of the quested player.
 				for (File playerFile : playerFiles) {
+					final String fileName = playerFile.getName();
+
+					//I now finally understand the appeal of libraries like Cats Effect / ZIO.
 					try {
-						CompoundTag compound = net.minecraft.nbt.NbtIo.readCompressed(playerFile);
-						if (compound.contains("bukkit", TAG_COMPOUND)) {
-							CompoundTag bukkit = compound.getCompound("bukkit");
-							if (bukkit.contains("lastKnownName", TAG_STRING)) {
-								String lastKnownName = bukkit.getString("lastKnownName");
-								if (lastKnownName.equalsIgnoreCase(userName)) {
-									String fileName = playerFile.getName();
-									String uuid = fileName.substring(0, fileName.length() - 4);
-									if (uuid.startsWith("-")) uuid = uuid.substring(1);
-									try {
-										UUID uniqueId = UUID.fromString(uuid);
-										return Optional.of(uniqueId);
-									} catch (IllegalArgumentException e) {
-										//log exception only later in case the *correct* player file couldn't be found.
-										if (warnings == null) warnings = new ArrayList<>(1);
-										warnings.add(new LogRecord(Level.WARNING, "Encountered player save file name that is not a uuid: " + fileName, e));
-									}
+						CompletableFuture<CompoundTag> compoundFuture = CompletableFuture.completedFuture(net.minecraft.nbt.NbtIo.readCompressed(playerFile));
+						// if reading the player file asynchronously fails, we retry on the main thread.
+						compoundFuture = compoundFuture.exceptionallyAsync(asyncEx -> {
+							try {
+								return net.minecraft.nbt.NbtIo.readCompressed(playerFile);
+							} catch (IOException syncEx) {
+								//too bad, could not read this player save file synchronously.
+								syncEx.addSuppressed(asyncEx);
+								throw new CompletionException(syncEx);
+							}
+						}, serverThreadExecutor());
+
+						try {
+							CompoundTag compound = compoundFuture.get(); // we join the (possibly synchronous!) future back into our async future!
+							if (tagHasLastKnownName(compound, userName)) {
+								String uuid = fileName.substring(0, fileName.length() - 4);
+								if (uuid.startsWith("-")) uuid = uuid.substring(1);
+								try {
+									UUID uniqueId = UUID.fromString(uuid);
+									return Optional.of(uniqueId);
+								} catch (IllegalArgumentException e) {
+									//log exception only later in case the *correct* player file couldn't be found.
+									errors.add(new LogRecord(Level.WARNING, "Encountered player save file name that is not a uuid: " + fileName, e));
 								}
 							}
+						} catch (ExecutionException e) {
+							// could not 'join' the future. nothing useful we can do here - we need to let some other strategy resolve the UUID instead.
+							Throwable syncEx = e.getCause();
+							errors.add(new LogRecord(Level.SEVERE, "Encountered player save file containing invalid NBT: " + fileName, syncEx));
+							return Optional.empty();
+						} catch (InterruptedException e) {
+							// idem.
+							return Optional.empty();
 						}
 					} catch (IOException e) {
 						plugin.getLogger().log(Level.WARNING, "Error reading player's save file: " + playerFile.getAbsolutePath(), e);
@@ -83,13 +98,24 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 				}
 
 				//log warnings only if the *correct* player file was missing.
-				if (warnings != null) {
-					for (LogRecord warning : warnings)
-						plugin.getLogger().log(warning.level, warning.message, warning.cause);
+				for (LogRecord error : errors) {
+					plugin.getLogger().log(error.level, error.message, error.cause);
 				}
 			}
 			return Optional.empty();
-		}, runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable));
+		}, asyncExecutor());
+	}
+
+	private static final boolean tagHasLastKnownName(CompoundTag compound, String userName) {
+		if (compound.contains("bukkit", TAG_COMPOUND)) {
+			CompoundTag bukkit = compound.getCompound("bukkit");
+			if (bukkit.contains("lastKnownName", TAG_STRING)) {
+				String lastKnownName = bukkit.getString("lastKnownName");
+				return lastKnownName.equalsIgnoreCase(userName);
+			}
+		}
+
+		return false;
 	}
 
 }

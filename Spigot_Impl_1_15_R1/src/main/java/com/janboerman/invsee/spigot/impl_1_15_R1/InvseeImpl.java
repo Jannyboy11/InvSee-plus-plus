@@ -103,7 +103,7 @@ public class InvseeImpl extends InvseeAPI {
             CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
             return Optional.of(invCreator.apply(craftHumanEntity, title));
 
-        }, asyncExecutor);
+        }, serverThreadExecutor);
     }
 
     private <SI extends SpectatorInventory> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, String, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
@@ -133,7 +133,7 @@ public class InvseeImpl extends InvseeAPI {
             transfer.accept(currentInv, newInventory);
 
             worldNBTStorage.save(fakeEntityPlayer);
-        }, asyncExecutor);
+        }, serverThreadExecutor);
     }
 
 }
