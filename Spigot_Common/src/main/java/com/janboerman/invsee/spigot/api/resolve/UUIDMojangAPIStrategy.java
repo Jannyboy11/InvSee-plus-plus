@@ -22,6 +22,7 @@ public class UUIDMojangAPIStrategy implements UUIDResolveStrategy {
     @Override
     public CompletableFuture<Optional<UUID>> resolveUniqueId(String userName) {
         return mojangApi.lookupUniqueId(userName).handle((Optional<UUID> success, Throwable error) -> {
+            assert !plugin.getServer().isPrimaryThread();
             if (error == null) return success;
             plugin.getLogger().log(Level.WARNING, "Could not request profile for name " + userName + " from Mojang's REST API", error);
             return Optional.empty();

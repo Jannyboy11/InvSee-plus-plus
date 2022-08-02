@@ -14,8 +14,8 @@ public class ClearPlugin extends JavaPlugin {
         InvseePlusPlus ispp = (InvseePlusPlus) server.getPluginManager().getPlugin("InvSeePlusPlus");
         InvseeAPI api = ispp.getApi();
 
-        server.getPluginCommand("invclear").setExecutor(new InvClearExecutor(api));
-        server.getPluginCommand("enderclear").setExecutor(new EnderClearExecutor(api));
+        server.getPluginCommand("invclear").setExecutor(new InvClearExecutor(this, api));
+        server.getPluginCommand("enderclear").setExecutor(new EnderClearExecutor(this, api));
     }
 
 }

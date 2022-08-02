@@ -86,7 +86,7 @@ public class NamesAndUUIDs {
         if (plugin.getServer().getOnlineMode()) {
             this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
             this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi));
-        }
+        } //TODO else: add strategy that calculates offline uuid based on username.
     }
 
     public Map<String, UUID> getUuidCache() {
@@ -126,7 +126,7 @@ public class NamesAndUUIDs {
         });
     }
 
-    private CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId, SynchronizedIterator<NameResolveStrategy> strategies) {
+    private static CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId, SynchronizedIterator<NameResolveStrategy> strategies) {
         Maybe<NameResolveStrategy> maybeStrat = strategies.moveNext();
         if (!maybeStrat.isPresent()) return CompletedEmpty.the();
 

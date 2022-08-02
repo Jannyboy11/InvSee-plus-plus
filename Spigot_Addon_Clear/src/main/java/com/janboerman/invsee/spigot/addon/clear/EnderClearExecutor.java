@@ -4,16 +4,20 @@ import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 class EnderClearExecutor implements TabExecutor {
 
+    private final ClearPlugin plugin;
     private final InvseeAPI api;
 
-    EnderClearExecutor(InvseeAPI api) {
+    EnderClearExecutor(ClearPlugin plugin, InvseeAPI api) {
+        this.plugin = plugin;
         this.api = api;
     }
 
@@ -37,6 +41,36 @@ class EnderClearExecutor implements TabExecutor {
             uuidFuture = api.fetchUniqueId(userName);
         }
 
+        Material itemType = null;
+        int maxCount = -1;
+
+        if (args.length >= 2) {
+            String inputItemType = args[1];
+            var eitherMaterial = Convert.convertItemType(inputItemType);
+            if (eitherMaterial.isRight()) {
+                itemType = eitherMaterial.getRight();
+            } else {
+                assert eitherMaterial.isLeft();
+                sender.sendMessage(ChatColor.RED + eitherMaterial.getLeft());
+                return true;
+            }
+        }
+
+        if (args.length >= 3) {
+            String inputMaxCount = args[2];
+            var eitherMaxCount = Convert.convertAmount(inputMaxCount);
+            if (eitherMaxCount.isRight()) {
+                maxCount = eitherMaxCount.getRight();
+            } else {
+                assert eitherMaxCount.isLeft();
+                sender.sendMessage(ChatColor.RED + eitherMaxCount.getLeft());
+                return true;
+            }
+        }
+
+        final Material finalItemType = itemType;
+        final int finalMaxCount = maxCount;
+
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
                 sender.sendMessage(ChatColor.RED + "Unknown player: " + inputPlayer);
@@ -48,9 +82,21 @@ class EnderClearExecutor implements TabExecutor {
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();
-                        inventory.clear();
-                        api.saveEnderChest(inventory);
-                        sender.sendMessage(ChatColor.GREEN + "Cleared " + userName + "'s enderchest");
+                        if (finalItemType == null) {
+                            inventory.clear();
+                            sender.sendMessage(ChatColor.GREEN + "Cleared " + userName + "'s enderchest.");
+                        } else {
+                            if (finalMaxCount == -1) {
+                                inventory.remove(finalItemType);
+                                sender.sendMessage(ChatColor.GREEN + "Removed all " + finalItemType + " from " + userName + "'s enderchest.");
+                            } else {
+                                int removed = RemoveUtil.removeAtMost(inventory, finalItemType, finalMaxCount);
+                                sender.sendMessage( ChatColor.GREEN + "Removed " + removed + " from " + userName + "'s enderchest.");
+                            }
+                        }
+                        api.saveEnderChest(inventory).whenComplete((v, e) -> {
+                            if (e != null) plugin.getLogger().log(Level.SEVERE, "Could not save enderchest", e);
+                        });
                     } else {
                         NotCreatedReason reason = response.getReason();
                         if (reason instanceof TargetDoesNotExist) {
