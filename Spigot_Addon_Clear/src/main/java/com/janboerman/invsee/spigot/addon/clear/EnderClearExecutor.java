@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-class EnderClearExecutor implements TabExecutor {
+class EnderClearExecutor implements CommandExecutor {
 
     private final ClearPlugin plugin;
     private final InvseeAPI api;
@@ -91,7 +91,7 @@ class EnderClearExecutor implements TabExecutor {
                                 sender.sendMessage(ChatColor.GREEN + "Removed all " + finalItemType + " from " + userName + "'s enderchest.");
                             } else {
                                 int removed = RemoveUtil.removeAtMost(inventory, finalItemType, finalMaxCount);
-                                sender.sendMessage( ChatColor.GREEN + "Removed " + removed + finalItemType + " from " + userName + "'s enderchest.");
+                                sender.sendMessage( ChatColor.GREEN + "Removed " + removed + " " + finalItemType + " from " + userName + "'s enderchest.");
                             }
                         }
                         api.saveEnderChest(inventory).whenComplete((v, e) -> {
@@ -118,12 +118,6 @@ class EnderClearExecutor implements TabExecutor {
             return null;
         }, api.serverThreadExecutor);
         return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (args.length > 1) return List.of();
-        return null;
     }
 
 }
