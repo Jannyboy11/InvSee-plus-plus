@@ -47,6 +47,14 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.give.inventory` allows access to `/invgive`.
 - `invseeplusplus.give.enderchest` allows access to `/endergive`.
 
+#### InvSee++_Clear
+###### Commands:
+- `/invclear <player> <item type>? <amount>?
+- `/enderclear <player> <item type>? <amount>?
+###### Permissions:
+- `invseeplusplus.clear.*` provides `invseeplusplus.clear.inventory` and `invseeplusplus.clear.enderchest`.
+- `invseeplusplus.clear.inventory` allows access to `/invclear`.
+- `invseeplusplus.clear.enderchest` allows access to `/enderclear`.
 
 ### Contact
 

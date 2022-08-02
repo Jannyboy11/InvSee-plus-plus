@@ -24,9 +24,7 @@ permissions:
   invseeplusplus.*:
     description: Grants all permissions of this plugin
     children:
-      invseeplusplus.invsee.view: true
       invseeplusplus.invsee.edit: true
-      invseeplusplus.endersee.view: true
       invseeplusplus.endersee.edit: true
       invseeplusplus.exempt.invsee: true
       invseeplusplus.exempt.endersee: true
@@ -37,9 +35,7 @@ permissions:
   invseeplusplus.spectate:
     description: Gives access to view and edit players' inventories and enderchests
     children:
-      invseeplusplus.invsee.view: true
       invseeplusplus.invsee.edit: true
-      invseeplusplus.endersee.view: true
       invseeplusplus.endersee.edit: true
 
   invseeplusplus.view:
@@ -88,8 +84,8 @@ permissions:
       invseeplusplus.endersee.view: true
 
   invseeplusplus.exempt.invsee:
-    default: false
     description: Makes it impossible for the owner of this permission to be spectated using /invsee
-  invseeplusplus.exempt.endersee:
     default: false
+  invseeplusplus.exempt.endersee:
     description: Makes it impossible for the owner of this permission to be spectated using /endersee
+    default: false

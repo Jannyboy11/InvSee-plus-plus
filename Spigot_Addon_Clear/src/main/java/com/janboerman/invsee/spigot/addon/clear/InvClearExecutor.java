@@ -91,7 +91,7 @@ class InvClearExecutor implements TabExecutor {
                                 sender.sendMessage(ChatColor.GREEN + "Removed all " + finalItemType + " from " + userName + "'s inventory.");
                             } else {
                                 int removed = RemoveUtil.removeAtMost(inventory, finalItemType, finalMaxCount);
-                                sender.sendMessage( ChatColor.GREEN + "Removed " + removed + " from " + userName + "'s inventory.");
+                                sender.sendMessage( ChatColor.GREEN + "Removed " + removed + finalItemType + " from " + userName + "'s inventory.");
                             }
                         }
                         api.saveInventory(inventory).whenComplete((v, e) -> {

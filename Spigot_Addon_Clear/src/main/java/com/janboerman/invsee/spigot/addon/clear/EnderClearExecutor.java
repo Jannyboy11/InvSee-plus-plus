@@ -91,7 +91,7 @@ class EnderClearExecutor implements TabExecutor {
                                 sender.sendMessage(ChatColor.GREEN + "Removed all " + finalItemType + " from " + userName + "'s enderchest.");
                             } else {
                                 int removed = RemoveUtil.removeAtMost(inventory, finalItemType, finalMaxCount);
-                                sender.sendMessage( ChatColor.GREEN + "Removed " + removed + " from " + userName + "'s enderchest.");
+                                sender.sendMessage( ChatColor.GREEN + "Removed " + removed + finalItemType + " from " + userName + "'s enderchest.");
                             }
                         }
                         api.saveEnderChest(inventory).whenComplete((v, e) -> {
