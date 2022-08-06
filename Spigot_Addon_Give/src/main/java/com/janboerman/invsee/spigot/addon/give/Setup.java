@@ -34,6 +34,8 @@ interface Setup {
                     return new Impl_1_19();
                 case MappingsVersion._1_19_1:
                     return new Impl_1_19_1();
+                case MappingsVersion._1_19_2:
+                    return new Impl_1_19_2();
             }
         }
 
@@ -52,6 +54,12 @@ class SetupImpl implements Setup {
     @Override
     public GiveApi getGiveApi() {
         return api;
+    }
+}
+
+class Impl_1_19_2 extends SetupImpl {
+    Impl_1_19_2() {
+        super(com.janboerman.invsee.spigot.addon.give.impl_1_19_2_R1.GiveImpl.INSTANCE);
     }
 }
 

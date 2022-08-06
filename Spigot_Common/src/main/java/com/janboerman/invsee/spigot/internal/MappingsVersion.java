@@ -19,6 +19,7 @@ public class MappingsVersion {
     public static final String _1_18_2 = "eaeedbff51b16ead3170906872fda334";
     public static final String _1_19 = "7b9de0da1357e5b251eddde9aa762916";
     public static final String _1_19_1 = "4cc0cc97cac491651bff3af8b124a214";
+    public static final String _1_19_2 = "69c84c88aeb92ce9fa9525438b93f4fe";
 
 
     /**

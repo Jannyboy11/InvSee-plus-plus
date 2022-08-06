@@ -40,6 +40,8 @@ public interface Setup {
                     return new Impl_1_19(plugin);
                 case MappingsVersion._1_19_1:
                     return new Impl_1_19_1(plugin);
+                case MappingsVersion._1_19_2:
+                    return new Impl_1_19_2(plugin);
             }
         }
 
@@ -90,6 +92,12 @@ class Impl_1_19 extends SetupImpl {
 class Impl_1_19_1 extends SetupImpl {
     Impl_1_19_1(Plugin plugin) {
         super(new com.janboerman.invsee.spigot.impl_1_19_1_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_1_R1.KnownPlayersProvider(plugin));
+    }
+}
+
+class Impl_1_19_2 extends SetupImpl {
+    Impl_1_19_2(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_19_2_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_2_R1.KnownPlayersProvider(plugin));
     }
 }
 
