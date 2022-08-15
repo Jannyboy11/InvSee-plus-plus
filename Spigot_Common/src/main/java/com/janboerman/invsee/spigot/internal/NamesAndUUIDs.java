@@ -7,6 +7,7 @@ import com.janboerman.invsee.utils.Maybe;
 import com.janboerman.invsee.utils.SynchronizedIterator;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.net.http.HttpClient;
@@ -25,6 +26,7 @@ public class NamesAndUUIDs {
 
     //static members
     protected static final boolean SPIGOT;
+    protected static final boolean PAPER;
     static {
         boolean configExists;
         try {
@@ -34,6 +36,15 @@ public class NamesAndUUIDs {
             configExists = false;
         }
         SPIGOT = configExists;
+
+        boolean paperParticleBuilder;
+        try {
+            Class.forName("com.destroystokyo.paper.ParticleBuilder");
+            paperParticleBuilder = true;
+        } catch (ClassNotFoundException e) {
+            paperParticleBuilder = false;
+        }
+        PAPER = paperParticleBuilder;
     }
 
     private final Map<String, UUID> uuidCache = Collections.synchronizedMap(new CaseInsensitiveMap<>() {
@@ -53,6 +64,9 @@ public class NamesAndUUIDs {
 
     public final List<UUIDResolveStrategy> uuidResolveStrategies;
     public final List<NameResolveStrategy> nameResolveStrategies;
+
+    private boolean bungeeCordOnline = false;
+    private boolean velocityOnline = false;
 
     public NamesAndUUIDs(Plugin plugin) {
 
@@ -74,7 +88,7 @@ public class NamesAndUUIDs {
         if (SPIGOT) {
             Configuration spigotConfig = plugin.getServer().spigot().getConfig();
             ConfigurationSection settings = spigotConfig.getConfigurationSection("settings");
-            if (settings != null && settings.getBoolean("bungeecord", false)) {
+            if (settings != null && (this.bungeeCordOnline = settings.getBoolean("bungeecord", false))) {
                 this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin));
                 //there is no BungeeCord plugin message subchannel which can get a player name given a uuid.
                 //the only way to do that currently is to 'get' a list of all players, and for every player in that list
@@ -83,10 +97,33 @@ public class NamesAndUUIDs {
             }
         }
 
-        if (plugin.getServer().getOnlineMode()) {
+        if (PAPER) {
+            YamlConfiguration paperConfig = plugin.getServer().spigot().getPaperConfig();
+            ConfigurationSection proxiesSection = paperConfig.getConfigurationSection("proxies");
+            if (proxiesSection != null) {
+                //bungee
+                ConfigurationSection bungeeSection = proxiesSection.getConfigurationSection("bungee-cord");
+                if (bungeeSection != null) {
+                    this.bungeeCordOnline = bungeeSection.getBoolean("online-mode", false);
+                }
+                //velocity
+                ConfigurationSection velocitySection = proxiesSection.getConfigurationSection("velocity");
+                if (velocitySection != null) {
+                    boolean enabled = velocitySection.getBoolean("enabled", false);
+                    if (enabled) {
+                        this.velocityOnline = velocitySection.getBoolean("online-mode", false);
+                    }
+                }
+            }
+        }
+
+        if (plugin.getServer().getOnlineMode() || bungeeCordOnline || velocityOnline) {
             this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
             this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi));
-        } //TODO else: add strategy that calculates offline uuid based on username.
+        } else {
+            this.uuidResolveStrategies.add(new UUIDOfflineModeStrategy());
+            //how to fake a username given a uuid, in offline mode?
+        }
     }
 
     public Map<String, UUID> getUuidCache() {

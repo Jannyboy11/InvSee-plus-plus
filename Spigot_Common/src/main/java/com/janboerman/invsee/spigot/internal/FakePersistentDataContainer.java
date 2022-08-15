@@ -4,6 +4,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,11 @@ public class FakePersistentDataContainer implements PersistentDataContainer {
         var inner = map.get(namespacedKey);
         if (inner == null) return false;
         return inner.containsKey(persistentDataType);
+    }
+
+    @Override
+    public boolean has(@NotNull NamespacedKey namespacedKey) {
+        return map.containsKey(namespacedKey);
     }
 
     @Override
