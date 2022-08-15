@@ -65,8 +65,8 @@ public class NamesAndUUIDs {
     public final List<UUIDResolveStrategy> uuidResolveStrategies;
     public final List<NameResolveStrategy> nameResolveStrategies;
 
-    private boolean bungeeCordOnline = false;
-    private boolean velocityOnline = false;
+    private boolean bungeeCord = false, bungeeCordOnline = false;
+    private boolean velocity = false, velocityOnline = false;
 
     public NamesAndUUIDs(Plugin plugin) {
 
@@ -88,12 +88,8 @@ public class NamesAndUUIDs {
         if (SPIGOT) {
             Configuration spigotConfig = plugin.getServer().spigot().getConfig();
             ConfigurationSection settings = spigotConfig.getConfigurationSection("settings");
-            if (settings != null && (this.bungeeCordOnline = settings.getBoolean("bungeecord", false))) {
-                this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin));
-                //there is no BungeeCord plugin message subchannel which can get a player name given a uuid.
-                //the only way to do that currently is to 'get' a list of all players, and for every player in that list
-                //request the uuid. If one matches the argument uuid, then that is the one.
-                //this is too expensive for my tastes so I'm not going to implement a NameBungeeCordStrategy for now.
+            if (settings != null) {
+                this.bungeeCord = this.bungeeCordOnline = settings.getBoolean("bungeecord", false); //assume bungee in online mode since Spigot does not specify this (Paper does).
             }
         }
 
@@ -104,17 +100,23 @@ public class NamesAndUUIDs {
                 //bungee
                 ConfigurationSection bungeeSection = proxiesSection.getConfigurationSection("bungee-cord");
                 if (bungeeSection != null) {
-                    this.bungeeCordOnline = bungeeSection.getBoolean("online-mode", false);
+                    this.bungeeCordOnline = this.bungeeCord && bungeeSection.getBoolean("online-mode", false);
                 }
                 //velocity
                 ConfigurationSection velocitySection = proxiesSection.getConfigurationSection("velocity");
                 if (velocitySection != null) {
-                    boolean enabled = velocitySection.getBoolean("enabled", false);
-                    if (enabled) {
-                        this.velocityOnline = velocitySection.getBoolean("online-mode", false);
-                    }
+                    this.velocity = velocitySection.getBoolean("enabled", false);
+                    this.velocityOnline = this.velocity && velocitySection.getBoolean("online-mode", false);
                 }
             }
+        }
+
+        if (bungeeCord || velocity) {
+            this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin));
+            //there is no BungeeCord plugin message subchannel which can get a player name given a uuid.
+            //the only way to do that currently is to 'get' a list of all players, and for every player in that list
+            //request the uuid. If one matches the argument uuid, then that is the one.
+            //this is too expensive for my tastes so I'm not going to implement a NameBungeeCordStrategy for now.
         }
 
         if (plugin.getServer().getOnlineMode() || bungeeCordOnline || velocityOnline) {
