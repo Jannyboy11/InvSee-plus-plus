@@ -85,9 +85,6 @@ public class NamesAndUUIDs {
         this.uuidResolveStrategies.add(new UUIDInMemoryStrategy(uuidCache));
         this.nameResolveStrategies.add(new NameInMemoryStrategy(userNameCache));
 
-        this.uuidResolveStrategies.add(new UUIDPermissionPluginStategy(plugin));
-        this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin));
-
         if (SPIGOT) {
             Configuration spigotConfig = plugin.getServer().spigot().getConfig();
             ConfigurationSection settings = spigotConfig.getConfigurationSection("settings");
@@ -115,6 +112,9 @@ public class NamesAndUUIDs {
                 }
             }
         }
+
+        this.uuidResolveStrategies.add(new UUIDPermissionPluginStategy(plugin));
+        this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin));
 
         if (bungeeCord || velocity) {
             this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin));
