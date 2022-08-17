@@ -30,7 +30,12 @@ public class InvseeImpl extends InvseeAPI {
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
-        lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin));
+        if (lookup.onlineMode(plugin.getServer())) {
+            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin));
+        } else {
+            // If we are in offline mode, then we should insert this strategy *before* the UUIDOfflineModeStrategy.
+            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin));
+        }
         lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
     }
 

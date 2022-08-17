@@ -5,6 +5,7 @@ import com.janboerman.invsee.spigot.api.resolve.*;
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import com.janboerman.invsee.utils.Maybe;
 import com.janboerman.invsee.utils.SynchronizedIterator;
+import org.bukkit.Server;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -124,13 +125,17 @@ public class NamesAndUUIDs {
             //this is too expensive for my tastes so I'm not going to implement a NameBungeeCordStrategy for now.
         }
 
-        if (plugin.getServer().getOnlineMode() || bungeeCordOnline || velocityOnline) {
+        if (onlineMode(plugin.getServer())) {
             this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
             this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi));
         } else {
             this.uuidResolveStrategies.add(new UUIDOfflineModeStrategy());
             //how to fake a username given a uuid, in offline mode?
         }
+    }
+
+    public final boolean onlineMode(Server server) {
+        return server.getOnlineMode() || bungeeCordOnline || velocityOnline;
     }
 
     public Map<String, UUID> getUuidCache() {
