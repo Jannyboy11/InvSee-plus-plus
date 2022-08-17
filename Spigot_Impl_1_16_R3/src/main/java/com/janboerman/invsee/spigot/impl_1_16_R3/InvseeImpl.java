@@ -29,7 +29,7 @@ public class InvseeImpl extends InvseeAPI {
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
-        lookup.uuidResolveStrategies.add(2, new UUIDSearchSaveFilesStrategy(plugin));
+        lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin));
         lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
     }
 

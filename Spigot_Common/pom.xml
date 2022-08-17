@@ -53,6 +53,14 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>bungeeperms-repo</id>
+            <url>https://repo.wea-ondara.net/repository/public/</url>
+        </repository>
+        <repository>
+            <id>techscode</id>
+            <url>https://repo.techscode.com/repository/maven-releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -80,6 +88,32 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ElgarL</groupId>
+            <artifactId>groupmanager</artifactId>
+            <version>2.9</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.alpenblock</groupId>
+            <artifactId>BungeePerms</artifactId>
+            <version>3.0-dev-80</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.TechsCode</groupId>
+            <artifactId>UltraPermissionsAPI</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

@@ -4,10 +4,8 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_12_R1.DedicatedPlayerList;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.IPlayerFileData;
 import net.minecraft.server.v1_12_R1.InventoryEnderChest;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
@@ -33,7 +31,7 @@ public class InvseeImpl extends InvseeAPI {
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
-        lookup.uuidResolveStrategies.add(2, new UUIDSearchSaveFilesStrategy(plugin));
+        lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin));
         lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
     }
 

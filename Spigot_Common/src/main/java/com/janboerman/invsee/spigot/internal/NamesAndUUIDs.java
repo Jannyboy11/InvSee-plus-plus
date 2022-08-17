@@ -76,14 +76,17 @@ public class NamesAndUUIDs {
                 .executor(asyncExecutor)
                 .build());
 
-        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(5));
-        this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>(5));
+        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
+        this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
 
         this.uuidResolveStrategies.add(new UUIDOnlinePlayerStrategy(plugin.getServer()));
         this.nameResolveStrategies.add(new NameOnlinePlayerStrategy(plugin.getServer()));
 
         this.uuidResolveStrategies.add(new UUIDInMemoryStrategy(uuidCache));
         this.nameResolveStrategies.add(new NameInMemoryStrategy(userNameCache));
+
+        this.uuidResolveStrategies.add(new UUIDPermissionPluginStategy(plugin));
+        this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin));
 
         if (SPIGOT) {
             Configuration spigotConfig = plugin.getServer().spigot().getConfig();
@@ -94,6 +97,8 @@ public class NamesAndUUIDs {
         }
 
         if (PAPER) {
+            this.uuidResolveStrategies.add(new UUIDPaperCacheStrategy(plugin));
+
             YamlConfiguration paperConfig = plugin.getServer().spigot().getPaperConfig();
             ConfigurationSection proxiesSection = paperConfig.getConfigurationSection("proxies");
             if (proxiesSection != null) {

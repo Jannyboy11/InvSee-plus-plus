@@ -53,6 +53,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
                 List<LogRecord> errors = new CopyOnWriteArrayList<>();
 
                 //search through the save files, find the save file which has the lastKnownName of the quested player.
+                playerFilesLoop:
                 for (File playerFile : playerFiles) {
                     final String fileName = playerFile.getName();
 
@@ -87,10 +88,10 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
                             // could not 'join' the future. nothing useful we can do here - we need to let some other strategy resolve the UUID instead.
                             Throwable syncEx = e.getCause();
                             errors.add(new LogRecord(Level.SEVERE, "Encountered player save file containing invalid NBT: " + fileName, syncEx));
-                            return Optional.empty();
+                            continue playerFilesLoop;
                         } catch (InterruptedException e) {
                             // idem.
-                            return Optional.empty();
+                            continue playerFilesLoop;
                         }
                     } catch (IOException e) {
                         plugin.getLogger().log(Level.WARNING, "Error reading player's save file: " + playerFile.getAbsolutePath(), e);
