@@ -58,7 +58,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         this.wrapped = Objects.requireNonNull(wrapped);
         this.pwiHook = Objects.requireNonNull(pwiHook);
 
-        wrapped.unregsiterListeners();
+        wrapped.unregisterListeners();
         setOpenInventories(wrapped.getOpenInventories());
         setOpenEnderChests(wrapped.getOpenEnderChests());
 
@@ -99,8 +99,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         pluginManager.registerEvents(tiedPlayerListener = new TiedPlayerListener(), plugin);
     }
 
-    public void unregsiterListeners() {
-        super.unregsiterListeners();
+    public void unregisterListeners() {
+        super.unregisterListeners();
         HandlerList.unregisterAll(pwiEventListener);
         HandlerList.unregisterAll(tiedInventoryListener);
         HandlerList.unregisterAll(tiedPlayerListener);
@@ -200,8 +200,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         public void onTeleport(PlayerTeleportEvent event) {
             if (pwiHook.bypassesWorldChange(event.getPlayer())) return;
 
-            World from = event.getFrom().getWorld();
-            World to = event.getTo().getWorld();
+            World from = event.getFrom().getWorld(); assert from != null;
+            World to = event.getTo().getWorld(); assert to != null;
 
             if (!from.equals(to) && !pwiHook.worldsShareInventory(from.toString(), to.toString())) {
                 giveSnapshotInventoryToSpectators(pwiHook.getActiveProfileKey(event.getPlayer()));
@@ -356,7 +356,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         Player target = plugin.getServer().getPlayer(inventory.getSpectatedPlayerId());
         if (target != null) location = target.getLocation();
         if (location == null) location = pwiHook.getDataSource().getLogout(new FakePlayer(inventory.getSpectatedPlayerId(), inventory.getSpectatedPlayerName(), plugin.getServer()));
-        World logoutWorld = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0);
+        World logoutWorld = location != null ? location.getWorld() : plugin.getServer().getWorlds().get(0); assert logoutWorld != null;
 
         if (profileKey == null) {
             saveVanilla = true;

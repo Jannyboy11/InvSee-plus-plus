@@ -4,10 +4,11 @@ import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
-import com.janboerman.invsee.spigot.perworldinventory.ProfileId;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.Either;
+import com.janboerman.invsee.utils.StringHelper;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -51,7 +52,7 @@ class InvseeCommandExecutor implements CommandExecutor {
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = null;
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
-            String pwiArgument = args[1];
+            String pwiArgument = StringHelper.joinArray(" ", 1, args);
             PerWorldInventorySeeApi pwiApi = (PerWorldInventorySeeApi) api;
 
             Either<String, PwiCommandArgs> either = PwiCommandArgs.parse(pwiArgument, pwiApi.getHook());
@@ -69,7 +70,7 @@ class InvseeCommandExecutor implements CommandExecutor {
             future = uuidFuture.thenCompose(optId -> {
                 if (optId.isPresent()) {
                     UUID uniqueId = optId.get();
-                    ProfileId profileId = new ProfileId(pwiApi.getHook(), pwiOptions, uniqueId);
+                    var profileId = new com.janboerman.invsee.spigot.perworldinventory.ProfileId(pwiApi.getHook(), pwiOptions, uniqueId);
                     CompletableFuture<String> userNameFuture = finalIsUuid
                             ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
                             : CompletableFuture.completedFuture(playerNameOrUUID);
@@ -78,6 +79,14 @@ class InvseeCommandExecutor implements CommandExecutor {
                     return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
                 }
             });
+        }
+
+        else if (args.length > 1 && api instanceof MultiverseInventoriesSeeApi) {
+            String mviArgument = StringHelper.joinArray(" ", 1, args);
+            MultiverseInventoriesSeeApi mviApi = (MultiverseInventoriesSeeApi) api;
+
+
+            //TODO
         }
 
         if (future == null) {

@@ -147,8 +147,7 @@ public class FakePlayer implements Player {
         registerAttribute(Attribute.GENERIC_ATTACK_DAMAGE);
         registerAttribute(Attribute.GENERIC_ARMOR);
         registerAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS);
-        //not yet present in 1.15.2
-        //registerAttribute(Attribute.GENERIC_ATTACK_KNOCKBACK);
+        try { registerAttribute(Attribute.valueOf("GENERIC_ATTACK_KNOCKBACK")); } catch (IllegalArgumentException ignored) {}
         registerAttribute(Attribute.GENERIC_ATTACK_SPEED);
         registerAttribute(Attribute.GENERIC_LUCK);
 

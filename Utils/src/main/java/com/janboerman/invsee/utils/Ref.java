@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+// For you FP nerds out there: this is much like a 'Lens'.
 public interface Ref<T> {
 
     public void set(T item);

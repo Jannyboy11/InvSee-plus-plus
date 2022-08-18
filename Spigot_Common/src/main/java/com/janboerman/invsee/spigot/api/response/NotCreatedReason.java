@@ -7,16 +7,6 @@ import com.janboerman.invsee.spigot.api.target.Target;
  */
 public interface NotCreatedReason {
 
-    /**
-     * Get the target for which a SpectatorInventory could not be created
-     * @return the target
-     * @throws UnsupportedOperationException if the reason has no target player
-     */
-    @Deprecated(forRemoval = true)
-    public default Target getTarget() {
-        throw new UnsupportedOperationException("This NotCreatedReason has no target player.");
-    }
-
     public static TargetDoesNotExist targetDoesNotExists(Target target) {
         return new TargetDoesNotExist(target);
     }

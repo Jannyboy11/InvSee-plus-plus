@@ -13,6 +13,7 @@ import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.ProfileId;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.Either;
+import com.janboerman.invsee.utils.StringHelper;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -56,7 +57,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
 
         InvseeAPI api = plugin.getApi();
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
-            String pwiArgument = args[1];
+            String pwiArgument = StringHelper.joinArray(" ", 1, args);
             PerWorldInventorySeeApi pwiApi = (PerWorldInventorySeeApi) api;
 
             Either<String, PwiCommandArgs> either = PwiCommandArgs.parse(pwiArgument, pwiApi.getHook());
@@ -84,6 +85,8 @@ class EnderseeCommandExecutor implements CommandExecutor {
                 }
             });
         }
+
+        //TODO Multiverse-Inventories
 
         if (future == null) {
             //No PWI argument - just continue with the regular method

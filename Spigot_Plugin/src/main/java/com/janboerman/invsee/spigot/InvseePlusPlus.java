@@ -3,8 +3,8 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
-//import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
-//import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
+import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
+import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
@@ -32,7 +32,7 @@ public class InvseePlusPlus extends JavaPlugin {
 
         //interop
         PerWorldInventoryHook pwiHook;
-//        MultiverseInventoriesHook mviHook;
+        MultiverseInventoriesHook mviHook;
         if (offlinePlayerSupport() && (pwiHook = new PerWorldInventoryHook(this)).trySetup()) {
             if (pwiHook.managesEitherInventory()) {
                 this.api = new PerWorldInventorySeeApi(this, api, pwiHook);
@@ -40,11 +40,11 @@ public class InvseePlusPlus extends JavaPlugin {
             }
         }
 //        else if (offlinePlayerSupport() && (mviHook = new MultiverseInventoriesHook(this)).trySetup()) {
-//            if (mviHook.managesEitherInventory()) {
-//                this.api = new MultiverseInventoriesSeeApi(this, api, mviHook);
-//                getLogger().info("Enabled Multiverse-Inventories integration.");
-//            }
+//            this.api = new MultiverseInventoriesSeeApi(this, api, mviHook);
+//            getLogger().info("Enabled Multiverse-Inventories integration.");
 //        }
+        // else if (MyWorlds)
+        // else if (Separe-World-Items)
 
         //commands
         PluginCommand invseeCommand = getCommand("invsee");
@@ -81,9 +81,12 @@ public class InvseePlusPlus extends JavaPlugin {
         metrics.addCustomChart(new SimplePie("Back-end", () -> {
             if (this.api instanceof PerWorldInventorySeeApi) {
                 return "PerWorldInventory";
-//            } else if (this.api instanceof MultiverseInventoriesSeeApi) {
-//                return "Multiverse-Inventories";
-            } else {
+            } else if (this.api instanceof MultiverseInventoriesSeeApi) {
+                return "Multiverse-Inventories";
+            }
+            //else if: MyWorlds
+            //else if: Separe-World-Items
+            else {
                 return "Vanilla";
             }
         }));

@@ -144,7 +144,7 @@ public class FakeAttributeInstance implements AttributeInstance {
             case GENERIC_MOVEMENT_SPEED:
                 return 0.7;
             case GENERIC_ATTACK_DAMAGE:
-                return 1;
+                return 1;   //2.0 * half hearts
             case GENERIC_ARMOR:
                 return 0;
             case GENERIC_ARMOR_TOUGHNESS:

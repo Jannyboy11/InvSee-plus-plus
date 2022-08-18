@@ -82,7 +82,7 @@ public abstract class InvseeAPI {
         pluginManager.registerEvents(inventoryListener, plugin);
     }
 
-    public void unregsiterListeners() {
+    public void unregisterListeners() {
         HandlerList.unregisterAll(playerListener);
         HandlerList.unregisterAll(inventoryListener);
     }

@@ -1,9 +1,9 @@
 package com.janboerman.invsee.spigot.perworldinventory;
 
 import com.janboerman.invsee.utils.Either;
+import com.janboerman.invsee.utils.Out;
 import com.janboerman.invsee.utils.StringHelper;
 import me.ebonjaeger.perworldinventory.Group;
-import me.ebonjaeger.perworldinventory.data.ProfileKey;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 
@@ -37,7 +37,7 @@ public class PwiCommandArgs {
         }
     }
 
-    private static Optional<String> parseProperties(PwiCommandArgs result, String propertyList, PerWorldInventoryHook hook) {
+    private static Optional<String> parseProperties(@Out PwiCommandArgs result, String propertyList, PerWorldInventoryHook hook) {
         String[] properties = propertyList.split(",");
         for (String kv : properties) {
             String[] keyValue = kv.split("=", 2);
@@ -72,6 +72,7 @@ public class PwiCommandArgs {
     public static List<String> complete(final String argument, PerWorldInventoryHook hook) {
         //TODO this can be called asynchronously!
         //TODO I don't think this is threadsafe.
+        //TODO if we are called async, then the should wait for the primary thread, execute the logic on there, and then join.
 
         if (argument.length() < 4) return List.of("PWI{");
         if (!StringHelper.startsWithIgnoreCase(argument, "PWI{")) {
@@ -101,7 +102,7 @@ public class PwiCommandArgs {
         }
 
         PwiCommandArgs result = new PwiCommandArgs();
-        parseProperties(result, propertyList, hook); //ignore errormessage
+        parseProperties(result, propertyList, hook); //ignore error message
 
         String lastProperty = properties[properties.length - 1];
         int stripLength = lastProperty.length();
