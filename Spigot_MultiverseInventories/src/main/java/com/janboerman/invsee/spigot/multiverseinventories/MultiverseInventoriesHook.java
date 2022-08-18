@@ -45,6 +45,9 @@ public class MultiverseInventoriesHook {
      *
      * figure out what to do with optional shares
      *
+     * Why does MVI have two profile container stores? (one for groups, one for worlds)
+     * Each WeakProfileContainer has a Map<String=playerName, Map<ProfileType=gameMode, PlayerProfile>>
+     *
      * design philosopy: https://www.spigotmc.org/threads/invsee.456148/page-2#post-3928841
      */
 
