@@ -4,8 +4,12 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,6 +23,11 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
     private final InvseeAPI wrapped;
     private final MultiverseInventoriesHook mviHook;
 
+    private final Map<ProfileId, MainSpectatorInventory> inventories = new HashMap<>();
+    private final Map<MainSpectatorInventory, Set<ProfileId>> inventoryKeys = new HashMap<>();  //a player profile can be matched by multiple profileKeys
+    private final Map<ProfileId, EnderSpectatorInventory> enderchests = new HashMap<>();
+    private final Map<EnderSpectatorInventory, Set<ProfileId>> enderchestKeys = new HashMap<>();   //a player profile can be matched by multiple profileKeys
+
     public MultiverseInventoriesSeeApi(Plugin plugin, InvseeAPI wrapped, MultiverseInventoriesHook mviHook) {
         super(plugin);
         this.wrapped = Objects.requireNonNull(wrapped);
@@ -29,9 +38,43 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
         return mviHook;
     }
 
+    private void tie(ProfileId profileId, MainSpectatorInventory spectatorInventory) {
+        assert !inventories.containsKey(profileId) || inventories.get(profileId).equals(spectatorInventory);
+        inventories.put(profileId, spectatorInventory);
+        inventoryKeys.computeIfAbsent(spectatorInventory, inv -> new HashSet<>()).add(profileId);
+    }
+
+    private void tie(ProfileId profileId, EnderSpectatorInventory spectatorInventory) {
+        assert !enderchests.containsKey(profileId) || enderchests.get(profileId).equals(spectatorInventory);
+        enderchests.put(profileId, spectatorInventory);
+        enderchestKeys.computeIfAbsent(spectatorInventory, inv -> new HashSet<>()).add(profileId);
+    }
+
+    private void unTie(ProfileId profileId, MainSpectatorInventory spectatorInventory) {
+        inventories.remove(profileId, spectatorInventory);
+        var set = inventoryKeys.get(spectatorInventory);
+        if (set != null) {
+            set.remove(profileId);
+            if (set.isEmpty()) inventoryKeys.remove(spectatorInventory);
+        }
+    }
+
+    private void unTie(ProfileId profileId, EnderSpectatorInventory spectatorInventory) {
+        enderchests.remove(profileId, spectatorInventory);
+        var set = enderchestKeys.get(spectatorInventory);
+        if (set != null) {
+            set.remove(profileId);
+            if (set.isEmpty()) enderchestKeys.remove(spectatorInventory);
+        }
+    }
+
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileId profileId) {
 
         //TODO
+
+        //TODO take into account that not groups necessarily share inventories across worlds
+        //TODO take into account that multiverse-inventories manages storage contents, armour contents and offhand contents independently
+        //TODO THIS NEEDS TO BE TAKEN INTO ACCOUNT *ESPECIALLY* WHEN SAVING PLAYER DATA!
 
         /*  IF the player is online THEN
          *      IF the player's current profile (world, gamemode) matches the profileId THEN
