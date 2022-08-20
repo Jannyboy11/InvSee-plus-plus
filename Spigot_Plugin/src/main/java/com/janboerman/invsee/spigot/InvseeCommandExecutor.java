@@ -5,6 +5,7 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
+import com.janboerman.invsee.spigot.multiverseinventories.MviCommandArgs;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.Either;
@@ -85,8 +86,30 @@ class InvseeCommandExecutor implements CommandExecutor {
             String mviArgument = StringHelper.joinArray(" ", 1, args);
             MultiverseInventoriesSeeApi mviApi = (MultiverseInventoriesSeeApi) api;
 
+            Either<String, MviCommandArgs> either = MviCommandArgs.parse(mviArgument, mviApi.getHook());
+            if (either.isLeft()) {
+                player.sendMessage(ChatColor.RED + either.getLeft());
+                return true;
+            }
 
-            //TODO
+            MviCommandArgs mviOptions = either.getRight();
+            CompletableFuture<Optional<UUID>> uuidFuture = isUuid
+                    ? CompletableFuture.completedFuture(Optional.of(uuid))
+                    : mviApi.fetchUniqueId(playerNameOrUUID);
+
+            final boolean finalIsUuid = isUuid;
+            future = uuidFuture.thenCompose(optId -> {
+                if (optId.isPresent()) {
+                    UUID uniqueId = optId.get();
+                    CompletableFuture<String> usernameFuture = finalIsUuid
+                            ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                            : CompletableFuture.completedFuture(playerNameOrUUID);
+                    return usernameFuture.thenCompose(playerName -> mviApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory",
+                            new com.janboerman.invsee.spigot.multiverseinventories.ProfileId(mviApi.getHook(), mviOptions, uniqueId, playerName)));
+                } else {
+                    return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
+                }
+            });
         }
 
         if (future == null) {

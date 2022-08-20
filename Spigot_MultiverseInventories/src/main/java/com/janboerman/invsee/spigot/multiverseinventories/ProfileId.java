@@ -1,24 +1,53 @@
 package com.janboerman.invsee.spigot.multiverseinventories;
 
 import com.onarandombox.multiverseinventories.profile.ProfileKey;
+import com.onarandombox.multiverseinventories.profile.ProfileType;
+import com.onarandombox.multiverseinventories.profile.ProfileTypes;
+import com.onarandombox.multiverseinventories.profile.container.ContainerType;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class ProfileId {
 
-    final ProfileKey profileKey;
+    private final UUID playerId;
+    private final String playerName;
+    private final ContainerType containerType;
+    private final String containerName;
+    private final ProfileType profileType; //null for gamemode-unspecific profiles
 
-    public ProfileId(ProfileKey profileKey) {
-        this.profileKey = Objects.requireNonNull(profileKey);
+    ProfileId(MultiverseInventoriesHook hook, ProfileKey profileKey) {
+        this.playerId = profileKey.getPlayerUUID();
+        this.playerName = profileKey.getPlayerName();
+        this.containerType = profileKey.getContainerType();
+        this.containerName = profileKey.getDataName();
+        this.profileType = hook.gameModeSpecificProfiles() ? profileKey.getProfileType() : null;
     }
 
-    public ProfileId(MviCommandArgs mviOptions, UUID playerId) {
-        this.profileKey = ProfileKey.createProfileKey(mviOptions.containerType, mviOptions.containerName, mviOptions.profileType, playerId);
+    public ProfileId(MultiverseInventoriesHook hook, MviCommandArgs args, UUID playerId, String playerName) {
+        this.playerId = playerId;
+        this.playerName = playerName;
+        this.containerType = args.containerType;
+        this.containerName = args.containerName;
+        this.profileType = hook.gameModeSpecificProfiles() ? args.profileType : null;
     }
 
-    public ProfileId(MviCommandArgs mviOptions, UUID playerId, String playerName) {
-        this.profileKey = ProfileKey.createProfileKey(mviOptions.containerType, mviOptions.containerName, mviOptions.profileType, playerId, playerName);
+    public boolean isMatchedByProfileKey(MultiverseInventoriesHook hook, ProfileKey profileKey) {
+        boolean result = playerId.equals(profileKey.getPlayerUUID());
+        if (containerType != null && profileKey.getContainerType() != null) result &= containerType.equals(profileKey.getContainerType());
+        if (containerName != null && profileKey.getDataName() != null) result &= containerType.equals(profileKey.getDataName());
+        if (hook.gameModeSpecificProfiles() && profileType != null && profileKey.getProfileType() != null) result &= profileType.equals(profileKey.getProfileType());
+        return result;
+    }
+
+    public ProfileKey toProfileKey() {
+        ProfileType profileType = this.profileType;
+        if (profileType == null) profileType = ProfileTypes.SURVIVAL;
+        if (playerName == null || playerName.equals("InvSee++ Player")) {
+            return ProfileKey.createProfileKey(containerType, containerName, profileType, playerId, playerName);
+        } else {
+            return ProfileKey.createProfileKey(containerType, containerName, profileType, playerId);
+        }
     }
 
     @Override
@@ -27,17 +56,19 @@ public class ProfileId {
         if (!(o instanceof ProfileId)) return false;
 
         ProfileId that = (ProfileId) o;
-        return this.profileKey.equals(that.profileKey);
+        return Objects.equals(this.playerId, that.playerId)
+                && Objects.equals(this.containerType, that.containerType)
+                && Objects.equals(this.containerName, that.containerName)
+                && Objects.equals(this.profileType, that.profileType);
     }
 
     @Override
     public int hashCode() {
-        return profileKey.hashCode();
+        return Objects.hash(playerId, containerType, containerName, profileType);
     }
 
     @Override
     public String toString() {
-        return "ProfileId(" + profileKey.toString() + ")";
+        return "ProfileId(" + playerId + "," + playerName + "," + containerType + "," + containerName + "," + profileType + ")";
     }
-
 }

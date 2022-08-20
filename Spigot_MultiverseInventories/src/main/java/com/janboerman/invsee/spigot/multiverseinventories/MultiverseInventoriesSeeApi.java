@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.Plugin;
 
@@ -24,6 +25,34 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
         this.mviHook = Objects.requireNonNull(mviHook);
     }
 
+    public MultiverseInventoriesHook getHook() {
+        return mviHook;
+    }
+
+    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileId profileId) {
+
+        //TODO
+
+        /*  IF the player is online THEN
+         *      IF the player's current profile (world, gamemode) matches the profileId THEN
+         *          - open a live spectator inventory
+         *          - tie the spectatorInventory and the profileId
+         *      ELSE (player's profile doesn't match profileId) THEN
+         *          - open an offline spectator inventory based on the profile identifier (use MVI storage)
+         *          - tie the spectatorInventory and the profileId
+         *  ELSE (the player is offline) THEN
+         *      IF the player's logout profileKey (world, gamemode) matches the profileId THEN
+         *          - open an offline spectator inventory based on the profile identifier
+         *              - load from MVI storage if 'save_load_on_log_in_out' is true
+         *              - load from Vanilla storage if 'save_load_on_log_in_out' is false
+         *          - tie the spectatorInventory and profileId
+         *      ELSE
+         *          - open an offline spectator inventory based on the profile identifier (use MVI storage)
+         *          - tie the spectatorInventory and the profileId
+         */
+
+        return null;
+    }
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {

@@ -26,4 +26,6 @@ public class ClearPlugin extends JavaPlugin {
         enderClear.setTabCompleter(tabCompleter);
     }
 
+    //TODO configuration option to also clear out of the queue created by InvSee++_Give ?
+
 }

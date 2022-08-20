@@ -123,4 +123,8 @@ public class MultiverseInventoriesHook {
         return worldGroupManager.getGroups();
     }
 
+    public boolean gameModeSpecificProfiles() {
+        return mviConfig.isUsingGameModeProfiles();
+    }
+
 }
