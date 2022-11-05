@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
@@ -91,6 +92,11 @@ public class InvseePlusPlus extends JavaPlugin {
             }
         }));
     }
+	
+	@Override
+	public void onDisable() {
+		api.shutDown(); //complete all inventory futures - ensures /invgive and /endergive will still work even if the server shuts down.
+	}
 
     public InvseeAPI getApi() {
         return api;
@@ -107,4 +113,15 @@ public class InvseePlusPlus extends JavaPlugin {
     public boolean offlinePlayerSupport() {
         return getConfig().getBoolean("enable-offline-player-support", true);
     }
+
+    public String getTitleForInventory(Target target) {
+        return getConfig().getString("titles.inventory", "<player>'s inventory")
+            .replace("<player>", target.toString());
+    }
+
+    public String getTitleForEnderChest(Target target) {
+        return getConfig().getString("titles.enderchest", "<player>'s enderchest")
+            .replace("<player>", target.toString());
+    }
+
 }

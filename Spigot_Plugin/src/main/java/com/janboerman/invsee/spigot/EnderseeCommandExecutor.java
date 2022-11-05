@@ -46,7 +46,6 @@ class EnderseeCommandExecutor implements CommandExecutor {
         String playerNameOrUUID = args[0];
         UUID uuid;
         boolean isUuid;
-        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = null;
         try {
             uuid = UUID.fromString(playerNameOrUUID);
             isUuid = true;
@@ -55,7 +54,10 @@ class EnderseeCommandExecutor implements CommandExecutor {
             uuid = null;
         }
 
-        InvseeAPI api = plugin.getApi();
+        final InvseeAPI api = plugin.getApi();
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = null;
+        final String title = plugin.getTitleForEnderChest(isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID));
+
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = StringHelper.joinArray(" ", 1, args);
             PerWorldInventorySeeApi pwiApi = (PerWorldInventorySeeApi) api;
@@ -79,7 +81,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
                     CompletableFuture<String> userNameFuture = finalIsUuid
                             ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
                             : CompletableFuture.completedFuture(playerNameOrUUID);
-                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateEnderChest(uniqueId, playerName, playerName + "'s enderchest", profileId));
+                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateEnderChest(uniqueId, playerName, title, profileId));
                 } else {
                     return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
                 }
@@ -93,11 +95,13 @@ class EnderseeCommandExecutor implements CommandExecutor {
             if (isUuid) {
                 final UUID finalUuid = uuid;
                 future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.enderSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s enderchest", plugin.offlinePlayerSupport()));
+                        .thenCompose(userName -> api.enderSpectatorInventory(finalUuid, userName, title, plugin.offlinePlayerSupport()));
             } else {
-                future = api.enderSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s enderchest", plugin.offlinePlayerSupport());
+                future = api.enderSpectatorInventory(playerNameOrUUID, title, plugin.offlinePlayerSupport());
             }
         }
+
+        assert future != null : "forgot to instantiate the future!";
 
         future.whenComplete((response, throwable) -> {
             if (throwable == null) {

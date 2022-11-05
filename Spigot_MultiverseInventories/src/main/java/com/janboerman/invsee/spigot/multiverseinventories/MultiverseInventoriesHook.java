@@ -49,6 +49,8 @@ public class MultiverseInventoriesHook {
      * Each WeakProfileContainer has a Map<String=playerName, Map<ProfileType=gameMode, PlayerProfile>>
      *
      * design philosopy: https://www.spigotmc.org/threads/invsee.456148/page-2#post-3928841
+     *
+     * handy documentation: https://github.com/Multiverse/Multiverse-Core/wiki/Sharing-Details-(Inventories)
      */
 
     //with Multiverse-Inventories, the following attributes can be shared per group:
@@ -125,6 +127,10 @@ public class MultiverseInventoriesHook {
 
     public boolean gameModeSpecificProfiles() {
         return mviConfig.isUsingGameModeProfiles();
+    }
+
+    public boolean saveAndLoadOnLoginAndLogout() {
+        return mviConfig.usingLoggingSaveLoad();
     }
 
 }

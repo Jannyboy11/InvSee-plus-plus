@@ -72,8 +72,8 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
 
         //TODO
 
-        //TODO take into account that not groups necessarily share inventories across worlds
-        //TODO take into account that multiverse-inventories manages storage contents, armour contents and offhand contents independently
+        //TODO take into account that not all groups necessarily share inventories across worlds.
+        //TODO take into account that multiverse-inventories manages storage contents, armour contents and offhand contents independently.
         //TODO THIS NEEDS TO BE TAKEN INTO ACCOUNT *ESPECIALLY* WHEN SAVING PLAYER DATA!
 
         /*  IF the player is online THEN

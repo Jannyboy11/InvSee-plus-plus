@@ -46,6 +46,9 @@ public interface Setup {
         }
 
         throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
+		//TODO list the versions that *ARE* supported by this release of InvSee++
+		//TODO suggest to the user to upgrade their version of InvSee++ if their current version software is unsupported.
+		//TODO might want to create a MinecraftVersion abstraction that uses MappingsVersion internally.
     }
 
 }

@@ -77,6 +77,8 @@ public class InvseeTabCompleter implements TabCompleter {
             return PwiCommandArgs.complete(pwiArgument, pwiApi.getHook());
         }
 
+        //TODO MultiVerse-Inventories
+
         return List.of();
     }
 }

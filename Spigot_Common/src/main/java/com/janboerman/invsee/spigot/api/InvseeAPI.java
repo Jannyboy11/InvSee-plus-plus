@@ -57,6 +57,13 @@ public abstract class InvseeAPI {
         registerListeners();
     }
 
+    public void shutDown() {
+        for (var future : pendingInventoriesByUuid.values())
+            try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
+        for (var future : pendingEnderChestsByUuid.values())
+            try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
+    }
+
     public Map<String, UUID> getUuidCache() {
         return lookup.getUuidCache();
     }
@@ -512,7 +519,9 @@ public abstract class InvseeAPI {
                                 newInventorySpectator.setCursorContents(oldSpectatorInventory.getCursorContents());
                                 newInventorySpectator.setPersonalContents(oldSpectatorInventory.getPersonalContents());
                             }
-
+							
+							//TODO instead of re-opening the inventory, couldn't we just 'set' the top inventory of the Container(/InventoryView)? This is possible since we implement our own anyway!
+							//TODO maybe we can even 'set' the nms inventory instance within the bukkit wrapper.
                             online.closeInventory();
                             online.openInventory(newInventorySpectator);
                         }
@@ -527,6 +536,7 @@ public abstract class InvseeAPI {
                                 newEnderSpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
                             }
 
+							//Idem!
                             online.closeInventory();
                             online.openInventory(newEnderSpectator);
                         }

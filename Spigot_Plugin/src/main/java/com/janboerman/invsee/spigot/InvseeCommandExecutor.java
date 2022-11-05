@@ -49,8 +49,9 @@ class InvseeCommandExecutor implements CommandExecutor {
             isUuid = false;
         }
 
-        InvseeAPI api = plugin.getApi();
+        final InvseeAPI api = plugin.getApi();
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = null;
+        final String title = plugin.getTitleForInventory(isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID));
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = StringHelper.joinArray(" ", 1, args);
@@ -75,7 +76,7 @@ class InvseeCommandExecutor implements CommandExecutor {
                     CompletableFuture<String> userNameFuture = finalIsUuid
                             ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
                             : CompletableFuture.completedFuture(playerNameOrUUID);
-                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory", profileId));
+                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateInventory(uniqueId, playerName, title, profileId));
                 } else {
                     return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
                 }
@@ -104,7 +105,7 @@ class InvseeCommandExecutor implements CommandExecutor {
                     CompletableFuture<String> usernameFuture = finalIsUuid
                             ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
                             : CompletableFuture.completedFuture(playerNameOrUUID);
-                    return usernameFuture.thenCompose(playerName -> mviApi.spectateInventory(uniqueId, playerName, playerName + "'s inventory",
+                    return usernameFuture.thenCompose(playerName -> mviApi.spectateInventory(uniqueId, playerName, title,
                             new com.janboerman.invsee.spigot.multiverseinventories.ProfileId(mviApi.getHook(), mviOptions, uniqueId, playerName)));
                 } else {
                     return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
@@ -118,12 +119,14 @@ class InvseeCommandExecutor implements CommandExecutor {
                 //playerNameOrUUID is a UUID.
                 final UUID finalUuid = uuid;
                 future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.mainSpectatorInventory(finalUuid, userName, playerNameOrUUID + "'s inventory", plugin.offlinePlayerSupport()));
+                        .thenCompose(userName -> api.mainSpectatorInventory(finalUuid, userName, title, plugin.offlinePlayerSupport()));
             } else {
                 //playerNameOrUUID is a username.
-                future = api.mainSpectatorInventory(playerNameOrUUID, playerNameOrUUID + "'s inventory", plugin.offlinePlayerSupport());
+                future = api.mainSpectatorInventory(playerNameOrUUID, title, plugin.offlinePlayerSupport());
             }
         }
+
+        assert future != null : "forgot to instantiate the future!";
 
         future.whenComplete((response, throwable) -> {
             if (throwable == null) {
