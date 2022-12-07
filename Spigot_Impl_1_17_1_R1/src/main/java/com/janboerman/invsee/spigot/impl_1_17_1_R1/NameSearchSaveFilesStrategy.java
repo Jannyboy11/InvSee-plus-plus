@@ -10,26 +10,12 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import com.janboerman.invsee.spigot.api.resolve.NameResolveStrategy;
+import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 
 public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
-
-    private static final int TAG_END = 0;
-    private static final int TAG_BYTE = 1;
-    private static final int TAG_SHORT = 2;
-    private static final int TAG_INT = 3;
-    private static final int TAG_LONG = 4;
-    private static final int TAG_FLOAT = 5;
-    private static final int TAG_DOUBLE = 6;
-    private static final int TAG_BYTE_ARRAY = 7;
-    private static final int TAG_STRING = 8;
-    private static final int TAG_LIST = 9;
-    private static final int TAG_COMPOUND = 10;
-    private static final int TAG_INT_ARRAY = 11;
-    private static final int TAG_LONG_ARRAY = 12;
-    private static final int TAG_UNKNOWN = 99;
 
     private final Plugin plugin;
 

@@ -4,8 +4,10 @@ import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.api.target.Target;
+/*
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
+ */
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
@@ -33,7 +35,7 @@ public class InvseePlusPlus extends JavaPlugin {
 
         //interop
         PerWorldInventoryHook pwiHook;
-        MultiverseInventoriesHook mviHook;
+        //MultiverseInventoriesHook mviHook;
         if (offlinePlayerSupport() && (pwiHook = new PerWorldInventoryHook(this)).trySetup()) {
             if (pwiHook.managesEitherInventory()) {
                 this.api = new PerWorldInventorySeeApi(this, api, pwiHook);
@@ -82,8 +84,8 @@ public class InvseePlusPlus extends JavaPlugin {
         metrics.addCustomChart(new SimplePie("Back-end", () -> {
             if (this.api instanceof PerWorldInventorySeeApi) {
                 return "PerWorldInventory";
-            } else if (this.api instanceof MultiverseInventoriesSeeApi) {
-                return "Multiverse-Inventories";
+//            } else if (this.api instanceof MultiverseInventoriesSeeApi) {
+//                return "Multiverse-Inventories";
             }
             //else if: MyWorlds
             //else if: Separe-World-Items
@@ -95,7 +97,9 @@ public class InvseePlusPlus extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		api.shutDown(); //complete all inventory futures - ensures /invgive and /endergive will still work even if the server shuts down.
+        if (api != null) { //the api can be null if we are running on unsupported server software.
+            api.shutDown(); //complete all inventory futures - ensures /invgive and /endergive will still work even if the server shuts down.
+        }
 	}
 
     public InvseeAPI getApi() {

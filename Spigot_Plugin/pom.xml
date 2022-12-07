@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>InvSee</artifactId>
-        <version>0.13.0-SNAPSHOT</version>
+        <version>0.13.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -185,10 +185,16 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_MultiverseInventories</artifactId>
+            <artifactId>Spigot_Impl_1_19_3_R1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.janboerman.invsee</groupId>-->
+<!--            <artifactId>Spigot_MultiverseInventories</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_PerWorldInventory</artifactId>

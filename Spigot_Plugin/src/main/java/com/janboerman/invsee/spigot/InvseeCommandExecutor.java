@@ -4,8 +4,10 @@ import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
+/*
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
 import com.janboerman.invsee.spigot.multiverseinventories.MviCommandArgs;
+ */
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.Either;
@@ -83,6 +85,7 @@ class InvseeCommandExecutor implements CommandExecutor {
             });
         }
 
+        /*
         else if (args.length > 1 && api instanceof MultiverseInventoriesSeeApi) {
             String mviArgument = StringHelper.joinArray(" ", 1, args);
             MultiverseInventoriesSeeApi mviApi = (MultiverseInventoriesSeeApi) api;
@@ -112,6 +115,7 @@ class InvseeCommandExecutor implements CommandExecutor {
                 }
             });
         }
+         */
 
         if (future == null) {
             //No PWI argument - just continue with the regular method
