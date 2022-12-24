@@ -3,6 +3,7 @@ package com.janboerman.invsee.fakes;
 import com.destroystokyo.paper.util.VersionFetcher;
 import com.google.common.collect.Multimap;
 import io.papermc.paper.inventory.ItemRarity;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.flattener.ComponentFlattener;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.RegionAccessor;
 import org.bukkit.Registry;
 import org.bukkit.UnsafeValues;
 import org.bukkit.World;
@@ -20,6 +22,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.CreativeCategory;
@@ -29,6 +32,8 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 public class FakeUnsafeValues implements UnsafeValues {
 
@@ -64,6 +69,11 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public LegacyComponentSerializer legacyComponentSerializer() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Component resolveWithContext(Component component, CommandSender commandSender, Entity entity, boolean b) throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -113,6 +123,7 @@ public class FakeUnsafeValues implements UnsafeValues {
     @Override
     public ItemStack modifyItemStack(ItemStack itemStack, String s) {
         //s is a json string that represents an nbt tag
+        //TODO actually, we could implement this now with Nedit, TheNullicorn's NBT library.
         return itemStack;
     }
 
@@ -259,6 +270,16 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public boolean isCollidable(@NotNull Material material) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull NamespacedKey getBiomeKey(RegionAccessor regionAccessor, int i, int i1, int i2) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setBiomeKey(RegionAccessor regionAccessor, int i, int i1, int i2, NamespacedKey namespacedKey) {
         throw new UnsupportedOperationException();
     }
 

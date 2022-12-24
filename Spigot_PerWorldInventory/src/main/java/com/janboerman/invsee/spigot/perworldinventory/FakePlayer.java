@@ -8,6 +8,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
@@ -127,6 +128,7 @@ public class FakePlayer implements Player {
     private GameMode previousGameMode;
     private final WeakHashMap<Plugin, Set<Entity>> hiddenEntities = new WeakHashMap<>();
     private WorldBorder worldBorder;
+    private Location lastDeathLocation;
 
     public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
@@ -624,6 +626,24 @@ public class FakePlayer implements Player {
         return EntityType.PLAYER;
     }
 
+    @NotNull
+    @Override
+    public Sound getSwimSound() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public Sound getSwimSplashSound() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public Sound getSwimHighSpeedSplashSound() {
+        return null;
+    }
+
     @Override
     public boolean isInsideVehicle() {
         return getVehicle() != null;
@@ -986,6 +1006,10 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void stopSound(@NotNull SoundCategory soundCategory) {
+    }
+
+    @Override
     public void stopAllSounds() {
     }
 
@@ -1005,6 +1029,10 @@ public class FakePlayer implements Player {
 
     @Override
     public void sendBlockChange(@NotNull Location location, @NotNull BlockData blockData) {
+    }
+
+    @Override
+    public void sendBlockChanges(@NotNull Collection<BlockState> collection, boolean b) {
     }
 
     @Override
@@ -1316,6 +1344,24 @@ public class FakePlayer implements Player {
     @Override
     public void setStarvationRate(int rate) {
         this.starvationRate = rate;
+    }
+
+    @Nullable
+    @Override
+    public Location getLastDeathLocation() {
+        return lastDeathLocation == null ? null : lastDeathLocation.clone();
+    }
+
+    @Override
+    public void setLastDeathLocation(@Nullable Location location) {
+        this.lastDeathLocation = location == null ? null : location.clone();
+    }
+
+    @Nullable
+    @Override
+    public Firework fireworkBoost(@NotNull ItemStack itemStack) {
+        //correct by signature, but a real server would never return null for a legit firework item stack.
+        return null;
     }
 
     @Override
@@ -2078,6 +2124,57 @@ public class FakePlayer implements Player {
     @Override
     public <T> void setMemory(@NotNull MemoryKey<T> memoryKey, @Nullable T t) {
         memory.put(memoryKey, t);
+    }
+
+    @Nullable
+    @Override
+    public Sound getHurtSound() {
+        return Sound.ENTITY_PLAYER_HURT;
+    }
+
+    @Nullable
+    @Override
+    public Sound getDeathSound() {
+        return Sound.ENTITY_PLAYER_DEATH;
+    }
+
+    @NotNull
+    @Override
+    public Sound getFallDamageSound(int distance) {
+        if (distance < 3) {
+            return getFallDamageSoundSmall();
+        } else {
+            return getFallDamageSoundBig();
+        }
+    }
+
+    @NotNull
+    @Override
+    public Sound getFallDamageSoundSmall() {
+        return Sound.ENTITY_PLAYER_SMALL_FALL;
+    }
+
+    @NotNull
+    @Override
+    public Sound getFallDamageSoundBig() {
+        return Sound.ENTITY_PLAYER_BIG_FALL;
+    }
+
+    @NotNull
+    @Override
+    public Sound getDrinkingSound(@NotNull ItemStack itemStack) {
+        return Sound.ENTITY_GENERIC_DRINK;
+    }
+
+    @NotNull
+    @Override
+    public Sound getEatingSound(@NotNull ItemStack itemStack) {
+        return Sound.ENTITY_GENERIC_EAT;
+    }
+
+    @Override
+    public boolean canBreatheUnderwater() {
+        return false;
     }
 
     @NotNull

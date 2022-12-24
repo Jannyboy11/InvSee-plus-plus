@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Registry;
 import org.bukkit.Server;
 import org.bukkit.StructureType;
 import org.bukkit.Tag;
@@ -53,6 +54,7 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.potion.PotionBrewer;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.CachedServerIcon;
@@ -82,12 +84,12 @@ public class FakeServer implements Server {
 
     @Override
     public String getVersion() {
-        return "1.18.2";
+        return "1.19.3";
     }
 
     @Override
     public String getBukkitVersion() {
-        return "1.18.2-R0.1-SNAPSHOT";
+        return "1.19.3-R0.1-SNAPSHOT";
     }
 
     @Override
@@ -281,6 +283,11 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public boolean isTickingWorlds() {
+        return false;
+    }
+
+    @Override
     public World createWorld(WorldCreator worldCreator) {
         throw new UnsupportedOperationException();
     }
@@ -423,6 +430,16 @@ public class FakeServer implements Server {
     @Override
     public void setSpawnRadius(int i) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean shouldSendChatPreviews() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnforcingSecureProfiles() {
+        return false;
     }
 
     @Override
@@ -606,6 +623,11 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public int getMaxChainedNeighborUpdates() {
+        return -1; //negative implies that the value is not used :)
+    }
+
+    @Override
     public int getMonsterSpawnLimit() {
         throw new UnsupportedOperationException();
     }
@@ -677,6 +699,11 @@ public class FakeServer implements Server {
 
     @Override
     public ScoreboardManager getScoreboardManager() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Criteria getScoreboardCriteria(@NotNull String s) {
         throw new UnsupportedOperationException();
     }
 
@@ -821,6 +848,11 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public @Nullable <T extends Keyed> Registry<T> getRegistry(@NotNull Class<T> aClass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public UnsafeValues getUnsafe() {
         return FakeUnsafeValues.INSTANCE;
     }
@@ -847,6 +879,11 @@ public class FakeServer implements Server {
 
     @Override
     public String getPermissionMessage() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Component permissionMessage() {
         throw new UnsupportedOperationException();
     }
 
