@@ -12,76 +12,97 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.function.Consumer;
+import java.util.logging.Level;
 
 public class KnownPlayersProvider implements OfflinePlayerProvider {
 
-    private final Plugin plugin;
+	private final Plugin plugin;
 
-    public KnownPlayersProvider(Plugin plugin) {
-        this.plugin = plugin;
-    }
-
-	@Override
-	public Set<String> getAll() {
-		CraftServer craftServer = (CraftServer) plugin.getServer();
-		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
-		
-		File playerDirectory = worldNBTStorage.getPlayerDir();
-		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
-			return Set.of();
-		
-		Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
-		
-		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
-		for (File playerFile : playerFiles) {
-			try {
-				CompoundTag compound = NbtIo.readCompressed(playerFile);
-				if (compound.contains("bukkit", TAG_COMPOUND)) {
-					CompoundTag bukkit = compound.getCompound("bukkit");
-					if (bukkit.contains("lastKnownName", TAG_STRING)) {
-						String lastKnownName = bukkit.getString("lastKnownName");
-						result.add(lastKnownName);
-					}
-				}
-			} catch (IOException | ReportedException e) {
-				//plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e);
-			}
-		}
-		
-		return result;
+	public KnownPlayersProvider(Plugin plugin) {
+		this.plugin = plugin;
 	}
 
-    @Override
-    public Set<String> getWithPrefix(String prefix) {
+	@Override
+	public void getAll(final Consumer<String> result) {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
-		
+
 		File playerDirectory = worldNBTStorage.getPlayerDir();
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
-			return Set.of();
+			return;
 
-        Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
+		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+		assert playerFiles != null : "playerFiles is not a directory?";
+		for (File playerFile : playerFiles) {
+			try {
+				readName(result, playerFile);
+			} catch (IOException | ReportedException e1) {
+				//did not work, try again on main thread:
+				plugin.getServer().getScheduler().runTask(plugin, () -> {
+					try {
+						readName(result, playerFile);
+					} catch (IOException | ReportedException e2) {
+						e2.addSuppressed(e1);
+						plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e2);
+					}
+				});
+			}
+		}
+	}
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
-        for (File playerFile : playerFiles) {
-            try {
-                CompoundTag compound = NbtIo.readCompressed(playerFile);
-                if (compound.contains("bukkit", TAG_COMPOUND)) {
-                	CompoundTag bukkit = compound.getCompound("bukkit");
-                    if (bukkit.contains("lastKnownName", TAG_STRING)) {
-                        String lastKnownName = bukkit.getString("lastKnownName");
-                        if (StringHelper.startsWithIgnoreCase(lastKnownName, prefix)) {
-                            result.add(lastKnownName);
-                        }
-                    }
-                }
-            } catch (IOException | ReportedException e) {
-                //plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e);
-            }
-        }
+	@Override
+	public void getWithPrefix(final String prefix, final Consumer<String> result) {
+		CraftServer craftServer = (CraftServer) plugin.getServer();
+		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
 
-        return result;
-    }
+		File playerDirectory = worldNBTStorage.getPlayerDir();
+		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
+			return;
+
+		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+		assert playerFiles != null : "playerFiles is not a directory?";
+		for (File playerFile : playerFiles) {
+			try {
+				readName(prefix, result, playerFile);
+			} catch (IOException | ReportedException e1) {
+				//did not work, try again on main thread:
+				plugin.getServer().getScheduler().runTask(plugin, () -> {
+					try {
+						readName(prefix, result, playerFile);
+					} catch (IOException | ReportedException e2) {
+						e2.addSuppressed(e1);
+						plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e2);
+					}
+				});
+			}
+		}
+	}
+
+	private static void readName(Consumer<String> reader, File playerFile) throws IOException, ReportedException {
+		String name = readName(playerFile);
+		if (name != null) {
+			reader.accept(name);
+		}
+	}
+
+	private static void readName(String prefix, Consumer<String> reader, File playerFile) throws IOException, ReportedException {
+		String name = readName(playerFile);
+		if (name != null && StringHelper.startsWithIgnoreCase(name, prefix)) {
+			reader.accept(name);
+		}
+	}
+
+	private static String readName(File playerFile) throws IOException, ReportedException {
+		CompoundTag compound = NbtIo.readCompressed(playerFile);
+		if (compound.contains("bukkit", TAG_COMPOUND)) {
+			CompoundTag bukkit = compound.getCompound("bukkit");
+			if (bukkit.contains("lastKnownName", TAG_STRING)) {
+				return bukkit.getString("lastKnownName");
+			}
+		}
+		return null;
+	}
+
 }
+

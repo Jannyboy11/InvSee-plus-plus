@@ -1,7 +1,7 @@
 # Whether to tabcomplete offline player names.
 # On Paper and other server implementation that implement the Paper API this will be done asynchronously,
 # causing less stress on the server's main thread, thus preventing lag.
-tabcomplete-offline-players: false
+tabcomplete-offline-players: true
 
 # Whether InvSee++ will let you spectate inventories of players who are offline.
 enable-offline-player-support: true

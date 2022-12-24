@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.IntStream;
@@ -21,7 +20,7 @@ public class UsernameTrieTest {
 
         StringJoiner sj = new StringJoiner(" ");
         trie.traverse("", (string, idx) -> sj.add(string + ":" + idx));
-        assertEquals("wpimp:3 Lmao:2 Swag:1 Yolo:0", sj.toString());
+        assertEquals("Lmao:2 Swag:1 wpimp:3 Yolo:0", sj.toString());
 
         StringJoiner tabComplete = new StringJoiner(" ");
         trie.traverse("wp", (string, idx) -> tabComplete.add(string + ":" + idx));

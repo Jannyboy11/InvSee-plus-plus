@@ -8,31 +8,29 @@ import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.StringHelper;
+import com.janboerman.invsee.utils.Username;
+import com.janboerman.invsee.utils.UsernameTrie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 public class AsyncTabCompleter implements Listener {
 
     private final InvseePlusPlus plugin;
-    private final OfflinePlayerProvider provider;
     private final Set<String> knownLabels;
     private final InvseeAPI api;
 
-    //TODO use a thread-safe (Radix) Trie in order to tabcomplete names!
-    //TODO populate this tree on startup (async)
-    //TODO when players join, also add their name to the Trie
-    //TODO when tabcompleting names, search the node in the trie with that specific prefix, and collect all children!
-    //TODO might also be able to use this for the synchronous tabcompletion implementation?
-    //TODO do I want a memory limit on the Trie? should not be necessary right, since Tries are extremely memory-efficient.
-    //TODO can take advantage of the minecraft username format: https://help.minecraft.net/hc/en-us/articles/4408950195341-Minecraft-Java-Edition-Username-VS-Gamertag-FAQ#:~:text=Accepted%20characters%3A,character%20accepted%20is%20_%20(underscore)
+    private final UsernameTrie<Void> knownPlayerNames = new UsernameTrie<>();
+    private final ConcurrentLinkedQueue<String> nameQueue = new ConcurrentLinkedQueue<>();
 
     public AsyncTabCompleter(InvseePlusPlus plugin) {
         this.plugin = plugin;
-        this.provider = plugin.getOfflinePlayerProvider();
         this.api = plugin.getApi();
 
         this.knownLabels = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -41,11 +39,24 @@ public class AsyncTabCompleter implements Listener {
         String pluginNameLower = "invseeplusplus";
         List<String> withPrefix = this.knownLabels.stream().map(s -> pluginNameLower + ":" + s).collect(Collectors.toList());
         this.knownLabels.addAll(withPrefix);
+
+        final OfflinePlayerProvider provider = plugin.getOfflinePlayerProvider();
+        final BukkitScheduler scheduler = plugin.getServer().getScheduler();
+        scheduler.runTaskAsynchronously(plugin, () -> provider.getAll(nameQueue::add));
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        nameQueue.add(event.getPlayer().getName());
     }
 
     @EventHandler
     public void onTabComplete(AsyncTabCompleteEvent event) {
         final String buffer = event.getBuffer();
+
+        while (!nameQueue.isEmpty()) {
+            knownPlayerNames.insert(nameQueue.poll(), null);
+        }
 
         if (event.isCommand()) {
             String matchedLabel = null;
@@ -63,19 +74,26 @@ public class AsyncTabCompleter implements Listener {
                 }
             }
 
-            Set<String> playerNames;
             if (equalsIgnoreCase) {
-                playerNames = provider.getAll();
+                List<String> playerNames = new ArrayList<>();
+                knownPlayerNames.traverse("", (name, v) -> playerNames.add(name));
                 if (!playerNames.isEmpty()) {
-                    event.setCompletions(List.copyOf(playerNames));
+                    event.setCompletions(playerNames);
                     event.setHandled(true);
                 }
             } else if (prefixIgnoreCase) {
                 String[] split = buffer.split("\\s");
                 if (split.length == 2) {
-                    playerNames = provider.getWithPrefix(buffer.substring(matchedLabel.length() + 2));
-                    if (!playerNames.isEmpty()) {
-                        event.setCompletions(List.copyOf(playerNames));
+                    List<String> playerNames = new ArrayList<>();
+                    String prefix = buffer.substring(matchedLabel.length() + 2);
+                    if (Username.isValidCharacters(prefix.toCharArray())) {
+                        knownPlayerNames.traverse(prefix, (name, v) -> playerNames.add(name));
+                        if (!playerNames.isEmpty()) {
+                            event.setCompletions(playerNames);
+                            event.setHandled(true);
+                        }
+                    } else {
+                        event.setCompletions(List.of());
                         event.setHandled(true);
                     }
                 } else if (split.length == 3 && api instanceof PerWorldInventorySeeApi) {

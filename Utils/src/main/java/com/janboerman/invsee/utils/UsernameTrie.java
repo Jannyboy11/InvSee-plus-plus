@@ -51,6 +51,9 @@ public class UsernameTrie<V> {
     }
 
     public Maybe<V> delete(char[] username) {
+        if (!Username.isValidUsername(username))
+            return Maybe.nothing();
+
         Node<V> node = root.lookup(username);
         Maybe<V> oldValue = node.value;
         node.value = Maybe.nothing();
@@ -63,7 +66,9 @@ public class UsernameTrie<V> {
     }
 
     public Maybe<V> get(char[] username) {
-        if (username == null) return root.value;
+        if (!Username.isValidUsername(username))
+            return Maybe.nothing();
+
         Node<V> node = root.lookup(username);
         Maybe<V> value = node.value;
         node.cleanUp();
@@ -75,6 +80,9 @@ public class UsernameTrie<V> {
     }
 
     public void traverse(char[] prefix, BiConsumer<char[], ? super V> consumer) {
+        if (!Username.isValidCharacters(prefix))
+            return;
+
         Node<V> node = root.lookup(prefix);
         node.traverse(consumer);
         node.cleanUp();
@@ -135,6 +143,8 @@ public class UsernameTrie<V> {
                     for (int i = 0; i < parent.children.length; i++) {
                         if (i != Username.toIndex(segment[0]) && parent.children[i] != null) return; //we are in fact not the only child.
                     }
+                    if (children == null) return; //we don't in fact have any children
+
                     int childCount = 0;
                     int idx = -1;
                     for (int i = 0; i < children.length; i++) {
@@ -152,7 +162,9 @@ public class UsernameTrie<V> {
                     parent.children[Username.toIndex(newSegment[0])] = longNode;
                     parent.cleanUp();
                 }
+                //else: we do have a value, so don't perform any clean-up.
             }
+            //else: there is no parent, we are the root!
         }
 
         private void ensureChildrenArray() {
@@ -266,52 +278,6 @@ public class UsernameTrie<V> {
                     }
                 }
             }
-        }
-    }
-
-    static class Username {
-
-        private Username() {
-        }
-
-        static boolean isValidCharacter(char c) {
-            return ('a' <= c && c <= 'z')
-                    || ('A' <= c && c <= 'Z')
-                    || ('0' <= c && c <= '9')
-                    || ('_' == c);
-        }
-
-        static void assertValidUsername(char[] username) {
-            assert username.length >= 3 : "Username must be at least 3 characters long, got: " + Arrays.toString(username);
-            assert username.length <= 16 : "Username must be at most 16 characters long, got: " + Arrays.toString(username);
-            for (int i = 0; i < username.length; i++) {
-                assert isValidCharacter(username[i]) : "Found invalid character at position " + i + ": " + username[i] + " in username " + Arrays.toString(username);
-            }
-        }
-
-        static int toIndex(char c) {
-
-            //[a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z,
-            // A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-            // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-            // _]
-
-            if ('a' <= c && c <= 'z') {
-                return c - 'a';
-            } else if ('A' <= c && c <= 'Z') {
-                return c - 'A' + 26;
-            } else if ('0' <= c && c <= '9') {
-                return c - '0' + 26 + 26;
-            } else if ('_' == c) {
-                return 26 + 26 + 10;
-            } else {
-                assert false : "invalid input character: " + c + ", expected: [a-zA-Z_0-9]";
-                return -1;
-            }
-        }
-
-        static int lookupTableSize() {
-            return 26 + 26 + 10 + 1;
         }
     }
 
