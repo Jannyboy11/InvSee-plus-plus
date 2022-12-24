@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 public class UsernameTrieTest {
@@ -109,19 +110,24 @@ public class UsernameTrieTest {
     /*
     @Test
     public void time100k() {
+        Set<String> set = new HashSet<>();
         UsernameTrie<Void> trie = new UsernameTrie<>();
         for (int i = 0; i < 100_000; i += 1) {
-            trie.insert(randomName(), null);
+            char[] randomName = randomName();
+            trie.insert(randomName, null);
+            set.add(new String(randomName));
         }
 
+        AtomicInteger counter = new AtomicInteger(0);
         long begin = System.nanoTime();
-        trie.traverse("", (string, v) -> System.out.println(string));
+        trie.traverse("", (string, v) -> { System.out.println(string); counter.incrementAndGet(); });
         long end = System.nanoTime();
+        assertEquals(set.size(), counter.get());
         System.out.println("Printing took " + ((end - begin) / 1000) + " µs");
         //takes about 0.8 seconds on my laptop! :)
     }
 
-    private final Random random = new Random();
+    private final java.util.Random random = new java.util.Random();
     private final char[] valid_chars = new char[] {
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
         'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -136,6 +142,6 @@ public class UsernameTrieTest {
         }
         return name;
     }
-     */
+    */
 
 }
