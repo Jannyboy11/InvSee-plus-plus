@@ -70,11 +70,11 @@ public class UsernameTrie<V> {
         return value;
     }
 
-    public void traverse(String prefix, BiConsumer<String, V> consumer) {
+    public void traverse(String prefix, BiConsumer<String, ? super V> consumer) {
         traverse(prefix.toCharArray(), (chars, v) -> consumer.accept(new String(chars), v));
     }
 
-    public void traverse(char[] prefix, BiConsumer<char[], V> consumer) {
+    public void traverse(char[] prefix, BiConsumer<char[], ? super V> consumer) {
         Node<V> node = root.lookup(prefix);
         node.traverse(consumer);
         node.cleanUp();
@@ -111,6 +111,8 @@ public class UsernameTrie<V> {
             if (value.isPresent())
                 return false;
             // are all our children empty?
+            if (children == null)
+                return false;
             for (Node<V> child : children)
                 if (child != null && !child.isEmpty())
                     return false;
@@ -236,18 +238,20 @@ public class UsernameTrie<V> {
         }
 
         private char[] fullString() {
-            int length = length();
-            char[] result = new char[length];
+            int last = length();
+            final char[] result = new char[last];
             Node<V> node = this;
             while (node != null) {
-                System.arraycopy(node.segment, 0, result, length - node.segment.length, node.segment.length);
-                length -= node.segment.length;
+                final char[] segment = node.segment;
+                final int segmentLength = segment.length;
+                System.arraycopy(segment, 0, result, last - segmentLength, segmentLength);
+                last -= segmentLength;
                 node = node.parent;
             }
             return result;
         }
 
-        private void traverse(BiConsumer<char[], V> consumer) {
+        private void traverse(BiConsumer<char[], ? super V> consumer) {
             //when we get here - we are guaranteed that 'this' is a node
 
             //only accept nodes whose value are Just(something)
