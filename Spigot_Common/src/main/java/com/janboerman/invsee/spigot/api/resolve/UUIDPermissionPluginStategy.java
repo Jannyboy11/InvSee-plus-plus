@@ -91,7 +91,7 @@ public class UUIDPermissionPluginStategy implements UUIDResolveStrategy {
 
                 String userId = user.getUUID();
                 try {
-                    resultFuture.complete(Optional.ofNullable(UUID.fromString(userId)));
+                    resultFuture.complete(userId == null ? Optional.empty() : Optional.of(UUID.fromString(userId)));
                 } catch (IllegalArgumentException e) {
                     resultFuture.complete(Optional.empty());
                 }

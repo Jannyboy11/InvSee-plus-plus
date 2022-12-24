@@ -8,7 +8,11 @@ public abstract class Maybe<T> {
     private Maybe() {}
 
     public static <T> Maybe<T> just(T value) {
-        return new Just<>(value);
+        if (value == null) {
+            return Just.NULL;
+        } else {
+            return new Just<>(value);
+        }
     }
 
     public static <T> Maybe<T> nothing() {
@@ -19,6 +23,7 @@ public abstract class Maybe<T> {
     public abstract T get() throws NoSuchElementException;
 
     private static class Just<T> extends Maybe<T> {
+        private static final Just NULL = new Just(null);
         private final T value;
         Just(T value) {
             this.value = value; //null is allowed!

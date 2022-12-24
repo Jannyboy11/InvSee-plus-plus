@@ -35,6 +35,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
 		
 		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+		assert playerFiles != null : "playerFiles is not a directory??";
 		for (File playerFile : playerFiles) {
 			try {
 				CompoundTag compound = NbtIo.readCompressed(playerFile);
@@ -65,6 +66,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
 
         File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+		assert playerFiles != null : "playerFiles is not a directory??";
         for (File playerFile : playerFiles) {
             try {
                 CompoundTag compound = NbtIo.readCompressed(playerFile);

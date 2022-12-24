@@ -6,6 +6,8 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.net.UnknownServiceException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -117,4 +119,15 @@ public class FakePersistentDataContainer implements PersistentDataContainer {
             return false;
         }
     }
+
+    @Override
+    public byte @NotNull [] serializeToBytes() throws IOException {
+        throw new UnknownServiceException("Can't serialize fake data");
+    }
+
+    @Override
+    public void readFromBytes(byte @NotNull [] bytes, boolean b) throws IOException {
+        throw new UnknownServiceException("Can't deserialize fake data");
+    }
+
 }

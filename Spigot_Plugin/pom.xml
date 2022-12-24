@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>InvSee</artifactId>
-        <version>0.13.1-SNAPSHOT</version>
+        <version>0.13.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -67,7 +67,7 @@
                     <dependency>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-engine</artifactId>
-                        <version>5.8.2</version>
+                        <version>${junit.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -206,7 +206,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.8.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

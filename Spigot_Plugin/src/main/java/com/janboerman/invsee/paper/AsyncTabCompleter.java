@@ -22,6 +22,14 @@ public class AsyncTabCompleter implements Listener {
     private final Set<String> knownLabels;
     private final InvseeAPI api;
 
+    //TODO use a thread-safe (Radix) Trie in order to tabcomplete names!
+    //TODO populate this tree on startup (async)
+    //TODO when players join, also add their name to the Trie
+    //TODO when tabcompleting names, search the node in the trie with that specific prefix, and collect all children!
+    //TODO might also be able to use this for the synchronous tabcompletion implementation?
+    //TODO do I want a memory limit on the Trie? should not be necessary right, since Tries are extremely memory-efficient.
+    //TODO can take advantage of the minecraft username format: https://help.minecraft.net/hc/en-us/articles/4408950195341-Minecraft-Java-Edition-Username-VS-Gamertag-FAQ#:~:text=Accepted%20characters%3A,character%20accepted%20is%20_%20(underscore)
+
     public AsyncTabCompleter(InvseePlusPlus plugin) {
         this.plugin = plugin;
         this.provider = plugin.getOfflinePlayerProvider();
@@ -51,6 +59,7 @@ public class AsyncTabCompleter implements Listener {
                 } else if (StringHelper.startsWithIgnoreCase(buffer, "/" + label + " ")) {
                     matchedLabel = label;
                     prefixIgnoreCase = true;
+                    break;
                 }
             }
 

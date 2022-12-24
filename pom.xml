@@ -6,7 +6,8 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.13.1-SNAPSHOT</version>
+    <version>0.13.2-SNAPSHOT</version>
+    <!-- TODO make this more hierarchical: InvSee++ (includes impls), InvSee++_Common, InvSee++_Give (includes impls), InvSee++_Clear, Mojang_API, Utils -->
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
@@ -43,6 +44,7 @@
     <description>A plugin to view and manipulate player's inventories.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>5.8.2</junit.version>
     </properties>
     <url>https://github.com/Jannyboy11/InvSee-plus-plus</url>
 
