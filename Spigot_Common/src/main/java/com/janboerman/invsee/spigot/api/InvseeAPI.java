@@ -32,6 +32,7 @@ public abstract class InvseeAPI {
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
 
+    //TODO actually use these, also create setters!
     private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
     private Mirror<EnderChestSlot> enderChestSlotMirror = Mirror.defaultEnderChest();
 
