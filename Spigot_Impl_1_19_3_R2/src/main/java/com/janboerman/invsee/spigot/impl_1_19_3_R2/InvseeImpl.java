@@ -4,19 +4,28 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
-import net.minecraft.world.entity.player.ProfilePublicKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
@@ -40,8 +49,29 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
-        MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), title);
+    public void openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, String title, Mirror<PlayerInventorySlot> mirror) {
+        CraftPlayer bukkitPlayer = (CraftPlayer) spectator;
+        ServerPlayer nmsPlayer = bukkitPlayer.getHandle();
+        MainBukkitInventory bukkitInventory = (MainBukkitInventory) inv;
+        MainNmsInventory nmsInventory = bukkitInventory.getInventory();
+
+        //this is what the nms does: nmsPlayer.openMenu(nmsWindow);
+        //so let's emulate that!
+        int windowId = nmsPlayer.nextContainerCounter();
+        Inventory bottom = nmsPlayer.getInventory();
+        MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, mirror);
+        nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
+        boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
+        if (!eventCancelled) {
+            nmsPlayer.containerMenu = nmsWindow;
+            nmsPlayer.connection.send(new ClientboundOpenScreenPacket(windowId, nmsWindow.getType(), nmsWindow.getTitle()));
+            nmsPlayer.initMenu(nmsWindow);
+        }
+    }
+
+    @Override
+    public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
+        MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), title, mirror);
         MainBukkitInventory bukkitInventory = new MainBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
         InventoryView targetView = player.getOpenInventory();
@@ -66,12 +96,33 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
+    public void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, String title, Mirror<EnderChestSlot> mirror) {
+        CraftPlayer bukkitPlayer = (CraftPlayer) spectator;
+        ServerPlayer nmsPlayer = bukkitPlayer.getHandle();
+        EnderBukkitInventory bukkitInventory = (EnderBukkitInventory) inv;
+        EnderNmsInventory nmsInventory = bukkitInventory.getInventory();
+
+        //this is what the nms does: nmsPlayer.openMenu(nmsWindow);
+        //so let's emulate that!
+        int windowId = nmsPlayer.nextContainerCounter();
+        Inventory bottom = nmsPlayer.getInventory();
+        EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, mirror);
+        nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
+        boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
+        if (!eventCancelled) {
+            nmsPlayer.containerMenu = nmsWindow;
+            nmsPlayer.connection.send(new ClientboundOpenScreenPacket(windowId, nmsWindow.getType(), nmsWindow.getTitle()));
+            nmsPlayer.initMenu(nmsWindow);
+        }
+    }
+
+    @Override
+    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
         UUID uuid = player.getUniqueId();
         String name = player.getName();
         CraftInventory craftInventory = (CraftInventory) player.getEnderChest();
         PlayerEnderChestContainer nmsInventory = (PlayerEnderChestContainer) craftInventory.getInventory();
-        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, title);
+        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, title, mirror);
         EnderBukkitInventory bukkitInventory = new EnderBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
         return bukkitInventory;

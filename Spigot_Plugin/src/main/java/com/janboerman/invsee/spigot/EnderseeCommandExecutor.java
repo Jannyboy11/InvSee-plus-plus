@@ -9,6 +9,7 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
 import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
 import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.ProfileId;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
@@ -90,43 +91,16 @@ class EnderseeCommandExecutor implements CommandExecutor {
 
         //TODO Multiverse-Inventories
 
-        if (future == null) {
+        if (future == null) {   //TODO get rid of this, actually extend pwi api to also accept mirrors.
             //No PWI argument - just continue with the regular method
             if (isUuid) {
                 final UUID finalUuid = uuid;
-                future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.enderSpectatorInventory(finalUuid, userName, title, plugin.offlinePlayerSupport()));
+                api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                        .thenAccept(userName -> api.spectateEnderChest(player, finalUuid, userName, title, plugin.offlinePlayerSupport(), Mirror.forEnderChest(plugin.getEnderChestTemplate())));
             } else {
-                future = api.enderSpectatorInventory(playerNameOrUUID, title, plugin.offlinePlayerSupport());
+                api.spectateEnderChest(player, playerNameOrUUID, title, plugin.offlinePlayerSupport(), Mirror.forEnderChest(plugin.getEnderChestTemplate()));
             }
         }
-
-        assert future != null : "forgot to instantiate the future!";
-
-        future.whenComplete((response, throwable) -> {
-            if (throwable == null) {
-                if (response.isSuccess()) {
-                    player.openInventory(response.getInventory());
-                } else {
-                    NotCreatedReason reason = response.getReason();
-                    if (reason instanceof TargetDoesNotExist) {
-                        var targetDoesNotExist = (TargetDoesNotExist) reason;
-                        player.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
-                    } else if (reason instanceof TargetHasExemptPermission) {
-                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
-                        player.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
-                    } else if (reason instanceof ImplementationFault) {
-                        var implementationFault = (ImplementationFault) reason;
-                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
-                    } else if (reason instanceof OfflineSupportDisabled) {
-                        player.sendMessage(ChatColor.RED + "Spectating offline players' enderchests is disabled.");
-                    }
-                }
-            } else {
-                player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s enderchest.");
-                plugin.getLogger().log(Level.SEVERE, "Error while trying to create ender-chest spectator inventory", throwable);
-            }
-        });
 
         return true;
     }

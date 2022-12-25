@@ -28,6 +28,7 @@ public class MappingsVersion {
      * @param server the Server instance
      * @return the mappings version (may be used for equality checking only), or null if running on CraftBukkit 1.13.2 or earlier.
      */
+    @SuppressWarnings("deprecation")
     public static String getMappingsVersion(Server server) {
         UnsafeValues craftMagicNumbers = server.getUnsafe();
         try {

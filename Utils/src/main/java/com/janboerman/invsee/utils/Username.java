@@ -51,9 +51,9 @@ public class Username {
         } else if ('0' <= c && c <= '9') {
             return 1 + c - '0';
         } else if ('a' <= c && c <= 'z') {
-            return 11 + (c - 'a') * 2;
+            return 1 + 10 + (c - 'a') * 2;
         } else if ('A' <= c && c <= 'Z') {
-            return 11 + (c - 'A') * 2 + 1;
+            return 1 + 10 + (c - 'A') * 2 + 1;
         } else {
             assert false : "invalid input character: " + c + ", expected: [a-zA-Z_0-9]";
             return -1;

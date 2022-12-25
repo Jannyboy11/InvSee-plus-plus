@@ -8,6 +8,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
 import com.janboerman.invsee.spigot.multiverseinventories.MviCommandArgs;
  */
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.Either;
@@ -117,45 +118,18 @@ class InvseeCommandExecutor implements CommandExecutor {
         }
          */
 
-        if (future == null) {
+        if (future == null) { //TODO get rid of this. actually extend pwi api to also accept mirrors.
             //No PWI argument - just continue with the regular method
             if (isUuid) {
                 //playerNameOrUUID is a UUID.
                 final UUID finalUuid = uuid;
-                future = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenCompose(userName -> api.mainSpectatorInventory(finalUuid, userName, title, plugin.offlinePlayerSupport()));
+
+                api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                        .thenAccept(userName -> api.spectateInventory(player, finalUuid, userName, title, plugin.offlinePlayerSupport(), Mirror.forInventory(plugin.getInventoryTemplate())));
             } else {
-                //playerNameOrUUID is a username.
-                future = api.mainSpectatorInventory(playerNameOrUUID, title, plugin.offlinePlayerSupport());
+                api.spectateInventory(player, playerNameOrUUID, title, plugin.offlinePlayerSupport(), Mirror.forInventory(plugin.getInventoryTemplate()));
             }
         }
-
-        assert future != null : "forgot to instantiate the future!";
-
-        future.whenComplete((response, throwable) -> {
-            if (throwable == null) {
-                if (response.isSuccess()) {
-                    player.openInventory(response.getInventory());
-                } else {
-                    NotCreatedReason reason = response.getReason();
-                    if (reason instanceof TargetDoesNotExist) {
-                        var targetDoesNotExist = (TargetDoesNotExist) reason;
-                        player.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
-                    } else if (reason instanceof TargetHasExemptPermission) {
-                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
-                        player.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
-                    } else if (reason instanceof ImplementationFault) {
-                        var implementationFault = (ImplementationFault) reason;
-                        player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s inventory.");
-                    } else if (reason instanceof OfflineSupportDisabled) {
-                        player.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
-                    }
-                }
-            } else {
-                player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s inventory.");
-                plugin.getLogger().log(Level.SEVERE, "Error while trying to create main-inventory spectator inventory", throwable);
-            }
-        });
 
         return true;
     }

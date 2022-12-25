@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_19_3_R2;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -27,25 +29,31 @@ class EnderNmsInventory implements Container, MenuProvider {
 
 	protected org.bukkit.inventory.Inventory bukkit;
 	protected String title;
+	protected Mirror<EnderChestSlot> mirror = Mirror.defaultEnderChest();
 	
 	private int maxStack = Container.MAX_STACK;
 	private final List<HumanEntity> transaction = new ArrayList<>();
 	protected InventoryHolder owner;
-	
-	public EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents) {
+
+	protected EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents) {
 		this.targetPlayerUuid = targetPlayerUuid;
 		this.targetPlayerName = targetPlayerName;
 		this.storageContents = storageContents;
 	}
-	
-	public EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title) {
+
+	protected EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title) {
 		this(targetPlayerUuid, targetPlayerName, storageContents);
 		this.title = title;
 	}
 
+	protected EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
+		this(targetPlayerUuid, targetPlayerName, storageContents, title);
+		this.mirror = mirror;
+	}
+
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-		return new EnderNmsContainer(containerId, this, playerInventory, player);
+		return new EnderNmsContainer(containerId, this, playerInventory, player, mirror);
 	}
 
 	@Override

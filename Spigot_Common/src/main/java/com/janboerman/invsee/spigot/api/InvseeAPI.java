@@ -6,9 +6,16 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.logging.Level;
 
+import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.OfflineSupportDisabled;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
+import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
+import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
 import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.utils.*;
 import org.bukkit.*;
@@ -24,6 +31,9 @@ public abstract class InvseeAPI {
     protected final Plugin plugin;
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
+
+    private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
+    private Mirror<EnderChestSlot> enderChestSlotMirror = Mirror.defaultEnderChest();
 
     private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<String, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
@@ -148,11 +158,27 @@ public abstract class InvseeAPI {
         return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
     }
 
-    public abstract MainSpectatorInventory spectateInventory(HumanEntity player, String title);
+
+    //TODO for future compat: create a class CreationOptions (which includes Title and Mirror)?
+
+    public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
+        return spectateInventory(player, title);
+    }
+    @Deprecated
+    public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
+        return spectateInventory(player, title, Mirror.defaultPlayerInventory());
+    }
     public abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title);
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
-    public abstract EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title);
+    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
+        return spectateEnderChest(player, title);
+    }
+
+    @Deprecated
+    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
+        return spectateEnderChest(player, title, Mirror.defaultEnderChest());
+    }
     public abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
@@ -165,6 +191,10 @@ public abstract class InvseeAPI {
         } else {
             return SpectateResponse.succeed(spectateInventory(player, title));
         }
+    }
+
+    public final CompletableFuture<Void> spectateInventory(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
+        return spectateInventory(spectator, mainSpectatorInventory(targetName, title, offlineSupport), title, mirror, targetName);
     }
 
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
@@ -237,8 +267,9 @@ public abstract class InvseeAPI {
         return future;
     }
 
-
-
+    public final CompletableFuture<Void> spectateInventory(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
+        return spectateInventory(spectator, mainSpectatorInventory(targetId, targetName, title, offlineSupport), title, mirror, targetId.toString());
+    }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
         return mainSpectatorInventory(playerId, playerName, title, true);
@@ -329,6 +360,10 @@ public abstract class InvseeAPI {
         }
     }
 
+    public final CompletableFuture<Void> spectateEnderChest(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
+        return spectateEnderChest(spectator, enderSpectatorInventory(targetName, title, offlineSupport), title, mirror, targetName);
+    }
+
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
         return enderSpectatorInventory(targetName, title, true);
     }
@@ -397,6 +432,10 @@ public abstract class InvseeAPI {
         pendingEnderChestsByName.put(targetName, future);
         future.whenComplete((result, error) -> pendingEnderChestsByName.remove(targetName));
         return future;
+    }
+
+    public final CompletableFuture<Void> spectateEnderChest(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
+        return spectateEnderChest(spectator, enderSpectatorInventory(targetId, targetName, title, offlineSupport), title, mirror, targetId.toString());
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
@@ -477,6 +516,71 @@ public abstract class InvseeAPI {
         return future;
     }
 
+    // ================================== Open Main/Ender Inventory ==================================
+
+    private final CompletableFuture<Void> spectateInventory(Player spectator, CompletableFuture<SpectateResponse<MainSpectatorInventory>> future, String title, Mirror<PlayerInventorySlot> mirror, String targetNameOrUUID) {
+        return future.whenComplete((response, throwable) -> {
+            if (throwable == null) {
+                if (response.isSuccess()) {
+                    openMainSpectatorInventory(spectator, response.getInventory(), title, mirror);
+                } else {
+                    NotCreatedReason reason = response.getReason();
+                    if (reason instanceof TargetDoesNotExist) {
+                        var targetDoesNotExist = (TargetDoesNotExist) reason;
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
+                    } else if (reason instanceof TargetHasExemptPermission) {
+                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
+                    } else if (reason instanceof ImplementationFault) {
+                        var implementationFault = (ImplementationFault) reason;
+                        spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s inventory.");
+                    } else if (reason instanceof OfflineSupportDisabled) {
+                        spectator.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
+                    }
+                }
+            } else {
+                spectator.sendMessage(ChatColor.RED + "An error occurred while trying to open " + targetNameOrUUID + "'s inventory.");
+                plugin.getLogger().log(Level.SEVERE, "Error while trying to create main-inventory spectator inventory", throwable);
+            }
+        }).thenApply(__ -> null);
+    }
+
+    //by default: ignore mirror, implementations can override!
+    public void openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, String title, Mirror<PlayerInventorySlot> mirror) {
+        spectator.openInventory(spectatorInventory);
+    }
+
+    private final CompletableFuture<Void> spectateEnderChest(Player spectator, CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future, String title, Mirror<EnderChestSlot> mirror, String targetNameOrUUID) {
+        return future.whenComplete((response, throwable) -> {
+            if (throwable == null) {
+                if (response.isSuccess()) {
+                    openEnderSpectatorInventory(spectator, response.getInventory(), title, mirror);
+                } else {
+                    NotCreatedReason reason = response.getReason();
+                    if (reason instanceof TargetDoesNotExist) {
+                        var targetDoesNotExist = (TargetDoesNotExist) reason;
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
+                    } else if (reason instanceof TargetHasExemptPermission) {
+                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
+                    } else if (reason instanceof ImplementationFault) {
+                        var implementationFault = (ImplementationFault) reason;
+                        spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
+                    } else if (reason instanceof OfflineSupportDisabled) {
+                        spectator.sendMessage(ChatColor.RED + "Spectating offline players' enderchests is disabled.");
+                    }
+                }
+            } else {
+                spectator.sendMessage(ChatColor.RED + "An error occurred while trying to open " + targetNameOrUUID + "'s enderchest.");
+                plugin.getLogger().log(Level.SEVERE, "Error while trying to create ender-chest spectator inventory", throwable);
+            }
+        }).thenApply(__ -> null);
+    }
+
+    //by default: ignore mirror, implementation can override!
+    public void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, String title, Mirror<EnderChestSlot> mirror) {
+        spectator.openInventory(spectatorInventory);
+    }
 
     // ================================== Event Stuff ==================================
 

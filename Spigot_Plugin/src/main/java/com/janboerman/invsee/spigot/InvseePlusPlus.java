@@ -128,4 +128,24 @@ public class InvseePlusPlus extends JavaPlugin {
             .replace("<player>", target.toString());
     }
 
+    public String getInventoryTemplate() {
+        return getConfig().getString("templates.inventory",
+            "i_00 i_01 i_02 i_03 i_04 i_05 i_06 i_07 i_08\n" +
+            "i_09 i_10 i_11 i_12 i_13 i_14 i_15 i_16 i_17\n" +
+            "i_18 i_19 i_20 i_21 i_22 i_23 i_24 i_25 i_26\n" +
+            "i_27 i_28 i_29 i_30 i_31 i_32 i_33 i_34 i_35\n" +
+            "a_b  a_l  a_c  a_h  oh   c    _    _    _   \n" +
+            "p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08");
+    }
+
+    public String getEnderChestTemplate() {
+        return getConfig().getString("templates.enderchest",
+            "e_00 e_01 e_02 e_03 e_04 e_05 e_06 e_07 e_08\n" +
+            "e_09 e_10 e_11 e_12 e_13 e_14 e_15 e_16 e_17\n" +
+            "e_18 e_19 e_20 e_21 e_22 e_23 e_24 e_25 e_26\n" +
+            "e_27 e_28 e_29 e_30 e_31 e_32 e_33 e_34 e_35\n" +
+            "e_36 e_37 e_38 e_39 e_40 e_41 e_42 e_43 e_44\n" +
+            "e_45 e_46 e_47 e_48 e_49 e_50 e_51 e_52 e_53");
+    }
+    
 }

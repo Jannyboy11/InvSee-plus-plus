@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_19_3_R2;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
@@ -35,6 +37,7 @@ class MainNmsInventory implements Container, MenuProvider {
 	
 	protected org.bukkit.inventory.Inventory bukkit;
 	protected String title;
+	protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
 	
 	private int maxStack = Container.MAX_STACK;
 	private final List<HumanEntity> transaction = new ArrayList<>();
@@ -65,6 +68,12 @@ class MainNmsInventory implements Container, MenuProvider {
 		this(target);
 		
 		this.title = title;
+	}
+
+	protected MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
+		this(target, title);
+
+		this.mirror = mirror;
 	}
 	
 	private Ref<ItemStack> decideWhichItem(int slot) {
@@ -114,7 +123,7 @@ class MainNmsInventory implements Container, MenuProvider {
 
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player viewer) {
-		return new MainNmsContainer(containerId, this, playerInventory, viewer);
+		return new MainNmsContainer(containerId, this, playerInventory, viewer, mirror);
 	}
 
 	@Override
