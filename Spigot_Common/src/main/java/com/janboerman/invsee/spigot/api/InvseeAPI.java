@@ -34,7 +34,7 @@ public abstract class InvseeAPI {
 
     //TODO actually use these, also create setters!
     private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
-    private Mirror<EnderChestSlot> enderChestSlotMirror = Mirror.defaultEnderChest();
+    private Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
 
     private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
     private final Map<String, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
@@ -160,27 +160,45 @@ public abstract class InvseeAPI {
     }
 
 
-    //TODO for future compat: create a class CreationOptions (which includes Title and Mirror)?
+    // ================================== implementation methods ==================================
 
+    //TODO for future compat: create a class CreationOptions (which includes Title and Mirror)?
+    //TODO this could be a replacement for multiple parameters now.
+
+    //TODO override this in more implementations
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(player, title);
     }
     @Deprecated
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
-        return spectateInventory(player, title, Mirror.defaultPlayerInventory());
+        return spectateInventory(player, title, inventoryMirror);
     }
-    public abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title);
+    //TODO override this in implementations
+    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
+        return createOfflineInventory(playerId, playerName, title);
+    }
+    @Deprecated
+    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
+        return createOfflineInventory(playerId, playerName, title, inventoryMirror);
+    }
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
+    //TODO override this is more implementations
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(player, title);
     }
-
     @Deprecated
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
-        return spectateEnderChest(player, title, Mirror.defaultEnderChest());
+        return spectateEnderChest(player, title, enderchestMirror);
     }
-    public abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title);
+    //TODO override this in implementations
+    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
+        return createOfflineEnderChest(playerId, playerName, title);
+    }
+    @Deprecated
+    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
+        return createOfflineEnderChest(playerId, playerName, title, enderchestMirror);
+    }
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
     // ================================== API methods: Main Inventory ==================================
@@ -203,7 +221,12 @@ public abstract class InvseeAPI {
     }
 
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport) {
+        return mainSpectatorInventory(targetName, title, offlineSupport, inventoryMirror);
+    }
+
+    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
+        Objects.requireNonNull(mirror, "mirror cannot be null!");
 
         //try online
         final Player targetPlayer = plugin.getServer().getPlayerExact(targetName);
@@ -213,7 +236,7 @@ public abstract class InvseeAPI {
             if (exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title);
+            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title, mirror);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
             openInventories.put(uuid, new WeakReference<>(spectatorInventory));
@@ -254,7 +277,7 @@ public abstract class InvseeAPI {
         final CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = combinedFuture.thenCompose(eitherReasonOrUuid -> {
             if (eitherReasonOrUuid.isRight()) {
                 UUID uuid = eitherReasonOrUuid.getRight();
-                return mainSpectatorInventory(uuid, targetName, title);
+                return mainSpectatorInventory(uuid, targetName, title, offlineSupport, mirror);
             } else {
                 NotCreatedReason reason = eitherReasonOrUuid.getLeft();
                 return CompletableFuture.completedFuture(SpectateResponse.fail(reason));
@@ -277,8 +300,13 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
+        return mainSpectatorInventory(playerId, playerName, title, offlineSupport, inventoryMirror);
+    }
+
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
+        Objects.requireNonNull(mirror, "mirror cannot be null!");
 
         //try cache
         WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
@@ -297,7 +325,7 @@ public abstract class InvseeAPI {
             if (exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title);
+            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title, mirror);
             lookup.cacheNameAndUniqueId(playerId, playerName);
             openInventories.put(playerId, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
@@ -321,7 +349,7 @@ public abstract class InvseeAPI {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(Either.left(maybeReason.get()));
             } else {
-                return createOfflineInventory(playerId, playerName, title).thenApply(maybeInventory -> {
+                return createOfflineInventory(playerId, playerName, title, mirror).thenApply(maybeInventory -> {
                     if (maybeInventory.isPresent()) {
                         return Either.right(maybeInventory.get());
                     } else {
@@ -370,7 +398,12 @@ public abstract class InvseeAPI {
     }
 
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport) {
+        return enderSpectatorInventory(targetName, title, offlineSupport, enderchestMirror);
+    }
+
+    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
+        Objects.requireNonNull(mirror, "mirror cannot be null!");
 
         //try online
         Player targetPlayer = plugin.getServer().getPlayerExact(targetName);
@@ -380,7 +413,7 @@ public abstract class InvseeAPI {
             if (exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title);
+            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title, mirror);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
             openEnderChests.put(uuid, new WeakReference<>(spectatorInventory));
@@ -421,7 +454,7 @@ public abstract class InvseeAPI {
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = combinedFuture.thenCompose(eitherReasonOrUuid -> {
             if (eitherReasonOrUuid.isRight()) {
                 UUID uuid = eitherReasonOrUuid.getRight();
-                return enderSpectatorInventory(uuid, targetName, title);
+                return enderSpectatorInventory(uuid, targetName, title, offlineSupport, mirror);
             } else {
                 NotCreatedReason reason = eitherReasonOrUuid.getLeft();
                 return CompletableFuture.completedFuture(SpectateResponse.fail(reason));
@@ -444,8 +477,13 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
+        return enderSpectatorInventory(playerId, playerName, title, offlineSupport, enderchestMirror);
+    }
+
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
+        Objects.requireNonNull(mirror, "mirror cannot be null!");
 
         //try cache
         WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(playerId);
@@ -464,7 +502,7 @@ public abstract class InvseeAPI {
             if (exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title);
+            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, title, mirror);
             lookup.cacheNameAndUniqueId(playerId, playerName);
             openEnderChests.put(playerId, new WeakReference<>(spectatorInventory));
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
@@ -488,7 +526,7 @@ public abstract class InvseeAPI {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(Either.left(maybeReason.get()));
             } else {
-                return createOfflineEnderChest(playerId, playerName, title).thenApply(maybeInventory -> {
+                return createOfflineEnderChest(playerId, playerName, title, mirror).thenApply(maybeInventory -> {
                     if (maybeInventory.isPresent()) {
                         return Either.right(maybeInventory.get());
                     } else {
