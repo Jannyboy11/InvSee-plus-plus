@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.*;
 import org.bukkit.entity.HumanEntity;
@@ -189,6 +191,11 @@ class MainBukkitInventory extends CraftInventory implements MainSpectatorInvento
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public Mirror<PlayerInventorySlot> getMirror() {
+        return getInventory().mirror;
     }
 
     // org.bukkit.inventory.Inventory overrides

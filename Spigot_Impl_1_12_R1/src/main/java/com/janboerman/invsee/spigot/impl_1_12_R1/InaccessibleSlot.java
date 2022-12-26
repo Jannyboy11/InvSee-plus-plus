@@ -1,12 +1,13 @@
-package com.janboerman.invsee.spigot.impl_1_16_R3;
+package com.janboerman.invsee.spigot.impl_1_12_R1;
 
-import net.minecraft.server.v1_16_R3.EntityHuman;
-import net.minecraft.server.v1_16_R3.IInventory;
-import net.minecraft.server.v1_16_R3.ItemStack;
-import net.minecraft.server.v1_16_R3.Slot;
+import net.minecraft.server.v1_12_R1.EntityHuman;
+import net.minecraft.server.v1_12_R1.IInventory;
+import net.minecraft.server.v1_12_R1.ItemStack;
+import net.minecraft.server.v1_12_R1.Slot;
 
-public class InAccessibleSlot extends Slot {
-    public InAccessibleSlot(IInventory inventory, int index, int xPos, int yPos) {
+public class InaccessibleSlot extends Slot {
+
+    public InaccessibleSlot(IInventory inventory, int index, int xPos, int yPos) {
         super(inventory, index, xPos, yPos);
     }
 
@@ -27,7 +28,7 @@ public class InAccessibleSlot extends Slot {
 
     @Override
     public void set(ItemStack var0) {
-        this.d(); //updateInventory
+        this.f(); //updateInventory
     }
 
     @Override
@@ -46,5 +47,4 @@ public class InAccessibleSlot extends Slot {
     public boolean isAllowed(EntityHuman player) {
         return false;
     }
-
 }

@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftHumanEntity;
@@ -20,20 +22,26 @@ class EnderNmsInventory implements IInventory, ITileEntityContainer {
 
     protected Inventory bukkit;
     protected String title;
+    protected Mirror<EnderChestSlot> mirror = Mirror.defaultEnderChest();
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
     protected InventoryHolder owner;
 
-    public EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents) {
+    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents) {
         this.spectatedPlayerUuid = spectatedPlayerUuid;
         this.spectatedPlayerName = spectatedPlayerName;
         this.storageContents = storageContents;
     }
 
-    public EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title) {
+    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title) {
         this(spectatedPlayerUuid, spectatedPlayerName, storageContents);
         this.title = title;
+    }
+
+    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
+        this(spectatedPlayerUuid, spectatedPlayerName, storageContents, title);
+        this.mirror = mirror;
     }
 
     @Override
@@ -195,11 +203,12 @@ class EnderNmsInventory implements IInventory, ITileEntityContainer {
     @Override
     public Container createContainer(PlayerInventory playerInventory, EntityHuman entityHuman) {
         EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
-        return new EnderNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, playerInventory.player);
+        return new EnderNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, playerInventory.player, mirror);
     }
 
     @Override
     public String getContainerName() {
         return "minecraft:container";
     }
+
 }

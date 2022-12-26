@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
@@ -13,7 +15,6 @@ import org.bukkit.inventory.InventoryHolder;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
-import static com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl.EMPTY_STACK;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -23,7 +24,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-
 
 class MainNmsInventory implements Container, MenuProvider {
 
@@ -39,6 +39,7 @@ class MainNmsInventory implements Container, MenuProvider {
 
     protected org.bukkit.inventory.Inventory bukkit;
     protected String title;
+    protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
 
     private int maxStack = Container.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -69,6 +70,12 @@ class MainNmsInventory implements Container, MenuProvider {
         this(target);
 
         this.title = title;
+    }
+
+    protected MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
+        this(target, title);
+
+        this.mirror = mirror;
     }
 
     private Ref<ItemStack> decideWhichItem(int slot) {
@@ -109,7 +116,7 @@ class MainNmsInventory implements Container, MenuProvider {
         storageContents.clear();
         armourContents.clear();
         offHand.clear();
-        onCursor.set(EMPTY_STACK);
+        onCursor.set(ItemStack.EMPTY);
         personalContents.clear();
         if (craftingContents != personalContents) {
             craftingContents.clear();
@@ -118,7 +125,7 @@ class MainNmsInventory implements Container, MenuProvider {
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player viewer) {
-        return new MainNmsContainer(containerId, this, playerInventory, viewer);
+        return new MainNmsContainer(containerId, this, playerInventory, viewer, mirror);
     }
 
     @Override
@@ -135,7 +142,7 @@ class MainNmsInventory implements Container, MenuProvider {
     @Override
     public List<ItemStack> getContents() {
         List<ItemStack> paddingOne = NonNullList.withSize(45 - storageContents.size() - armourContents.size() - offHand.size() - 1, ItemStack.EMPTY);
-        List<ItemStack> paddingTwo = NonNullList.withSize(9 - personalContents.size(), EMPTY_STACK);
+        List<ItemStack> paddingTwo = NonNullList.withSize(9 - personalContents.size(), ItemStack.EMPTY);
 
         return new ConcatList<>(storageContents,
                 new ConcatList<>(armourContents,
@@ -149,7 +156,7 @@ class MainNmsInventory implements Container, MenuProvider {
     @Override
     public ItemStack getItem(int slot) {
         var ref = decideWhichItem(slot);
-        if (ref == null) return EMPTY_STACK;
+        if (ref == null) return ItemStack.EMPTY;
 
         return ref.get();
     }
@@ -206,7 +213,7 @@ class MainNmsInventory implements Container, MenuProvider {
     @Override
     public ItemStack removeItem(int slot, int amount) {
         var ref = decideWhichItem(slot);
-        if (ref == null) return EMPTY_STACK;
+        if (ref == null) return ItemStack.EMPTY;
 
         ItemStack stack = ref.get();
         if (!stack.isEmpty() && amount > 0) {
@@ -216,20 +223,20 @@ class MainNmsInventory implements Container, MenuProvider {
             }
             return oldStackCopy;
         } else {
-            return EMPTY_STACK;
+            return ItemStack.EMPTY;
         }
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
         var ref = decideWhichItem(slot);
-        if (ref == null) return EMPTY_STACK;
+        if (ref == null) return ItemStack.EMPTY;
 
         ItemStack stack = ref.get();
         if (stack.isEmpty()) {
-            return EMPTY_STACK;
+            return ItemStack.EMPTY;
         } else {
-            ref.set(EMPTY_STACK);
+            ref.set(ItemStack.EMPTY);
             return stack;
         }
     }
@@ -263,4 +270,3 @@ class MainNmsInventory implements Container, MenuProvider {
     }
 
 }
-

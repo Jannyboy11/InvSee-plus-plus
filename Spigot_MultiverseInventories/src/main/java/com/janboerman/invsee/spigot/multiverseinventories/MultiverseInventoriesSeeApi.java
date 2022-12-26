@@ -14,7 +14,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 
@@ -98,14 +102,21 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
     }
 
     @Override
-    public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
-        return wrapped.spectateInventory(player, title);
+    public void openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, String title, Mirror<PlayerInventorySlot> mirror) {
+        //TODO
+        wrapped.openMainSpectatorInventory(spectator, spectatorInventory, title, mirror);
     }
 
     @Override
-    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
+    public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
+        //TODO
+        return wrapped.spectateInventory(player, title, mirror);
+    }
+
+    @Override
+    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
         //TODO decide whether to load from vanilla save file, or MVI save file
-        return wrapped.createOfflineInventory(playerId, playerName, title);
+        return wrapped.createOfflineInventory(playerId, playerName, title, mirror);
     }
 
     @Override
@@ -115,14 +126,21 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
     }
 
     @Override
-    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
-        return wrapped.spectateEnderChest(player, title);
+    public void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, String title, Mirror<EnderChestSlot> mirror) {
+        //TODO
+        wrapped.openEnderSpectatorInventory(spectator, spectatorInventory, title, mirror);
     }
 
     @Override
-    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
+    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
+        //TODO
+        return wrapped.spectateEnderChest(player, title, mirror);
+    }
+
+    @Override
+    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
         //TODO decide whether to load from vanilla save file, or MVI save file
-        return wrapped.createOfflineEnderChest(playerId, playerName, title);
+        return wrapped.createOfflineEnderChest(playerId, playerName, title, mirror);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_15_R1;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
@@ -35,6 +37,7 @@ public class MainNmsInventory extends TileEntityContainer {
 
     protected Inventory bukkit;
     protected String title;
+    protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -82,6 +85,12 @@ public class MainNmsInventory extends TileEntityContainer {
 
         this.title = title;
         this.setCustomName(CraftChatMessage.fromStringOrNull(title));
+    }
+
+    protected MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
+        this(target, title);
+
+        this.mirror = mirror;
     }
 
     private Ref<ItemStack> decideWhichItem(int slot) {
@@ -284,7 +293,7 @@ public class MainNmsInventory extends TileEntityContainer {
 
     @Override
     protected Container createContainer(int containerId, PlayerInventory playerInventory) {
-        return new MainNmsContainer(containerId, this, playerInventory, playerInventory.player);
+        return new MainNmsContainer(containerId, this, playerInventory, playerInventory.player, mirror);
     }
 
     @Override

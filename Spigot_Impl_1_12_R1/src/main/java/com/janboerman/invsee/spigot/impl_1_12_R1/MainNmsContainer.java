@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import net.minecraft.server.v1_12_R1.Container;
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.ItemStack;
@@ -8,7 +10,7 @@ import net.minecraft.server.v1_12_R1.Slot;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryView;
 import org.bukkit.inventory.InventoryView;
 
-public class MainNmsContainer extends Container {
+class MainNmsContainer extends Container {
 
     private final EntityHuman player;
     private final MainNmsInventory top;
@@ -17,7 +19,32 @@ public class MainNmsContainer extends Container {
 
     private InventoryView bukkitView;
 
-    public MainNmsContainer(int containerId, MainNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player) {
+    private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
+        final PlayerInventorySlot place = mirror.getSlot(positionIndex);
+
+        if (place == null) {
+            return new InaccessibleSlot(top, positionIndex, magicX, magicY);
+        } else if (place.isContainer()) {
+            final int referringTo = place.ordinal() - PlayerInventorySlot.CONTAINER_00.ordinal();
+            return new Slot(top, referringTo, magicX, magicY); //magicX and magicY correct here? it seems to work though.
+        } else if (place.isArmour()) {
+            final int referringTo = place.ordinal() - PlayerInventorySlot.ARMOUR_BOOTS.ordinal() + 36;
+            return new Slot(top, referringTo, magicX, magicY); //idem?
+        } else if (place.isPersonal()) {
+            final int referringTo = place.ordinal() - PlayerInventorySlot.PERSONAL_00.ordinal() + 45;
+            return new PersonalSlot(top, referringTo, magicX, magicY); //idem?
+        } else if (place.isOffHand()) {
+            final int referringTo = 40;
+            return new Slot(top, referringTo, magicX, magicY); //idem?
+        } else if (place.isCursor() && !spectatingOwnInventory) {
+            final int referringTo = 41;
+            return new Slot(top, referringTo, magicX, magicY); //idem?
+        } else {
+            return new InaccessibleSlot(top, positionIndex, magicX, magicY); //idem?
+        }
+    }
+
+    MainNmsContainer(int containerId, MainNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player, Mirror<PlayerInventorySlot> mirror) {
         this.windowId = containerId;
 
         this.top = nmsInventory;
@@ -27,24 +54,13 @@ public class MainNmsContainer extends Container {
 
         nmsInventory.startOpen(player);
 
-        int firstFiveRows = top.storageContents.size()
-                + top.armourContents.size()
-                + top.offHand.size()
-                + (spectatingOwnInventory ? 0 : 1); //only include cursor when not spectating yourself
-
         //top inventory slots
         for (int yPos = 0; yPos < 6; yPos++) {
             for (int xPos = 0; xPos < 9; xPos++) {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;
                 int magicY = 18 + yPos * 18;
-                if (index < firstFiveRows) {
-                    a(new Slot(top, index, magicX, magicY));
-                } else if (45 <= index && index < 54) {
-                    a(new PersonalSlot(top, index, magicX, magicY));
-                } else {
-                    a(new InAccessibleSlot(top, index, magicX, magicY));
-                }
+                a(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY));
             }
         }
 

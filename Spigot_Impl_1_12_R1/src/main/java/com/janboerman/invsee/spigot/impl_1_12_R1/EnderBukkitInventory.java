@@ -1,6 +1,8 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory;
 
 import java.util.UUID;
@@ -27,8 +29,10 @@ public class EnderBukkitInventory extends CraftInventory implements EnderSpectat
     }
 
     @Override
-    public String getTitle() {
-        return getInventory().title;
+    public Mirror<EnderChestSlot> getMirror() {
+        return getInventory().mirror;
     }
+
+    // getTitle() already correctly implemented by CraftInventory!
 
 }

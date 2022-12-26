@@ -32,7 +32,6 @@ public abstract class InvseeAPI {
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
 
-    //TODO actually use these, also create setters!
     private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
     private Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
 
@@ -115,11 +114,23 @@ public abstract class InvseeAPI {
         this.enderSpectatorInvTitleProvider = titleFactory;
     }
 
+    public final void setMainInventoryMirror(Mirror<PlayerInventorySlot> mirror) {
+        Objects.requireNonNull(mirror);
+        this.inventoryMirror = mirror;
+    }
+
+    public final void setEnderInventoryMirror(Mirror<EnderChestSlot> mirror) {
+        Objects.requireNonNull(mirror);
+        this.enderchestMirror = mirror;
+    }
+
+    //TODO I don't like the design of this.
     public final void setMainInventoryTransferPredicate(BiPredicate<MainSpectatorInventory, Player> bip) {
         Objects.requireNonNull(bip);
         this.transferInvToLivePlayer = bip;
     }
 
+    //TODO I don't like the design of this.
     public final void setEnderChestTransferPredicate(BiPredicate<EnderSpectatorInventory, Player> bip) {
         Objects.requireNonNull(bip);
         this.transferEnderToLivePlayer = bip;
@@ -133,10 +144,12 @@ public abstract class InvseeAPI {
         return openEnderChests;
     }
 
+    //TODO I don't like the design of this
     protected void setOpenInventories(Map<UUID, WeakReference<MainSpectatorInventory>> openInventories) {
         this.openInventories = openInventories;
     }
 
+    //TODO I don't like the design of this
     protected void setOpenEnderChests(Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests) {
         this.openEnderChests = openEnderChests;
     }
@@ -170,7 +183,7 @@ public abstract class InvseeAPI {
         return spectateInventory(player, title);
     }
     @Deprecated
-    public MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
+    public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         return spectateInventory(player, title, inventoryMirror);
     }
     //TODO override this in implementations
@@ -178,7 +191,7 @@ public abstract class InvseeAPI {
         return createOfflineInventory(playerId, playerName, title);
     }
     @Deprecated
-    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
+    public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
         return createOfflineInventory(playerId, playerName, title, inventoryMirror);
     }
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
@@ -188,7 +201,7 @@ public abstract class InvseeAPI {
         return spectateEnderChest(player, title);
     }
     @Deprecated
-    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
+    public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
         return spectateEnderChest(player, title, enderchestMirror);
     }
     //TODO override this in implementations
@@ -196,7 +209,7 @@ public abstract class InvseeAPI {
         return createOfflineEnderChest(playerId, playerName, title);
     }
     @Deprecated
-    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
+    public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
         return createOfflineEnderChest(playerId, playerName, title, enderchestMirror);
     }
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);

@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_19_R1;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
@@ -22,24 +24,25 @@ import java.util.List;
 import java.util.UUID;
 
 class MainNmsInventory implements Container, MenuProvider {
-	
+
 	protected final UUID targetPlayerUuid;
 	protected final String targetPlayerName;
 	protected final NonNullList<ItemStack> storageContents;
 	protected final NonNullList<ItemStack> armourContents;
 	protected final NonNullList<ItemStack> offHand;
-	
+
 	protected final Ref<ItemStack> onCursor;
 	protected final List<ItemStack> craftingContents;
 	protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
-	
+
 	protected org.bukkit.inventory.Inventory bukkit;
 	protected String title;
-	
+	protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
+
 	private int maxStack = Container.MAX_STACK;
 	private final List<HumanEntity> transaction = new ArrayList<>();
 	protected InventoryHolder owner;
-	
+
 	protected MainNmsInventory(Player target) {
 		this.targetPlayerUuid = target.getUUID();
 		this.targetPlayerName = target.getScoreboardName();
@@ -52,7 +55,7 @@ class MainNmsInventory implements Container, MenuProvider {
 			public void set(ItemStack item) {
 				target.containerMenu.setCarried(item);
 			}
-			
+
 			@Override
 			public ItemStack get() {
 				return target.containerMenu.getCarried();
@@ -60,43 +63,49 @@ class MainNmsInventory implements Container, MenuProvider {
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
 	}
-	
+
 	protected MainNmsInventory(Player target, String title) {
 		this(target);
-		
+
 		this.title = title;
 	}
-	
+
+	protected MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
+		this(target, title);
+
+		this.mirror = mirror;
+	}
+
 	private Ref<ItemStack> decideWhichItem(int slot) {
 		int storageSize = storageContents.size();
 		if (0 <= slot && slot < storageSize) {
 			int idx = slot;
 			return Ref.ofList(idx, storageContents);
 		}
-		
+
 		int armourSize = armourContents.size();
 		if (storageSize <= slot && slot < storageSize + armourSize) {
 			int idx = slot - storageSize;
 			return Ref.ofList(idx, armourContents);
 		}
-		
+
 		int offHandSize = offHand.size();
 		if (storageSize + armourSize <= slot && slot < storageSize + armourSize + offHandSize) {
 			int idx = slot - storageSize - armourSize;
 			return Ref.ofList(idx, offHand);
 		}
-		
+
 		if (storageSize + armourSize + offHandSize == slot) {
 			return onCursor;
 		}
-		
+
 		if (45 <= slot && slot < 54) {
 			int idx = slot - 45;
 			if (idx < personalContents.size()) {
 				return Ref.ofList(idx,  personalContents);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -114,7 +123,7 @@ class MainNmsInventory implements Container, MenuProvider {
 
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player viewer) {
-		return new MainNmsContainer(containerId, this, playerInventory, viewer);
+		return new MainNmsContainer(containerId, this, playerInventory, viewer, mirror);
 	}
 
 	@Override
@@ -132,21 +141,21 @@ class MainNmsInventory implements Container, MenuProvider {
 	public List<ItemStack> getContents() {
 		List<ItemStack> paddingOne = NonNullList.withSize(45 - storageContents.size() - armourContents.size() - offHand.size() - 1, ItemStack.EMPTY);
 		List<ItemStack> paddingTwo = NonNullList.withSize(9 - personalContents.size(), ItemStack.EMPTY);
-		
+
 		return new ConcatList<>(storageContents,
 				new ConcatList<>(armourContents,
 						new ConcatList<>(offHand,
 								new ConcatList<>(new SingletonList<>(onCursor),
 										new ConcatList<>(paddingOne,
-											new ConcatList<>(personalContents,
-													paddingTwo))))));
+												new ConcatList<>(personalContents,
+														paddingTwo))))));
 	}
 
 	@Override
 	public ItemStack getItem(int slot) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return ItemStack.EMPTY;
-		
+
 		return ref.get();
 	}
 
@@ -185,7 +194,7 @@ class MainNmsInventory implements Container, MenuProvider {
 			if (!stack.isEmpty()) return false;
 		}
 		if (!onCursor.get().isEmpty()) return false;
-		
+
 		return true;
 	}
 
@@ -203,7 +212,7 @@ class MainNmsInventory implements Container, MenuProvider {
 	public ItemStack removeItem(int slot, int amount) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return ItemStack.EMPTY;
-		
+
 		ItemStack stack = ref.get();
 		if (!stack.isEmpty() && amount > 0) {
 			ItemStack oldStackCopy = ref.get().split(amount);
@@ -220,7 +229,7 @@ class MainNmsInventory implements Container, MenuProvider {
 	public ItemStack removeItemNoUpdate(int slot) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return ItemStack.EMPTY;
-		
+
 		ItemStack stack = ref.get();
 		if (stack.isEmpty()) {
 			return ItemStack.EMPTY;
@@ -239,12 +248,12 @@ class MainNmsInventory implements Container, MenuProvider {
 	public void setItem(int slot, ItemStack stack) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return;
-		
+
 		ref.set(stack);
 		if (!stack.isEmpty() && stack.getCount() > getMaxStackSize()) {
 			stack.setCount(getMaxStackSize());
 		}
-		
+
 		setChanged();
 	}
 

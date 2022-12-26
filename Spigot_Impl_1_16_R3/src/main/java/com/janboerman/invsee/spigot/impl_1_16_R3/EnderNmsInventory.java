@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.server.v1_16_R3.*;
 
 import org.bukkit.Location;
@@ -24,6 +26,7 @@ class EnderNmsInventory extends TileEntityContainer {
 
     protected Inventory bukkit;
     protected String title;
+    protected Mirror<EnderChestSlot> mirror = Mirror.defaultEnderChest();
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -50,6 +53,11 @@ class EnderNmsInventory extends TileEntityContainer {
         this(spectatedPlayerUuid, spectatedPlayerName, storageContents);
         this.title = title;
         this.setCustomName(CraftChatMessage.fromStringOrNull(title));
+    }
+
+    protected EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
+        this(targetPlayerUuid, targetPlayerName, storageContents, title);
+        this.mirror = mirror;
     }
 
     @Override
@@ -176,7 +184,7 @@ class EnderNmsInventory extends TileEntityContainer {
 
     @Override
     protected Container createContainer(int containerId, PlayerInventory playerInventory) {
-        return new EnderNmsContainer(containerId, this, playerInventory, playerInventory.player);
+        return new EnderNmsContainer(containerId, this, playerInventory, playerInventory.player, mirror);
     }
 
     @Override
@@ -184,4 +192,5 @@ class EnderNmsInventory extends TileEntityContainer {
         //there is no chestlock here
         return true;
     }
+
 }

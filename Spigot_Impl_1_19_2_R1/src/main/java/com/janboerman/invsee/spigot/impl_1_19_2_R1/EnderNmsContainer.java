@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_19_2_R1;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -30,14 +32,24 @@ class EnderNmsContainer extends AbstractContainerMenu {
 		};
 	}
 
-	public EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player) {
+	private static Slot makeSlot(Mirror<EnderChestSlot> mirror, EnderNmsInventory top, int positionIndex, int magicX, int magicY) {
+		final EnderChestSlot place = mirror.getSlot(positionIndex);
+
+		if (place == null) {
+			return new InaccessibleSlot(top, positionIndex, magicX, magicY);
+		} else {
+			final int referringTo = place.ordinal();
+			return new Slot(top, referringTo, magicX, magicY);
+		}
+	}
+
+	EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player, Mirror<EnderChestSlot> mirror) {
 		super(determineMenuType(nmsInventory), containerId);
-		
+
 		this.topRows = nmsInventory.getContainerSize() / 9;
 		this.player = player;
 		this.top = nmsInventory;
 		this.bottom = playerInventory;
-		//nmsInventory.startOpen(player);
 
 		//top inventory slots
 		for (int yPos = 0; yPos < topRows; yPos++) {
@@ -45,7 +57,10 @@ class EnderNmsContainer extends AbstractContainerMenu {
 				int index = xPos + yPos * 9;
 				int magicX = 8 + xPos * 18;
 				int magicY = 18 + yPos * 18;
-				this.addSlot(new Slot(top, index, magicX, magicY));
+
+				addSlot(makeSlot(mirror, top, index, magicX, magicY));
+
+				//this.addSlot(new Slot(top, index, magicX, magicY));
 			}
 		}
 		

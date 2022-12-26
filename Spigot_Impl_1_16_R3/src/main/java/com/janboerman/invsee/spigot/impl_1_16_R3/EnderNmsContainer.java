@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.server.v1_16_R3.*;
 
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryView;
@@ -26,7 +28,18 @@ public class EnderNmsContainer extends Container {
         return Containers.GENERIC_9X3;
     }
 
-    public EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player) {
+    private static Slot makeSlot(Mirror<EnderChestSlot> mirror, EnderNmsInventory top, int positionIndex, int magicX, int magicY) {
+        final EnderChestSlot place = mirror.getSlot(positionIndex);
+
+        if (place == null) {
+            return new InaccessibleSlot(top, positionIndex, magicX, magicY);
+        } else {
+            final int referringTo = place.ordinal();
+            return new Slot(top, referringTo, magicX, magicY);
+        }
+    }
+
+    EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player, Mirror<EnderChestSlot> mirror) {
         super(determineContainerType(nmsInventory), containerId);
         this.topRows = nmsInventory.getSize() / 9;
         this.player = player;
@@ -39,7 +52,7 @@ public class EnderNmsContainer extends Container {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;
                 int magicY = 18 + yPos * 18;
-                a(new Slot(top, index, magicX, magicY));
+                a(makeSlot(mirror, top, index, magicX, magicY));
             }
         }
 

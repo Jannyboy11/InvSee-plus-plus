@@ -1,12 +1,13 @@
 package com.janboerman.invsee.spigot.impl_1_18_2_R2;
 
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 class InaccessibleSlot extends Slot {
-	
-	InaccessibleSlot(MainNmsInventory inventory, int index, int xPos, int yPos) {
+
+	InaccessibleSlot(Container inventory, int index, int xPos, int yPos) {
 		super(inventory, index, xPos, yPos);
 	}
 	

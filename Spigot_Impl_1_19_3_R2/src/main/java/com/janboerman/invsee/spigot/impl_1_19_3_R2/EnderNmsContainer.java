@@ -77,7 +77,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 			}
 		}
 		
-		//player 'hotbar'
+		//player 'hotbar' (yPos = 0)
 		for (int xPos = 0; xPos < 9; xPos++) {
 			int index = xPos;
 			int magicX = 8 + xPos * 18;

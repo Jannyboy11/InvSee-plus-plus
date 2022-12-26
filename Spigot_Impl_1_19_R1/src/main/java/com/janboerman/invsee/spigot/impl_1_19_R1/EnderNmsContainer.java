@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_19_R1;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -10,14 +12,14 @@ import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventoryView;
 import org.bukkit.inventory.InventoryView;
 
 class EnderNmsContainer extends AbstractContainerMenu {
-	
+
 	private final Player player;
 	private final EnderNmsInventory top;
 	private final Inventory bottom;
 	private final int topRows;	//in Purpur, this is not always 3.
-	
+
 	private InventoryView bukkitView;
-	
+
 	private static MenuType<?> determineMenuType(EnderNmsInventory inv) {
 		return switch(inv.getContainerSize()) {
 			case 9 -> MenuType.GENERIC_9x1;
@@ -30,14 +32,24 @@ class EnderNmsContainer extends AbstractContainerMenu {
 		};
 	}
 
-	public EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player) {
+	private static Slot makeSlot(Mirror<EnderChestSlot> mirror, EnderNmsInventory top, int positionIndex, int magicX, int magicY) {
+		final EnderChestSlot place = mirror.getSlot(positionIndex);
+
+		if (place == null) {
+			return new InaccessibleSlot(top, positionIndex, magicX, magicY);
+		} else {
+			final int referringTo = place.ordinal();
+			return new Slot(top, referringTo, magicX, magicY);
+		}
+	}
+
+	EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player, Mirror<EnderChestSlot> mirror) {
 		super(determineMenuType(nmsInventory), containerId);
-		
+
 		this.topRows = nmsInventory.getContainerSize() / 9;
 		this.player = player;
 		this.top = nmsInventory;
 		this.bottom = playerInventory;
-		//nmsInventory.startOpen(player);
 
 		//top inventory slots
 		for (int yPos = 0; yPos < topRows; yPos++) {
@@ -45,13 +57,14 @@ class EnderNmsContainer extends AbstractContainerMenu {
 				int index = xPos + yPos * 9;
 				int magicX = 8 + xPos * 18;
 				int magicY = 18 + yPos * 18;
-				this.addSlot(new Slot(top, index, magicX, magicY));
+
+				addSlot(makeSlot(mirror, top, index, magicX, magicY));
 			}
 		}
-		
+
 		//bottom inventory slots
 		int magicAddY = (topRows - 4 /*4 because the bottom inventory has 4 rows*/) * 18;
-		
+
 		//player 'storage'
 		for (int yPos = 1; yPos < 4; yPos++) {
 			for (int xPos = 0; xPos < 9; xPos++) {
@@ -61,7 +74,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 				this.addSlot(new Slot(bottom, index, magicX, magicY));
 			}
 		}
-		
+
 		//player 'hotbar'
 		for (int xPos = 0; xPos < 9; xPos++) {
 			int index = xPos;
@@ -87,14 +100,14 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	@Override
 	public ItemStack quickMoveStack(Player player, int rawIndex) {
 		//returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
-        //remember that we are called from inside the body of a loop!
+		//remember that we are called from inside the body of a loop!
 
 		ItemStack itemStack = ItemStack.EMPTY;
 		Slot slot = this.getSlot(rawIndex);
-		
+
 		if (slot != null && slot.hasItem()) {
 			ItemStack clickedSlotItem = slot.getItem();
-			
+
 			itemStack = clickedSlotItem.copy();
 			if (rawIndex < topRows * 9) {
 				//clicked in the top inventory
@@ -107,14 +120,14 @@ class EnderNmsContainer extends AbstractContainerMenu {
 					return ItemStack.EMPTY;
 				}
 			}
-			
+
 			if (clickedSlotItem.isEmpty()) {
 				slot.set(ItemStack.EMPTY);
 			} else {
 				slot.setChanged();
 			}
 		}
-		
+
 		return itemStack;
 	}
 }

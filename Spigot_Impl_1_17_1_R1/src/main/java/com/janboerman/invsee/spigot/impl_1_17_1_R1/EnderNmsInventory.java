@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
@@ -28,25 +30,31 @@ class EnderNmsInventory implements Container, MenuProvider {
 
     protected org.bukkit.inventory.Inventory bukkit;
     protected String title;
+    protected Mirror<EnderChestSlot> mirror = Mirror.defaultEnderChest();
 
     private int maxStack = Container.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
     protected InventoryHolder owner;
 
-    public EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents) {
+    protected EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents) {
         this.targetPlayerUuid = targetPlayerUuid;
         this.targetPlayerName = targetPlayerName;
         this.storageContents = storageContents;
     }
 
-    public EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title) {
+    protected EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title) {
         this(targetPlayerUuid, targetPlayerName, storageContents);
         this.title = title;
     }
 
+    protected EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
+        this(targetPlayerUuid, targetPlayerName, storageContents, title);
+        this.mirror = mirror;
+    }
+
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        return new EnderNmsContainer(containerId, this, playerInventory, player);
+        return new EnderNmsContainer(containerId, this, playerInventory, player, mirror);
     }
 
     @Override
@@ -72,7 +80,7 @@ class EnderNmsInventory implements Container, MenuProvider {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot < 0 || slot >= getContainerSize()) return InvseeImpl.EMPTY_STACK;
+        if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
 
         return storageContents.get(slot);
     }
@@ -117,7 +125,7 @@ class EnderNmsInventory implements Container, MenuProvider {
 
     @Override
     public ItemStack removeItem(int slot, int amount) {
-        if (slot < 0 || slot >= getContainerSize()) return InvseeImpl.EMPTY_STACK;
+        if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
 
         ItemStack stack = ContainerHelper.removeItem(storageContents, slot, amount);
         if (!stack.isEmpty()) {
@@ -128,13 +136,13 @@ class EnderNmsInventory implements Container, MenuProvider {
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-        if (slot < 0 || slot >= getContainerSize()) return InvseeImpl.EMPTY_STACK;
+        if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
 
         ItemStack stack = storageContents.get(slot);
         if (stack.isEmpty()) {
-            return InvseeImpl.EMPTY_STACK;
+            return ItemStack.EMPTY;
         } else {
-            storageContents.set(slot, InvseeImpl.EMPTY_STACK);
+            storageContents.set(slot, ItemStack.EMPTY);
             return stack;
         }
     }
@@ -168,4 +176,3 @@ class EnderNmsInventory implements Container, MenuProvider {
     }
 
 }
-

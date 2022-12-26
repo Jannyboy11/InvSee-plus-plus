@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.api;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
@@ -7,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
  * A spectator inventory that contains all the items of the target player's 'normal' inventory.
  * This includes the player's armour, items in his crafting grid, and even the item on his cursor!
  */
-public interface MainSpectatorInventory extends SpectatorInventory {
+public interface MainSpectatorInventory extends SpectatorInventory<PlayerInventorySlot> {
 
     /** internal use only */
     void watch(InventoryView targetPlayerView);
@@ -46,5 +48,10 @@ public interface MainSpectatorInventory extends SpectatorInventory {
 
     /** Get the length of the {@link #getPersonalContents()} array. */
     int getPersonalContentsSize();
+
+    /** Get the mirror this inventory is viewed through. */
+    public default Mirror<PlayerInventorySlot> getMirror() {
+        return Mirror.defaultPlayerInventory();
+    }
 
 }

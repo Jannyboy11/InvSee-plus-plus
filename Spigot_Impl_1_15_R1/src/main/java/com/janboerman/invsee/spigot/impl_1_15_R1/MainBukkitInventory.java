@@ -1,6 +1,8 @@
 package com.janboerman.invsee.spigot.impl_1_15_R1;
 
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import net.minecraft.server.v1_15_R1.IInventory;
 import net.minecraft.server.v1_15_R1.InventoryCrafting;
 import net.minecraft.server.v1_15_R1.InventoryMerchant;
@@ -194,6 +196,11 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Mirror<PlayerInventorySlot> getMirror() {
+        return getInventory().mirror;
     }
 
     // org.bukkit.inventory.Inventory overrides

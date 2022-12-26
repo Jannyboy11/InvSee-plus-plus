@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>InvSee</artifactId>
-    <version>0.14.0-SNAPSHOT</version>
+    <version>0.15.0-SNAPSHOT</version>
     <!-- TODO make this more hierarchical: InvSee++ (includes impls), InvSee++_Common, InvSee++_Give (includes impls), InvSee++_Clear, Mojang_API, Utils -->
     <modules>
         <module>Utils</module>
@@ -18,7 +18,6 @@
         <module>Spigot_Impl_1_17_1_R1</module>
         <module>Spigot_Impl_1_18_2_R2</module>
         <module>Spigot_Impl_1_19_R1</module>
-        <module>Spigot_Impl_1_19_1_R1</module>
         <module>Spigot_Impl_1_19_2_R1</module>
         <module>Spigot_Impl_1_19_3_R2</module>
         <module>Spigot_MultiverseInventories</module> <!-- TODO finish this module -->
@@ -32,7 +31,6 @@
         <module>Spigot_Addon_Give_1_17_1_R1</module>
         <module>Spigot_Addon_Give_1_18_2_R2</module>
         <module>Spigot_Addon_Give_1_19_R1</module>
-        <module>Spigot_Addon_Give_1_19_1_R1</module>
         <module>Spigot_Addon_Give_1_19_2_R1</module>
         <module>Spigot_Addon_Give_1_19_3_R2</module>
         <module>Spigot_Addon_Clear</module>

@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
@@ -38,6 +40,7 @@ public class MainNmsInventory implements IInventory, ITileEntityContainer {
 
     protected Inventory bukkit;
     protected String title;
+    protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -73,6 +76,12 @@ public class MainNmsInventory implements IInventory, ITileEntityContainer {
         this(target);
 
         this.title = title;
+    }
+
+    protected MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
+        this(target, title);
+
+        this.mirror = mirror;
     }
 
     private Ref<ItemStack> decideWhichItem(int slot) {
@@ -296,7 +305,7 @@ public class MainNmsInventory implements IInventory, ITileEntityContainer {
     @Override
     public Container createContainer(PlayerInventory playerInventory, EntityHuman entityHuman) {
         EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
-        return new MainNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, entityHuman);
+        return new MainNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, entityHuman, mirror);
     }
 
     @Override

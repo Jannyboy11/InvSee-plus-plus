@@ -9,11 +9,11 @@ class PersonalSlot extends Slot {
 	PersonalSlot(MainNmsInventory inventory, int index, int xPos, int yPos) {
 		super(inventory, index, xPos, yPos);
 	}
-	
+
 	private boolean works() {
 		MainNmsInventory inv = (MainNmsInventory) container;
 		int personalSize = inv.personalContents.size();
-		boolean inRange = index < 45 + personalSize;
+		boolean inRange = 45 <= slot && slot < 45 + personalSize;
 		return inRange;
 	}
 	
@@ -60,6 +60,12 @@ class PersonalSlot extends Slot {
 	public boolean mayPickup(Player player) {
 		if (!works()) return false;
 		return super.mayPickup(player);
+	}
+
+	@Override
+	public ItemStack getItem() {
+		if (!works()) return ItemStack.EMPTY;
+		return super.getItem();
 	}
 
 }

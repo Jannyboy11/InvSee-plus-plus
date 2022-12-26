@@ -7,6 +7,7 @@ import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.utils.TriFunction;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -33,7 +34,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 public class InvseeImpl extends InvseeAPI {
 
@@ -80,8 +80,8 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
-        return createOffline(playerId, playerName, title, this::spectateInventory);
+    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
+        return createOffline(playerId, playerName, title, mirror, this::spectateInventory);
     }
 
     @Override
@@ -129,8 +129,8 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String name, String title) {
-        return createOffline(player, name, title, this::spectateEnderChest);
+    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID player, String name, String title, Mirror<EnderChestSlot> mirror) {
+        return createOffline(player, name, title, mirror, this::spectateEnderChest);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class InvseeImpl extends InvseeAPI {
         });
     }
     
-    private <IS extends SpectatorInventory> CompletableFuture<Optional<IS>> createOffline(UUID player, String name, String title, BiFunction<? super HumanEntity, String, IS> invCreator) {
+    private <Slot, IS extends SpectatorInventory<Slot>> CompletableFuture<Optional<IS>> createOffline(UUID player, String name, String title, Mirror<Slot> mirror, TriFunction<? super HumanEntity, String, ? super Mirror<Slot>, IS> invCreator) {
     	CraftServer server = (CraftServer) plugin.getServer();
     	DedicatedPlayerList playerList = server.getHandle();
     	PlayerDataStorage worldNBTStorage = playerList.playerIo;
@@ -163,11 +163,11 @@ public class InvseeImpl extends InvseeAPI {
     		} //else: player save file exists.
     		
     		CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
-    		return Optional.of(invCreator.apply(craftHumanEntity, title));
+    		return Optional.of(invCreator.apply(craftHumanEntity, title, mirror));
     	}, serverThreadExecutor);   //loading must occur on the main thread.
     }
     
-    private <SI extends SpectatorInventory> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, String, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
+    private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<Void> save(SI newInventory, TriFunction<? super HumanEntity, String, ? super Mirror<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
     	CraftServer server = (CraftServer) plugin.getServer();
 
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
@@ -182,12 +182,11 @@ public class InvseeImpl extends InvseeAPI {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
             fakeCraftPlayer.loadData();
 
-    		SI currentInv = currentInvProvider.apply(fakeCraftPlayer, newInventory.getTitle());
+    		SI currentInv = currentInvProvider.apply(fakeCraftPlayer, newInventory.getTitle(), newInventory.getMirror());
     		transfer.accept(currentInv, newInventory);
 
             fakeCraftPlayer.saveData();
     	}, serverThreadExecutor);   //saving must occur on the main thread.
     }
-
 
 }
