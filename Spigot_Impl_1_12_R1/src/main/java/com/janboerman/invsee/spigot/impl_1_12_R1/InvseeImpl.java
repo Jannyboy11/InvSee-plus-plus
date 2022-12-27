@@ -68,7 +68,7 @@ public class InvseeImpl extends InvseeAPI {
         boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
         if (!eventCancelled) {
             nmsPlayer.activeContainer = nmsWindow;
-            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, nmsInventory.getContainerName(), titleComponent));
+            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, nmsInventory.getContainerName(), titleComponent, nmsInventory.getSize()));
             nmsWindow.addSlotListener(nmsPlayer);
         }
     }
@@ -89,7 +89,7 @@ public class InvseeImpl extends InvseeAPI {
         boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
         if (!eventCancelled) {
             nmsPlayer.activeContainer = nmsWindow;
-            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, nmsInventory.getContainerName(), titleComponent));
+            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, nmsInventory.getContainerName(), titleComponent, nmsInventory.getSize()));
             nmsWindow.addSlotListener(nmsPlayer);
         }
     }
