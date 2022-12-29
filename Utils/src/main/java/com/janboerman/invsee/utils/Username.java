@@ -33,7 +33,8 @@ public class Username {
     }
 
     public static boolean isValidUsername(char[] username) {
-        return username != null && 3 <= username.length && username.length <= 16 && isValidCharacters(username);
+        return username != null && /*3 <= username.length &&*/ username.length <= 16 && isValidCharacters(username);
+        //minecraft.net article seems to suggest that creating usernames of length 2 and 1 was actually possible in the past!
     }
 
 

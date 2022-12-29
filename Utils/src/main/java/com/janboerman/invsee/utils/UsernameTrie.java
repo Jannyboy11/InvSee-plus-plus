@@ -38,7 +38,8 @@ public class UsernameTrie<V> {
     }
 
     public Maybe<V> insert(char[] username, V value) {
-        Username.assertValidUsername(username);
+        if (!Username.isValidUsername(username))
+            return Maybe.nothing();
 
         Node<V> node = root.lookup(username);
         Maybe<V> oldValue = node.value;
@@ -80,7 +81,7 @@ public class UsernameTrie<V> {
     }
 
     public void traverse(char[] prefix, BiConsumer<char[], ? super V> consumer) {
-        if (!Username.isValidCharacters(prefix))
+        if (prefix.length > 16 || !Username.isValidCharacters(prefix))
             return;
 
         Node<V> node = root.lookup(prefix);
