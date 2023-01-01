@@ -110,6 +110,8 @@ class EnderClearExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
                         } else if (reason instanceof OfflineSupportDisabled) {
                             sender.sendMessage(ChatColor.RED + "Spectating offline players' enderchests is disabled.");
+                        } else {
+                            sender.sendMessage(ChatColor.RED + "Cannot clear from " + inputPlayer + "'s enderchest for an unknown reason.");
                         }
                     }
                 }, api.serverThreadExecutor);

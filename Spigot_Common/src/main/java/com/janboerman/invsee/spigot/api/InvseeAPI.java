@@ -588,6 +588,8 @@ public abstract class InvseeAPI {
                         spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s inventory.");
                     } else if (reason instanceof OfflineSupportDisabled) {
                         spectator.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
+                    } else {
+                        spectator.sendMessage(ChatColor.RED + "Cannot open " + targetNameOrUUID + "'s inventory for an unknown reason.");
                     }
                 }
             } else {
@@ -620,6 +622,8 @@ public abstract class InvseeAPI {
                         spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
                     } else if (reason instanceof OfflineSupportDisabled) {
                         spectator.sendMessage(ChatColor.RED + "Spectating offline players' enderchests is disabled.");
+                    } else {
+                        spectator.sendMessage(ChatColor.RED + "Cannot open " + targetNameOrUUID + "'s enderchest for an unknown reason.");
                     }
                 }
             } else {
