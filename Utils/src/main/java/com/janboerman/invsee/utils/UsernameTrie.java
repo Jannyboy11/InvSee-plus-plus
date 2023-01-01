@@ -1,6 +1,8 @@
 package com.janboerman.invsee.utils;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.TreeMap;
 import java.util.function.BiConsumer;
 
 /**
@@ -17,7 +19,7 @@ import java.util.function.BiConsumer;
  */
 public class UsernameTrie<V> {
 
-    //TODO we might want to be case in-sensitive
+    //TODO we might want to be case in-sensitive. now that we use a Map<Character, Node<V>>, can we do this? I think we can!
 
     private final Node<V> root;
 
@@ -38,9 +40,6 @@ public class UsernameTrie<V> {
     }
 
     public Maybe<V> insert(char[] username, V value) {
-        if (!Username.isValidUsername(username))
-            return Maybe.nothing();
-
         Node<V> node = root.lookup(username);
         Maybe<V> oldValue = node.value;
         node.value = Maybe.just(value);
@@ -52,9 +51,6 @@ public class UsernameTrie<V> {
     }
 
     public Maybe<V> delete(char[] username) {
-        if (!Username.isValidUsername(username))
-            return Maybe.nothing();
-
         Node<V> node = root.lookup(username);
         Maybe<V> oldValue = node.value;
         node.value = Maybe.nothing();
@@ -67,9 +63,6 @@ public class UsernameTrie<V> {
     }
 
     public Maybe<V> get(char[] username) {
-        if (!Username.isValidUsername(username))
-            return Maybe.nothing();
-
         Node<V> node = root.lookup(username);
         Maybe<V> value = node.value;
         node.cleanUp();
@@ -81,9 +74,6 @@ public class UsernameTrie<V> {
     }
 
     public void traverse(char[] prefix, BiConsumer<char[], ? super V> consumer) {
-        if (prefix.length > 16 || !Username.isValidCharacters(prefix))
-            return;
-
         Node<V> node = root.lookup(prefix);
         node.traverse(consumer);
         node.cleanUp();
@@ -91,13 +81,15 @@ public class UsernameTrie<V> {
 
     private static class Node<V> {
 
+        private static final Comparator<Character> CHAR_COMPARATOR = Comparator.comparingInt(Character::toLowerCase);
+
         /*not-null, except for the root node*/
-        private final char[] segment; //TODO don't we want byte[] instead?
+        private final char[] segment;
         /*nullable*/
         private Maybe<V> value;
 
         /*nullable*/
-        private Node<V>[] children;
+        private TreeMap<Character, Node<V>> children;
         /*not-null, except for the root node*/
         private Node<V> parent;
 
@@ -105,7 +97,7 @@ public class UsernameTrie<V> {
             this(segment, value, null, parent);
         }
 
-        private Node(char[] segment, Maybe<V> value, Node<V>[] children, Node<V> parent) {
+        private Node(char[] segment, Maybe<V> value, TreeMap<Character, Node<V>> children, Node<V> parent) {
             assert segment != null : "segment cannot be null";
             assert value != null : "value cannot be null";
 
@@ -122,7 +114,7 @@ public class UsernameTrie<V> {
             // are all our children empty?
             if (children == null)
                 return false;
-            for (Node<V> child : children)
+            for (Node<V> child : children.values())
                 if (child != null && !child.isEmpty())
                     return false;
             // if the answers to both questions are 'yes', then we are empty!
@@ -135,32 +127,25 @@ public class UsernameTrie<V> {
                     //we are empty
                     //remove `this` from parent:
 
-                    parent.children[Username.toIndex(segment[0])] = null;
+                    parent.children.remove(segment[0]);
                     parent.cleanUp();
                 } else if (!value.isPresent()) {
                     //we have no value
                     //if we are the single node between to others, make our child a direct child of our parent:
 
-                    for (int i = 0; i < parent.children.length; i++) {
-                        if (i != Username.toIndex(segment[0]) && parent.children[i] != null) return; //we are in fact not the only child.
+                    for (Character sibling : parent.children.keySet()) {
+                        if (!sibling.equals(segment[0])) return; //we are in fact not the only child.
                     }
-                    if (children == null) return; //we don't in fact have any children
 
-                    int childCount = 0;
-                    int idx = -1;
-                    for (int i = 0; i < children.length; i++) {
-                        if (children[i] != null) {
-                            childCount += 1;
-                            idx = i;
-                        }
-                        if (childCount > 1) return; //we have more than one child.
-                    }
-                    assert 0 <= idx && idx < children.length;
-                    //we are the only child, concat our segment and our child's segment.
+                    if (children == null || children.isEmpty()) return; //we don't in fact have any children
+                    if (children.size() > 1) return; //we have more than one child.
 
-                    final char[] newSegment = ArrayHelper.concat(segment, children[idx].segment);
-                    final Node<V> longNode = new Node<>(newSegment, children[idx].value, children[idx].children, parent);
-                    parent.children[Username.toIndex(newSegment[0])] = longNode;
+                    final var entry = children.firstEntry(); //do we want to poll?
+                    final var theNode = entry.getValue();
+
+                    final char[] newSegment = ArrayHelper.concat(segment, theNode.segment);
+                    final Node<V> longNode = new Node<>(newSegment, theNode.value, theNode.children, parent);
+                    parent.children.put(newSegment[0], longNode); //replace ourselves
                     parent.cleanUp();
                 }
                 //else: we do have a value, so don't perform any clean-up.
@@ -168,8 +153,8 @@ public class UsernameTrie<V> {
             //else: there is no parent, we are the root!
         }
 
-        private void ensureChildrenArray() {
-            if (children == null) children = new Node[Username.lookupTableSize()];
+        private void ensureChildrenNotNull() {
+            if (children == null) children = new TreeMap<Character, Node<V>>(CHAR_COMPARATOR);
         }
 
         private Node<V> lookup(final char[] segment) {
@@ -177,14 +162,15 @@ public class UsernameTrie<V> {
 
             if (segment.length == 0) return this;
 
-            ensureChildrenArray();
-            final int atIndex = Username.toIndex(segment[0]);
-            Node<V> child = children[atIndex];
+            ensureChildrenNotNull();
+            //final int atIndex = Username.toIndex(segment[0]);
+            final char childKey = segment[0];
+            Node<V> child = children.get(childKey);
             if (child == null) {
                 //the child does not exist!
                 //create a new one and return it!
                 child = new Node<>(segment, Maybe.nothing(), this);
-                this.children[atIndex] = child;
+                this.children.put(childKey, child);
                 return child;
             } else {
                 //the child does exist!
@@ -216,9 +202,9 @@ public class UsernameTrie<V> {
                         char[] suffix = Arrays.copyOfRange(childSegment, segment.length, childSegment.length);
                         Node<V> replacingChild = new Node<>(segment, Maybe.nothing(), this);
                         Node<V> grandChild = new Node<>(suffix, child.value, child.children, replacingChild);
-                        replacingChild.ensureChildrenArray();
-                        replacingChild.children[Username.toIndex(suffix[0])] = grandChild;
-                        this.children[atIndex] = replacingChild;
+                        replacingChild.ensureChildrenNotNull();
+                        replacingChild.children.put(suffix[0], grandChild);
+                        this.children.put(childKey, replacingChild);
 
                         return replacingChild;
                     }
@@ -234,13 +220,13 @@ public class UsernameTrie<V> {
                     final char[] suffixChildSegment = Arrays.copyOfRange(childSegment, i, childSegment.length);
                     final char[] suffixSegment = Arrays.copyOfRange(segment, i, segment.length);
 
-                    final Node<V> replacingChild = new Node<>(commonPrefix, Maybe.nothing(), new Node[Username.lookupTableSize()] /*fill later*/, this);
+                    final Node<V> replacingChild = new Node<>(commonPrefix, Maybe.nothing(), new TreeMap<>() /*fill later*/, this);
                     final Node<V> grandChild1 = new Node<>(suffixChildSegment, child.value, child.children, replacingChild);
                     final Node<V> grandChild2 = new Node<>(suffixSegment, Maybe.nothing(), null, replacingChild);
-                    replacingChild.children[Username.toIndex(suffixChildSegment[0])] = grandChild1;
-                    replacingChild.children[Username.toIndex(suffixSegment[0])] = grandChild2;
+                    replacingChild.children.put(suffixChildSegment[0], grandChild1);
+                    replacingChild.children.put(suffixSegment[0], grandChild2);
 
-                    this.children[atIndex] = replacingChild;
+                    this.children.put(childKey, replacingChild);
                     return grandChild2;
                 }
             }
@@ -273,7 +259,7 @@ public class UsernameTrie<V> {
             }
 
             if (children != null) {
-                for (Node<V> child : children) {
+                for (Node<V> child : children.values()) {
                     if (child != null) {
                         child.traverse(consumer);
                     }
