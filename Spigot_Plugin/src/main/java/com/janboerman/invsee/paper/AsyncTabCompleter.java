@@ -8,7 +8,6 @@ import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.StringHelper;
-import com.janboerman.invsee.utils.Username;
 import com.janboerman.invsee.utils.UsernameTrie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -86,14 +85,9 @@ public class AsyncTabCompleter implements Listener {
                 if (split.length == 2) {
                     List<String> playerNames = new ArrayList<>();
                     String prefix = buffer.substring(matchedLabel.length() + 2);
-                    if (Username.isValidCharacters(prefix.toCharArray())) {
-                        knownPlayerNames.traverse(prefix, (name, v) -> playerNames.add(name));
-                        if (!playerNames.isEmpty()) {
-                            event.setCompletions(playerNames);
-                            event.setHandled(true);
-                        }
-                    } else {
-                        event.setCompletions(List.of());
+                    knownPlayerNames.traverse(prefix, (name, v) -> playerNames.add(name));
+                    if (!playerNames.isEmpty()) {
+                        event.setCompletions(playerNames);
                         event.setHandled(true);
                     }
                 } else if (split.length == 3 && api instanceof PerWorldInventorySeeApi) {

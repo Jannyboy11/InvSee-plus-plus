@@ -19,7 +19,7 @@ import java.util.function.BiConsumer;
  */
 public class UsernameTrie<V> {
 
-    //TODO we might want to be case in-sensitive. now that we use a Map<Character, Node<V>>, can we do this? I think we can!
+    //TODO we might want to be case in-sensitive, but goes at the cost of tab-completing names in their right casing.
 
     private final Node<V> root;
 
