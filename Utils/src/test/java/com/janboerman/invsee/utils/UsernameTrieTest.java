@@ -10,6 +10,13 @@ import java.util.stream.IntStream;
 
 public class UsernameTrieTest {
 
+    private final char[] valid_chars = new char[] {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '_'
+    };
+
     @Test
     public void testDisjunct() {
         UsernameTrie<Integer> trie = new UsernameTrie<>();
@@ -73,6 +80,31 @@ public class UsernameTrieTest {
     }
 
     @Test
+    public void testCasingDifferences() {
+        final String[] words = new String[] {"Piet", "Pizza", "PiEs"};
+
+        UsernameTrie<Void> trie = new UsernameTrie<>();
+        for (String word : words) {
+            trie.insert(word, null);
+        }
+
+        final StringJoiner sj = new StringJoiner(" ");
+        trie.traverse("", (str, v) -> sj.add(str));
+        assertEquals("PiEs Piet Pizza", sj.toString());
+    }
+
+    @Test
+    public void testOrder() {
+        UsernameTrie<Void> trie = new UsernameTrie<>();
+        for (char c : valid_chars) {
+            trie.insert(new char[] { c }, null);
+        }
+        StringJoiner sj = new StringJoiner("");
+        trie.traverse("", (k, v) -> sj.add(k));
+        assertEquals("0123456789_AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz", sj.toString());
+    }
+
+    @Test
     public void testDeletes() {
         UsernameTrie<Integer> trie = new UsernameTrie<>();
         trie.insert("Jannyboy11", 0);
@@ -106,7 +138,7 @@ public class UsernameTrieTest {
         assertEquals("Jankebal:4 Jankoekenpan:2", sj4.toString());
     }
 
-    /*
+
     @Test
     public void time100k() {
         Set<String> set = new HashSet<>();
@@ -117,22 +149,16 @@ public class UsernameTrieTest {
             set.add(new String(randomName));
         }
 
-        AtomicInteger counter = new AtomicInteger(0);
+        java.util.concurrent.atomic.AtomicInteger counter = new java.util.concurrent.atomic.AtomicInteger(0);
         long begin = System.nanoTime();
-        trie.traverse("", (string, v) -> { System.out.println(string); counter.incrementAndGet(); });
+        trie.traverse("", (string, v) -> { /*System.out.println(string);*/ counter.incrementAndGet(); });
         long end = System.nanoTime();
         assertEquals(set.size(), counter.get());
-        System.out.println("Printing took " + ((end - begin) / 1000) + " µs");
+        //System.out.println("Printing took " + ((end - begin) / 1000) + " µs");
         //takes about 0.8 seconds on my laptop! :)
     }
 
     private final java.util.Random random = new java.util.Random();
-    private final char[] valid_chars = new char[] {
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        '_'
-    };
     private char[] randomName() {
         int length = random.nextInt(16-3) + 3;
         char[] name = new char[length];
@@ -141,6 +167,6 @@ public class UsernameTrieTest {
         }
         return name;
     }
-    */
+
 
 }

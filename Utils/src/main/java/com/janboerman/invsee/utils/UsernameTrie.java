@@ -81,7 +81,30 @@ public class UsernameTrie<V> {
 
     private static class Node<V> {
 
-        private static final Comparator<Character> CHAR_COMPARATOR = Comparator.comparingInt(Character::toLowerCase);
+        //comparator that ignores case, except when the characters are equalsIgnoreCase
+        private static final Comparator<Character> CHAR_COMPARATOR = (Character character1, Character character2) -> {
+            char c1 = character1.charValue(), c2 = character2.charValue();
+            if (Character.isLetter(c1) && Character.isLetter(c2)) {
+                //both are letters
+                char l1 = Character.toLowerCase(c1), l2 = Character.toLowerCase(c2);
+                if (l1 == l2) {
+                    //equalsIgnoreCase -> compare normally!
+                    return Character.compare(c1, c2);
+                } else {
+                    //unequal characters -> compare ignoring case!
+                    return Character.compare(l1, l2);
+                }
+            } else if (Character.isLetter(c1)) {
+                //letters come after other characters
+                return 1;
+            } else if (Character.isLetter(c2)) {
+                //non-letters come before letters
+                return -1;
+            } else {
+                //both are non-letters
+                return Character.compare(c1, c2);
+            }
+        };
 
         /*not-null, except for the root node*/
         private final char[] segment;
@@ -220,7 +243,7 @@ public class UsernameTrie<V> {
                     final char[] suffixChildSegment = Arrays.copyOfRange(childSegment, i, childSegment.length);
                     final char[] suffixSegment = Arrays.copyOfRange(segment, i, segment.length);
 
-                    final Node<V> replacingChild = new Node<>(commonPrefix, Maybe.nothing(), new TreeMap<>() /*fill later*/, this);
+                    final Node<V> replacingChild = new Node<>(commonPrefix, Maybe.nothing(), new TreeMap<>(CHAR_COMPARATOR) /*fill later*/, this);
                     final Node<V> grandChild1 = new Node<>(suffixChildSegment, child.value, child.children, replacingChild);
                     final Node<V> grandChild2 = new Node<>(suffixSegment, Maybe.nothing(), null, replacingChild);
                     replacingChild.children.put(suffixChildSegment[0], grandChild1);
