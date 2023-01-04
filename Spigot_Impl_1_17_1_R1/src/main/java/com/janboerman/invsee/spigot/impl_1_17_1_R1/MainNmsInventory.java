@@ -173,26 +173,6 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
     }
 
     @Override
-    public Location getLocation() {
-        return null;
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return maxStack;
-    }
-
-    @Override
-    public InventoryHolder getOwner() {
-        return owner;
-    }
-
-    @Override
-    public List<HumanEntity> getViewers() {
-        return transaction;
-    }
-
-    @Override
     public boolean isEmpty() {
         for (ItemStack stack : armourContents) {
             if (!stack.isEmpty()) return false;
@@ -268,11 +248,6 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
         }
 
         setChanged();
-    }
-
-    @Override
-    public void setMaxStackSize(int amount) {
-        this.maxStack = amount;
     }
 
     @Override

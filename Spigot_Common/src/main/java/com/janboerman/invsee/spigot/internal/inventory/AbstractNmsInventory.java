@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.internal.inventory;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventor
 
     public final String title;
     public final Mirror<Slot> mirror;
-    public org.bukkit.inventory.Inventory bukkit;
+    public Inventory bukkit;
 
     private int maxStack;
     private final List<HumanEntity> transaction = new ArrayList<>(1);
