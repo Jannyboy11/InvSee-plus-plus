@@ -62,6 +62,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
     public void shallowCopyFrom(EnderNmsInventory from) {
         setMaxStackSize(from.getMaxStackSize());
         this.storageContents = from.storageContents;
+        update();
     }
 
     @Override

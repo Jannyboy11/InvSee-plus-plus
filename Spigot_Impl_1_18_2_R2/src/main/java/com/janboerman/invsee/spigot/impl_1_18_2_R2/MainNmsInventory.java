@@ -62,6 +62,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
 		this.onCursor = from.onCursor;
 		this.craftingContents = from.craftingContents;
 		this.personalContents = from.personalContents;
+		setChanged();
 	}
 
 	private Ref<ItemStack> decideWhichItem(int slot) {

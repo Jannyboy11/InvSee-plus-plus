@@ -673,69 +673,55 @@ public abstract class InvseeAPI {
 
             //check if somebody was looking up the player and make sure they get the player's live inventory
             CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvNameFuture = pendingInventoriesByName.remove(userName);
-            if (mainInvNameFuture != null) mainInvNameFuture.complete(SpectateResponse.succeed(newInventorySpectator = spectateInventory(player, mainTitle)));
+            if (mainInvNameFuture != null) mainInvNameFuture.complete(SpectateResponse.succeed(newInventorySpectator = spectateInventory(player, mainTitle, inventoryMirror)));
             CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvUuidFuture = pendingInventoriesByUuid.remove(uuid);
-            if (mainInvUuidFuture != null) mainInvUuidFuture.complete(SpectateResponse.succeed(newInventorySpectator != null ? newInventorySpectator : (newInventorySpectator = spectateInventory(player, mainTitle))));
+            if (mainInvUuidFuture != null) mainInvUuidFuture.complete(SpectateResponse.succeed(newInventorySpectator != null ? newInventorySpectator : (newInventorySpectator = spectateInventory(player, mainTitle, inventoryMirror))));
             CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderNameFuture = pendingEnderChestsByName.remove(userName);
-            if (enderNameFuture != null) enderNameFuture.complete(SpectateResponse.succeed(newEnderSpectator = spectateEnderChest(player, enderTitle)));
+            if (enderNameFuture != null) enderNameFuture.complete(SpectateResponse.succeed(newEnderSpectator = spectateEnderChest(player, enderTitle, enderchestMirror)));
             CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderUuidFuture = pendingEnderChestsByUuid.remove(uuid);
-            if (enderUuidFuture != null) enderUuidFuture.complete(SpectateResponse.succeed(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderTitle))));
+            if (enderUuidFuture != null) enderUuidFuture.complete(SpectateResponse.succeed(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderTitle, enderchestMirror))));
 
+            
             //check if somebody was looking in the offline inventory and update player's inventory.
+            //idem for ender.
 
-            //TODO
-            //TODO do we really need to loop over all players to find all spectators?
-            //TODO can't we just make use of the openInventories and openEnderChests caches?
-            //TODO if we need the list of viewers, we could just do { SpectatorInventory si = cache.get(targetUuid); List<HumanEntity> viewers = si.getViewers(); }
-            //TODO this currently does not work for profile-tied spectator inventories (PWI)
-            //TODO
-            //TODO I think we can, but we have to be really careful about spectator inventories that are tied to a player's profile (e.g. PWI ProfileKey)
-            //TODO maybe the caches contain only 'global' spectator inventories?
-            //TODO
+            final WeakReference<MainSpectatorInventory> invRef = openInventories.get(uuid);
+            final WeakReference<EnderSpectatorInventory> enderRef = openEnderChests.get(uuid);
 
-            for (Player online : player.getServer().getOnlinePlayers()) {
-                Inventory topInventory = online.getOpenInventory().getTopInventory();
-                if (topInventory instanceof MainSpectatorInventory) {
-                    MainSpectatorInventory oldSpectatorInventory = (MainSpectatorInventory) topInventory;
-                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
-                        if (transferInvToLivePlayer.test(oldSpectatorInventory, player)) {
-                            if (newInventorySpectator == null) {
-                                newInventorySpectator = spectateInventory(player, mainTitle);
-                                //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
-                                newInventorySpectator.setContents(oldSpectatorInventory);
-                            }
+            final MainSpectatorInventory oldMainSpectator = invRef.get();
+            if (oldMainSpectator != null && transferInvToLivePlayer.test(oldMainSpectator, player)) {
+                if (newInventorySpectator == null) {
+                    newInventorySpectator = spectateInventory(player, mainTitle, inventoryMirror);
+                    newInventorySpectator.setContents(oldMainSpectator); //set the contents of the player's inventory to the contents that the spectators have.
+                }
 
-                            if (oldSpectatorInventory instanceof ShallowCopy) {
-                                //the inventory supports in-place replacement, let's do just that!
-                                ((ShallowCopy<MainSpectatorInventory>) oldSpectatorInventory).shallowCopyFrom(newInventorySpectator);
-                                online.updateInventory();
-                            } else {
-                                //replacement not supported: close and re-open
-                                online.closeInventory();
-                                online.openInventory(newInventorySpectator);
-                            }
-                        }
+                if (oldMainSpectator instanceof ShallowCopy) {
+                    ((ShallowCopy<MainSpectatorInventory>) oldMainSpectator).shallowCopyFrom(newInventorySpectator); //shallow-copy the live itemstack lists into the open spectator inventory.
+                } else {
+                    //does not support shallow copying, just close and re-open, and update the cache!
+                    openInventories.put(uuid, new WeakReference<>(newInventorySpectator));
+                    for (HumanEntity viewer : List.copyOf(oldMainSpectator.getViewers())) {
+                        viewer.closeInventory();
+                        viewer.openInventory(newInventorySpectator);
                     }
-                } else if (topInventory instanceof EnderSpectatorInventory) {
-                    EnderSpectatorInventory oldSpectatorInventory = (EnderSpectatorInventory) topInventory;
-                    if (oldSpectatorInventory.getSpectatedPlayerId().equals(uuid)) {
-                        if (transferEnderToLivePlayer.test(oldSpectatorInventory, player)) {
-                            if (newEnderSpectator == null) {
-                                //this also updates the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
-                                newEnderSpectator = spectateEnderChest(player, enderTitle);
-                                newEnderSpectator.setContents(oldSpectatorInventory);
-                            }
+                }
+            }
 
-                            if (oldSpectatorInventory instanceof ShallowCopy) {
-                                //the inventory supports in-place replacement, let's do just that!
-                                ((ShallowCopy<EnderSpectatorInventory>) oldSpectatorInventory).shallowCopyFrom(newEnderSpectator);
-                                online.updateInventory();
-                            } else {
-                                //replacement not supported: close and re-open
-                                online.closeInventory();
-                                online.openInventory(newEnderSpectator);
-                            }
-                        }
+            final EnderSpectatorInventory oldEnderSpectator = enderRef.get();
+            if (oldEnderSpectator != null && transferEnderToLivePlayer.test(oldEnderSpectator, player)) {
+                if (newEnderSpectator == null) {
+                    newEnderSpectator = spectateEnderChest(player, enderTitle, enderchestMirror);
+                    newEnderSpectator.setContents(oldEnderSpectator); //set the contents of the player's enderchest to the contents that the spectators have.
+                }
+
+                if (oldEnderSpectator instanceof ShallowCopy) {
+                    ((ShallowCopy<EnderSpectatorInventory>) oldEnderSpectator).shallowCopyFrom(newEnderSpectator); //shallow-copy the live itemstack list into the open spectator inventory.
+                } else {
+                    //does not shpport shallow copying, just close and re-open, and update the cache!
+                    openEnderChests.put(uuid, new WeakReference<>(newEnderSpectator));
+                    for (HumanEntity viewer : List.copyOf(oldEnderSpectator.getViewers())) {
+                        viewer.closeInventory();
+                        viewer.openInventory(newEnderSpectator);
                     }
                 }
             }
@@ -747,18 +733,16 @@ public abstract class InvseeAPI {
             UUID uuid = player.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, player.getName());
 
+            //the following logic is flawed: we shan't remove spectator inventories from the cache - the cache does that itself.
+            //as long as we can be sure that the UUID of the target player is garbage-collected.
+            //the reason this logic is flawed is because API consumers could still be holding on to SpectatorInventory references, hence they should stay in the cache, even if nobody is viewing.
+
+            /*
             WeakReference<MainSpectatorInventory> invRef = openInventories.get(uuid);
             if (invRef != null) {
                 MainSpectatorInventory inv = invRef.get();
                 if (inv != null) {
-                    boolean open = false;
-                    for (Player online : player.getServer().getOnlinePlayers()) {
-                        if (online.getOpenInventory().getTopInventory().equals(inv)) {
-                            open = true;
-                            break;
-                        }
-                    }
-                    if (!open) {
+                    if (inv.getViewers().isEmpty()) {
                         openInventories.remove(uuid);
                     }
                 }
@@ -767,18 +751,12 @@ public abstract class InvseeAPI {
             if (enderRef != null) {
                 EnderSpectatorInventory ender = enderRef.get();
                 if (ender != null) {
-                    boolean open = false;
-                    for (Player online : player.getServer().getOnlinePlayers()) {
-                        if (online.getOpenInventory().getTopInventory().equals(ender)) {
-                            open = true;
-                            break;
-                        }
-                    }
-                    if (!open) {
+                    if (ender.getViewers().isEmpty()) {
                         openEnderChests.remove(uuid);
                     }
                 }
             }
+             */
         }
     }
 

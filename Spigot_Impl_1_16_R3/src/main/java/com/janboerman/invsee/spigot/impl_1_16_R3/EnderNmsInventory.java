@@ -60,6 +60,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
     @Override
     public void shallowCopyFrom(EnderNmsInventory from) {
         this.storageContents = from.storageContents;
+        update();
     }
 
     @Override

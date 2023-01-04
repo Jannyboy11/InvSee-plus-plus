@@ -36,15 +36,8 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
 		this.armourContents = inv.armor;
 		this.offHand = inv.offhand;
 		this.onCursor = new Ref<>() {
-			@Override
-			public void set(ItemStack item) {
-				target.containerMenu.setCarried(item);
-			}
-			
-			@Override
-			public ItemStack get() {
-				return target.containerMenu.getCarried();
-			}
+			@Override public void set(ItemStack item) { target.containerMenu.setCarried(item); }
+			@Override public ItemStack get() { return target.containerMenu.getCarried(); }
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
 	}
@@ -63,6 +56,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
 		this.onCursor = from.onCursor;
 		this.craftingContents = from.craftingContents;
 		this.personalContents = from.personalContents;
+		setChanged();
 	}
 	
 	private Ref<ItemStack> decideWhichItem(int slot) {

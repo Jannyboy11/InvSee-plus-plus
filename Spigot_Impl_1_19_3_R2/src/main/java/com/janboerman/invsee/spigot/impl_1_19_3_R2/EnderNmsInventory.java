@@ -39,6 +39,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderNmsInv
 	public void shallowCopyFrom(EnderNmsInventory from) {
 		this.setMaxStackSize(from.getMaxStackSize());
 		this.storageContents = from.storageContents;
+		setChanged();
 	}
 
 	@Override

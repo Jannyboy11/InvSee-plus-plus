@@ -98,6 +98,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
         this.onCursor = from.onCursor;
         this.playerCraftingContents = from.playerCraftingContents;
         this.personalContents = from.personalContents;
+        update();
     }
 
     private Ref<ItemStack> decideWhichItem(int slot) {
