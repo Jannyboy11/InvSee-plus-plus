@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.impl_1_15_R1;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
+import com.janboerman.invsee.utils.UUIDHelper;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftHumanEntity;
@@ -46,7 +47,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
         super(TileEntityTypeFakeEnderChest);
-        this.spectatedPlayerUuid = spectatedPlayerUuid;
+        this.spectatedPlayerUuid = UUIDHelper.copy(spectatedPlayerUuid);
         this.spectatedPlayerName = spectatedPlayerName;
         this.storageContents = storageContents;
         this.title = title;

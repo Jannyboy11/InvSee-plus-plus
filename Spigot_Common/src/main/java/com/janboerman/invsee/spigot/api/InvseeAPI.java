@@ -751,9 +751,16 @@ public abstract class InvseeAPI {
             //we shan't remove spectator inventories from the openInventories and openEnderChests cache
             //the reason this logic is flawed is that API consumers could still be holding on to SpectatorInventory references, hence they should stay in the cache, even if nobody is viewing.
             //entries will be evicted from the cache once the target player uuid gets garbage-collected (happens when the player logs out and no other plugins are holding on to their uuid).
-            //I don't like this design though. other plugins could be holding on to the target player's id for whatever reason.
-            //It's better to use the SpectatorInventory itself as the WeakHashMap key.
-            //TODO improve the situation.
+            //I don't like this design though. other plugins could be holding on to the target player's uuid for whatever reason.
+            //It's better to use the SpectatorInventory itself as the WeakHashMap key. In that case entries are removed when the SpectatorInventory itself is garbage-collected.
+            //I should probably override .equals in every BukkitInventory implementation then: SpectatorInventories are equal when they are of the same type, and their targetPlayerUUIDs are equal!
+
+            //What if I use a Trie implementation with UUID keys? (use the bits of the uuid as symbols in the key strings!)
+            //If I go this route, then I need to continuously check whether nodes can be cleaned up from the Trie though. That does not have to be a problem, but I think it's rather ugly tho.
+
+            //Alternatively, I could just create new UUID objects for every SpectatorInventory (in their constructors) so that I don't hold on to existing UUIDs.
+            //In that case, it is important that I *ALWAYS* use the UUID obtained from the SpectatorInventory for the cache key.
+            //^ This is the solution I went with for now. It's pretty disgusting since api implementors need to be aware that this is necessary now!!
         }
     }
 
@@ -771,7 +778,7 @@ public abstract class InvseeAPI {
                             plugin.getLogger().log(Level.SEVERE, "Error while saving offline inventory", throwable);
                             event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the inventory.");
                         }
-                    });
+                    }); //idem: don't remove from cache.
                 }
             } else if (inventory instanceof EnderSpectatorInventory) {
                 EnderSpectatorInventory spectatorInventory = (EnderSpectatorInventory) inventory;
@@ -782,7 +789,7 @@ public abstract class InvseeAPI {
                             plugin.getLogger().log(Level.SEVERE, "Error while saving offline enderchest", throwable);
                             event.getPlayer().sendMessage(ChatColor.RED + "Something went wrong when trying to save the enderchest.");
                         }
-                    });
+                    }); //idem: don't remove from cache.
                 }
             }
         }

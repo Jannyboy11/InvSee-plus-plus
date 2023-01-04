@@ -18,4 +18,8 @@ public class UUIDHelper {
     public static String unDashed(UUID id) {
         return id.toString().replace("-", "");
     }
+
+    public static UUID copy(UUID from) {
+        return new UUID(from.getMostSignificantBits(), from.getLeastSignificantBits());
+    }
 }

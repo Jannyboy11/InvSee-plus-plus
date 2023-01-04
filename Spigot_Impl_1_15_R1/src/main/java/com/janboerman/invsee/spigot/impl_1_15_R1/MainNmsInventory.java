@@ -6,6 +6,7 @@ import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
+import com.janboerman.invsee.utils.UUIDHelper;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftHumanEntity;
@@ -60,7 +61,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
         super(TileEntityTypeFakePlayerInventory);
-        this.spectatedPlayerUuid = target.getUniqueID();
+        this.spectatedPlayerUuid = UUIDHelper.copy(target.getUniqueID());
         this.spectatedPlayerName = target.getName();
         PlayerInventory inv = target.inventory;
         this.storageContents = inv.items;

@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.internal.inventory;
 
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.utils.UUIDHelper;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
@@ -27,7 +28,7 @@ public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventor
     protected InventoryHolder owner;
 
     protected AbstractNmsInventory(UUID targetPlayerUuid, String targetPlayerName, String title, Mirror<Slot> mirror) {
-        this.targetPlayerUuid = targetPlayerUuid;
+        this.targetPlayerUuid = UUIDHelper.copy(targetPlayerUuid);
         this.targetPlayerName = targetPlayerName;
         this.title = title;
         this.mirror = mirror;
