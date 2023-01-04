@@ -3,6 +3,8 @@ package com.janboerman.invsee.spigot.impl_1_16_R3;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.inventory.Watchable;
+import com.janboerman.invsee.spigot.internal.inventory.Wrapper;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.*;
@@ -15,7 +17,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
-public class MainBukkitInventory extends CraftInventory implements MainSpectatorInventory {
+public class MainBukkitInventory extends CraftInventory implements MainSpectatorInventory, Watchable, Wrapper<MainNmsInventory, MainBukkitInventory> {
 
     protected MainBukkitInventory(MainNmsInventory nmsInventory) {
         super(nmsInventory);
@@ -289,76 +291,6 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
         }
 
         return leftOvers;
-    }
-
-    private ItemStack addItem(ItemStack itemStack) {
-        if (itemStack == null || itemStack.getAmount() == 0) return null;
-
-        ItemStack[] storageContents = getStorageContents();
-        addItem(storageContents, itemStack, getMaxStackSize());
-        setStorageContents(storageContents);
-
-        if (itemStack.getAmount() == 0) return null;
-
-        ItemStack[] armourContents = getArmourContents();
-        addItem(armourContents, itemStack, getMaxStackSize());
-        setArmourContents(armourContents);
-
-        if (itemStack.getAmount() == 0) return null;
-
-        ItemStack[] offHand = getOffHandContents();
-        addItem(offHand, itemStack, getMaxStackSize());
-        setOffHandContents(offHand);
-
-        return itemStack;
-    }
-
-    private static void addItem(final ItemStack[] contents, final ItemStack itemStack, final int maxStackSize) {
-        assert contents != null && itemStack != null;
-
-        //merge with existing similar item stacks
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack existingStack = contents[i];
-            if (existingStack != null) {
-                if (existingStack.isSimilar(itemStack) && existingStack.getAmount() < maxStackSize) {
-                    //how many can we merge (at most)?
-                    int maxMergeAmount = Math.min(maxStackSize - existingStack.getAmount(), itemStack.getAmount());
-                    if (maxMergeAmount > 0) {
-                        if (itemStack.getAmount() <= maxMergeAmount) {
-                            //full merge
-                            existingStack.setAmount(existingStack.getAmount() + itemStack.getAmount());
-                            itemStack.setAmount(0);
-                        } else {
-                            //partial merge
-                            existingStack.setAmount(maxStackSize);
-                            itemStack.setAmount(itemStack.getAmount() - maxMergeAmount);
-                        }
-                    }
-                }
-            }
-
-            if (itemStack.getAmount() == 0) break;
-        }
-
-        //merge with empty slots
-        if (itemStack.getAmount() > 0) {
-            for (int i = 0; i < contents.length; i++) {
-                if (contents[i] == null || contents[i].getAmount() == 0 || contents[i].getType() == Material.AIR) {
-                    if (itemStack.getAmount() <= maxStackSize) {
-                        //full merge
-                        contents[i] = itemStack.clone();
-                        itemStack.setAmount(0);
-                    } else {
-                        //partial merge
-                        ItemStack clone = itemStack.clone(); clone.setAmount(maxStackSize);
-                        contents[i] = clone;
-                        itemStack.setAmount(itemStack.getAmount() - maxStackSize);
-                    }
-                }
-
-                if (itemStack.getAmount() == 0) break;
-            }
-        }
     }
 
 }

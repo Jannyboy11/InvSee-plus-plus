@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_15_R1;
 
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftHumanEntity;
@@ -15,17 +16,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-class EnderNmsInventory extends TileEntityContainer {
+class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNmsInventory unfortunately */ implements ShallowCopy<EnderNmsInventory> {
 
     private static final TileEntityTypes TileEntityTypeFakeEnderChest = new TileEntityTypes(EnderNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.NilSave());
 
     protected final UUID spectatedPlayerUuid;
     protected final String spectatedPlayerName;
-    protected final NonNullList<ItemStack> storageContents;
+    protected NonNullList<ItemStack> storageContents;
 
     protected Inventory bukkit;
-    protected String title;
-    protected Mirror<EnderChestSlot> mirror = Mirror.defaultEnderChest();
+    final protected String title;
+    final protected Mirror<EnderChestSlot> mirror;
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -36,9 +37,11 @@ class EnderNmsInventory extends TileEntityContainer {
         spectatedPlayerUuid = null;
         spectatedPlayerName = null;
         storageContents = null;
+        title = null;
+        mirror = null;
     }
 
-    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents) {
+    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
         // Possibly could've used TileEntityTypes.ENDER_CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
@@ -46,17 +49,19 @@ class EnderNmsInventory extends TileEntityContainer {
         this.spectatedPlayerUuid = spectatedPlayerUuid;
         this.spectatedPlayerName = spectatedPlayerName;
         this.storageContents = storageContents;
-    }
-
-    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title) {
-        this(spectatedPlayerUuid, spectatedPlayerName, storageContents);
         this.title = title;
-        this.setCustomName(CraftChatMessage.fromStringOrNull(title));
+        this.mirror = mirror;
     }
 
-    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
-        this(spectatedPlayerUuid, spectatedPlayerName, storageContents, title);
-        this.mirror = mirror;
+    @Override
+    public int defaultMaxStack() {
+        return IInventory.MAX_STACK;
+    }
+
+    @Override
+    public void shallowCopyFrom(EnderNmsInventory from) {
+        setMaxStackSize(from.getMaxStackSize());
+        this.storageContents = from.storageContents;
     }
 
     @Override

@@ -168,5 +168,4 @@ public class UsernameTrieTest {
         return name;
     }
 
-
 }

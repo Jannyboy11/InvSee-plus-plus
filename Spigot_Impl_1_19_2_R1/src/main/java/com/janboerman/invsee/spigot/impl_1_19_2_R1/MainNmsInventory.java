@@ -2,9 +2,11 @@ package com.janboerman.invsee.spigot.impl_1_19_2_R1;
 
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
+
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -13,39 +15,23 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.Location;
+
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.InventoryHolder;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-class MainNmsInventory implements Container, MenuProvider {
+class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNmsInventory> implements Container, MenuProvider {
 
-	protected final UUID targetPlayerUuid;
-	protected final String targetPlayerName;
-	protected final NonNullList<ItemStack> storageContents;
-	protected final NonNullList<ItemStack> armourContents;
-	protected final NonNullList<ItemStack> offHand;
-
-	protected final Ref<ItemStack> onCursor;
-	protected final List<ItemStack> craftingContents;
+	protected NonNullList<ItemStack> storageContents;
+	protected NonNullList<ItemStack> armourContents;
+	protected NonNullList<ItemStack> offHand;
+	protected Ref<ItemStack> onCursor;
+	protected List<ItemStack> craftingContents;
 	protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
-	protected org.bukkit.inventory.Inventory bukkit;
-	protected String title;
-	protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
-
-	private int maxStack = Container.MAX_STACK;
-	private final List<HumanEntity> transaction = new ArrayList<>();
-	protected InventoryHolder owner;
-
-	protected MainNmsInventory(Player target) {
-		this.targetPlayerUuid = target.getUUID();
-		this.targetPlayerName = target.getScoreboardName();
+	MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
+		super(target.getUUID(), target.getScoreboardName(), title, mirror);
 		Inventory inv = target.getInventory();
 		this.storageContents = inv.items;
 		this.armourContents = inv.armor;
@@ -64,16 +50,20 @@ class MainNmsInventory implements Container, MenuProvider {
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
 	}
 
-	protected MainNmsInventory(Player target, String title) {
-		this(target);
-
-		this.title = title;
+	@Override
+	public int defaultMaxStack() {
+		return Container.LARGE_MAX_STACK_SIZE;
 	}
 
-	protected MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
-		this(target, title);
-
-		this.mirror = mirror;
+	@Override
+	public void shallowCopyFrom(MainNmsInventory from) {
+		setMaxStackSize(from.getMaxStackSize());
+		this.storageContents = from.storageContents;
+		this.armourContents = from.armourContents;
+		this.offHand = from.offHand;
+		this.onCursor = from.onCursor;
+		this.craftingContents = from.craftingContents;
+		this.personalContents = from.personalContents;
 	}
 
 	private Ref<ItemStack> decideWhichItem(int slot) {
@@ -160,26 +150,6 @@ class MainNmsInventory implements Container, MenuProvider {
 	}
 
 	@Override
-	public Location getLocation() {
-		return null;
-	}
-
-	@Override
-	public int getMaxStackSize() {
-		return maxStack;
-	}
-
-	@Override
-	public InventoryHolder getOwner() {
-		return owner;
-	}
-
-	@Override
-	public List<HumanEntity> getViewers() {
-		return transaction;
-	}
-
-	@Override
 	public boolean isEmpty() {
 		for (ItemStack stack : armourContents) {
 			if (!stack.isEmpty()) return false;
@@ -200,12 +170,12 @@ class MainNmsInventory implements Container, MenuProvider {
 
 	@Override
 	public void onClose(CraftHumanEntity bukkitPlayer) {
-		transaction.remove(bukkitPlayer);
+		super.onClose(bukkitPlayer);
 	}
 
 	@Override
 	public void onOpen(CraftHumanEntity bukkitPlayer) {
-		transaction.add(bukkitPlayer);
+		super.onOpen(bukkitPlayer);
 	}
 
 	@Override
@@ -255,11 +225,6 @@ class MainNmsInventory implements Container, MenuProvider {
 		}
 
 		setChanged();
-	}
-
-	@Override
-	public void setMaxStackSize(int amount) {
-		this.maxStack = amount;
 	}
 
 	@Override

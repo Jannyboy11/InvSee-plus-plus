@@ -14,4 +14,9 @@ public interface EnderSpectatorInventory extends SpectatorInventory<EnderChestSl
         return Mirror.defaultEnderChest();
     }
 
+    /** Set the contents of this inventory based on the contents from the provided inventory */
+    public default void setContents(EnderSpectatorInventory newContents) {
+        setStorageContents(newContents.getStorageContents());
+    }
+
 }

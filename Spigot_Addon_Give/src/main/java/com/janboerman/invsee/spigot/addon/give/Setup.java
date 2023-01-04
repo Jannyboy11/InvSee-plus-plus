@@ -30,8 +30,6 @@ interface Setup {
             }
         } else if ("org.bukkit.craftbukkit.v1_19_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_19:
-                    return new Impl_1_19();
                 case MappingsVersion._1_19_2:
                     return new Impl_1_19_2();
             }
@@ -43,7 +41,7 @@ interface Setup {
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
-            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19, 1.19.2, 1.19.3]. Are you running the latest InvSee++_Give?");
+            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.3]. Are you running the latest InvSee++_Give?");
         } else {
             throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
         }
@@ -73,12 +71,6 @@ class Impl_1_19_3 extends SetupImpl {
 class Impl_1_19_2 extends SetupImpl {
     Impl_1_19_2() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_19_2_R1.GiveImpl.INSTANCE);
-    }
-}
-
-class Impl_1_19 extends SetupImpl {
-    Impl_1_19() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_1_19_R1.GiveImpl.INSTANCE);
     }
 }
 

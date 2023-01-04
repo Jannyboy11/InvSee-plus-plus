@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_15_R1;
 
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
@@ -21,18 +22,18 @@ import java.util.UUID;
 
 import static com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl.EMPTY_STACK;
 
-public class MainNmsInventory extends TileEntityContainer {
+public class MainNmsInventory extends TileEntityContainer /* cannot extend AbstractNmsInventory unfortunately */ implements ShallowCopy<MainNmsInventory> {
 
     private static final TileEntityTypes TileEntityTypeFakePlayerInventory = new TileEntityTypes(MainNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.NilSave());
 
     protected final UUID spectatedPlayerUuid;
     protected final String spectatedPlayerName;
-    protected final NonNullList<ItemStack> storageContents;
-    protected final NonNullList<ItemStack> armourContents;
-    protected final NonNullList<ItemStack> offHand;
+    protected NonNullList<ItemStack> storageContents;
+    protected NonNullList<ItemStack> armourContents;
+    protected NonNullList<ItemStack> offHand;
 
-    protected final Ref<ItemStack> onCursor;
-    protected final List<ItemStack> playerCraftingContents;
+    protected Ref<ItemStack> onCursor;
+    protected List<ItemStack> playerCraftingContents;
     protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
     protected Inventory bukkit;
@@ -54,7 +55,7 @@ public class MainNmsInventory extends TileEntityContainer {
         playerCraftingContents = null;
     }
 
-    protected MainNmsInventory(EntityHuman target) {
+    MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
         // Possibly could've used TileEntityTypes.CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
@@ -78,19 +79,25 @@ public class MainNmsInventory extends TileEntityContainer {
         };
         IInventory /*InventoryCrafting*/ playerCrafting = ((CraftInventory) target.defaultContainer.getBukkitView().getTopInventory()).getInventory();
         this.personalContents = this.playerCraftingContents = playerCrafting.getContents();
-    }
-
-    protected MainNmsInventory(EntityHuman target, String title) {
-        this(target);
 
         this.title = title;
-        this.setCustomName(CraftChatMessage.fromStringOrNull(title));
+        this.mirror = mirror;
     }
 
-    protected MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
-        this(target, title);
+    @Override
+    public int defaultMaxStack() {
+        return IInventory.MAX_STACK;
+    }
 
-        this.mirror = mirror;
+    @Override
+    public void shallowCopyFrom(MainNmsInventory from) {
+        setMaxStackSize(from.getMaxStackSize());
+        this.storageContents = from.storageContents;
+        this.armourContents = from.armourContents;
+        this.offHand = from.offHand;
+        this.onCursor = from.onCursor;
+        this.playerCraftingContents = from.playerCraftingContents;
+        this.personalContents = from.personalContents;
     }
 
     private Ref<ItemStack> decideWhichItem(int slot) {

@@ -3,11 +3,12 @@ package com.janboerman.invsee.spigot.impl_1_15_R1;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.internal.inventory.Wrapper;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftInventory;
 
 import java.util.UUID;
 
-public class EnderBukkitInventory extends CraftInventory implements EnderSpectatorInventory {
+public class EnderBukkitInventory extends CraftInventory implements EnderSpectatorInventory, Wrapper<EnderNmsInventory, EnderBukkitInventory> {
 
     protected EnderBukkitInventory(EnderNmsInventory inventory) {
         super(inventory);

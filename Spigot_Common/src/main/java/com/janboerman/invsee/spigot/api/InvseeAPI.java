@@ -17,6 +17,8 @@ import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
+import com.janboerman.invsee.spigot.internal.inventory.Watchable;
 import com.janboerman.invsee.utils.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -35,17 +37,21 @@ public abstract class InvseeAPI {
     private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
     private Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
 
-    private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());
+    private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());    //TODO does this need to be synchronised still?
+    //TODO this^ design can fail very badly when two players spectate the same player, using different profiles!
     private final Map<String, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByUuid = new ConcurrentHashMap<>();
 
-    private Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests = Collections.synchronizedMap(new WeakHashMap<>());
+    private Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests = Collections.synchronizedMap(new WeakHashMap<>());   //TODO does this need to be synchronised still?
+    //TODO this^ design can fail very badly when two players spectate the same player, using different profiles!
     private final Map<String, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByUuid = new ConcurrentHashMap<>();
 
     private Function<Player, String> mainSpectatorInvTitleProvider = player -> spectateInventoryTitle(player.getName());
     private Function<Player, String> enderSpectatorInvTitleProvider = player -> spectateEnderchestTitle(player.getName());
 
+    //TODO I don't like the design of this. This looks like a hack purely introduced for PerWorldInventory integration
+    //TODO maybe we can create a proper abstraction and use that for Multiverse-Inventories / MyWorlds?
     private BiPredicate<MainSpectatorInventory, Player> transferInvToLivePlayer = (spectatorInv, player) -> true;
     private BiPredicate<EnderSpectatorInventory, Player> transferEnderToLivePlayer = (spectatorInv, player) -> true;
 
@@ -178,36 +184,48 @@ public abstract class InvseeAPI {
     //TODO for future compat: create a class CreationOptions (which includes Title and Mirror)?
     //TODO this could be a replacement for multiple parameters now.
 
-    //TODO override this in more implementations
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(player, title);
     }
+    /**
+     * Use {@link #spectateInventory(HumanEntity, String, Mirror)} instead.
+     * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
+     */
     @Deprecated
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         return spectateInventory(player, title, inventoryMirror);
     }
-    //TODO override this in implementations
     public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
         return createOfflineInventory(playerId, playerName, title);
     }
+    /**
+     * Use {@link #createOfflineInventory(UUID, String, String, Mirror)} instead.
+     * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
+     */
     @Deprecated
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
         return createOfflineInventory(playerId, playerName, title, inventoryMirror);
     }
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
-    //TODO override this is more implementations
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(player, title);
     }
+    /**
+     * Use {@link #spectateEnderChest(HumanEntity, String, Mirror)} instead.
+     * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
+     */
     @Deprecated
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
         return spectateEnderChest(player, title, enderchestMirror);
     }
-    //TODO override this in implementations
     public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
         return createOfflineEnderChest(playerId, playerName, title);
     }
+    /**
+     * Use {@link #createOfflineEnderChest(UUID, String, String, Mirror)} instead.
+     * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
+     */
     @Deprecated
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
         return createOfflineEnderChest(playerId, playerName, title, enderchestMirror);
@@ -664,6 +682,17 @@ public abstract class InvseeAPI {
             if (enderUuidFuture != null) enderUuidFuture.complete(SpectateResponse.succeed(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderTitle))));
 
             //check if somebody was looking in the offline inventory and update player's inventory.
+
+            //TODO
+            //TODO do we really need to loop over all players to find all spectators?
+            //TODO can't we just make use of the openInventories and openEnderChests caches?
+            //TODO if we need the list of viewers, we could just do { SpectatorInventory si = cache.get(targetUuid); List<HumanEntity> viewers = si.getViewers(); }
+            //TODO this currently does not work for profile-tied spectator inventories (PWI)
+            //TODO
+            //TODO I think we can, but we have to be really careful about spectator inventories that are tied to a player's profile (e.g. PWI ProfileKey)
+            //TODO maybe the caches contain only 'global' spectator inventories?
+            //TODO
+
             for (Player online : player.getServer().getOnlinePlayers()) {
                 Inventory topInventory = online.getOpenInventory().getTopInventory();
                 if (topInventory instanceof MainSpectatorInventory) {
@@ -673,17 +702,18 @@ public abstract class InvseeAPI {
                             if (newInventorySpectator == null) {
                                 newInventorySpectator = spectateInventory(player, mainTitle);
                                 //this also updates the player's inventory! (because they are backed by the same NonNullList<ItemStacks>s)
-                                newInventorySpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
-                                newInventorySpectator.setArmourContents(oldSpectatorInventory.getArmourContents());
-                                newInventorySpectator.setOffHandContents(oldSpectatorInventory.getOffHandContents());
-                                newInventorySpectator.setCursorContents(oldSpectatorInventory.getCursorContents());
-                                newInventorySpectator.setPersonalContents(oldSpectatorInventory.getPersonalContents());
+                                newInventorySpectator.setContents(oldSpectatorInventory);
                             }
-							
-							//TODO instead of re-opening the inventory, couldn't we just 'set' the top inventory of the Container(/InventoryView)? This is possible since we implement our own anyway!
-							//TODO maybe we can even 'set' the nms inventory instance within the bukkit wrapper.
-                            online.closeInventory();
-                            online.openInventory(newInventorySpectator);
+
+                            if (oldSpectatorInventory instanceof ShallowCopy) {
+                                //the inventory supports in-place replacement, let's do just that!
+                                ((ShallowCopy<MainSpectatorInventory>) oldSpectatorInventory).shallowCopyFrom(newInventorySpectator);
+                                online.updateInventory();
+                            } else {
+                                //replacement not supported: close and re-open
+                                online.closeInventory();
+                                online.openInventory(newInventorySpectator);
+                            }
                         }
                     }
                 } else if (topInventory instanceof EnderSpectatorInventory) {
@@ -693,12 +723,18 @@ public abstract class InvseeAPI {
                             if (newEnderSpectator == null) {
                                 //this also updates the player's enderchest! (because they are backed by the same NonNullList<ItemStack>)
                                 newEnderSpectator = spectateEnderChest(player, enderTitle);
-                                newEnderSpectator.setStorageContents(oldSpectatorInventory.getStorageContents());
+                                newEnderSpectator.setContents(oldSpectatorInventory);
                             }
 
-							//Idem!
-                            online.closeInventory();
-                            online.openInventory(newEnderSpectator);
+                            if (oldSpectatorInventory instanceof ShallowCopy) {
+                                //the inventory supports in-place replacement, let's do just that!
+                                ((ShallowCopy<EnderSpectatorInventory>) oldSpectatorInventory).shallowCopyFrom(newEnderSpectator);
+                                online.updateInventory();
+                            } else {
+                                //replacement not supported: close and re-open
+                                online.closeInventory();
+                                online.openInventory(newEnderSpectator);
+                            }
                         }
                     }
                 }
@@ -799,9 +835,10 @@ public abstract class InvseeAPI {
             HumanEntity target = event.getPlayer();
             WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
             MainSpectatorInventory spectatorInventory;
-            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) != null) {
+            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Watchable) {
+                //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
                 //set the cursor reference and crafting inventory
-                spectatorInventory.watch(event.getView());
+                ((Watchable) spectatorInventory).watch(event.getView());
             }
         }
 
@@ -810,8 +847,10 @@ public abstract class InvseeAPI {
             HumanEntity target = event.getPlayer();
             WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
             MainSpectatorInventory spectatorInventory;
-            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) != null) {
-                spectatorInventory.unwatch();
+            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Watchable) {
+                //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
+                //reset personal contents to the player's own crafting contents
+                ((Watchable) spectatorInventory).unwatch();
             }
         }
 

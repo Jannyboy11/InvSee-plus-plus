@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_12_R1;
 
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
@@ -14,45 +15,25 @@ import net.minecraft.server.v1_12_R1.ITileEntityContainer;
 import net.minecraft.server.v1_12_R1.ItemStack;
 import net.minecraft.server.v1_12_R1.NonNullList;
 import net.minecraft.server.v1_12_R1.PlayerInventory;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class MainNmsInventory implements IInventory, ITileEntityContainer {
+class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNmsInventory> implements IInventory, ITileEntityContainer {
 
-    protected final UUID spectatedPlayerUuid;
-    protected final String spectatedPlayerName;
-    protected final NonNullList<ItemStack> storageContents;
-    protected final NonNullList<ItemStack> armourContents;
-    protected final NonNullList<ItemStack> offHand;
+    protected NonNullList<ItemStack> storageContents;
+    protected NonNullList<ItemStack> armourContents;
+    protected NonNullList<ItemStack> offHand;
 
-    protected final Ref<ItemStack> onCursor;
-    protected final List<ItemStack> playerCraftingContents;
+    protected Ref<ItemStack> onCursor;
+    protected List<ItemStack> playerCraftingContents;
     protected List<ItemStack> personalContents;  //crafting, anvil, merchant, enchanting
 
-    protected Inventory bukkit;
-    protected String title;
-    protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
+    MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
+        super(target.getUniqueID(), target.getName(), title, mirror);
 
-    private int maxStack = IInventory.MAX_STACK;
-    private final List<HumanEntity> transaction = new ArrayList<>();
-    protected InventoryHolder owner;
-
-    protected MainNmsInventory(EntityHuman target) {
-        // Possibly could've used TileEntityTypes.CHEST, but I'm afraid that will cause troubles elsewhere.
-        // So use the fake type for now.
-        // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
-
-        this.spectatedPlayerUuid = target.getUniqueID();
-        this.spectatedPlayerName = target.getName();
         PlayerInventory inv = target.inventory;
         this.storageContents = inv.items;
         this.armourContents = inv.armor;
@@ -72,16 +53,20 @@ public class MainNmsInventory implements IInventory, ITileEntityContainer {
         this.personalContents = this.playerCraftingContents = playerCrafting.getContents();
     }
 
-    protected MainNmsInventory(EntityHuman target, String title) {
-        this(target);
-
-        this.title = title;
+    @Override
+    public int defaultMaxStack() {
+        return IInventory.MAX_STACK;
     }
 
-    protected MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
-        this(target, title);
-
-        this.mirror = mirror;
+    @Override
+    public void shallowCopyFrom(MainNmsInventory from) {
+        setMaxStackSize(from.getMaxStackSize());
+        this.storageContents = from.storageContents;
+        this.armourContents = from.armourContents;
+        this.offHand = from.offHand;
+        this.onCursor = from.onCursor;
+        this.playerCraftingContents = from.playerCraftingContents;
+        this.personalContents = from.personalContents;
     }
 
     private Ref<ItemStack> decideWhichItem(int slot) {
@@ -196,11 +181,6 @@ public class MainNmsInventory implements IInventory, ITileEntityContainer {
     }
 
     @Override
-    public int getMaxStackSize() {
-        return maxStack;
-    }
-
-    @Override
     public void update() {
         //called after an item in the inventory was removed, added or updated.
         //looking at InventorySubContainer, I don't think we need to do anything here.
@@ -221,12 +201,12 @@ public class MainNmsInventory implements IInventory, ITileEntityContainer {
 
     @Override
     public void startOpen(EntityHuman entityHuman) {
-        transaction.add(entityHuman.getBukkitEntity());
+        onOpen(entityHuman.getBukkitEntity());
     }
 
     @Override
     public void closeContainer(EntityHuman entityHuman) {
-        transaction.remove(entityHuman.getBukkitEntity());
+        onClose(entityHuman.getBukkitEntity());
     }
 
     @Override
@@ -265,32 +245,12 @@ public class MainNmsInventory implements IInventory, ITileEntityContainer {
 
     @Override
     public void onOpen(CraftHumanEntity who) {
-        transaction.add(who);
+        super.onOpen(who);
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
-        transaction.remove(who);
-    }
-
-    @Override
-    public List<HumanEntity> getViewers() {
-        return transaction;
-    }
-
-    @Override
-    public InventoryHolder getOwner() {
-        return owner;
-    }
-
-    @Override
-    public void setMaxStackSize(int maxStack) {
-        this.maxStack = maxStack;
-    }
-
-    @Override
-    public Location getLocation() {
-        return null;
+        super.onClose(who);
     }
 
     @Override

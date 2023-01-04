@@ -36,8 +36,6 @@ public interface Setup {
             }
         } else if ("org.bukkit.craftbukkit.v1_19_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_19:
-                    return new Impl_1_19(plugin);
                 case MappingsVersion._1_19_2:
                     return new Impl_1_19_2(plugin);
             }
@@ -49,7 +47,7 @@ public interface Setup {
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
-            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19, 1.19.2, 1.19.3]. Are you running the latest InvSee++?");
+            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.3]. Are you running the latest InvSee++?");
         } else {
             throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
         }
@@ -87,12 +85,6 @@ class Impl_1_17_1 extends SetupImpl {
 class Impl_1_18_2 extends SetupImpl {
     Impl_1_18_2(Plugin plugin) {
         super(new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin));
-    }
-}
-
-class Impl_1_19 extends SetupImpl {
-    Impl_1_19(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_19_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_R1.KnownPlayersProvider(plugin));
     }
 }
 

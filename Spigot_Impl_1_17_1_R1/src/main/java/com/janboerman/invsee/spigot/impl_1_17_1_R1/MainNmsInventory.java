@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
@@ -25,16 +27,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
-class MainNmsInventory implements Container, MenuProvider {
+class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNmsInventory> implements Container, MenuProvider {
 
     protected final UUID targetPlayerUuid;
     protected final String targetPlayerName;
-    protected final NonNullList<ItemStack> storageContents;
-    protected final NonNullList<ItemStack> armourContents;
-    protected final NonNullList<ItemStack> offHand;
+    protected NonNullList<ItemStack> storageContents;
+    protected NonNullList<ItemStack> armourContents;
+    protected NonNullList<ItemStack> offHand;
 
-    protected final Ref<ItemStack> onCursor;
-    protected final List<ItemStack> craftingContents;
+    protected Ref<ItemStack> onCursor;
+    protected List<ItemStack> craftingContents;
     protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
     protected org.bukkit.inventory.Inventory bukkit;
@@ -45,7 +47,9 @@ class MainNmsInventory implements Container, MenuProvider {
     private final List<HumanEntity> transaction = new ArrayList<>();
     protected InventoryHolder owner;
 
-    protected MainNmsInventory(Player target) {
+    MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
+        super(target.getUUID(), target.getScoreboardName(), title, mirror);
+
         this.targetPlayerUuid = target.getUUID();
         this.targetPlayerName = target.getScoreboardName();
         Inventory inv = target.getInventory();
@@ -64,18 +68,25 @@ class MainNmsInventory implements Container, MenuProvider {
             }
         };
         this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
-    }
-
-    protected MainNmsInventory(Player target, String title) {
-        this(target);
 
         this.title = title;
+        this.mirror = mirror;
     }
 
-    protected MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
-        this(target, title);
+    @Override
+    public int defaultMaxStack() {
+        return Container.LARGE_MAX_STACK_SIZE;
+    }
 
-        this.mirror = mirror;
+    @Override
+    public void shallowCopyFrom(MainNmsInventory from) {
+        setMaxStackSize(from.getMaxStackSize());
+        this.storageContents = from.storageContents;
+        this.armourContents = from.armourContents;
+        this.offHand = from.offHand;
+        this.onCursor = from.onCursor;
+        this.craftingContents = from.craftingContents;
+        this.personalContents = from.personalContents;
     }
 
     private Ref<ItemStack> decideWhichItem(int slot) {

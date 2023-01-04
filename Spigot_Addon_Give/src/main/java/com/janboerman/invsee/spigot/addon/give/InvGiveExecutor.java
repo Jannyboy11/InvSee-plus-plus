@@ -94,7 +94,7 @@ class InvGiveExecutor implements CommandExecutor {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();
                         final ItemStack originalItems = finalItems.clone();
-                        Map<Integer, ItemStack> map = inventory.addItem(finalItems);
+                        Map<Integer, ItemStack> map = inventory.addItem(new ItemStack[] { finalItems });
                         if (map.isEmpty()) {
                             //success!!
                             if (plugin.getServer().getPlayer(uuid) == null)
