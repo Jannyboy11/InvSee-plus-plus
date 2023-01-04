@@ -82,6 +82,7 @@ public class InvseeImpl extends InvseeAPI {
         spectatorInv.bukkit = bukkitInventory;
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
+        cache(bukkitInventory);
         return bukkitInventory;
     }
 
@@ -131,6 +132,7 @@ public class InvseeImpl extends InvseeAPI {
         EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, title, mirror);
         EnderBukkitInventory bukkitInventory = new EnderBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
+        cache(bukkitInventory);
         return bukkitInventory;
     }
 

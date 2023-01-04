@@ -178,6 +178,13 @@ public abstract class InvseeAPI {
         return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
     }
 
+    protected void cache(MainSpectatorInventory spectatorInventory) {
+        openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+    }
+
+    protected void cache(EnderSpectatorInventory spectatorInventory) {
+        openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+    }
 
     // ================================== implementation methods ==================================
 
@@ -681,7 +688,7 @@ public abstract class InvseeAPI {
             CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderUuidFuture = pendingEnderChestsByUuid.remove(uuid);
             if (enderUuidFuture != null) enderUuidFuture.complete(SpectateResponse.succeed(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderTitle, enderchestMirror))));
 
-            
+
             //check if somebody was looking in the offline inventory and update player's inventory.
             //idem for ender.
 
@@ -696,14 +703,16 @@ public abstract class InvseeAPI {
                 }
 
                 if (oldMainSpectator instanceof ShallowCopy) {
-                    ((ShallowCopy<MainSpectatorInventory>) oldMainSpectator).shallowCopyFrom(newInventorySpectator); //shallow-copy the live itemstack lists into the open spectator inventory.
+                    //shallow-copy the live itemstack lists into the open spectator inventory and update the cache.
+                    ((ShallowCopy<MainSpectatorInventory>) oldMainSpectator).shallowCopyFrom(newInventorySpectator);
+                    openInventories.put(uuid, new WeakReference<>(oldMainSpectator));
                 } else {
                     //does not support shallow copying, just close and re-open, and update the cache!
-                    openInventories.put(uuid, new WeakReference<>(newInventorySpectator));
                     for (HumanEntity viewer : List.copyOf(oldMainSpectator.getViewers())) {
                         viewer.closeInventory();
                         viewer.openInventory(newInventorySpectator);
                     }
+                    openInventories.put(uuid, new WeakReference<>(newInventorySpectator));
                 }
             }
 
@@ -715,14 +724,16 @@ public abstract class InvseeAPI {
                 }
 
                 if (oldEnderSpectator instanceof ShallowCopy) {
-                    ((ShallowCopy<EnderSpectatorInventory>) oldEnderSpectator).shallowCopyFrom(newEnderSpectator); //shallow-copy the live itemstack list into the open spectator inventory.
+                    //shallow-copy the live itemstack list into the open spectator inventory and update the cache.
+                    ((ShallowCopy<EnderSpectatorInventory>) oldEnderSpectator).shallowCopyFrom(newEnderSpectator);
+                    openEnderChests.put(uuid, new WeakReference<>(oldEnderSpectator));
                 } else {
                     //does not shpport shallow copying, just close and re-open, and update the cache!
-                    openEnderChests.put(uuid, new WeakReference<>(newEnderSpectator));
                     for (HumanEntity viewer : List.copyOf(oldEnderSpectator.getViewers())) {
                         viewer.closeInventory();
                         viewer.openInventory(newEnderSpectator);
                     }
+                    openEnderChests.put(uuid, new WeakReference<>(newEnderSpectator));
                 }
             }
         }
@@ -733,30 +744,12 @@ public abstract class InvseeAPI {
             UUID uuid = player.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, player.getName());
 
-            //the following logic is flawed: we shan't remove spectator inventories from the cache - the cache does that itself.
-            //as long as we can be sure that the UUID of the target player is garbage-collected.
-            //the reason this logic is flawed is because API consumers could still be holding on to SpectatorInventory references, hence they should stay in the cache, even if nobody is viewing.
-
-            /*
-            WeakReference<MainSpectatorInventory> invRef = openInventories.get(uuid);
-            if (invRef != null) {
-                MainSpectatorInventory inv = invRef.get();
-                if (inv != null) {
-                    if (inv.getViewers().isEmpty()) {
-                        openInventories.remove(uuid);
-                    }
-                }
-            }
-            WeakReference<EnderSpectatorInventory> enderRef = openEnderChests.get(uuid);
-            if (enderRef != null) {
-                EnderSpectatorInventory ender = enderRef.get();
-                if (ender != null) {
-                    if (ender.getViewers().isEmpty()) {
-                        openEnderChests.remove(uuid);
-                    }
-                }
-            }
-             */
+            //we shan't remove spectator inventories from the openInventories and openEnderChests cache
+            //the reason this logic is flawed is that API consumers could still be holding on to SpectatorInventory references, hence they should stay in the cache, even if nobody is viewing.
+            //entries will be evicted from the cache once the target player uuid gets garbage-collected (happens when the player logs out and no other plugins are holding on to their uuid).
+            //I don't like this design though. other plugins could be holding on to the target player's id for whatever reason.
+            //It's better to use the SpectatorInventory itself as the WeakHashMap key.
+            //TODO improve the situation.
         }
     }
 

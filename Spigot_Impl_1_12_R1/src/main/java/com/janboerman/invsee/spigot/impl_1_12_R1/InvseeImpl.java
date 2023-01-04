@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 public class InvseeImpl extends InvseeAPI {
 
@@ -101,6 +100,7 @@ public class InvseeImpl extends InvseeAPI {
         spectatorInv.bukkit = bukkitInventory;
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
+        cache(bukkitInventory);
         return bukkitInventory;
     }
 
@@ -113,6 +113,7 @@ public class InvseeImpl extends InvseeAPI {
         EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, title, mirror);
         EnderBukkitInventory bukkitInventory = new EnderBukkitInventory(spectatorInv);
         spectatorInv.bukkit = bukkitInventory;
+        cache(bukkitInventory);
         return bukkitInventory;
     }
 
