@@ -142,10 +142,14 @@ public abstract class InvseeAPI {
         this.transferEnderToLivePlayer = bip;
     }
 
+    /** will get *protected* visibility */
+    @Deprecated(forRemoval = true) //mark deprecated for removal, because for api consumers it will look as if it is removed.
     public Map<UUID, WeakReference<MainSpectatorInventory>> getOpenInventories() {
         return openInventories;
     }
 
+    /** will get *protected* visibility */
+    @Deprecated(forRemoval = true) //mark deprecated for removal, because for api consumers it will look as if it is removed.
     public Map<UUID, WeakReference<EnderSpectatorInventory>> getOpenEnderChests() {
         return openEnderChests;
     }
@@ -761,6 +765,7 @@ public abstract class InvseeAPI {
             //Alternatively, I could just create new UUID objects for every SpectatorInventory (in their constructors) so that I don't hold on to existing UUIDs.
             //In that case, it is important that I *ALWAYS* use the UUID obtained from the SpectatorInventory for the cache key.
             //^ This is the solution I went with for now. It's pretty disgusting since api implementors need to be aware that this is necessary now!!
+            //TODO can we improve the situation?
         }
     }
 
