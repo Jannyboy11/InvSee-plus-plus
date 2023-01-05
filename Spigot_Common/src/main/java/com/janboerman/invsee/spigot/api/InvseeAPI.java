@@ -18,7 +18,7 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
-import com.janboerman.invsee.spigot.internal.inventory.Watchable;
+import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.utils.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -34,6 +34,11 @@ public abstract class InvseeAPI {
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
 
+    private Function<Player, String> mainSpectatorInvTitleProvider = player -> spectateInventoryTitle(player.getName());
+    private Function<Player, String> enderSpectatorInvTitleProvider = player -> spectateEnderchestTitle(player.getName());
+
+    private boolean offlineSupport = true;
+
     private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
     private Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
 
@@ -46,9 +51,6 @@ public abstract class InvseeAPI {
     //TODO this^ design can fail very badly when two players spectate the same player, using different profiles!
     private final Map<String, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByUuid = new ConcurrentHashMap<>();
-
-    private Function<Player, String> mainSpectatorInvTitleProvider = player -> spectateInventoryTitle(player.getName());
-    private Function<Player, String> enderSpectatorInvTitleProvider = player -> spectateEnderchestTitle(player.getName());
 
     //TODO I don't like the design of this. This looks like a hack purely introduced for PerWorldInventory integration
     //TODO maybe we can create a proper abstraction and use that for Multiverse-Inventories / MyWorlds?
@@ -88,10 +90,14 @@ public abstract class InvseeAPI {
         return lookup.getUserNameCache();
     }
 
+    /** this method has no reason to exist. */
+    @Deprecated(forRemoval = true)
     public String spectateInventoryTitle(String targetPlayerName) {
         return targetPlayerName + "'s inventory";
     }
 
+    /** @deprecated this method has no reason to exist. */
+    @Deprecated(forRemoval = true)
     public String spectateEnderchestTitle(String targetPlayerName) {
         return targetPlayerName + "'s enderchest";
     }
@@ -108,6 +114,10 @@ public abstract class InvseeAPI {
     public void unregisterListeners() {
         HandlerList.unregisterAll(playerListener);
         HandlerList.unregisterAll(inventoryListener);
+    }
+
+    public final void setOfflineSupport(boolean offlineSupport) {
+        this.offlineSupport = offlineSupport;
     }
 
     public final void setMainInventoryTitleFactory(Function<Player, String> titleFactory) {
@@ -259,7 +269,7 @@ public abstract class InvseeAPI {
     }
 
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
-        return mainSpectatorInventory(targetName, title, true);
+        return mainSpectatorInventory(targetName, title, offlineSupport);
     }
 
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport) {
@@ -338,7 +348,7 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
-        return mainSpectatorInventory(playerId, playerName, title, true);
+        return mainSpectatorInventory(playerId, playerName, title, offlineSupport);
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
@@ -436,7 +446,7 @@ public abstract class InvseeAPI {
     }
 
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
-        return enderSpectatorInventory(targetName, title, true);
+        return enderSpectatorInventory(targetName, title, offlineSupport);
     }
 
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport) {
@@ -515,7 +525,7 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
-        return enderSpectatorInventory(playerId, playerName, title, true);
+        return enderSpectatorInventory(playerId, playerName, title, offlineSupport);
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
@@ -798,10 +808,10 @@ public abstract class InvseeAPI {
             HumanEntity target = event.getPlayer();
             WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
             MainSpectatorInventory spectatorInventory;
-            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Watchable) {
+            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Personal) {
                 //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
                 //set the cursor reference and crafting inventory
-                ((Watchable) spectatorInventory).watch(event.getView());
+                ((Personal) spectatorInventory).watch(event.getView());
             }
         }
 
@@ -810,10 +820,10 @@ public abstract class InvseeAPI {
             HumanEntity target = event.getPlayer();
             WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
             MainSpectatorInventory spectatorInventory;
-            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Watchable) {
+            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Personal) {
                 //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
                 //reset personal contents to the player's own crafting contents
-                ((Watchable) spectatorInventory).unwatch();
+                ((Personal) spectatorInventory).unwatch();
             }
         }
 

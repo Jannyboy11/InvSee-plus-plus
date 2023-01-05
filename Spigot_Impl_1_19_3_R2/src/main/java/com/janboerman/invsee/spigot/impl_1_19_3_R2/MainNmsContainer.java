@@ -148,4 +148,6 @@ class MainNmsContainer extends AbstractContainerMenu {
 		return itemStack;
 	}
 
+	//TODO decorate clicked(int,int,ClickType,Player) and log actions (may want to accumulate them into a 'diff' object - actually will have to accumulate small diffs per spectator).
+
 }

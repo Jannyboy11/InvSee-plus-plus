@@ -9,6 +9,7 @@ import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesS
 import com.janboerman.invsee.spigot.multiverseinventories.MviCommandArgs;
  */
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.Either;
@@ -55,6 +56,8 @@ class InvseeCommandExecutor implements CommandExecutor {
         final InvseeAPI api = plugin.getApi();
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = null;
         final String title = plugin.getTitleForInventory(isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID));
+        final Mirror<PlayerInventorySlot> mirror = Mirror.forInventory(plugin.getInventoryTemplate());
+        final boolean offlineSupport = plugin.offlinePlayerSupport();
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = StringHelper.joinArray(" ", 1, args);
@@ -79,7 +82,7 @@ class InvseeCommandExecutor implements CommandExecutor {
                     CompletableFuture<String> userNameFuture = finalIsUuid
                             ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
                             : CompletableFuture.completedFuture(playerNameOrUUID);
-                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateInventory(uniqueId, playerName, title, Mirror.forInventory(plugin.getInventoryTemplate()), profileId));
+                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateInventory(uniqueId, playerName, title, mirror, profileId));
                 } else {
                     return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
                 }
@@ -125,9 +128,9 @@ class InvseeCommandExecutor implements CommandExecutor {
                 final UUID finalUuid = uuid;
 
                 api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenAccept(userName -> api.spectateInventory(player, finalUuid, userName, title, plugin.offlinePlayerSupport(), Mirror.forInventory(plugin.getInventoryTemplate())));
+                        .thenAccept(userName -> api.spectateInventory(player, finalUuid, userName, title, offlineSupport, mirror));
             } else {
-                api.spectateInventory(player, playerNameOrUUID, title, plugin.offlinePlayerSupport(), Mirror.forInventory(plugin.getInventoryTemplate()));
+                api.spectateInventory(player, playerNameOrUUID, title, offlineSupport, mirror);
             }
         }
 

@@ -3,7 +3,7 @@ package com.janboerman.invsee.spigot.impl_1_16_R3;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
-import com.janboerman.invsee.spigot.internal.inventory.Watchable;
+import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.spigot.internal.inventory.Wrapper;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
-public class MainBukkitInventory extends CraftInventory implements MainSpectatorInventory, Watchable, Wrapper<MainNmsInventory, MainBukkitInventory> {
+public class MainBukkitInventory extends CraftInventory implements MainSpectatorInventory, Personal, Wrapper<MainNmsInventory, MainBukkitInventory> {
 
     protected MainBukkitInventory(MainNmsInventory nmsInventory) {
         super(nmsInventory);

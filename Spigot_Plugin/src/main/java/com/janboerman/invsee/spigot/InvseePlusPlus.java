@@ -8,6 +8,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
  */
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
@@ -48,6 +49,13 @@ public class InvseePlusPlus extends JavaPlugin {
 //        }
         // else if (MyWorlds)
         // else if (Separe-World-Items)
+
+        //set configured values
+        api.setOfflineSupport(offlinePlayerSupport());
+        api.setMainInventoryTitleFactory(player -> getTitleForInventory(Target.byPlayer(player)));
+        api.setEnderInventoryTitleFactory(player -> getTitleForEnderChest(Target.byPlayer(player)));
+        api.setMainInventoryMirror(Mirror.forInventory(getInventoryTemplate()));
+        api.setEnderInventoryMirror(Mirror.forEnderChest(getEnderChestTemplate()));
 
         //commands
         PluginCommand invseeCommand = getCommand("invsee");

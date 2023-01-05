@@ -11,7 +11,7 @@ import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
-import com.janboerman.invsee.spigot.internal.inventory.Watchable;
+import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import me.ebonjaeger.perworldinventory.Group;
 import me.ebonjaeger.perworldinventory.data.PlayerProfile;
 import me.ebonjaeger.perworldinventory.data.ProfileKey;
@@ -177,13 +177,13 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
             ProfileKey activeProfileKey = pwiHook.getActiveProfileKey(player);
             MainSpectatorInventory mainSpectator = inventories.get(activeProfileKey);
-            if (mainSpectator instanceof Watchable) {
-                ((Watchable) mainSpectator).watch(event.getView());
+            if (mainSpectator instanceof Personal) {
+                ((Personal) mainSpectator).watch(event.getView());
             }
 
             wrapped.getOpenMainSpectatorInventory(player.getUniqueId()).ifPresent(spectator -> {
-                if (spectator instanceof Watchable) {
-                    ((Watchable) spectator).watch(event.getView());
+                if (spectator instanceof Personal) {
+                    ((Personal) spectator).watch(event.getView());
                 }
             });
         }
@@ -194,13 +194,13 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
             ProfileKey activeProfileKey = pwiHook.getActiveProfileKey(player);
             MainSpectatorInventory mainSpectator = inventories.get(activeProfileKey);
-            if (mainSpectator instanceof Watchable) {
-                ((Watchable) mainSpectator).unwatch();
+            if (mainSpectator instanceof Personal) {
+                ((Personal) mainSpectator).unwatch();
             }
 
             wrapped.getOpenMainSpectatorInventory(player.getUniqueId()).ifPresent(spectator -> {
-                if (spectator instanceof Watchable) {
-                    ((Watchable) spectator).unwatch();
+                if (spectator instanceof Personal) {
+                    ((Personal) spectator).unwatch();
                 }
             });
         }
