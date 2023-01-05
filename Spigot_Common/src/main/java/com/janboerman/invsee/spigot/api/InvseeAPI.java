@@ -737,9 +737,9 @@ public abstract class InvseeAPI {
                     }
 
                     if (oldMainSpectator instanceof ShallowCopy) {
-                        //shallow-copy the live itemstack lists into the open spectator inventory and update the cache.
+                        //shallow-copy the live itemstack lists into the open spectator inventory.
                         ((ShallowCopy<MainSpectatorInventory>) oldMainSpectator).shallowCopyFrom(newInventorySpectator);
-                        cache(oldMainSpectator, true);
+                        //no need to update the cache because oldMainSpectator already came from the cache!
                     } else {
                         //does not support shallow copying, just close and re-open, and update the cache!
                         for (HumanEntity viewer : List.copyOf(oldMainSpectator.getViewers())) {
@@ -760,11 +760,11 @@ public abstract class InvseeAPI {
                     }
 
                     if (oldEnderSpectator instanceof ShallowCopy) {
-                        //shallow-copy the live itemstack list into the open spectator inventory and update the cache.
+                        //shallow-copy the live itemstack list into the open spectator inventory.
                         ((ShallowCopy<EnderSpectatorInventory>) oldEnderSpectator).shallowCopyFrom(newEnderSpectator);
-                        cache(oldEnderSpectator, true);
+                        //no need to update the cache because oldEnderSpectator already came from the cache!
                     } else {
-                        //does not shpport shallow copying, just close and re-open, and update the cache!
+                        //does not support shallow copying, just close and re-open, and update the cache!
                         for (HumanEntity viewer : List.copyOf(oldEnderSpectator.getViewers())) {
                             viewer.closeInventory();
                             viewer.openInventory(newEnderSpectator);

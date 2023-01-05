@@ -10,7 +10,7 @@ public class UUIDTest {
     @Test
     public void testDashing() {
         UUID uuid = UUID.randomUUID();
-        
+
         assertEquals(uuid, UUIDHelper.dashed(UUIDHelper.unDashed(uuid)));
     }
 
