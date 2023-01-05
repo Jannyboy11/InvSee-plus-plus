@@ -29,6 +29,16 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderNmsInv
     }
 
     @Override
+    public void setMaxStackSize(int size) {
+        this.maxStack = size;
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return maxStack;
+    }
+
+    @Override
     public int defaultMaxStack() {
         return Container.MAX_STACK;
     }

@@ -12,11 +12,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.InventoryHolder;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +25,16 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderNmsInv
 	EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
 		super(targetPlayerUuid, targetPlayerName, title, mirror);
 		this.storageContents = storageContents;
+	}
+
+	@Override
+	public void setMaxStackSize(int size) {
+		this.maxStack = size;
+	}
+
+	@Override
+	public int getMaxStackSize() {
+		return maxStack;
 	}
 
 	@Override

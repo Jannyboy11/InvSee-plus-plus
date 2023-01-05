@@ -23,7 +23,7 @@ public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventor
     public final Mirror<Slot> mirror;
     public Inventory bukkit;
 
-    private int maxStack;
+    protected int maxStack; //can't abstract out the getters and setters because of remapping.
     private final List<HumanEntity> transaction = new ArrayList<>(1);
     protected InventoryHolder owner;
 
@@ -32,7 +32,7 @@ public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventor
         this.targetPlayerName = targetPlayerName;
         this.title = title;
         this.mirror = mirror;
-        setMaxStackSize(defaultMaxStack());
+        this.maxStack = defaultMaxStack();
     }
 
     public void onOpen(HumanEntity who) {
@@ -53,14 +53,6 @@ public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventor
 
     public Location getLocation() {
         return null;
-    }
-
-    public void setMaxStackSize(int size) {
-        this.maxStack = size;
-    }
-
-    public int getMaxStackSize() {
-        return maxStack;
     }
 
 }

@@ -192,12 +192,37 @@ public abstract class InvseeAPI {
         return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
     }
 
+
     protected void cache(MainSpectatorInventory spectatorInventory) {
-        openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+        cache(spectatorInventory, false);
+    }
+
+    protected void cache(MainSpectatorInventory spectatorInventory, boolean force) {
+        if (force) {
+            openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+        } else {
+            WeakReference<MainSpectatorInventory> ref = openInventories.get(spectatorInventory.getSpectatedPlayerId());
+            MainSpectatorInventory oldSpectatorInv;
+            if (ref == null || (oldSpectatorInv = ref.get()) == null) {
+                openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+            } //else: don't update cache.
+        }
     }
 
     protected void cache(EnderSpectatorInventory spectatorInventory) {
-        openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+        cache(spectatorInventory, false);
+    }
+
+    protected void cache(EnderSpectatorInventory spectatorInventory, boolean force) {
+        if (force) {
+            openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+        } else {
+            WeakReference<EnderSpectatorInventory> ref = openEnderChests.get(spectatorInventory.getSpectatedPlayerId());
+            EnderSpectatorInventory oldSpectatorInv;
+            if (ref == null || (oldSpectatorInv = ref.get()) == null) {
+                openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+            } //else: don't update cache.
+        }
     }
 
     // ================================== implementation methods ==================================
@@ -714,14 +739,14 @@ public abstract class InvseeAPI {
                     if (oldMainSpectator instanceof ShallowCopy) {
                         //shallow-copy the live itemstack lists into the open spectator inventory and update the cache.
                         ((ShallowCopy<MainSpectatorInventory>) oldMainSpectator).shallowCopyFrom(newInventorySpectator);
-                        cache(oldMainSpectator);
+                        cache(oldMainSpectator, true);
                     } else {
                         //does not support shallow copying, just close and re-open, and update the cache!
                         for (HumanEntity viewer : List.copyOf(oldMainSpectator.getViewers())) {
                             viewer.closeInventory();
                             viewer.openInventory(newInventorySpectator);
                         }
-                        cache(newInventorySpectator);
+                        cache(newInventorySpectator, true);
                     }
                 }
             }
@@ -737,14 +762,14 @@ public abstract class InvseeAPI {
                     if (oldEnderSpectator instanceof ShallowCopy) {
                         //shallow-copy the live itemstack list into the open spectator inventory and update the cache.
                         ((ShallowCopy<EnderSpectatorInventory>) oldEnderSpectator).shallowCopyFrom(newEnderSpectator);
-                        cache(oldEnderSpectator);
+                        cache(oldEnderSpectator, true);
                     } else {
                         //does not shpport shallow copying, just close and re-open, and update the cache!
                         for (HumanEntity viewer : List.copyOf(oldEnderSpectator.getViewers())) {
                             viewer.closeInventory();
                             viewer.openInventory(newEnderSpectator);
                         }
-                        cache(newEnderSpectator);
+                        cache(newEnderSpectator, true);
                     }
                 }
             }
