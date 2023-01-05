@@ -607,14 +607,11 @@ public abstract class InvseeAPI {
                 } else {
                     NotCreatedReason reason = response.getReason();
                     if (reason instanceof TargetDoesNotExist) {
-                        var targetDoesNotExist = (TargetDoesNotExist) reason;
-                        spectator.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetNameOrUUID + " does not exist.");
                     } else if (reason instanceof TargetHasExemptPermission) {
-                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
-                        spectator.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetNameOrUUID + " is exempted from being spectated.");
                     } else if (reason instanceof ImplementationFault) {
-                        var implementationFault = (ImplementationFault) reason;
-                        spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s inventory.");
+                        spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + targetNameOrUUID + "'s inventory.");
                     } else if (reason instanceof OfflineSupportDisabled) {
                         spectator.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
                     } else {
@@ -641,14 +638,11 @@ public abstract class InvseeAPI {
                 } else {
                     NotCreatedReason reason = response.getReason();
                     if (reason instanceof TargetDoesNotExist) {
-                        var targetDoesNotExist = (TargetDoesNotExist) reason;
-                        spectator.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetNameOrUUID + " does not exist.");
                     } else if (reason instanceof TargetHasExemptPermission) {
-                        var targetHasExemptPermission = (TargetHasExemptPermission) reason;
-                        spectator.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
+                        spectator.sendMessage(ChatColor.RED + "Player " + targetNameOrUUID + " is exempted from being spectated.");
                     } else if (reason instanceof ImplementationFault) {
-                        var implementationFault = (ImplementationFault) reason;
-                        spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
+                        spectator.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + targetNameOrUUID + "'s enderchest.");
                     } else if (reason instanceof OfflineSupportDisabled) {
                         spectator.sendMessage(ChatColor.RED + "Spectating offline players' enderchests is disabled.");
                     } else {
