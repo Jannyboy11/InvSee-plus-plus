@@ -562,15 +562,6 @@ public abstract class InvseeAPI {
         Objects.requireNonNull(playerName, "player name cannot be null!");
         Objects.requireNonNull(mirror, "mirror cannot be null!");
 
-        //try cache
-        WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(playerId);
-        if (alreadyOpen != null) {
-            EnderSpectatorInventory inv = alreadyOpen.get();
-            if (inv != null) {
-                return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
-            }
-        }
-
         //try online
         Player targetPlayer = plugin.getServer().getPlayer(playerId);
         Target target;
@@ -585,6 +576,15 @@ public abstract class InvseeAPI {
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!offlineSupport) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
+        }
+
+        //try cache (can actually do this, because if the target is exempted, then he/she is absent from the cache!)
+        WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(playerId);
+        if (alreadyOpen != null) {
+            EnderSpectatorInventory inv = alreadyOpen.get();
+            if (inv != null) {
+                return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
+            }
         }
 
         target = Target.byUniqueId(playerId);
