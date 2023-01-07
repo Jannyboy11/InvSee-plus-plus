@@ -61,6 +61,7 @@ class EnderGiveExecutor implements CommandExecutor {
         if (eitherMaterial.isLeft()) { sender.sendMessage(ChatColor.RED + eitherMaterial.getLeft()); return true; }
         assert eitherMaterial.isRight();
         Material material = eitherMaterial.getRight();
+        //TODO data value? (because that's a thing in pre-1.13)
 
         int amount;
         if (args.length > 2) {
