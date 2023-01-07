@@ -58,6 +58,8 @@ public enum PlayerInventorySlot {
     PERSONAL_07,
     PERSONAL_08;
 
+    private static final PlayerInventorySlot[] VALUES = values();
+
     public boolean isContainer() {
         switch (this) {
             case CONTAINER_00:
@@ -137,6 +139,30 @@ public enum PlayerInventorySlot {
 
     public boolean isCursor() {
         return this == CURSOR;
+    }
+
+    public int defaultIndex() {
+        if (isContainer()) {
+            return 0 + ordinal() - CONTAINER_00.ordinal();
+        } else if (isArmour()) {
+            return 36 + ordinal() - ARMOUR_BOOTS.ordinal();
+        } else if (isOffHand()) {
+            return 40;
+        } else if (isCursor()) {
+            return 41;
+        } else {
+            return 45 + ordinal() - PERSONAL_00.ordinal();
+        }
+    }
+
+    public static PlayerInventorySlot byDefaultIndex(int index) {
+        if (0 <= index && index <= 41) {
+            return VALUES[index]; //storage, armour, offhand, cursor
+        } else if (45 <= index && index < 54) {
+            return VALUES[index + PERSONAL_00.ordinal() - 45]; //personal
+        } else {
+            return null; //unused slots, or out of bounds
+        }
     }
 
 }

@@ -59,4 +59,18 @@ public enum EnderChestSlot {
     CONTAINER_52,
     CONTAINER_53;
 
+    private static final EnderChestSlot[] VALUES = values();
+
+    public int defaultIndex() {
+       return ordinal();
+    }
+
+    public static EnderChestSlot byDefaultIndex(int index) {
+        if (0 <= index && index < 54) {
+            return VALUES[index];
+        } else {
+            return null;
+        }
+    }
+
 }

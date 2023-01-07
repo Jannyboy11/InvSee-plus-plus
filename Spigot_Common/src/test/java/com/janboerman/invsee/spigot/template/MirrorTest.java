@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.template;
 
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.template.PlayerInventoryMirror;
 import com.janboerman.invsee.spigot.internal.template.EnderChestMirror;
@@ -56,6 +57,20 @@ public class MirrorTest {
     public void testEnderChest() {
         EnderChestMirror template = new EnderChestMirror(ENDERCHEST_TEMPLATE);
         assertArrayEquals(EXPECTED_ENDER_CHEST_TEMPLATE, template.getSlots());
+    }
+
+    @Test
+    public void testInventoryDefaultIndices() {
+        for (PlayerInventorySlot slot : PlayerInventorySlot.values()) {
+            assertEquals(slot, PlayerInventorySlot.byDefaultIndex(slot.defaultIndex()));
+        }
+    }
+
+    @Test
+    public void testEnderChestDefaultIndices() {
+        for (EnderChestSlot slot : EnderChestSlot.values()) {
+            assertEquals(slot, EnderChestSlot.byDefaultIndex(slot.defaultIndex()));
+        }
     }
 
 }
