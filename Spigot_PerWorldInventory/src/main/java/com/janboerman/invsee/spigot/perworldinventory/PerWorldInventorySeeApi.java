@@ -12,6 +12,7 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
+import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import me.ebonjaeger.perworldinventory.Group;
 import me.ebonjaeger.perworldinventory.data.PlayerProfile;
 import me.ebonjaeger.perworldinventory.data.ProfileKey;
@@ -293,7 +294,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 viewers.forEach(HumanEntity::closeInventory);
 
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
-                    //run in the next tick to ensure that hte player has changed worlds and the live inventory is actually really live
+                    //run in the next tick to ensure that the player has changed worlds and the live inventory is actually really live
                     Optional<MainSpectatorInventory> liveFuture = asLiveInventory(mainSpectator, false);
                     liveFuture.ifPresentOrElse(liveSpectator -> {
                         inventories.put(newProfileKey, liveSpectator);
@@ -310,7 +311,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 viewers.forEach(HumanEntity::closeInventory);
 
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
-                    //run in the next tick to ensure that hte player has changed worlds and the live inventory is actually really live
+                    //run in the next tick to ensure that the player has changed worlds and the live inventory is actually really live
                     Optional<EnderSpectatorInventory> liveFuture = asLiveInventory(enderSpectator, false);
                     liveFuture.ifPresentOrElse(liveSpectator -> {
                         enderchests.put(newProfileKey, liveSpectator);
@@ -666,7 +667,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
         S live = null;
 
-        //can't wait till pattern matching arrives
+        //TODO can I use ShallowCopy here? probably, yes!
         if (snapshotInventory instanceof MainSpectatorInventory) {
             Mirror<PlayerInventorySlot> mirror = (Mirror<PlayerInventorySlot>) snapshotInventory.getMirror();
             live = (S) spectateInventory(player, title, mirror);
