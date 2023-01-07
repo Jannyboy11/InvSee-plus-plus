@@ -80,7 +80,7 @@ public class EnderNmsContainer extends Container {
     @Override
     public InventoryView getBukkitView() {
         if (bukkitView == null) {
-            bukkitView = new CraftInventoryView(player.getBukkitEntity(), top.bukkit, this);
+            bukkitView = new CraftInventoryView(player.getBukkitEntity(), top.bukkit(), this);
         }
         return bukkitView;
     }

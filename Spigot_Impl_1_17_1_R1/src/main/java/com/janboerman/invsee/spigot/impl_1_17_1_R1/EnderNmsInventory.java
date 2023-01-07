@@ -19,13 +19,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 
-class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderNmsInventory> implements Container, MenuProvider {
+class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkitInventory, EnderNmsInventory> implements Container, MenuProvider {
 
     protected NonNullList<ItemStack> storageContents;
 
     EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
         super(targetPlayerUuid, targetPlayerName, title, mirror);
         this.storageContents = storageContents;
+    }
+
+    @Override
+    protected EnderBukkitInventory createBukkit() {
+        return new EnderBukkitInventory(this);
     }
 
     @Override

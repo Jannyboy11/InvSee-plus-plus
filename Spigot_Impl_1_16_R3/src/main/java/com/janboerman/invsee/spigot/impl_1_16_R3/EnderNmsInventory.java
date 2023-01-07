@@ -10,7 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
     protected final String spectatedPlayerName;
     protected NonNullList<ItemStack> storageContents;
 
-    protected Inventory bukkit;
+    private EnderBukkitInventory bukkit;
     protected String title;
     protected Mirror<EnderChestSlot> mirror = Mirror.defaultEnderChest();
 
@@ -51,6 +50,10 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
         this.storageContents = storageContents;
         this.title = title;
         this.mirror = mirror;
+    }
+
+    public EnderBukkitInventory bukkit() {
+        return bukkit == null ? bukkit = new EnderBukkitInventory(this) : bukkit;
     }
 
     @Override

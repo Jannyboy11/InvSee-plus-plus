@@ -5,7 +5,7 @@ import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import java.util.UUID;
 
-public interface EnderInventory<NMS extends AbstractNmsInventory<EnderChestSlot, NMS>, Self extends EnderInventory<NMS, Self>> extends StandardSpectatorInventory<EnderChestSlot, NMS, Self>, EnderSpectatorInventory {
+public interface EnderInventory<NMS extends AbstractNmsInventory<EnderChestSlot, Self, NMS>, Self extends EnderInventory<NMS, Self>> extends StandardSpectatorInventory<EnderChestSlot, NMS, Self>, EnderSpectatorInventory {
 
     @Override
     default String getSpectatedPlayerName() {

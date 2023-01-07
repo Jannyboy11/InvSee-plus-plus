@@ -21,7 +21,7 @@ import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
 
 import java.util.List;
 
-class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNmsInventory> implements Container, MenuProvider {
+class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements Container, MenuProvider {
 
 	protected NonNullList<ItemStack> storageContents;
 	protected NonNullList<ItemStack> armourContents;
@@ -48,6 +48,11 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
 			}
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
+	}
+
+	@Override
+	protected MainBukkitInventory createBukkit() {
+		return new MainBukkitInventory(this);
 	}
 
 	@Override

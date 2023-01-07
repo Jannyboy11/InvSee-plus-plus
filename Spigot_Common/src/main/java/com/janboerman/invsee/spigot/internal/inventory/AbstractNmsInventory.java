@@ -1,17 +1,17 @@
 package com.janboerman.invsee.spigot.internal.inventory;
 
+import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.utils.UUIDHelper;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventory<Slot, NMS>> implements ShallowCopy<NMS> {
+public abstract class AbstractNmsInventory<Slot, Bukkit extends SpectatorInventory<Slot>, NMS extends AbstractNmsInventory<Slot, Bukkit, NMS>> implements ShallowCopy<NMS> {
 
     //NOTE: despite the many similarities between the different NMS inventory implementations,
     //NOTE: we can only abstract out the non-nms parts!
@@ -21,7 +21,7 @@ public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventor
 
     public final String title;
     public final Mirror<Slot> mirror;
-    public Inventory bukkit;
+    private Bukkit bukkit;
 
     protected int maxStack; //can't abstract out the getters and setters because of remapping.
     private final List<HumanEntity> transaction = new ArrayList<>(1);
@@ -33,6 +33,12 @@ public abstract class AbstractNmsInventory<Slot, NMS extends AbstractNmsInventor
         this.title = title;
         this.mirror = mirror;
         this.maxStack = defaultMaxStack();
+    }
+
+    protected abstract Bukkit createBukkit();
+
+    public Bukkit bukkit() {
+        return bukkit == null ? bukkit = createBukkit() : bukkit;
     }
 
     public void onOpen(HumanEntity who) {

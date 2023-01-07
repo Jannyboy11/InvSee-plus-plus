@@ -18,10 +18,11 @@ import net.minecraft.server.v1_12_R1.PlayerInventory;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage;
+import org.bukkit.inventory.Inventory;
 
 import java.util.List;
 
-class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNmsInventory> implements IInventory, ITileEntityContainer {
+class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements IInventory, ITileEntityContainer {
 
     protected NonNullList<ItemStack> storageContents;
     protected NonNullList<ItemStack> armourContents;
@@ -51,6 +52,11 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
         };
         IInventory /*InventoryCrafting*/ playerCrafting = ((CraftInventory) target.defaultContainer.getBukkitView().getTopInventory()).getInventory();
         this.personalContents = this.playerCraftingContents = playerCrafting.getContents();
+    }
+
+    @Override
+    protected MainBukkitInventory createBukkit() {
+        return new MainBukkitInventory(this);
     }
 
     @Override

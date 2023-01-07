@@ -5,7 +5,7 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 
 import java.util.UUID;
 
-public interface StandardSpectatorInventory<Slot, NMS extends AbstractNmsInventory<Slot, NMS>, Self extends StandardSpectatorInventory<Slot, NMS, Self>> extends SpectatorInventory<Slot>, Wrapper<NMS, Self> {
+public interface StandardSpectatorInventory<Slot, NMS extends AbstractNmsInventory<Slot, Self, NMS>, Self extends StandardSpectatorInventory<Slot, NMS, Self>> extends SpectatorInventory<Slot>, Wrapper<NMS, Self> {
 
     public default String getSpectatedPlayerName() {
         return getInventory().targetPlayerName;

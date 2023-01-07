@@ -16,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
     protected List<ItemStack> playerCraftingContents;
     protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
-    protected Inventory bukkit;
+    private MainBukkitInventory bukkit;
     protected String title;
     protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
 
@@ -83,6 +82,10 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
 
         this.title = title;
         this.mirror = mirror;
+    }
+
+    public MainBukkitInventory bukkit() {
+        return bukkit == null ? bukkit = new MainBukkitInventory(this) : bukkit;
     }
 
     @Override

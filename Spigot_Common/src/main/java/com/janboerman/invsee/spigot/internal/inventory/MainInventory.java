@@ -6,7 +6,7 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 
 import java.util.UUID;
 
-public interface MainInventory<NMS extends AbstractNmsInventory<PlayerInventorySlot, NMS>, Self extends MainInventory<NMS, Self>> extends StandardSpectatorInventory<PlayerInventorySlot, NMS, Self>, MainSpectatorInventory, Personal {
+public interface MainInventory<NMS extends AbstractNmsInventory<PlayerInventorySlot, Self, NMS>, Self extends MainInventory<NMS, Self>> extends StandardSpectatorInventory<PlayerInventorySlot, NMS, Self>, MainSpectatorInventory, Personal {
 
     @Override
     public default String getSpectatedPlayerName() {

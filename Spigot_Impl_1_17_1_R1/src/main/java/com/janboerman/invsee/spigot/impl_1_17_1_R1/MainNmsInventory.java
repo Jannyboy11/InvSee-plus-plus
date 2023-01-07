@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
@@ -27,7 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 
-class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNmsInventory> implements Container, MenuProvider {
+class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements Container, MenuProvider {
 
     protected final UUID targetPlayerUuid;
     protected final String targetPlayerName;
@@ -39,7 +37,6 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
     protected List<ItemStack> craftingContents;
     protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
-    protected org.bukkit.inventory.Inventory bukkit;
     protected String title;
     protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
 
@@ -71,6 +68,11 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainNms
 
         this.title = title;
         this.mirror = mirror;
+    }
+
+    @Override
+    protected MainBukkitInventory createBukkit() {
+        return new MainBukkitInventory(this);
     }
 
     @Override

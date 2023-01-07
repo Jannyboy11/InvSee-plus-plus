@@ -10,13 +10,18 @@ import org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage;
 import java.util.List;
 import java.util.UUID;
 
-class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderNmsInventory> implements IInventory, ITileEntityContainer {
+class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkitInventory, EnderNmsInventory> implements IInventory, ITileEntityContainer {
 
     protected NonNullList<ItemStack> storageContents;
 
     EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
         super(spectatedPlayerUuid, spectatedPlayerName, title, mirror);
         this.storageContents = storageContents;
+    }
+
+    @Override
+    protected EnderBukkitInventory createBukkit() {
+        return new EnderBukkitInventory(this);
     }
 
     @Override

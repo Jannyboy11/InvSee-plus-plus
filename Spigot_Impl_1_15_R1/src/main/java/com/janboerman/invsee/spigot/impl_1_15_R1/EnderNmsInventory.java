@@ -25,7 +25,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
     protected final String spectatedPlayerName;
     protected NonNullList<ItemStack> storageContents;
 
-    protected Inventory bukkit;
+    private EnderBukkitInventory bukkit;
     final protected String title;
     final protected Mirror<EnderChestSlot> mirror;
 
@@ -52,6 +52,10 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
         this.storageContents = storageContents;
         this.title = title;
         this.mirror = mirror;
+    }
+
+    public EnderBukkitInventory bukkit() {
+        return bukkit == null ? bukkit = new EnderBukkitInventory(this) : bukkit;
     }
 
     @Override

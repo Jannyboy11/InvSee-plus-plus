@@ -74,8 +74,7 @@ public class InvseeImpl extends InvseeAPI {
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
         MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), title, mirror);
-        MainBukkitInventory bukkitInventory = new MainBukkitInventory(spectatorInv);
-        spectatorInv.bukkit = bukkitInventory;
+        MainBukkitInventory bukkitInventory = spectatorInv.bukkit();
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
         cache(bukkitInventory);
@@ -126,8 +125,7 @@ public class InvseeImpl extends InvseeAPI {
         CraftInventory craftInventory = (CraftInventory) player.getEnderChest();
         PlayerEnderChestContainer nmsInventory = (PlayerEnderChestContainer) craftInventory.getInventory();
         EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, title, mirror);
-        EnderBukkitInventory bukkitInventory = new EnderBukkitInventory(spectatorInv);
-        spectatorInv.bukkit = bukkitInventory;
+        EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
         cache(bukkitInventory);
         return bukkitInventory;
     }
