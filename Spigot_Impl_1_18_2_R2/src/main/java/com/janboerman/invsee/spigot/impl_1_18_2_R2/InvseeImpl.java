@@ -86,13 +86,7 @@ public class InvseeImpl extends InvseeAPI {
 
     @Override
     public CompletableFuture<Void> saveInventory(MainSpectatorInventory newInventory) {
-        return save(newInventory, this::spectateInventory, (currentInv, newInv) -> {
-            currentInv.setStorageContents(newInv.getStorageContents());
-            currentInv.setArmourContents(newInv.getArmourContents());
-            currentInv.setOffHandContents(newInv.getOffHandContents());
-            currentInv.setCursorContents(newInv.getCursorContents());
-            currentInv.setPersonalContents(newInv.getPersonalContents());
-        });
+        return save(newInventory, this::spectateInventory, MainSpectatorInventory::setContents);
     }
 
     @Override
@@ -135,9 +129,7 @@ public class InvseeImpl extends InvseeAPI {
 
     @Override
     public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory newInventory) {
-        return save(newInventory, this::spectateEnderChest, (currentInv, newInv) -> {
-            currentInv.setStorageContents(newInv.getStorageContents());
-        });
+        return save(newInventory, this::spectateEnderChest, EnderSpectatorInventory::setContents);
     }
 
     private <Slot, IS extends SpectatorInventory<Slot>> CompletableFuture<Optional<IS>> createOffline(UUID player, String name, String title, Mirror<Slot> mirror, TriFunction<? super HumanEntity, String, ? super Mirror<Slot>, IS> invCreator) {

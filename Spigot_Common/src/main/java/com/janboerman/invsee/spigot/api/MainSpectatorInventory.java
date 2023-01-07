@@ -20,7 +20,7 @@ public interface MainSpectatorInventory extends SpectatorInventory<PlayerInvento
     /** Get the items in the player's offhand. The length of array is usually 1.*/
     ItemStack[] getOffHandContents();
 
-    /** Set the items int he player's offhand. The length of this array must be equal to {@code getOffHandContents().length}. */
+    /** Set the items in the player's offhand. The length of this array must be equal to {@code getOffHandContents().length}. */
     void setOffHandContents(ItemStack[] offHand);
 
     /** Set the item that is on the player's cursor. */
