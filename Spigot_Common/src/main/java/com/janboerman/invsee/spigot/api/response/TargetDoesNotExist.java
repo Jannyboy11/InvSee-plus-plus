@@ -23,4 +23,9 @@ public class TargetDoesNotExist extends AbstractNotCreatedReason {
         TargetDoesNotExist that = (TargetDoesNotExist) obj;
         return Objects.equals(this.getTarget(), that.getTarget());
     }
+
+    @Override
+    public String toString() {
+        return "Target " + getTarget() + " does not exist";
+    }
 }

@@ -24,4 +24,8 @@ public class ImplementationFault extends AbstractNotCreatedReason {
         return Objects.equals(this.getTarget(), that.getTarget());
     }
 
+    @Override
+    public String toString() {
+        return "Implementation fault";
+    }
 }

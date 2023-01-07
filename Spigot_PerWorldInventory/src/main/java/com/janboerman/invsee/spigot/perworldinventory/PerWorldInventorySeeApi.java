@@ -348,11 +348,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         if (player != null && getHook().isMatchedByProfile(player, profileKey))
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectateInventory(player, title, mirror, profileKey)));
 
-        return createOfflineInventory(playerId, playerName, title, mirror, profileKey)
-                .thenApply(optInv -> {
-                    if (optInv.isPresent()) return SpectateResponse.succeed(optInv.get());
-                    else return SpectateResponse.fail(NotCreatedReason.implementationFault(Target.byUniqueId(playerId)));
-                });
+        return createOfflineInventory(playerId, playerName, title, mirror, profileKey);
     }
 
     @Override
@@ -361,7 +357,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         World world = logoutLocation != null ? logoutLocation.getWorld() : plugin.getServer().getWorlds().get(0);
         Group group = pwiHook.getGroupForWorld(world.getName());
         ProfileKey profileKey = new ProfileKey(playerId, group, GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
-        return createOfflineInventory(playerId, playerName, title, mirror, profileKey, false);
+        return createOfflineInventory(playerId, playerName, title, mirror, profileKey, false).thenApply(SpectateResponse::toOptional);
     }
 
     @Override
@@ -409,11 +405,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         if (player != null && pwiHook.isMatchedByProfile(player, profileKey))
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectateEnderChest(player, title, mirror, profileKey)));
 
-        return createOfflineEnderChest(playerId, playerName, title, mirror, profileKey)
-                .thenApply(optional -> {
-                    if (optional.isPresent()) return SpectateResponse.succeed(optional.get());
-                    else return SpectateResponse.fail(NotCreatedReason.implementationFault(Target.byUniqueId(playerId)));
-                });
+        return createOfflineEnderChest(playerId, playerName, title, mirror, profileKey);
     }
 
     @Override
@@ -425,7 +417,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         World world = logoutLocation != null ? logoutLocation.getWorld() : plugin.getServer().getWorlds().get(0);
         Group group = pwiHook.getGroupForWorld(world.getName());
         ProfileKey profileKey = new ProfileKey(playerId, group, GameMode.SURVIVAL /*I don't really care about creative, do I?*/);
-        return createOfflineEnderChest(playerId, playerName, title, mirror, profileKey, false);
+        return createOfflineEnderChest(playerId, playerName, title, mirror, profileKey, false).thenApply(SpectateResponse::toOptional);
     }
 
     @Override
@@ -451,16 +443,21 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         return saveEnderChest(enderChest, profileKey, saveVanilla);
     }
 
-    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror, ProfileKey profileKey) {
+    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror, ProfileKey profileKey) {
         return createOfflineInventory(playerId, playerName, title, mirror, profileKey, pwiHook.isGroupManagedByPWI(profileKey.getGroup()));
     }
 
-    private CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror, ProfileKey profileKey, boolean tieToProfile) {
+    private CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror, ProfileKey profileKey, boolean tieToProfile) {
         //don't ask the cache because it may contain a live inventory! (and we could get called by asSnapshotInventory!)
+
+        //check whether the player is not exempted.
+        final Target target = Target.byUniqueId(playerId);
+        if (profileKey.getGroup().getWorlds().stream().anyMatch(world -> exempt.isExemptedFromHavingMainInventorySpectated(target, world)))
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
         //try non-managed
         CompletableFuture<Optional<MainSpectatorInventory>> fromVanillaStorageOfflineInv = wrapped.createOfflineInventory(playerId, playerName, title, mirror);
-        if (!pwiHook.pwiManagedInventories()) return fromVanillaStorageOfflineInv;
+        if (!pwiHook.pwiManagedInventories()) return fromVanillaStorageOfflineInv.thenApply(opt -> SpectateResponse.fromOptional(opt, NotCreatedReason.implementationFault(target)));
 
         //create a fake player for PWI so that we can load data onto it!
         FakePlayer player = new FakePlayer(playerId, playerName, plugin.getServer());
@@ -500,7 +497,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 }
             });
 
-            return optionalSpectatorInv;
+            return SpectateResponse.fromOptional(optionalSpectatorInv, NotCreatedReason.implementationFault(target));
         }, serverThreadExecutor);
     }
 
@@ -560,16 +557,21 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         }
     }
 
-    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror, ProfileKey profileKey) {
+    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror, ProfileKey profileKey) {
         return createOfflineEnderChest(playerId, playerName, title, mirror, profileKey, pwiHook.isGroupManagedByPWI(profileKey.getGroup()));
     }
 
-    private CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror, ProfileKey profileKey, boolean tieToProfile) {
+    private CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror, ProfileKey profileKey, boolean tieToProfile) {
         //don't ask the cache because it may contain a live inventory! (and we could get called by asSnapshotInventory!)
+
+        //check whether the player is not exempted.
+        final Target target = Target.byUniqueId(playerId);
+        if (profileKey.getGroup().getWorlds().stream().anyMatch(world -> exempt.isExemptedFromHavingEnderchestSpectated(target, world)))
+            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
         //try non-managed
         CompletableFuture<Optional<EnderSpectatorInventory>> nonPwiEnderSpectatorFuture = wrapped.createOfflineEnderChest(playerId, playerName, title, mirror);
-        if (!pwiHook.pwiManagedEnderChests()) return nonPwiEnderSpectatorFuture;
+        if (!pwiHook.pwiManagedEnderChests()) return nonPwiEnderSpectatorFuture.thenApply(opt -> SpectateResponse.fromOptional(opt, NotCreatedReason.implementationFault(target)));
 
         //create a fake player for PWI so that we can load data onto it!
         FakePlayer player = new FakePlayer(playerId, playerName, plugin.getServer());
@@ -602,7 +604,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
                 }
             });
 
-            return optionalSpectatorInv;
+            return SpectateResponse.fromOptional(optionalSpectatorInv, NotCreatedReason.implementationFault(target));
         }, serverThreadExecutor);
     }
 

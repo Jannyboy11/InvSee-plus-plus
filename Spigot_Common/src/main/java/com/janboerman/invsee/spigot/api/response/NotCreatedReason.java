@@ -22,5 +22,9 @@ public interface NotCreatedReason {
     public static OfflineSupportDisabled offlineSupportDisabled() {
         return OfflineSupportDisabled.INSTANCE;
     }
+
+    public static UnknownReason generic() {
+        return UnknownReason.INSTANCE;
+    }
 }
 

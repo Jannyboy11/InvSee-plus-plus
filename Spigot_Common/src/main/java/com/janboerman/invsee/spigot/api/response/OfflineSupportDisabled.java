@@ -6,4 +6,8 @@ public class OfflineSupportDisabled implements NotCreatedReason {
 
     private OfflineSupportDisabled() {}
 
+    @Override
+    public String toString() {
+        return "Offline support disabled";
+    }
 }

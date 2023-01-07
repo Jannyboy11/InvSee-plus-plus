@@ -38,31 +38,23 @@ public class Exempt {
     }
 
     public boolean isExemptedFromHavingMainInventorySpectated(Target target) {
-        if (target instanceof PlayerTarget) {
-            return ((PlayerTarget) target).getPlayer().hasPermission(EXEMPT_INVENTORY);
-        }
-
-        if (vaultPermissionEnabled()) {
-            if (target instanceof UniqueIdTarget) {
-                return vaultHasPermission(((UniqueIdTarget) target).getUniqueId(), EXEMPT_INVENTORY);
-            } else if (target instanceof UsernameTarget) {
-                return vaultHasPermission(((UsernameTarget) target).getUsername(), EXEMPT_INVENTORY);
-            }
-        }
-
-        return false;
+        return isExempted(target, EXEMPT_INVENTORY);
     }
 
     public boolean isExemptedFromHavingEnderchestSpectated(Target target) {
+        return isExempted(target, EXEMPT_ENDERCHEST);
+    }
+
+    private boolean isExempted(Target target, String permission) {
         if (target instanceof PlayerTarget) {
-            return ((PlayerTarget) target).getPlayer().hasPermission(EXEMPT_ENDERCHEST);
+            return ((PlayerTarget) target).getPlayer().hasPermission(permission);
         }
 
         if (vaultPermissionEnabled()) {
             if (target instanceof UniqueIdTarget) {
-                return vaultHasPermission(((UniqueIdTarget) target).getUniqueId(), EXEMPT_ENDERCHEST);
+                return vaultHasPermission(((UniqueIdTarget) target).getUniqueId(), permission);
             } else if (target instanceof UsernameTarget) {
-                return vaultHasPermission(((UsernameTarget) target).getUsername(), EXEMPT_ENDERCHEST);
+                return vaultHasPermission(((UsernameTarget) target).getUsername(), permission);
             }
         }
 
@@ -76,6 +68,39 @@ public class Exempt {
     @Deprecated
     private boolean vaultHasPermission(String username, String permission) {
         return this.permission.playerHas(server.getWorlds().get(0).getName(), username, permission);
+    }
+
+    private boolean vaultHasPermission(UUID uniqueId, String world, String permission) {
+        return this.permission.playerHas(world, server.getOfflinePlayer(uniqueId), permission);
+    }
+
+    @Deprecated
+    private boolean vaultHasPermission(String username, String world, String permission) {
+        return this.permission.playerHas(world, username, permission);
+    }
+
+    public boolean isExemptedFromHavingMainInventorySpectated(Target target, String world) {
+        return isExempted(target, world, EXEMPT_INVENTORY);
+    }
+
+    public boolean isExemptedFromHavingEnderchestSpectated(Target target, String world) {
+        return isExempted(target, world, EXEMPT_ENDERCHEST);
+    }
+
+    private boolean isExempted(Target target, String world, String permission) {
+        if (target instanceof PlayerTarget) {
+            return ((PlayerTarget) target).getPlayer().hasPermission(permission);
+        }
+
+        if (vaultPermissionEnabled()) {
+            if (target instanceof UniqueIdTarget) {
+                return vaultHasPermission(((UniqueIdTarget) target).getUniqueId(), world, permission);
+            } else if (target instanceof UsernameTarget) {
+                return vaultHasPermission(((UsernameTarget) target).getUsername(), world, permission);
+            }
+        }
+
+        return false;
     }
 
 }

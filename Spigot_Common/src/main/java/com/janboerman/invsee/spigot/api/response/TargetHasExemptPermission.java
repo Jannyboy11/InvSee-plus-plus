@@ -23,4 +23,9 @@ public class TargetHasExemptPermission extends AbstractNotCreatedReason {
         TargetHasExemptPermission that = (TargetHasExemptPermission) obj;
         return Objects.equals(this.getTarget(), that.getTarget());
     }
+
+    @Override
+    public String toString() {
+        return getTarget().toString() + " has exempt permission";
+    }
 }

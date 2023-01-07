@@ -4,9 +4,10 @@ import com.janboerman.invsee.spigot.api.SpectatorInventory;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 
 //like Either<NotCreatedReason, SpectatorInventory>
-public interface SpectateResponse<SI extends SpectatorInventory> {
+public interface SpectateResponse<SI extends SpectatorInventory<?>> {
 
     public boolean isSuccess();
 
@@ -14,16 +15,36 @@ public interface SpectateResponse<SI extends SpectatorInventory> {
 
     public NotCreatedReason getReason() throws NoSuchElementException;
 
-    public static <SI extends SpectatorInventory> SpectateResponse<SI> succeed(SI spectatorInventory) {
+    public static <SI extends SpectatorInventory<?>> SpectateResponse<SI> succeed(SI spectatorInventory) {
         return new Succeed<>(spectatorInventory);
     }
 
-    public static <SI extends SpectatorInventory> SpectateResponse<SI> fail(NotCreatedReason reason) {
+    public static <SI extends SpectatorInventory<?>> SpectateResponse<SI> fail(NotCreatedReason reason) {
         return new Fail<>(reason);
+    }
+
+    public static <SI extends SpectatorInventory<?>> SpectateResponse<SI> fromOptional(Optional<SI> optional, NotCreatedReason ifEmpty) {
+        if (optional.isPresent()) {
+            return succeed(optional.get());
+        } else {
+            return fail(ifEmpty);
+        }
+    }
+
+    public static <SI extends SpectatorInventory<?>> SpectateResponse<SI> fromOptional(Optional<SI> optional) {
+        return fromOptional(optional, NotCreatedReason.generic());
+    }
+
+    public static <SI extends SpectatorInventory<?>> Optional<SI> toOptional(SpectateResponse<SI> response) {
+        if (response.isSuccess()) {
+            return Optional.ofNullable(response.getInventory());
+        } else {
+            return Optional.empty();
+        }
     }
 }
 
-class Succeed<SI extends SpectatorInventory> implements SpectateResponse<SI> {
+class Succeed<SI extends SpectatorInventory<?>> implements SpectateResponse<SI> {
 
     private final SI inventory;
 
@@ -60,7 +81,7 @@ class Succeed<SI extends SpectatorInventory> implements SpectateResponse<SI> {
     }
 }
 
-class Fail<SI extends SpectatorInventory> implements SpectateResponse<SI> {
+class Fail<SI extends SpectatorInventory<?>> implements SpectateResponse<SI> {
 
     private final NotCreatedReason reason;
 
