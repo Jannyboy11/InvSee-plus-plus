@@ -42,6 +42,7 @@ class InvClearExecutor implements CommandExecutor {
         }
 
         Material itemType = null;
+        //TODO data value? (because that's a thing in pre-1.13)
         int maxCount = -1;
 
         if (args.length >= 2) {
@@ -78,7 +79,7 @@ class InvClearExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.mainSpectatorInventory(uuid, userName, userName + "s inventory");
+                var responseFuture = api.mainSpectatorInventory(uuid, userName, userName + "'s inventory");
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();

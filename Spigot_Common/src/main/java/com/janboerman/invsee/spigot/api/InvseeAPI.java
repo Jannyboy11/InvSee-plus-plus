@@ -34,8 +34,8 @@ public abstract class InvseeAPI {
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
 
-    private Function<Player, String> mainSpectatorInvTitleProvider = player -> spectateInventoryTitle(player.getName());
-    private Function<Player, String> enderSpectatorInvTitleProvider = player -> spectateEnderchestTitle(player.getName());
+    private Function<Target, String> mainSpectatorInvTitleProvider = target -> spectateInventoryTitle(target.toString());
+    private Function<Target, String> enderSpectatorInvTitleProvider = target -> spectateEnderchestTitle(target.toString());
 
     private boolean offlineSupport = true;
 
@@ -90,13 +90,13 @@ public abstract class InvseeAPI {
         return lookup.getUserNameCache();
     }
 
-    /** this method has no reason to exist. */
+    /** this method has no reason to exist. */ //we can just inline this when the field is initialised.
     @Deprecated(forRemoval = true)
     public String spectateInventoryTitle(String targetPlayerName) {
         return targetPlayerName + "'s inventory";
     }
 
-    /** @deprecated this method has no reason to exist. */
+    /** @deprecated this method has no reason to exist. */ //we can just inline this when the field is initialised.
     @Deprecated(forRemoval = true)
     public String spectateEnderchestTitle(String targetPlayerName) {
         return targetPlayerName + "'s enderchest";
@@ -120,12 +120,12 @@ public abstract class InvseeAPI {
         this.offlineSupport = offlineSupport;
     }
 
-    public final void setMainInventoryTitleFactory(Function<Player, String> titleFactory) {
+    public final void setMainInventoryTitleFactory(Function<Target, String> titleFactory) {
         Objects.requireNonNull(titleFactory);
         this.mainSpectatorInvTitleProvider = titleFactory;
     }
 
-    public final void setEnderInventoryTitleFactory(Function<Player, String> titleFactory) {
+    public final void setEnderInventoryTitleFactory(Function<Target, String> titleFactory) {
         Objects.requireNonNull(titleFactory);
         this.enderSpectatorInvTitleProvider = titleFactory;
     }
@@ -293,15 +293,19 @@ public abstract class InvseeAPI {
         return spectateInventory(spectator, mainSpectatorInventory(targetName, title, offlineSupport), title, mirror, targetName);
     }
 
-    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName) {
+        return mainSpectatorInventory(targetName, mainSpectatorInvTitleProvider.apply(Target.byUsername(targetName)));
+    }
+
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
         return mainSpectatorInventory(targetName, title, offlineSupport);
     }
 
-    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport) {
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport) {
         return mainSpectatorInventory(targetName, title, offlineSupport, inventoryMirror);
     }
 
-    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
         Objects.requireNonNull(mirror, "mirror cannot be null!");
 
@@ -370,6 +374,10 @@ public abstract class InvseeAPI {
 
     public final CompletableFuture<Void> spectateInventory(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(spectator, mainSpectatorInventory(targetId, targetName, title, offlineSupport), title, mirror, targetId.toString());
+    }
+
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName) {
+        return mainSpectatorInventory(playerId, playerName, mainSpectatorInvTitleProvider.apply(Target.byUniqueId(playerId)));
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
@@ -470,15 +478,19 @@ public abstract class InvseeAPI {
         return spectateEnderChest(spectator, enderSpectatorInventory(targetName, title, offlineSupport), title, mirror, targetName);
     }
 
-    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName) {
+        return enderSpectatorInventory(targetName, enderSpectatorInvTitleProvider.apply(Target.byUsername(targetName)));
+    }
+
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
         return enderSpectatorInventory(targetName, title, offlineSupport);
     }
 
-    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport) {
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport) {
         return enderSpectatorInventory(targetName, title, offlineSupport, enderchestMirror);
     }
 
-    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
         Objects.requireNonNull(mirror, "mirror cannot be null!");
 
@@ -547,6 +559,10 @@ public abstract class InvseeAPI {
 
     public final CompletableFuture<Void> spectateEnderChest(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(spectator, enderSpectatorInventory(targetId, targetName, title, offlineSupport), title, mirror, targetId.toString());
+    }
+
+    public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName) {
+        return enderSpectatorInventory(playerId, playerName, enderSpectatorInvTitleProvider.apply(Target.byUniqueId(playerId)));
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
@@ -705,11 +721,12 @@ public abstract class InvseeAPI {
             Player player = event.getPlayer();
             UUID uuid = player.getUniqueId();
             String userName = player.getName();
+            Target target = Target.byPlayer(player);
 
             MainSpectatorInventory newInventorySpectator = null;
-            String mainTitle = mainSpectatorInvTitleProvider.apply(player);
+            String mainTitle = mainSpectatorInvTitleProvider.apply(target);
             EnderSpectatorInventory newEnderSpectator = null;
-            String enderTitle = enderSpectatorInvTitleProvider.apply(player);
+            String enderTitle = enderSpectatorInvTitleProvider.apply(target);
 
             //check if somebody was looking up the player and make sure they get the player's live inventory
             CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvNameFuture = pendingInventoriesByName.remove(userName);

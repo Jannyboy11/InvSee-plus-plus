@@ -52,8 +52,8 @@ public class InvseePlusPlus extends JavaPlugin {
 
         //set configured values
         api.setOfflineSupport(offlinePlayerSupport());
-        api.setMainInventoryTitleFactory(player -> getTitleForInventory(Target.byPlayer(player)));
-        api.setEnderInventoryTitleFactory(player -> getTitleForEnderChest(Target.byPlayer(player)));
+        api.setMainInventoryTitleFactory(this::getTitleForInventory);
+        api.setEnderInventoryTitleFactory(this::getTitleForEnderChest);
         api.setMainInventoryMirror(Mirror.forInventory(getInventoryTemplate()));
         api.setEnderInventoryMirror(Mirror.forEnderChest(getEnderChestTemplate()));
 
