@@ -90,6 +90,12 @@ public abstract class InvseeAPI {
         return lookup.getUserNameCache();
     }
 
+    /** @deprecated Unstable api*/
+    @Deprecated
+    public final NamesAndUUIDs namesAndUuidsLookup() {
+        return lookup;
+    }
+
     /** this method has no reason to exist. */ //we can just inline this when the field is initialised.
     @Deprecated(forRemoval = true)
     public String spectateInventoryTitle(String targetPlayerName) {
@@ -308,6 +314,7 @@ public abstract class InvseeAPI {
         }
     }
 
+    //TODO overloads for when target's HumanEntity is known!
     public final CompletableFuture<Void> spectateInventory(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(spectator, mainSpectatorInventory(targetName, title, offlineSupport), title, mirror, targetName);
     }
@@ -391,6 +398,7 @@ public abstract class InvseeAPI {
         return future;
     }
 
+    //TODO needs an overload for when the target's HumanEntity is known
     public final CompletableFuture<Void> spectateInventory(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(spectator, mainSpectatorInventory(targetId, targetName, title, offlineSupport), title, mirror, targetId.toString());
     }
@@ -501,6 +509,7 @@ public abstract class InvseeAPI {
         }
     }
 
+    //TODO overloads for when target's HumanEntity is known!
     public final CompletableFuture<Void> spectateEnderChest(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(spectator, enderSpectatorInventory(targetName, title, offlineSupport), title, mirror, targetName);
     }
@@ -584,6 +593,7 @@ public abstract class InvseeAPI {
         return future;
     }
 
+    //TODO overloads for when target's HumanEntity is known!
     public final CompletableFuture<Void> spectateEnderChest(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(spectator, enderSpectatorInventory(targetId, targetName, title, offlineSupport), title, mirror, targetId.toString());
     }
