@@ -182,47 +182,27 @@ public abstract class InvseeAPI {
         return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
     }
 
-    /** @return the MainSpectatorInventory that is now in the cache */
-    protected MainSpectatorInventory cache(MainSpectatorInventory spectatorInventory) {
-        return cache(spectatorInventory, false);
+    protected void cache(MainSpectatorInventory spectatorInventory) {
+        cache(spectatorInventory, false);
     }
 
-    /** @return the MainSpectatorInventory from the cache */
-    protected MainSpectatorInventory cache(MainSpectatorInventory spectatorInventory, boolean force) {
-        if (force) {
+    protected void cache(MainSpectatorInventory spectatorInventory, boolean force) {
+        WeakReference<MainSpectatorInventory> ref;
+        MainSpectatorInventory oldSpectatorInv;
+        if (force || (ref = openInventories.get(spectatorInventory.getSpectatedPlayerId())) == null || (oldSpectatorInv = ref.get()) == null) {
             openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-            return spectatorInventory;
-        } else {
-            WeakReference<MainSpectatorInventory> ref = openInventories.get(spectatorInventory.getSpectatedPlayerId());
-            MainSpectatorInventory oldSpectatorInv;
-            if (ref == null || (oldSpectatorInv = ref.get()) == null) {
-                openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-                return spectatorInventory;
-            } else {
-                return oldSpectatorInv;
-            }
         }
     }
 
-    /** @return the EnderSpectatorInventory that is now in the cache */
-    protected EnderSpectatorInventory cache(EnderSpectatorInventory spectatorInventory) {
-        return cache(spectatorInventory, false);
+    protected void cache(EnderSpectatorInventory spectatorInventory) {
+        cache(spectatorInventory, false);
     }
 
-    /** @return the MainSpectatorInventory from the cache */
-    protected EnderSpectatorInventory cache(EnderSpectatorInventory spectatorInventory, boolean force) {
-        if (force) {
+    protected void cache(EnderSpectatorInventory spectatorInventory, boolean force) {
+        WeakReference<EnderSpectatorInventory> ref;
+        EnderSpectatorInventory oldSpectatorInv;
+        if (force || (ref = openEnderChests.get(spectatorInventory.getSpectatedPlayerId())) == null || (oldSpectatorInv = ref.get()) == null) {
             openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-            return spectatorInventory;
-        } else {
-            WeakReference<EnderSpectatorInventory> ref = openEnderChests.get(spectatorInventory.getSpectatedPlayerId());
-            EnderSpectatorInventory oldSpectatorInv;
-            if (ref == null || (oldSpectatorInv = ref.get()) == null) {
-                openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-                return spectatorInventory;
-            } else {
-                return oldSpectatorInv;
-            }
         }
     }
 

@@ -75,7 +75,8 @@ public class InvseeImpl extends InvseeAPI {
         MainBukkitInventory bukkitInventory = spectatorInv.bukkit();
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
-        return cache(bukkitInventory);
+        cache(bukkitInventory);
+        return bukkitInventory;
     }
 
     @Override
