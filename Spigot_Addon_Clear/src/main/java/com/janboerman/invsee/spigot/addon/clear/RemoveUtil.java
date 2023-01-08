@@ -11,7 +11,7 @@ class RemoveUtil {
     static int removeAtMost(Inventory inventory, Material material, int atMost) {
         int removed = 0;
 
-        for (int i = 0; i < inventory.getSize(); i++) {
+        for (int i = 0; i < inventory.getSize() && atMost > 0; i++) {
             ItemStack itemStack = inventory.getItem(i);
             if (itemStack != null && itemStack.getType() == material) {
                 final int stackAmount = itemStack.getAmount();
@@ -22,8 +22,6 @@ class RemoveUtil {
 
                 atMost -= subtractAmount;
                 removed += subtractAmount;
-
-                if (atMost == 0) break;
             }
         }
 

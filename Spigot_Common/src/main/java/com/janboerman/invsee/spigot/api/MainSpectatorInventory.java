@@ -57,75 +57,7 @@ public interface MainSpectatorInventory extends SpectatorInventory<PlayerInvento
         setPersonalContents(newContents.getPersonalContents());
     }
 
-
-    public default ItemStack addItem(ItemStack itemStack) {
-        if (itemStack == null || itemStack.getAmount() == 0) return null;
-
-        ItemStack[] storageContents = getStorageContents();
-        addItem(storageContents, itemStack, getMaxStackSize());
-        setStorageContents(storageContents);
-
-        if (itemStack.getAmount() == 0) return null;
-
-        ItemStack[] armourContents = getArmourContents();
-        addItem(armourContents, itemStack, getMaxStackSize());
-        setArmourContents(armourContents);
-
-        if (itemStack.getAmount() == 0) return null;
-
-        ItemStack[] offHand = getOffHandContents();
-        addItem(offHand, itemStack, getMaxStackSize());
-        setOffHandContents(offHand);
-
-        return itemStack;
-    }
-
-    private static void addItem(final ItemStack[] contents, final ItemStack itemStack, final int maxStackSize) {
-        assert contents != null && itemStack != null;
-
-        //merge with existing similar item stacks
-        for (int i = 0; i < contents.length; i++) {
-            ItemStack existingStack = contents[i];
-            if (existingStack != null) {
-                if (existingStack.isSimilar(itemStack) && existingStack.getAmount() < maxStackSize) {
-                    //how many can we merge (at most)?
-                    int maxMergeAmount = Math.min(maxStackSize - existingStack.getAmount(), itemStack.getAmount());
-                    if (maxMergeAmount > 0) {
-                        if (itemStack.getAmount() <= maxMergeAmount) {
-                            //full merge
-                            existingStack.setAmount(existingStack.getAmount() + itemStack.getAmount());
-                            itemStack.setAmount(0);
-                        } else {
-                            //partial merge
-                            existingStack.setAmount(maxStackSize);
-                            itemStack.setAmount(itemStack.getAmount() - maxMergeAmount);
-                        }
-                    }
-                }
-            }
-
-            if (itemStack.getAmount() == 0) break;
-        }
-
-        //merge with empty slots
-        if (itemStack.getAmount() > 0) {
-            for (int i = 0; i < contents.length; i++) {
-                if (contents[i] == null || contents[i].getAmount() == 0 || contents[i].getType() == Material.AIR) {
-                    if (itemStack.getAmount() <= maxStackSize) {
-                        //full merge
-                        contents[i] = itemStack.clone();
-                        itemStack.setAmount(0);
-                    } else {
-                        //partial merge
-                        ItemStack clone = itemStack.clone(); clone.setAmount(maxStackSize);
-                        contents[i] = clone;
-                        itemStack.setAmount(itemStack.getAmount() - maxStackSize);
-                    }
-                }
-
-                if (itemStack.getAmount() == 0) break;
-            }
-        }
-    }
+    @Deprecated(forRemoval = true)
+    public ItemStack addItem(ItemStack itemStack);
 
 }

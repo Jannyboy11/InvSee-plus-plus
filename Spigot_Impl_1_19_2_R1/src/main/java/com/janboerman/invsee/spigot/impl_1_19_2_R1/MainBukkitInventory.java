@@ -178,26 +178,28 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 
 	// org.bukkit.inventory.Inventory overrides
 
+	// lookups
+
 	@Override
 	public int first(ItemStack stack) {
-		assert stack != null;
+		return first(stack, true);
+	}
 
-		ItemStack[] storageContents = getStorageContents();
-		for (int i = 0; i < storageContents.length; i++) {
-			if (storageContents[i] != null && storageContents[i].isSimilar(stack))
-				return i;
-		}
-
-		ItemStack[] armourContents = getArmourContents();
-		for (int i = 0; i < armourContents.length; i++) {
-			if (armourContents[i] != null && armourContents[i].isSimilar(stack))
-				return i + storageContents.length;
-		}
-
-		ItemStack[] offHandContents = getOffHandContents();
-		for (int i = 0; i < offHandContents.length; i++) {
-			if (offHandContents[i] != null && offHandContents[i].isSimilar(stack))
-				return i + storageContents.length + armourContents.length;
+	public int first(ItemStack stack, boolean withAmount) {
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (item != null) {
+				if (withAmount) {
+					if (item.equals(stack))
+						return slot;
+				} else {
+					if (item.isSimilar(stack))
+						return slot;
+				}
+			} else {
+				if (stack == null)
+					return slot;
+			}
 		}
 
 		return -1;
@@ -205,24 +207,10 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 
 	@Override
 	public int first(Material material) {
-		assert material != null;
-
-		ItemStack[] storageContents = getStorageContents();
-		for (int i = 0; i < storageContents.length; i++) {
-			if (storageContents[i] != null && storageContents[i].getType() == material)
-				return i;
-		}
-
-		ItemStack[] armourContents = getArmourContents();
-		for (int i = 0; i < armourContents.length; i++) {
-			if (armourContents[i] != null && armourContents[i].getType() == material)
-				return i + storageContents.length;
-		}
-
-		ItemStack[] offHandContents = getOffHandContents();
-		for (int i = 0; i < offHandContents.length; i++) {
-			if (offHandContents[i] != null && offHandContents[i].getType() == material)
-				return i + storageContents.length + armourContents.length;
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if ((item == null && material == null) || (item != null && item.getType() == material))
+				return slot;
 		}
 
 		return -1;
@@ -230,27 +218,142 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 
 	@Override
 	public int firstEmpty() {
-
-		ItemStack[] storageContents = getStorageContents();
-		for (int i = 0; i < storageContents.length; i++) {
-			if (storageContents[i] == null || storageContents[i].getAmount() == 0)
-				return i;
-		}
-
-		ItemStack[] armourContents = getArmourContents();
-		for (int i = 0; i < armourContents.length; i++) {
-			if (armourContents[i] == null || armourContents[i].getAmount() == 0)
-				return i + storageContents.length;
-		}
-
-		ItemStack[] offHandContents = getOffHandContents();
-		for (int i = 0; i < offHandContents.length; i++) {
-			if (offHandContents[i] == null || offHandContents[i].getAmount() == 0)
-				return i + storageContents.length + armourContents.length;
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (item == null || item.getAmount() == 0 || item.getType() == Material.AIR)
+				return slot;
 		}
 
 		return -1;
 	}
+
+	@Override
+	public int firstPartial(Material material) {
+		if (material == null)
+			return -1;
+
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (item != null && item.getType() == material && item.getAmount() < item.getMaxStackSize())
+				return slot;
+		}
+
+		return -1;
+	}
+
+	public int firstPartial(ItemStack item) {
+		if (item == null)
+			return -1;
+
+		item = CraftItemStack.asCraftCopy(item);
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack cItem = getItem(slot);
+			if (cItem != null && cItem.getAmount() < cItem.getMaxStackSize() && cItem.isSimilar(item))
+				return slot;
+		}
+
+		return -1;
+	}
+
+	@Override
+	public boolean contains(Material material) {
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if ((item == null && material == null) || (item != null && item.getType() == material))
+				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean contains(ItemStack stack) {
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (Objects.equals(item, stack))
+				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean contains(Material material, int amount) {
+		if (amount <= 0)
+			return true;
+
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (item != null && item.getType() == material && (amount -= item.getAmount()) <= 0)
+				return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean contains(ItemStack stack, int count) {
+		if (count <= 0)
+			return true;
+
+		int encountered = 0;
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (Objects.equals(item, stack)) {
+				encountered += 1;
+				if (encountered >= count)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean containsAtLeast(ItemStack stack, int amount) {
+		if (amount <= 0)
+			return true;
+		if (stack == null)
+			return false; //this is a bit weird, but this is what CraftInventory does.
+
+		int encountered = 0;
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (item != null && item.isSimilar(stack)) {
+				encountered += item.getAmount();
+				if (encountered >= amount)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public HashMap<Integer, ItemStack> all(Material material) {
+		HashMap<Integer, ItemStack> slots = new HashMap<>();
+
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if ((item == null && material == null) || (item != null && item.getType() == material))
+				slots.put(slot, item);
+		}
+
+		return slots;
+	}
+
+	@Override
+	public HashMap<Integer, ItemStack> all(ItemStack stack) {
+		HashMap<Integer, ItemStack> slots = new HashMap<>();
+
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (Objects.equals(item, stack))
+				slots.put(slot, item);
+		}
+
+		return slots;
+	}
+
+	// adding
 
 	@Override
 	public HashMap<Integer, ItemStack> addItem(ItemStack[] items) {
@@ -265,6 +368,131 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		}
 
 		return leftOvers;
+	}
+
+	//TODO make private
+	public ItemStack addItem(ItemStack itemStack) {
+		if (itemStack == null || itemStack.getAmount() == 0) return null;
+
+		ItemStack[] storageContents = getStorageContents();
+		addItem(storageContents, itemStack, getMaxStackSize());
+		setStorageContents(storageContents);
+
+		if (itemStack.getAmount() == 0) return null;
+
+		ItemStack[] armourContents = getArmourContents();
+		addItem(armourContents, itemStack, getMaxStackSize());
+		setArmourContents(armourContents);
+
+		if (itemStack.getAmount() == 0) return null;
+
+		ItemStack[] offHand = getOffHandContents();
+		addItem(offHand, itemStack, getMaxStackSize());
+		setOffHandContents(offHand);
+
+		return itemStack; //leftover (couldn't be added)
+	}
+
+	private static void addItem(final ItemStack[] contents, final ItemStack add, final int maxStackSize) {
+		assert contents != null && add != null;
+
+		//merge with existing similar item stacks
+		for (int i = 0; i < contents.length && add.getAmount() > 0; i++) {
+			final ItemStack existingStack = contents[i];
+			if (existingStack != null) {
+				final int maxStackSizeForThisItem = Math.min(maxStackSize, existingStack.getMaxStackSize());
+				if (existingStack.isSimilar(add) && existingStack.getAmount() < maxStackSizeForThisItem) {
+					//how many can we merge (at most)?
+					final int maxMergeAmount = Math.min(maxStackSizeForThisItem - existingStack.getAmount(), add.getAmount());
+					if (maxMergeAmount > 0) {
+						if (add.getAmount() <= maxMergeAmount) {
+							//full merge
+							existingStack.setAmount(existingStack.getAmount() + add.getAmount());
+							add.setAmount(0);
+						} else {
+							//partial merge
+							existingStack.setAmount(maxStackSizeForThisItem);
+							add.setAmount(add.getAmount() - maxMergeAmount);
+						}
+					}
+				}
+			}
+		}
+
+		//merge with empty slots
+		final int maxStackSizeForThisItem = Math.min(maxStackSize, add.getMaxStackSize());
+		for (int i = 0; i < contents.length && add.getAmount() > 0; i++) {
+			if (contents[i] == null || contents[i].getAmount() == 0 || contents[i].getType() == Material.AIR) {
+				if (add.getAmount() <= maxStackSizeForThisItem) {
+					//full merge
+					contents[i] = add.clone();
+					add.setAmount(0);
+				} else {
+					//partial merge
+					ItemStack clone = add.clone(); clone.setAmount(maxStackSize);
+					contents[i] = clone;
+					add.setAmount(add.getAmount() - maxStackSize);
+				}
+			}
+		}
+	}
+
+	// removing
+
+	@Override
+	public void remove(Material material) {
+		if (material == null) return;
+
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (item != null && item.getType() == material)
+				clear(slot);
+		}
+	}
+
+	@Override
+	public void remove(ItemStack stack) {
+		if (stack == null) return;
+
+		for (int slot = 0; slot < getSize(); slot++) {
+			ItemStack item = getItem(slot);
+			if (item != null && item.equals(stack))
+				clear(slot);
+		}
+	}
+
+	@Override
+	public HashMap<Integer, ItemStack> removeItem(ItemStack... items) {
+		assert items != null;
+
+		HashMap<Integer, ItemStack> leftOvers = new HashMap<>();
+		for (int i = 0; i < items.length; i++) {
+			ItemStack leftOver = removeItem(items[i]);
+			if (leftOver != null && leftOver.getAmount() > 0) {
+				leftOvers.put(i, leftOver);
+			}
+		}
+
+		return leftOvers;
+	}
+
+	private ItemStack removeItem(ItemStack remove) {
+		if (remove == null || remove.getAmount() == 0) return null;
+
+		for (int slot = 0; slot < getSize() && remove.getAmount() > 0; slot++) {
+			final ItemStack existingStack = getItem(slot);
+			if (existingStack != null) {
+				if (existingStack.isSimilar(remove)) {
+					//how many can we remove (at most)?
+					final int maxRemoveAmount = Math.min(existingStack.getAmount(), remove.getAmount());
+					//subtract the amount from both item stacks
+					existingStack.setAmount(existingStack.getAmount() - maxRemoveAmount);
+					remove.setAmount(remove.getAmount() - maxRemoveAmount);
+				}
+			}
+		}
+
+		return remove; //leftover (couldn't be removed)
 	}
 
 }
