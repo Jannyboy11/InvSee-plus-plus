@@ -76,8 +76,11 @@ and running `mvn clean install -DskipTests=true` in its root directory.
 3. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at Spigot_Plugin/target/InvSee++.jar.
 
+### Developers API
+Documentation available on the [wiki](https://github.com/Jannyboy11/InvSee-plus-plus/wiki)!
+
 ### License
-2-Clause BSD. See the LICENSE.txt file.
+LGPLv2.1. See the LICENSE.txt file.
 
 ### Credits
 Special thanks to Icodak ([Discord](https://discordapp.com/users/345308025331908619)) ([SpigotMC](https://www.spigotmc.org/members/icodak.473813/)) for creating the logo!
