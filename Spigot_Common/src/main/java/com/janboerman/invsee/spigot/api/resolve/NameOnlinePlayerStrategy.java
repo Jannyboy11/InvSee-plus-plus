@@ -8,20 +8,24 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 public class NameOnlinePlayerStrategy implements NameResolveStrategy {
 
     private final Server server;
+    private final Executor syncExecutor;
 
-    public NameOnlinePlayerStrategy(Server server) {
+    public NameOnlinePlayerStrategy(Server server, Executor syncExecutor) {
         this.server = Objects.requireNonNull(server);
+        this.syncExecutor = Objects.requireNonNull(syncExecutor);
     }
 
     @Override
     public CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId) {
-        Player player = server.getPlayer(uniqueId);
-        if (player == null) return CompletedEmpty.the();
-
-        return CompletableFuture.completedFuture(Optional.of(player.getName()));
+        return CompletableFuture.supplyAsync(() -> {
+            Player player = server.getPlayer(uniqueId);
+            if (player == null) return Optional.empty();
+            else return Optional.of(player.getName());
+        }, syncExecutor);
     }
 }

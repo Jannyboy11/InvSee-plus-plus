@@ -71,7 +71,14 @@ public class NamesAndUUIDs {
 
     public NamesAndUUIDs(Plugin plugin) {
 
-        Executor asyncExecutor = runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable);
+        Executor asyncExecutor = runnable -> {
+            if (plugin.getServer().isPrimaryThread()) { plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable); }
+            else { runnable.run(); }
+        };
+        Executor syncExecutor = runnable -> {
+            if (plugin.getServer().isPrimaryThread()) { runnable.run(); }
+            else { plugin.getServer().getScheduler().runTask(plugin, runnable); }
+        };
 
         MojangAPI mojangApi = new MojangAPI(HttpClient.newBuilder()
                 .executor(asyncExecutor)
@@ -80,8 +87,8 @@ public class NamesAndUUIDs {
         this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
         this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
 
-        this.uuidResolveStrategies.add(new UUIDOnlinePlayerStrategy(plugin.getServer()));
-        this.nameResolveStrategies.add(new NameOnlinePlayerStrategy(plugin.getServer()));
+        this.uuidResolveStrategies.add(new UUIDOnlinePlayerStrategy(plugin.getServer(), syncExecutor));
+        this.nameResolveStrategies.add(new NameOnlinePlayerStrategy(plugin.getServer(), syncExecutor));
 
         this.uuidResolveStrategies.add(new UUIDInMemoryStrategy(uuidCache));
         this.nameResolveStrategies.add(new NameInMemoryStrategy(userNameCache));

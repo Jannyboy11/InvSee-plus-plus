@@ -8,20 +8,24 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 public class UUIDOnlinePlayerStrategy implements UUIDResolveStrategy {
 
-    private Server server;
+    private final Server server;
+    private final Executor syncExecutor;
 
-    public UUIDOnlinePlayerStrategy(Server server) {
+    public UUIDOnlinePlayerStrategy(Server server, Executor syncExecutor) {
         this.server = Objects.requireNonNull(server);
+        this.syncExecutor = Objects.requireNonNull(syncExecutor);
     }
 
     @Override
     public CompletableFuture<Optional<UUID>> resolveUniqueId(String userName) {
-        Player player = server.getPlayer(userName);
-        if (player == null) return CompletedEmpty.the();
-
-        return CompletableFuture.completedFuture(Optional.of(player.getUniqueId()));
+        return CompletableFuture.supplyAsync(() -> {
+            Player player = server.getPlayerExact(userName);
+            if (player == null) return Optional.empty();
+            else return Optional.of(player.getUniqueId());
+        }, syncExecutor);
     }
 }
