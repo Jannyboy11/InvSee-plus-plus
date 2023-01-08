@@ -37,9 +37,6 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
     protected List<ItemStack> craftingContents;
     protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
-    protected String title;
-    protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
-
     private int maxStack = Container.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
     protected InventoryHolder owner;
@@ -65,9 +62,6 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
             }
         };
         this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
-
-        this.title = title;
-        this.mirror = mirror;
     }
 
     @Override

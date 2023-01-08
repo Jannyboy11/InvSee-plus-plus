@@ -27,7 +27,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
 
     private EnderBukkitInventory bukkit;
     protected String title;
-    protected Mirror<EnderChestSlot> mirror = Mirror.defaultEnderChest();
+    protected Mirror<EnderChestSlot> mirror;
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -40,7 +40,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
         storageContents = null;
     }
 
-    public EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
+    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
         // Possibly could've used TileEntityTypes.ENDER_CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.

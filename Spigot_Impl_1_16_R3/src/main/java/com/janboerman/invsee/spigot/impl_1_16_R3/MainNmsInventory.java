@@ -39,7 +39,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
 
     private MainBukkitInventory bukkit;
     protected String title;
-    protected Mirror<PlayerInventorySlot> mirror = Mirror.defaultPlayerInventory();
+    protected Mirror<PlayerInventorySlot> mirror;
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -49,11 +49,6 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
         super(TileEntityTypeFakePlayerInventory);
         spectatedPlayerUuid = null;
         spectatedPlayerName = null;
-        storageContents = null;
-        armourContents = null;
-        offHand = null;
-        onCursor = null;
-        playerCraftingContents = null;
     }
 
     protected MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
