@@ -57,7 +57,4 @@ public interface MainSpectatorInventory extends SpectatorInventory<PlayerInvento
         setPersonalContents(newContents.getPersonalContents());
     }
 
-    @Deprecated(forRemoval = true)
-    public ItemStack addItem(ItemStack itemStack);
-
 }

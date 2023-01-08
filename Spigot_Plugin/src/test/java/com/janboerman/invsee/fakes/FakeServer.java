@@ -737,7 +737,7 @@ public class FakeServer implements Server {
         throw new UnsupportedOperationException();
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public ChunkData createVanillaChunkData(World world, int i, int i1) {
         throw new UnsupportedOperationException();
     }

@@ -34,8 +34,8 @@ public abstract class InvseeAPI {
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
 
-    private Function<Target, String> mainSpectatorInvTitleProvider = target -> spectateInventoryTitle(target.toString());
-    private Function<Target, String> enderSpectatorInvTitleProvider = target -> spectateEnderchestTitle(target.toString());
+    private Function<Target, String> mainSpectatorInvTitleProvider = target -> target.toString() + "'s inventory";
+    private Function<Target, String> enderSpectatorInvTitleProvider = target -> target.toString() + "'s enderchest";
 
     private boolean offlineSupport = true;
 
@@ -96,18 +96,6 @@ public abstract class InvseeAPI {
         return lookup;
     }
 
-    /** this method has no reason to exist. */ //we can just inline this when the field is initialised.
-    @Deprecated(forRemoval = true)
-    public String spectateInventoryTitle(String targetPlayerName) {
-        return targetPlayerName + "'s inventory";
-    }
-
-    /** @deprecated this method has no reason to exist. */ //we can just inline this when the field is initialised.
-    @Deprecated(forRemoval = true)
-    public String spectateEnderchestTitle(String targetPlayerName) {
-        return targetPlayerName + "'s enderchest";
-    }
-
     //TODO un-hack this registerListeners thing.
     //TODO should I make a protected constructor that takes a delegate InvseeAPI as a parameter?
 
@@ -158,16 +146,12 @@ public abstract class InvseeAPI {
         this.transferEnderToLivePlayer = bip;
     }
 
-    /** will get *protected* visibility */
-    @Deprecated(forRemoval = true) //mark deprecated for removal, because for api consumers it will look as if it is removed.
-    public Map<UUID, WeakReference<MainSpectatorInventory>> getOpenInventories() {
-        return openInventories;
+    protected static Map<UUID, WeakReference<MainSpectatorInventory>> getOpenInventories(InvseeAPI api) {
+        return api.openInventories;
     }
 
-    /** will get *protected* visibility */
-    @Deprecated(forRemoval = true) //mark deprecated for removal, because for api consumers it will look as if it is removed.
-    public Map<UUID, WeakReference<EnderSpectatorInventory>> getOpenEnderChests() {
-        return openEnderChests;
+    protected static Map<UUID, WeakReference<EnderSpectatorInventory>> getOpenEnderChests(InvseeAPI api) {
+        return api.openEnderChests;
     }
 
     //TODO I don't like the design of this

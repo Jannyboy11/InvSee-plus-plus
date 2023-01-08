@@ -64,8 +64,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         this.pwiHook = Objects.requireNonNull(pwiHook);
 
         wrapped.unregisterListeners();
-        setOpenInventories(wrapped.getOpenInventories());
-        setOpenEnderChests(wrapped.getOpenEnderChests());
+        setOpenInventories(getOpenInventories(wrapped));
+        setOpenEnderChests(getOpenEnderChests(wrapped));
 
         //these influence the PlayerListener
         setMainInventoryTransferPredicate((spectatorInventory, player) -> {

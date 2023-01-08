@@ -369,8 +369,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
         return leftOvers;
     }
 
-    //TODO make private
-    public ItemStack addItem(ItemStack itemStack) {
+    private ItemStack addItem(ItemStack itemStack) {
         if (itemStack == null || itemStack.getAmount() == 0) return null;
 
         ItemStack[] storageContents = getStorageContents();
