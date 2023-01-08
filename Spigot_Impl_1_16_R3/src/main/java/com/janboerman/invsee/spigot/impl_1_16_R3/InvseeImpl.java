@@ -106,8 +106,7 @@ public class InvseeImpl extends InvseeAPI {
         InventoryEnderChest nmsInventory = (InventoryEnderChest) craftInventory.getInventory();
         EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, title, mirror);
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
-        cache(bukkitInventory);
-        return bukkitInventory;
+        return cache(bukkitInventory);
     }
 
     @Override

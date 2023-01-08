@@ -192,36 +192,47 @@ public abstract class InvseeAPI {
         return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
     }
 
-
-    protected void cache(MainSpectatorInventory spectatorInventory) {
-        cache(spectatorInventory, false);
+    /** @return the MainSpectatorInventory that is now in the cache */
+    protected MainSpectatorInventory cache(MainSpectatorInventory spectatorInventory) {
+        return cache(spectatorInventory, false);
     }
 
-    protected void cache(MainSpectatorInventory spectatorInventory, boolean force) {
+    /** @return the MainSpectatorInventory from the cache */
+    protected MainSpectatorInventory cache(MainSpectatorInventory spectatorInventory, boolean force) {
         if (force) {
             openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+            return spectatorInventory;
         } else {
             WeakReference<MainSpectatorInventory> ref = openInventories.get(spectatorInventory.getSpectatedPlayerId());
             MainSpectatorInventory oldSpectatorInv;
             if (ref == null || (oldSpectatorInv = ref.get()) == null) {
                 openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-            } //else: don't update cache.
+                return spectatorInventory;
+            } else {
+                return oldSpectatorInv;
+            }
         }
     }
 
-    protected void cache(EnderSpectatorInventory spectatorInventory) {
-        cache(spectatorInventory, false);
+    /** @return the EnderSpectatorInventory that is now in the cache */
+    protected EnderSpectatorInventory cache(EnderSpectatorInventory spectatorInventory) {
+        return cache(spectatorInventory, false);
     }
 
-    protected void cache(EnderSpectatorInventory spectatorInventory, boolean force) {
+    /** @return the MainSpectatorInventory from the cache */
+    protected EnderSpectatorInventory cache(EnderSpectatorInventory spectatorInventory, boolean force) {
         if (force) {
             openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
+            return spectatorInventory;
         } else {
             WeakReference<EnderSpectatorInventory> ref = openEnderChests.get(spectatorInventory.getSpectatedPlayerId());
             EnderSpectatorInventory oldSpectatorInv;
             if (ref == null || (oldSpectatorInv = ref.get()) == null) {
                 openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-            } //else: don't update cache.
+                return spectatorInventory;
+            } else {
+                return oldSpectatorInv;
+            }
         }
     }
 
@@ -280,12 +291,20 @@ public abstract class InvseeAPI {
 
     // ================================== API methods: Main Inventory ==================================
 
-    public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity player, String title) {
-        Target target = Target.byPlayer(player);
-        if (exempt.isExemptedFromHavingMainInventorySpectated(target)) {
-            return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target));
+    public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target) {
+        return mainSpectatorInventory(target, mainSpectatorInvTitleProvider.apply(Target.byPlayer(target)));
+    }
+
+    public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target, String title) {
+        return mainSpectatorInventory(target, title, inventoryMirror);
+    }
+
+    public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target, String title, Mirror<PlayerInventorySlot> mirror) {
+        Target theTarget = Target.byPlayer(target);
+        if (exempt.isExemptedFromHavingMainInventorySpectated(theTarget)) {
+            return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
-            return SpectateResponse.succeed(spectateInventory(player, title));
+            return SpectateResponse.succeed(spectateInventory(target, title, mirror));
         }
     }
 
@@ -465,12 +484,20 @@ public abstract class InvseeAPI {
 
     // ================================== API methods: Enderchest ==================================
 
-    public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity player, String title) {
-        Target target = Target.byPlayer(player);
-        if (exempt.isExemptedFromHavingEnderchestSpectated(target)) {
-            return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target));
+    public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target) {
+        return enderSpectatorInventory(target, enderSpectatorInvTitleProvider.apply(Target.byPlayer(target)));
+    }
+
+    public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target, String title) {
+        return enderSpectatorInventory(target, title, enderchestMirror);
+    }
+
+    public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target, String title, Mirror<EnderChestSlot> mirror) {
+        Target theTarget = Target.byPlayer(target);
+        if (exempt.isExemptedFromHavingEnderchestSpectated(theTarget)) {
+            return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
-            return SpectateResponse.succeed(spectateEnderChest(player, title));
+            return SpectateResponse.succeed(spectateEnderChest(target, title, mirror));
         }
     }
 
