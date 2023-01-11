@@ -245,10 +245,9 @@ public abstract class InvseeAPI {
     }
 
     // ================================== implementation methods ==================================
-
-    //TODO for future compat: create a class CreationOptions (which includes Title and Mirror)?
-    //TODO this could be a replacement for multiple parameters now.
-
+    
+    //TODO CreationOptions overload.
+    @Deprecated(forRemoval = true)
     public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(player, title);
     }
@@ -256,7 +255,7 @@ public abstract class InvseeAPI {
      * Use {@link #spectateInventory(HumanEntity, String, Mirror)} instead.
      * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         return spectateInventory(player, title, inventoryMirror);
     }
@@ -275,6 +274,7 @@ public abstract class InvseeAPI {
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
     //TODO actually create overload with CreationOptions
+    @Deprecated(forRemoval = true)
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(player, title);
     }
@@ -282,7 +282,7 @@ public abstract class InvseeAPI {
      * Use {@link #spectateEnderChest(HumanEntity, String, Mirror)} instead.
      * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
         return spectateEnderChest(player, title, enderchestMirror);
     }
@@ -340,6 +340,7 @@ public abstract class InvseeAPI {
         return mainSpectatorInventory(targetName, title, offlineSupport, inventoryMirror);
     }
 
+    //TODO CreationOptions overload!
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
         Objects.requireNonNull(mirror, "mirror cannot be null!");
@@ -437,8 +438,6 @@ public abstract class InvseeAPI {
         final String title = creationOptions.getTitle().titleFor(gameProfileTarget);
         final Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
         final boolean offlineSupport = creationOptions.isOfflineSupported();
-        final boolean unknownSupport = creationOptions.isUnknownPlayerSupported();
-        //TODO actually use this^
 
         //try cache
         WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
@@ -481,7 +480,7 @@ public abstract class InvseeAPI {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(Either.left(maybeReason.get()));
             } else {
-                return createOfflineInventory(playerId, playerName, title, mirror).thenApply(maybeInventory -> {
+                return createOfflineInventory(playerId, playerName, creationOptions).thenApply(maybeInventory -> {
                     if (maybeInventory.isPresent()) {
                         return Either.right(maybeInventory.get());
                     } else {
@@ -546,6 +545,7 @@ public abstract class InvseeAPI {
         return enderSpectatorInventory(targetName, title, offlineSupport, enderchestMirror);
     }
 
+    //TODO CreationOptions overload!
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
         Objects.requireNonNull(mirror, "mirror cannot be null!");
@@ -630,6 +630,7 @@ public abstract class InvseeAPI {
         return enderSpectatorInventory(playerId, playerName, title, offlineSupport, enderchestMirror);
     }
 
+    //TODO CreationOptions overload!
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
@@ -734,6 +735,7 @@ public abstract class InvseeAPI {
     }
 
     //by default: ignore mirror, implementations can override!
+    //TODO CreationOptions overload
     public void openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, String title, Mirror<PlayerInventorySlot> mirror) {
         spectator.openInventory(spectatorInventory);
     }
@@ -765,6 +767,7 @@ public abstract class InvseeAPI {
     }
 
     //by default: ignore mirror, implementation can override!
+    //TODO CreationOptions overload!
     public void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, String title, Mirror<EnderChestSlot> mirror) {
         spectator.openInventory(spectatorInventory);
     }
