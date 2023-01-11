@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.internal;
 
 import com.janboerman.invsee.mojangapi.MojangAPI;
+import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.resolve.*;
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import com.janboerman.invsee.utils.Maybe;
@@ -132,9 +133,11 @@ public class NamesAndUUIDs {
             //this is too expensive for my tastes so I'm not going to implement a NameBungeeCordStrategy for now.
         }
 
+        //these methods 'resolve' names and uuids for players that have never played on the server before.
+        //they implement the marker interface NewPlayerSupport.
         if (onlineMode(plugin.getServer())) {
             this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
-            this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi));
+            this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi)); //ok, theoretically this could occur if the player already played before.
         } else {
             this.uuidResolveStrategies.add(new UUIDOfflineModeStrategy());
             //how to fake a username given a uuid, in offline mode?

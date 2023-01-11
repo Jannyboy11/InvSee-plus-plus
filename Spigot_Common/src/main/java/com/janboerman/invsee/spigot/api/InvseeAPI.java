@@ -30,14 +30,22 @@ import org.bukkit.plugin.*;
 
 public abstract class InvseeAPI {
 
+    /* TODO this class needs a BIG refactor.
+     * TODO implementations should be able to override *just* the abstract methods.
+     * TODO I should create a new interface for this.
+     * TODo I think I'll call this new interface "Platform".
+     * TODO we then use composition over inheritance!
+     */
+
     protected final Plugin plugin;
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
 
-    private Function<Target, String> mainSpectatorInvTitleProvider = target -> target.toString() + "'s inventory";
-    private Function<Target, String> enderSpectatorInvTitleProvider = target -> target.toString() + "'s enderchest";
+    private Title mainInventoryTitle = target -> target.toString() + "'s inventory";
+    private Title enderInventoryTitle = target -> target.toString() + "'s enderchest";
 
-    private boolean offlineSupport = true;
+    private boolean offlinePlayerSupport = true;
+    private boolean unknownPlayerSupport = true;
 
     private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
     private Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
@@ -110,18 +118,35 @@ public abstract class InvseeAPI {
         HandlerList.unregisterAll(inventoryListener);
     }
 
-    public final void setOfflineSupport(boolean offlineSupport) {
-        this.offlineSupport = offlineSupport;
+
+    // ========= creation options =========
+
+    public final void setOfflinePlayerSupport(boolean offlinePlayerSupport) {
+        this.offlinePlayerSupport = offlinePlayerSupport;
     }
 
+    public final void setUnknownPlayerSupport(boolean unknownPlayerSupport) {
+        this.unknownPlayerSupport = unknownPlayerSupport;
+    }
+
+    @Deprecated
     public final void setMainInventoryTitleFactory(Function<Target, String> titleFactory) {
-        Objects.requireNonNull(titleFactory);
-        this.mainSpectatorInvTitleProvider = titleFactory;
+        setMainInventoryTitle(Title.of(titleFactory));
     }
 
+    @Deprecated
     public final void setEnderInventoryTitleFactory(Function<Target, String> titleFactory) {
+        setEnderInventoryTitle(Title.of(titleFactory));
+    }
+
+    public final void setMainInventoryTitle(Title titleFactory) {
         Objects.requireNonNull(titleFactory);
-        this.enderSpectatorInvTitleProvider = titleFactory;
+        this.mainInventoryTitle = titleFactory;
+    }
+
+    public final void setEnderInventoryTitle(Title titleFactory) {
+        Objects.requireNonNull(titleFactory);
+        this.enderInventoryTitle = titleFactory;
     }
 
     public final void setMainInventoryMirror(Mirror<PlayerInventorySlot> mirror) {
@@ -133,6 +158,19 @@ public abstract class InvseeAPI {
         Objects.requireNonNull(mirror);
         this.enderchestMirror = mirror;
     }
+
+    public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions(Target target) {
+        return new CreationOptions<>(target, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport);
+    }
+
+    public CreationOptions<EnderChestSlot> enderInventoryCreationOptions(Target target) {
+        return new CreationOptions<>(target, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport);
+    }
+
+    // ========= end of creation options =========
+
+
+    //
 
     //TODO I don't like the design of this.
     public final void setMainInventoryTransferPredicate(BiPredicate<MainSpectatorInventory, Player> bip) {
@@ -222,19 +260,21 @@ public abstract class InvseeAPI {
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         return spectateInventory(player, title, inventoryMirror);
     }
-    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
-        return createOfflineInventory(playerId, playerName, title);
+
+    //TODO implement
+    public abstract CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options);
+
+    @Deprecated(forRemoval = true)
+    public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
+        return createOfflineInventory(playerId, playerName, mainInventoryCreationOptions(Target.byGameProfile(playerId, playerName)).withTitle(title).withMirror(mirror));
     }
-    /**
-     * Use {@link #createOfflineInventory(UUID, String, String, Mirror)} instead.
-     * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
-     */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
-        return createOfflineInventory(playerId, playerName, title, inventoryMirror);
+        return createOfflineInventory(playerId, playerName, mainInventoryCreationOptions(Target.byGameProfile(playerId, playerName)).withTitle(title));
     }
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
+    //TODO actually create overload with CreationOptions
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(player, title);
     }
@@ -246,23 +286,28 @@ public abstract class InvseeAPI {
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
         return spectateEnderChest(player, title, enderchestMirror);
     }
-    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
-        return createOfflineEnderChest(playerId, playerName, title);
+
+    //TODO implement
+    public abstract CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options);
+
+    @Deprecated(forRemoval = true)
+    public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
+        return createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions(Target.byGameProfile(playerId, playerName)).withTitle(title).withMirror(mirror));
     }
     /**
      * Use {@link #createOfflineEnderChest(UUID, String, String, Mirror)} instead.
      * @deprecated used to be overridden by implementations of the api, never intended to be called by api consumers.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
-        return createOfflineEnderChest(playerId, playerName, title, enderchestMirror);
+        return createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions(Target.byGameProfile(playerId, playerName)).withTitle(title));
     }
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
     // ================================== API methods: Main Inventory ==================================
 
     public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target) {
-        return mainSpectatorInventory(target, mainSpectatorInvTitleProvider.apply(Target.byPlayer(target)));
+        return mainSpectatorInventory(target, mainInventoryTitle.titleFor(Target.byPlayer(target)));
     }
 
     public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target, String title) {
@@ -284,11 +329,11 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName) {
-        return mainSpectatorInventory(targetName, mainSpectatorInvTitleProvider.apply(Target.byUsername(targetName)));
+        return mainSpectatorInventory(targetName, mainInventoryTitle.titleFor(Target.byUsername(targetName)));
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
-        return mainSpectatorInventory(targetName, title, offlineSupport);
+        return mainSpectatorInventory(targetName, title, offlinePlayerSupport);
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport) {
@@ -368,11 +413,11 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName) {
-        return mainSpectatorInventory(playerId, playerName, mainSpectatorInvTitleProvider.apply(Target.byUniqueId(playerId)));
+        return mainSpectatorInventory(playerId, playerName, mainInventoryTitle.titleFor(Target.byUniqueId(playerId)));
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
-        return mainSpectatorInventory(playerId, playerName, title, offlineSupport);
+        return mainSpectatorInventory(playerId, playerName, title, offlinePlayerSupport);
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
@@ -380,9 +425,20 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
+        return mainSpectatorInventory(playerId, playerName, new CreationOptions<>(Target.byGameProfile(playerId, playerName), Title.constant(title), offlineSupport, mirror, unknownPlayerSupport));
+    }
+
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> creationOptions) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
-        Objects.requireNonNull(mirror, "mirror cannot be null!");
+        Objects.requireNonNull(creationOptions, "creation options cannot be null!");
+
+        final Target gameProfileTarget = Target.byGameProfile(playerId, playerName);
+        final String title = creationOptions.getTitle().titleFor(gameProfileTarget);
+        final Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+        final boolean offlineSupport = creationOptions.isOfflineSupported();
+        final boolean unknownSupport = creationOptions.isUnknownPlayerSupported();
+        //TODO actually use this^
 
         //try cache
         WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
@@ -409,7 +465,7 @@ public abstract class InvseeAPI {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
 
-        target = Target.byUniqueId(playerId);
+        target = gameProfileTarget;
         //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
         final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
         final CompletableFuture<Optional<NotCreatedReason>> reasonFuture = isExemptedFuture.thenApply(isExempted -> {
@@ -457,7 +513,7 @@ public abstract class InvseeAPI {
     // ================================== API methods: Enderchest ==================================
 
     public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target) {
-        return enderSpectatorInventory(target, enderSpectatorInvTitleProvider.apply(Target.byPlayer(target)));
+        return enderSpectatorInventory(target, enderInventoryTitle.titleFor(Target.byPlayer(target)));
     }
 
     public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target, String title) {
@@ -479,11 +535,11 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName) {
-        return enderSpectatorInventory(targetName, enderSpectatorInvTitleProvider.apply(Target.byUsername(targetName)));
+        return enderSpectatorInventory(targetName, enderInventoryTitle.titleFor(Target.byUsername(targetName)));
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
-        return enderSpectatorInventory(targetName, title, offlineSupport);
+        return enderSpectatorInventory(targetName, title, offlinePlayerSupport);
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport) {
@@ -563,11 +619,11 @@ public abstract class InvseeAPI {
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName) {
-        return enderSpectatorInventory(playerId, playerName, enderSpectatorInvTitleProvider.apply(Target.byUniqueId(playerId)));
+        return enderSpectatorInventory(playerId, playerName, enderInventoryTitle.titleFor(Target.byUniqueId(playerId)));
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
-        return enderSpectatorInventory(playerId, playerName, title, offlineSupport);
+        return enderSpectatorInventory(playerId, playerName, title, offlinePlayerSupport);
     }
 
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
@@ -725,9 +781,9 @@ public abstract class InvseeAPI {
             Target target = Target.byPlayer(player);
 
             MainSpectatorInventory newInventorySpectator = null;
-            String mainTitle = mainSpectatorInvTitleProvider.apply(target);
+            String mainTitle = mainInventoryTitle.titleFor(target);
             EnderSpectatorInventory newEnderSpectator = null;
-            String enderTitle = enderSpectatorInvTitleProvider.apply(target);
+            String enderTitle = enderInventoryTitle.titleFor(target);
 
             //check if somebody was looking up the player and make sure they get the player's live inventory
             CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvNameFuture = pendingInventoriesByName.remove(userName);

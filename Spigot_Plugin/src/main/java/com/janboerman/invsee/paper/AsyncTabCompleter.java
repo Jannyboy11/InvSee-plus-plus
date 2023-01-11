@@ -51,6 +51,11 @@ public class AsyncTabCompleter implements Listener {
 
     @EventHandler
     public void onTabComplete(AsyncTabCompleteEvent event) {
+        // Can be called from multiple threads. By the looks of it these are Netty threads.
+        //TODO if we can adjust the UsernameTrie implementation such that lookups done for 'get' and 'tabcompletion' don't restructure the internal tree structure,
+        //TODO then we could use a ReentrantReadWriteLock to protect the UsernameTrie.
+        //TODO alternatively, we could just make the UsernameTrie implementation itself thread-safe?
+
         final String buffer = event.getBuffer();
 
         while (!nameQueue.isEmpty()) {

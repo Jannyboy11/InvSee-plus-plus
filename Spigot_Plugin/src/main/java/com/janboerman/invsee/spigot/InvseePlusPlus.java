@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.target.Target;
 /*
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
@@ -51,9 +52,10 @@ public class InvseePlusPlus extends JavaPlugin {
         // else if (Separe-World-Items)
 
         //set configured values
-        api.setOfflineSupport(offlinePlayerSupport());
-        api.setMainInventoryTitleFactory(this::getTitleForInventory);
-        api.setEnderInventoryTitleFactory(this::getTitleForEnderChest);
+        api.setOfflinePlayerSupport(offlinePlayerSupport());
+        api.setUnknownPlayerSupport(unknownPlayerSupport());
+        api.setMainInventoryTitle(this::getTitleForInventory);
+        api.setEnderInventoryTitle(this::getTitleForEnderChest);
         api.setMainInventoryMirror(Mirror.forInventory(getInventoryTemplate()));
         api.setEnderInventoryMirror(Mirror.forEnderChest(getEnderChestTemplate()));
 
@@ -124,6 +126,10 @@ public class InvseePlusPlus extends JavaPlugin {
 
     public boolean offlinePlayerSupport() {
         return getConfig().getBoolean("enable-offline-player-support", true);
+    }
+
+    public boolean unknownPlayerSupport() {
+        return getConfig().getBoolean("enable-unknown-player-support", true);
     }
 
     public String getTitleForInventory(Target target) {

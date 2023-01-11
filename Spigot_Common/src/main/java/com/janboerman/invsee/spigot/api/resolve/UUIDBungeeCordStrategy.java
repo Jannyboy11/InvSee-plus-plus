@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class UUIDBungeeCordStrategy implements UUIDResolveStrategy, PluginMessageListener {
@@ -58,7 +59,7 @@ public class UUIDBungeeCordStrategy implements UUIDResolveStrategy, PluginMessag
             CompletableFuture<Optional<UUID>> future = new CompletableFuture<>();
             future.orTimeout(5, TimeUnit.SECONDS);
             future = future.exceptionally(throwable -> {
-                if (!(throwable instanceof CancellationException)) {
+                if (!(throwable instanceof CancellationException || throwable instanceof TimeoutException)) {
                     plugin.getLogger().log(Level.WARNING, "Could not request " + userName + "'s UUID from BungeeCord", throwable);
                 }
                 futureMap.remove(userName);

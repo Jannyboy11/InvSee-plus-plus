@@ -27,5 +27,6 @@ public class ClearPlugin extends JavaPlugin {
     }
 
     //TODO configuration option to also clear out of the queue created by InvSee++_Give ?
+    //TODO when enabled, the InvSee++_Give queue could also be re-polled after clearing happens.
 
 }

@@ -18,5 +18,9 @@ public interface Target {
         return new PlayerTarget(player);
     }
 
+    public static Target byGameProfile(UUID uniqueId, String userName) {
+        return new GameProfileTarget(uniqueId, userName);
+    }
+
 }
 
