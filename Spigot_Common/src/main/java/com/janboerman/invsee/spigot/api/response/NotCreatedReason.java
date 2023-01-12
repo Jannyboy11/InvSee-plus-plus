@@ -7,6 +7,10 @@ import com.janboerman.invsee.spigot.api.target.Target;
  */
 public interface NotCreatedReason {
 
+    public static UnknownTarget unknownTarget(Target target) {
+        return new UnknownTarget(target);
+    }
+
     public static TargetDoesNotExist targetDoesNotExists(Target target) {
         return new TargetDoesNotExist(target);
     }
@@ -15,6 +19,7 @@ public interface NotCreatedReason {
         return new TargetHasExemptPermission(target);
     }
 
+    @Deprecated
     public static ImplementationFault implementationFault(Target target) {
         return new ImplementationFault(target);
     }

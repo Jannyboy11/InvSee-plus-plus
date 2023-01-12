@@ -5,6 +5,7 @@ import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 //like Either<NotCreatedReason, SpectatorInventory>
 public interface SpectateResponse<SI extends SpectatorInventory<?>> {
@@ -14,6 +15,18 @@ public interface SpectateResponse<SI extends SpectatorInventory<?>> {
     public SI getInventory() throws NoSuchElementException;
 
     public NotCreatedReason getReason() throws NoSuchElementException;
+
+    public default void ifSuccess(Consumer<? super SI> inventoryConsumer) {
+        if (isSuccess()) {
+            inventoryConsumer.accept(getInventory());
+        }
+    }
+
+    public default void ifFailure(Consumer<? super NotCreatedReason> reasonConsumer) {
+        if (!isSuccess()) {
+            reasonConsumer.accept(getReason());
+        }
+    }
 
     public static <SI extends SpectatorInventory<?>> SpectateResponse<SI> succeed(SI spectatorInventory) {
         return new Succeed<>(spectatorInventory);

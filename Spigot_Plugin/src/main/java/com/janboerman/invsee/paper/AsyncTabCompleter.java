@@ -55,6 +55,7 @@ public class AsyncTabCompleter implements Listener {
         //TODO if we can adjust the UsernameTrie implementation such that lookups done for 'get' and 'tabcompletion' don't restructure the internal tree structure,
         //TODO then we could use a ReentrantReadWriteLock to protect the UsernameTrie.
         //TODO alternatively, we could just make the UsernameTrie implementation itself thread-safe?
+        //TODO but I don't think it's such a big problem right now - incorrect tabcompletions are not the end of the world.
 
         final String buffer = event.getBuffer();
 

@@ -27,7 +27,7 @@ public class FakeCraftPlayer extends CraftPlayer {
             if (tag.contains("bukkit", Tag.TAG_COMPOUND) && loadedBukkit != null && !loadedBukkit.isEmpty())
                 tag.getCompound("bukkit").putLong("lastPlayed", loadedBukkit.getLong("lastPlayed"));
             if (tag.contains("Paper", Tag.TAG_COMPOUND) && loadedPaper != null && !loadedPaper.isEmpty())
-                tag.getCompound("Paper").putLong("lastSeen", loadedPaper.getLong("LastSeen"));
+                tag.getCompound("Paper").putLong("LastSeen", loadedPaper.getLong("LastSeen"));
         }
     }
 

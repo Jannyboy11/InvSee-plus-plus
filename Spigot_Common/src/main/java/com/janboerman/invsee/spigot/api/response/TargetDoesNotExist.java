@@ -4,7 +4,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 
 import java.util.Objects;
 
-public class TargetDoesNotExist extends AbstractNotCreatedReason {
+public class TargetDoesNotExist extends UnknownTarget {
 
     TargetDoesNotExist(Target target) {
         super(target);

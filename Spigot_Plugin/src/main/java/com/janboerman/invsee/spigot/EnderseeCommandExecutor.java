@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
@@ -58,9 +59,16 @@ class EnderseeCommandExecutor implements CommandExecutor {
 
         final InvseeAPI api = plugin.getApi();
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = null;
-        final String title = plugin.getTitleForEnderChest(isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID));
+        final Target target = isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID);
+        final String title = plugin.getTitleForEnderChest(target);
         final Mirror<EnderChestSlot> mirror = Mirror.forEnderChest(plugin.getEnderChestTemplate());
         final boolean offlineSupport = plugin.offlinePlayerSupport();
+        final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
+        final CreationOptions<EnderChestSlot> creationOptions = CreationOptions.defaultEnderInventory()
+                .withTitle(title)
+                .withMirror(mirror)
+                .withOfflinePlayerSupport(offlineSupport)
+                .withUnknownPlayerSupport(unknownPlayerSupport);
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = StringHelper.joinArray(" ", 1, args);
@@ -85,9 +93,9 @@ class EnderseeCommandExecutor implements CommandExecutor {
                     CompletableFuture<String> userNameFuture = finalIsUuid
                             ? api.fetchUserName(uniqueId).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
                             : CompletableFuture.completedFuture(playerNameOrUUID);
-                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateEnderChest(uniqueId, playerName, title, mirror, profileId));
+                    return userNameFuture.thenCompose(playerName -> pwiApi.spectateEnderChest(uniqueId, playerName, creationOptions, profileId));
                 } else {
-                    return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(Target.byUsername(playerNameOrUUID))));
+                    return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetDoesNotExists(target)));
                 }
             });
         }
@@ -99,9 +107,9 @@ class EnderseeCommandExecutor implements CommandExecutor {
             if (isUuid) {
                 final UUID finalUuid = uuid;
                 api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenAccept(userName -> api.spectateEnderChest(player, finalUuid, userName, title, offlineSupport, mirror));
+                        .thenAccept(userName -> api.spectateEnderChest(player, finalUuid, userName, creationOptions));
             } else {
-                api.spectateEnderChest(player, playerNameOrUUID, title, offlineSupport, mirror);
+                api.spectateEnderChest(player, playerNameOrUUID, creationOptions);
             }
         }
 

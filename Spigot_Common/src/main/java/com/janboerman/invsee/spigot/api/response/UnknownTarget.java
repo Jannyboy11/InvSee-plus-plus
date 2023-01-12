@@ -4,10 +4,9 @@ import com.janboerman.invsee.spigot.api.target.Target;
 
 import java.util.Objects;
 
-@Deprecated
-public class ImplementationFault extends AbstractNotCreatedReason {
+public class UnknownTarget extends AbstractNotCreatedReason {
 
-    ImplementationFault(Target target) {
+    UnknownTarget(Target target) {
         super(target);
     }
 
@@ -17,16 +16,17 @@ public class ImplementationFault extends AbstractNotCreatedReason {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (!(obj instanceof ImplementationFault)) return false;
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof UnknownTarget)) return false;
 
-        ImplementationFault that = (ImplementationFault) obj;
+        UnknownTarget that = (UnknownTarget) o;
         return Objects.equals(this.getTarget(), that.getTarget());
     }
 
     @Override
     public String toString() {
-        return "Implementation fault";
+        return "Target " + getTarget() + " has not played on the server before";
     }
+
 }

@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.multiverseinventories;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
@@ -19,6 +20,7 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
 
@@ -102,21 +104,21 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
     }
 
     @Override
-    public void openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, String title, Mirror<PlayerInventorySlot> mirror) {
+    public InventoryView openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
         //TODO
-        wrapped.openMainSpectatorInventory(spectator, spectatorInventory, title, mirror);
+        return wrapped.openMainSpectatorInventory(spectator, spectatorInventory, options);
     }
 
     @Override
-    public MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
+    public MainSpectatorInventory spectateInventory(HumanEntity player, CreationOptions<PlayerInventorySlot> options) {
         //TODO
-        return wrapped.spectateInventory(player, title, mirror);
+        return wrapped.spectateInventory(player, options);
     }
 
     @Override
-    public CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
+    public CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options) {
         //TODO decide whether to load from vanilla save file, or MVI save file
-        return wrapped.createOfflineInventory(playerId, playerName, title, mirror);
+        return wrapped.createOfflineInventory(playerId, playerName, options);
     }
 
     @Override
@@ -126,21 +128,21 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
     }
 
     @Override
-    public void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, String title, Mirror<EnderChestSlot> mirror) {
+    public InventoryView openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
         //TODO
-        wrapped.openEnderSpectatorInventory(spectator, spectatorInventory, title, mirror);
+        return wrapped.openEnderSpectatorInventory(spectator, spectatorInventory, options);
     }
 
     @Override
-    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
+    public EnderSpectatorInventory spectateEnderChest(HumanEntity player, CreationOptions<EnderChestSlot> options) {
         //TODO
-        return wrapped.spectateEnderChest(player, title, mirror);
+        return wrapped.spectateEnderChest(player, options);
     }
 
     @Override
-    public CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
+    public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options) {
         //TODO decide whether to load from vanilla save file, or MVI save file
-        return wrapped.createOfflineEnderChest(playerId, playerName, title, mirror);
+        return wrapped.createOfflineEnderChest(playerId, playerName, options);
     }
 
     @Override

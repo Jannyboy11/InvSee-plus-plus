@@ -103,6 +103,9 @@ class EnderClearExecutor implements CommandExecutor {
                         if (reason instanceof TargetDoesNotExist) {
                             var targetDoesNotExist = (TargetDoesNotExist) reason;
                             sender.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
+                        } else if (reason instanceof UnknownTarget) {
+                            var unknownTarget = (UnknownTarget) reason;
+                            sender.sendMessage(ChatColor.RED + "Player " + unknownTarget.getTarget() + " has not logged onto the server yet.");
                         } else if (reason instanceof TargetHasExemptPermission) {
                             var targetHasExemptPermission = (TargetHasExemptPermission) reason;
                             sender.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");

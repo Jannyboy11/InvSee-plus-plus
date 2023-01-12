@@ -10,7 +10,7 @@ public interface Title {
 
     public String titleFor(Target target);
 
-    public static Title constant(String title) {
+    public static Title of(String title) {
         if (title == null) return null;
         return new ConstantTitle(title);
     }
@@ -18,6 +18,14 @@ public interface Title {
     public static Title of(Function<? super Target, ? extends String> function) {
         if (function == null) return null;
         return function::apply;
+    }
+
+    public static Title defaultMainInventory() {
+        return DefaultTitles.DEFAULT_MAIN_INVENTORY;
+    }
+
+    public static Title defaultEnderInventory() {
+        return DefaultTitles.DEFAULT_ENDER_INVENTORY;
     }
 
 }
@@ -53,4 +61,13 @@ class ConstantTitle implements Title {
     public int hashCode() {
         return title.hashCode();
     }
+}
+
+class DefaultTitles {
+
+    private DefaultTitles() {}
+
+    static final Title DEFAULT_MAIN_INVENTORY = target -> target.toString() + "'s inventory";
+    static final Title DEFAULT_ENDER_INVENTORY = target -> target.toString() + "'s enderchest";
+
 }

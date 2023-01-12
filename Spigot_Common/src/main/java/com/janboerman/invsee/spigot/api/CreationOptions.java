@@ -1,35 +1,42 @@
 package com.janboerman.invsee.spigot.api;
 
-import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 
 import java.util.Objects;
 
 public class CreationOptions<Slot> implements Cloneable {
 
-    private Target target;
     private Title title;
-    private boolean offlineSupport = true;
+    private boolean offlinePlayerSupport = true;
     private Mirror<Slot> mirror;
     private boolean unknownPlayerSupport = true;
 
     //TODO logging options
 
-    public CreationOptions(Target target) {
-        this.target = Objects.requireNonNull(target, "target cannot be null");
+    CreationOptions(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport) {
+        this.title = Objects.requireNonNull(title);
+        this.offlinePlayerSupport = offlinePlayerSupport;
+        this.mirror = Objects.requireNonNull(mirror);
+        this.unknownPlayerSupport = unknownPlayerSupport;
     }
 
-    CreationOptions(Target target, Title title, boolean offlineSupport, Mirror<Slot> mirror, boolean newPlayerSupport) {
-        this.target = Objects.requireNonNull(target);
-        this.title = Objects.requireNonNull(title);
-        this.offlineSupport = offlineSupport;
-        this.mirror = Objects.requireNonNull(mirror);
-        this.unknownPlayerSupport = newPlayerSupport;
+    public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport) {
+        return new CreationOptions<>(title, offlinePlayerSupport, mirror, unknownPlayerSupport);
+    }
+
+    public static CreationOptions<PlayerInventorySlot> defaultMainInventory() {
+        return new CreationOptions<>(Title.defaultMainInventory(), true, Mirror.defaultPlayerInventory(), true);
+    }
+
+    public static CreationOptions<EnderChestSlot> defaultEnderInventory() {
+        return new CreationOptions<>(Title.defaultEnderInventory(), true, Mirror.defaultEnderChest(), true);
     }
 
     @Override
     public CreationOptions<Slot> clone() {
-        return new CreationOptions<>(target, title, offlineSupport, mirror, unknownPlayerSupport);
+        return new CreationOptions<>(getTitle(), isOfflinePlayerSupported(), getMirror(), isUnknownPlayerSupported());
     }
 
     public CreationOptions<Slot> withTitle(Title title) {
@@ -38,11 +45,11 @@ public class CreationOptions<Slot> implements Cloneable {
     }
 
     public CreationOptions<Slot> withTitle(String title) {
-        return withTitle(Title.constant(title));
+        return withTitle(Title.of(title));
     }
 
-    public CreationOptions<Slot> withOfflineSupport(boolean offlineSupport) {
-        this.offlineSupport = offlineSupport;
+    public CreationOptions<Slot> withOfflinePlayerSupport(boolean offlinePlayerSupport) {
+        this.offlinePlayerSupport = offlinePlayerSupport;
         return this;
     }
 
@@ -51,8 +58,8 @@ public class CreationOptions<Slot> implements Cloneable {
         return this;
     }
 
-    public CreationOptions<Slot> allowSaveFileCreation(boolean createSaveFileIfAbsent) {
-        this.unknownPlayerSupport = createSaveFileIfAbsent;
+    public CreationOptions<Slot> withUnknownPlayerSupport(boolean unknownPlayerSupport) {
+        this.unknownPlayerSupport = unknownPlayerSupport;
         return this;
     }
 
@@ -62,39 +69,33 @@ public class CreationOptions<Slot> implements Cloneable {
         if (!(o instanceof CreationOptions)) return false;
 
         CreationOptions<?> that = (CreationOptions<?>) o;
-        return this.getTarget().equals(that.getTarget())
-                && this.getTitle().equals(that.getTitle())
-                && this.isOfflineSupported() == that.isOfflineSupported()
+        return this.getTitle().equals(that.getTitle())
+                && this.isOfflinePlayerSupported() == that.isOfflinePlayerSupported()
                 && this.getMirror() == that.getMirror()
                 && this.isUnknownPlayerSupported() == that.isUnknownPlayerSupported();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTarget(), getTitle(), isOfflineSupported(), getMirror(), isUnknownPlayerSupported());
+        return Objects.hash(getTitle(), isOfflinePlayerSupported(), getMirror(), isUnknownPlayerSupported());
     }
 
     @Override
     public String toString() {
         return "CreationOptions"
-                + "{target=" + getTarget()
-                + ",title=" + getTitle()
-                + ",offlineSupport=" + isOfflineSupported()
+                + "{title=" + getTitle()
+                + ",offlinePlayerSupport=" + isOfflinePlayerSupported()
                 + ",mirror=" + getMirror()
                 + ",unknownPlayerSupport=" + isUnknownPlayerSupported()
                 + "}";
-    }
-
-    public Target getTarget() {
-        return target;
     }
 
     public Title getTitle() {
         return title;
     }
 
-    public boolean isOfflineSupported() {
-        return offlineSupport;
+    public boolean isOfflinePlayerSupported() {
+        return offlinePlayerSupport;
     }
 
     public Mirror<Slot> getMirror() {
@@ -103,11 +104,6 @@ public class CreationOptions<Slot> implements Cloneable {
 
     public boolean isUnknownPlayerSupported() {
         return unknownPlayerSupport;
-    }
-
-    //this is not a true getter.
-    public String getTitleString() {
-        return getTitle().titleFor(getTarget());
     }
 
 }
