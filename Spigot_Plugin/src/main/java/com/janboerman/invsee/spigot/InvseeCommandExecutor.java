@@ -20,10 +20,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 class InvseeCommandExecutor implements CommandExecutor {
 
@@ -54,7 +56,6 @@ class InvseeCommandExecutor implements CommandExecutor {
         }
 
         final InvseeAPI api = plugin.getApi();
-        CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = null;
         final Target target = isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID);
         final String title = plugin.getTitleForInventory(target);
         final Mirror<PlayerInventorySlot> mirror = Mirror.forInventory(plugin.getInventoryTemplate());
@@ -65,6 +66,8 @@ class InvseeCommandExecutor implements CommandExecutor {
                 .withMirror(mirror)
                 .withOfflinePlayerSupport(offlineSupport)
                 .withUnknownPlayerSupport(unknownPlayerSupport);
+
+        CompletableFuture<SpectateResponse<MainSpectatorInventory>> pwiFuture = null;
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = StringHelper.joinArray(" ", 1, args);
@@ -82,7 +85,7 @@ class InvseeCommandExecutor implements CommandExecutor {
                     : pwiApi.fetchUniqueId(playerNameOrUUID);
 
             final boolean finalIsUuid = isUuid;
-            future = uuidFuture.thenCompose(optId -> {
+            pwiFuture = uuidFuture.thenCompose(optId -> {
                 if (optId.isPresent()) {
                     UUID uniqueId = optId.get();
                     var profileId = new com.janboerman.invsee.spigot.perworldinventory.ProfileId(pwiApi.getHook(), pwiOptions, uniqueId);
@@ -128,17 +131,51 @@ class InvseeCommandExecutor implements CommandExecutor {
         }
          */
 
-        if (future == null) { //TODO get rid of this. actually extend pwi api to also accept mirrors.
+        if (pwiFuture == null) { //TODO get rid of this. actually extend pwi api to also accept mirrors.
             //No PWI argument - just continue with the regular method
+
+            CompletableFuture<OpenResponse<InventoryView>> fut;
+
             if (isUuid) {
                 //playerNameOrUUID is a UUID.
                 final UUID finalUuid = uuid;
 
-                api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
-                        .thenAccept(userName -> api.spectateInventory(player, finalUuid, userName, creationOptions));
+                fut = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
+                        .thenCompose(userName -> api.spectateInventory(player, finalUuid, userName, creationOptions));
             } else {
-                api.spectateInventory(player, playerNameOrUUID, creationOptions);
+                fut = api.spectateInventory(player, playerNameOrUUID, creationOptions);
             }
+
+            fut.whenComplete((response, throwable) -> {
+                if (throwable != null) {
+                    player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s inventory.");
+                    plugin.getLogger().log(Level.SEVERE, "Error while trying to create main-inventory spectator inventory", throwable);
+                } else {
+                    if (!response.isOpen()) {
+                        NotOpenedReason notOpenedReason = response.getReason();
+                        if (notOpenedReason instanceof InventoryOpenEventCancelled) {
+                            player.sendMessage(ChatColor.RED + "Another plugin prevented you from spectating " + playerNameOrUUID + "'s inventory");
+                        } else if (notOpenedReason instanceof InventoryNotCreated) {
+                            NotCreatedReason notCreatedReason = ((InventoryNotCreated) notOpenedReason).getNotCreatedReason();
+                            if (notCreatedReason instanceof TargetDoesNotExist) {
+                                player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist.");
+                            } else if (notCreatedReason instanceof UnknownTarget) {
+                                player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " has not logged onto the server yet.");
+                            }  else if (notCreatedReason instanceof TargetHasExemptPermission) {
+                                player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " is exempted from being spectated.");
+                            } else if (notCreatedReason instanceof ImplementationFault) {
+                                player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + playerNameOrUUID + "'s inventory.");
+                            } else if (notCreatedReason instanceof OfflineSupportDisabled) {
+                                player.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Could not create " + playerNameOrUUID + "'s inventory for an unknown reason.");
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Could not open " + playerNameOrUUID + "'s inventory for an unknown reason.");
+                        }
+                    } //else: it opened successfully: nothing to do there!
+                }
+            });
         }
 
         return true;

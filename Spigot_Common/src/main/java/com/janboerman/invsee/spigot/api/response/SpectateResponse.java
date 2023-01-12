@@ -89,7 +89,7 @@ class Succeed<SI extends SpectatorInventory<?>> implements SpectateResponse<SI> 
         if (obj == this) return true;
         if (!(obj instanceof Succeed)) return false;
 
-        Succeed that = (Succeed) obj;
+        Succeed<?> that = (Succeed<?>) obj;
         return Objects.equals(this.getInventory(), that.getInventory());
     }
 }
@@ -126,7 +126,7 @@ class Fail<SI extends SpectatorInventory<?>> implements SpectateResponse<SI> {
         if (obj == this) return true;
         if (!(obj instanceof Fail)) return false;
 
-        Fail that = (Fail) obj;
+        Fail<?> that = (Fail<?>) obj;
         return Objects.equals(this.getReason(), that.getReason());
     }
 }

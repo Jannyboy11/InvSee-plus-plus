@@ -454,7 +454,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         //don't ask the cache because it may contain a live inventory! (and we could get called by asSnapshotInventory!)
 
         //check whether the player is not exempted.
-        final Target target = Target.byUniqueId(playerId);
+        final Target target = Target.byGameProfile(playerId, playerName);
         if (profileKey.getGroup().getWorlds().stream().anyMatch(world -> exempt.isExemptedFromHavingMainInventorySpectated(target, world)))
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
@@ -568,7 +568,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
         //don't ask the cache because it may contain a live inventory! (and we could get called by asSnapshotInventory!)
 
         //check whether the player is not exempted.
-        final Target target = Target.byUniqueId(playerId);
+        final Target target = Target.byGameProfile(playerId, playerName);
         if (profileKey.getGroup().getWorlds().stream().anyMatch(world -> exempt.isExemptedFromHavingEnderchestSpectated(target, world)))
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
