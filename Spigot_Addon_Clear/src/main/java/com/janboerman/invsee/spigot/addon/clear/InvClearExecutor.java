@@ -79,7 +79,7 @@ class InvClearExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.mainSpectatorInventory(uuid, userName, userName + "'s inventory");
+                var responseFuture = api.mainSpectatorInventory(uuid, userName);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();

@@ -90,7 +90,9 @@ class InvGiveExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = invseeApi.mainSpectatorInventory(uuid, userName, userName + "'s inventory");
+                var responseFuture = invseeApi.mainSpectatorInventory(uuid, userName, invseeApi.mainInventoryCreationOptions()
+                        .withOfflinePlayerSupport(true)
+                        .withUnknownPlayerSupport(true)); //TODO set in own config
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();

@@ -79,7 +79,7 @@ class EnderClearExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.enderSpectatorInventory(uuid, userName, userName + "'s enderchest");
+                var responseFuture = api.enderSpectatorInventory(uuid, userName);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();
