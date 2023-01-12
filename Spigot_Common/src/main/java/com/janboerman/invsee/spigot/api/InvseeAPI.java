@@ -250,12 +250,22 @@ public abstract class InvseeAPI {
 
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
+    //by default: ignore creation options, implementations can override!
+    public InventoryView openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
+        return spectator.openInventory(spectatorInventory);
+    }
+
 
     public abstract EnderSpectatorInventory spectateEnderChest(HumanEntity target, CreationOptions<EnderChestSlot> options);
 
     public abstract CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options);
 
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
+
+    //by default: ignore creation options, implementation can override!
+    public InventoryView openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
+        return spectator.openInventory(spectatorInventory);
+    }
 
     // ================================== API methods: Main Inventory ==================================
 
@@ -279,7 +289,9 @@ public abstract class InvseeAPI {
         if (exempt.isExemptedFromHavingMainInventorySpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
-            return SpectateResponse.succeed(spectateInventory(target, options));
+            MainSpectatorInventory inv = spectateInventory(target, options);
+            cache(inv);
+            return SpectateResponse.succeed(inv);
         }
     }
 
@@ -460,7 +472,9 @@ public abstract class InvseeAPI {
         if (exempt.isExemptedFromHavingEnderchestSpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
-            return SpectateResponse.succeed(spectateEnderChest(target, options));
+            EnderSpectatorInventory inv = spectateEnderChest(target, options);
+            cache(inv);
+            return SpectateResponse.succeed(inv);
         }
     }
 
@@ -632,11 +646,6 @@ public abstract class InvseeAPI {
         return result;
     }
 
-    //by default: ignore creation options, implementations can override!
-    public InventoryView openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
-        return spectator.openInventory(spectatorInventory);
-    }
-
     private final CompletableFuture<OpenResponse<InventoryView>> spectateEnderChest(Player spectator, CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future, CreationOptions<EnderChestSlot> options) {
         CompletableFuture<OpenResponse<InventoryView>> result = new CompletableFuture<>();
         future.whenComplete((response, throwable) -> {
@@ -651,11 +660,6 @@ public abstract class InvseeAPI {
             }
         });
         return result;
-    }
-
-    //by default: ignore creation options, implementation can override!
-    public InventoryView openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
-        return spectator.openInventory(spectatorInventory);
     }
 
     // ================================== Event Stuff ==================================

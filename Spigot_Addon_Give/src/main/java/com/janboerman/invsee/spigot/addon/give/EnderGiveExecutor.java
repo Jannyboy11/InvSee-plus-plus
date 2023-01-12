@@ -96,9 +96,7 @@ class EnderGiveExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.enderSpectatorInventory(uuid, userName, api.enderInventoryCreationOptions()
-                        .withOfflinePlayerSupport(true)
-                        .withUnknownPlayerSupport(true)); //TODO set in own config
+                var responseFuture = api.enderSpectatorInventory(uuid, userName);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();
