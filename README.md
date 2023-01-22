@@ -34,7 +34,7 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.edit` provides `invseeplusplus.invsee.edit` and `invseeplusplus.endersee.edit`.
 - `invseeplusplus.exempt` provides `invseeplusplus.exempt.invsee` and `invseeplusplus.exempt.endersee`.
 - `invseeplusplus.bypass-exempt` provides `invseeplusplus.bypass-exempt.invsee` and `invseeplusplus.bypass-exempt.endersee`.
-- `invseeplusplus.*` provides all six of the base permissions as well as all of the addon permissions.
+- `invseeplusplus.*` provides all eight of the base permissions as well as all of the addon permissions.
 
 ## Addons
 
