@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.addon.give;
 
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
@@ -9,6 +10,8 @@ import com.janboerman.invsee.spigot.api.response.OfflineSupportDisabled;
 import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
 import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
 import com.janboerman.invsee.spigot.api.response.UnknownTarget;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -88,6 +91,10 @@ class EnderGiveExecutor implements CommandExecutor {
         }
 
         final ItemStack finalItems = items;
+        final CreationOptions<EnderChestSlot> creationOptions = api.enderInventoryCreationOptions()
+                .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
+                .withUnknownPlayerSupport(plugin.unknownPlayerSupport())
+                .withBypassExemptedPlayers(plugin.bypassExemptEndersee(sender));
 
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
@@ -96,7 +103,7 @@ class EnderGiveExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.enderSpectatorInventory(uuid, userName);
+                var responseFuture = api.enderSpectatorInventory(uuid, userName, creationOptions);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();

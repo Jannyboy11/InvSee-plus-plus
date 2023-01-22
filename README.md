@@ -26,11 +26,14 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.endersee.edit` allows the player to manipulate the target player's enderchest. By default only for server operators.
 - `invseeplusplus.exempt.invsee` makes it impossible to spectate the inventory of the owner of this permission.
 - `invseeplusplus.exempt.endersee` makes it impossible to spectate the enderchest of the owner of this permission.
+- `invseeplusplus.bypass-exempt.invsee` ignore whether target players are exempted from having their inventory spectated
+- `invseeplusplus.bypass-exempt.endersee` ignore whether target players are exempted from having their enderchest spectated
 
 ###### Aggregate permissions:
 - `invseeplusplus.view` provides `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`.
 - `invseeplusplus.edit` provides `invseeplusplus.invsee.edit` and `invseeplusplus.endersee.edit`.
 - `invseeplusplus.exempt` provides `invseeplusplus.exempt.invsee` and `invseeplusplus.exempt.endersee`.
+- `invseeplusplus.bypass-exempt` provides `invseeplusplus.bypass-exempt.invsee` and `invseeplusplus.bypass-exempt.endersee`.
 - `invseeplusplus.*` provides all six of the base permissions as well as all of the addon permissions.
 
 ## Addons

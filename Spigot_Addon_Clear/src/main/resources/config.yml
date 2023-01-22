@@ -1,0 +1,7 @@
+# Whether InvSee++_Clear can remove items from offline players.
+# Possible values: [false, true, same_as_InvSee++, same_as_InvseeAPI]
+offline-player-support: true
+
+# Whether InvSee++_Clear respects the target player's exemption status.
+# Possible values: [false, true, permission]
+bypass-exempt: permission

@@ -28,6 +28,8 @@ permissions:
       invseeplusplus.endersee.edit: true
       invseeplusplus.exempt.invsee: true
       invseeplusplus.exempt.endersee: true
+      invseeplusplus.bypass-exempt.invsee: true
+      invseeplusplus.bypass-exempt.endersee: true
       invseeplusplus.give.*: true
       invseeplusplus.clear.*: true
     default: false
@@ -48,6 +50,12 @@ permissions:
     children:
       invseeplusplus.exempt.invsee: true
       invseeplusplus.exempt.endersee: true
+    default: false
+  invseeplusplus.bypass-exempt:
+    description: Ignore exemption status of target players
+    children:
+      invseeplusplus.bypass-exempt.invsee: true
+      invseeplusplus.bypass-exempt.endersee: true
     default: false
 
   invseeplusplus.invsee.view:
@@ -72,4 +80,10 @@ permissions:
     default: false
   invseeplusplus.exempt.endersee:
     description: Makes it impossible for the owner of this permission to be spectated using /endersee
+    default: false
+  invseeplusplus.bypass-exempt.invsee:
+    description: Ignore whether target players are exempted from having their inventory spectated
+    default: false
+  invseeplusplus.bypass-exempt.endersee:
+    description: Ignore whether target players are exempted from having their enderchest spectated
     default: false

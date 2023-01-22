@@ -41,12 +41,18 @@ public class AsyncTabCompleter implements Listener {
 
         final OfflinePlayerProvider provider = plugin.getOfflinePlayerProvider();
         final BukkitScheduler scheduler = plugin.getServer().getScheduler();
-        scheduler.runTaskAsynchronously(plugin, () -> provider.getAll(nameQueue::add));
+        scheduler.runTaskAsynchronously(plugin, () -> provider.getAll(this::enqueue));
+    }
+
+    private void enqueue(String name) {
+        if (name != null) {
+            nameQueue.add(name);
+        }
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        nameQueue.add(event.getPlayer().getName());
+        enqueue(event.getPlayer().getName());
     }
 
     @EventHandler
@@ -60,7 +66,10 @@ public class AsyncTabCompleter implements Listener {
         final String buffer = event.getBuffer();
 
         while (!nameQueue.isEmpty()) {
-            knownPlayerNames.insert(nameQueue.poll(), null);
+            String name = nameQueue.poll();
+            if (name != null) {
+                knownPlayerNames.insert(name, null);
+            }
         }
 
         if (event.isCommand()) {

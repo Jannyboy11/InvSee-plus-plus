@@ -1,8 +1,10 @@
 package com.janboerman.invsee.spigot.addon.clear;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.*;
@@ -71,6 +73,9 @@ class InvClearExecutor implements CommandExecutor {
 
         final Material finalItemType = itemType;
         final int finalMaxCount = maxCount;
+        final CreationOptions<PlayerInventorySlot> creationOptions = api.mainInventoryCreationOptions()
+                .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
+                .withBypassExemptedPlayers(plugin.bypassExemptInvsee(sender));
 
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
@@ -79,7 +84,7 @@ class InvClearExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.mainSpectatorInventory(uuid, userName);
+                var responseFuture = api.mainSpectatorInventory(uuid, userName, creationOptions);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();

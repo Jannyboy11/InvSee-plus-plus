@@ -134,6 +134,14 @@ public abstract class InvseeAPI {
         this.unknownPlayerSupport = unknownPlayerSupport;
     }
 
+    public final boolean offlinePlayerSupport() {
+        return this.offlinePlayerSupport;
+    }
+
+    public final boolean unknownPlayerSupport() {
+        return this.unknownPlayerSupport;
+    }
+
     public final void setMainInventoryTitle(Title titleFactory) {
         Objects.requireNonNull(titleFactory);
         this.mainInventoryTitle = titleFactory;
@@ -154,12 +162,22 @@ public abstract class InvseeAPI {
         this.enderchestMirror = mirror;
     }
 
+    public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions(Player spectator) {
+        final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY);
+        return new CreationOptions<>(mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, bypassExempt);
+    }
+
+    public CreationOptions<EnderChestSlot> enderInventoryCreationOptions(Player spectator) {
+        final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST);
+        return new CreationOptions<>(enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, bypassExempt);
+    }
+
     public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions() {
-        return new CreationOptions<>(mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport);
+        return new CreationOptions<>(mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, false);
     }
 
     public CreationOptions<EnderChestSlot> enderInventoryCreationOptions() {
-        return new CreationOptions<>(enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport);
+        return new CreationOptions<>(enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, false);
     }
 
     // ========= end of creation options =========
@@ -286,7 +304,7 @@ public abstract class InvseeAPI {
 
     public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target, CreationOptions<PlayerInventorySlot> options) {
         Target theTarget = Target.byPlayer(target);
-        if (exempt.isExemptedFromHavingMainInventorySpectated(theTarget)) {
+        if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
             MainSpectatorInventory inv = spectateInventory(target, options);
@@ -314,7 +332,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (exempt.isExemptedFromHavingMainInventorySpectated(target))
+            if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, options);
@@ -328,11 +346,13 @@ public abstract class InvseeAPI {
 
         target = Target.byUsername(targetName);
 
-        // Work around a LuckPerms bug where it can't perform a permission check for players who haven't logged into the server yet,
-        // because it tries to find the player's UUID in its database. How silly - it could just return whether the default group has that permission or not.
-        // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
         final CompletableFuture<Boolean> isExemptedFuture;
-        if (plugin.getServer().getPluginManager().isPluginEnabled("LuckPerms")) {
+        if (options.canBypassExemptedPlayers()) {
+            isExemptedFuture = CompletableFuture.completedFuture(false);
+        } else if (plugin.getServer().getPluginManager().isPluginEnabled("LuckPerms")) {
+            // Work around a LuckPerms bug where it can't perform a permission check for players who haven't logged into the server yet,
+            // because it tries to find the player's UUID in its database. How silly - it could just return whether the default group has that permission or not.
+            // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
             isExemptedFuture = CompletableFuture.completedFuture(false);
         } else {
             isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
@@ -382,15 +402,15 @@ public abstract class InvseeAPI {
         return mainSpectatorInventory(playerId, playerName, mainInventoryCreationOptions());
     }
 
-    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> creationOptions) {
+    public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
-        Objects.requireNonNull(creationOptions, "creation options cannot be null!");
+        Objects.requireNonNull(options, "creation options cannot be null!");
 
         final Target gameProfileTarget = Target.byGameProfile(playerId, playerName);
-        final String title = creationOptions.getTitle().titleFor(gameProfileTarget);
-        final Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
-        final boolean offlineSupport = creationOptions.isOfflinePlayerSupported();
+        final String title = options.getTitle().titleFor(gameProfileTarget);
+        final Mirror<PlayerInventorySlot> mirror = options.getMirror();
+        final boolean offlineSupport = options.isOfflinePlayerSupported();
 
         //try cache
         WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
@@ -406,7 +426,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (exempt.isExemptedFromHavingMainInventorySpectated(target))
+            if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title, mirror);
@@ -418,8 +438,14 @@ public abstract class InvseeAPI {
         }
 
         target = gameProfileTarget;
-        //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
-        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+        final CompletableFuture<Boolean> isExemptedFuture;
+        if (options.canBypassExemptedPlayers()) {
+            isExemptedFuture = CompletableFuture.completedFuture(false);
+        } else {
+            //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+        }
+
         final CompletableFuture<Optional<NotCreatedReason>> reasonFuture = isExemptedFuture.thenApply(isExempted -> {
             if (isExempted) {
                 return Optional.of(NotCreatedReason.targetHasExemptPermission(target));
@@ -433,7 +459,7 @@ public abstract class InvseeAPI {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(SpectateResponse.fail(maybeReason.get()));
             } else {
-                return createOfflineInventory(playerId, playerName, creationOptions);
+                return createOfflineInventory(playerId, playerName, options);
             }
         });
 
@@ -469,7 +495,7 @@ public abstract class InvseeAPI {
 
     public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target, CreationOptions<EnderChestSlot> options) {
         Target theTarget = Target.byPlayer(target);
-        if (exempt.isExemptedFromHavingEnderchestSpectated(theTarget)) {
+        if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
             EnderSpectatorInventory inv = spectateEnderChest(target, options);
@@ -497,7 +523,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (exempt.isExemptedFromHavingEnderchestSpectated(target))
+            if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, options);
@@ -511,11 +537,13 @@ public abstract class InvseeAPI {
 
         target = Target.byUsername(targetName);
 
-        // Work around a LuckPerms bug where it can't perform a permission check for players who haven't logged into the server yet,
-        // because it tries to find the player's UUID in its database. How silly - it could just return whether the default group has that permission or not.
-        // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
         final CompletableFuture<Boolean> isExemptedFuture;
-        if (plugin.getServer().getPluginManager().isPluginEnabled("LuckPerms")) {
+        if (options.canBypassExemptedPlayers()) {
+            isExemptedFuture = CompletableFuture.completedFuture(false);
+        } else if (plugin.getServer().getPluginManager().isPluginEnabled("LuckPerms")) {
+            // Work around a LuckPerms bug where it can't perform a permission check for players who haven't logged into the server yet,
+            // because it tries to find the player's UUID in its database. How silly - it could just return whether the default group has that permission or not.
+            // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
             isExemptedFuture = CompletableFuture.completedFuture(false);
         } else {
             isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
@@ -575,7 +603,7 @@ public abstract class InvseeAPI {
         Target target;
         if (targetPlayer != null) {
             target = Target.byPlayer(targetPlayer);
-            if (exempt.isExemptedFromHavingEnderchestSpectated(target))
+            if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
             EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, options);
@@ -596,8 +624,15 @@ public abstract class InvseeAPI {
         }
 
         target = Target.byGameProfile(playerId, playerName);
-        //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
-        final CompletableFuture<Boolean> isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+
+        final CompletableFuture<Boolean> isExemptedFuture;
+        if (options.canBypassExemptedPlayers()) {
+            isExemptedFuture = CompletableFuture.completedFuture(false);
+        } else {
+            //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+        }
+
         final CompletableFuture<Optional<NotCreatedReason>> reasonFuture = isExemptedFuture.thenApply(isExempted -> {
             if (isExempted) {
                 return Optional.of(NotCreatedReason.targetHasExemptPermission(target));
@@ -883,13 +918,13 @@ public abstract class InvseeAPI {
     }
 
     @Deprecated public final CompletableFuture<Void> spectateEnderChest(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
-        return spectateEnderChest(spectator, targetName, enderInventoryCreationOptions().withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
+        return spectateEnderChest(spectator, targetName, enderInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleEnderInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetName))
                 .thenApply(__ -> null);
     }
 
     @Deprecated public final CompletableFuture<Void> spectateEnderChest(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
-        return spectateEnderChest(spectator, targetId, targetName, enderInventoryCreationOptions().withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
+        return spectateEnderChest(spectator, targetId, targetName, enderInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleEnderInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetId.toString()))
                 .thenApply(__ -> null);
     }
@@ -962,7 +997,7 @@ public abstract class InvseeAPI {
     }
 
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
-        return mainSpectatorInventory(playerId, playerName, new CreationOptions<>(Title.of(title), offlineSupport, mirror, unknownPlayerSupport));
+        return mainSpectatorInventory(playerId, playerName, new CreationOptions<>(Title.of(title), offlineSupport, mirror, unknownPlayerSupport, false));
     }
 
     // open ender spectator inventory using parameters
@@ -1014,7 +1049,6 @@ public abstract class InvseeAPI {
     @Deprecated public final void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, String title, Mirror<EnderChestSlot> mirror) {
         openEnderSpectatorInventory(spectator, spectatorInventory, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
-
 
     // =================================== deprecated private apis ===================================
 

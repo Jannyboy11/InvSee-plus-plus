@@ -16,6 +16,8 @@ public class Exempt {
 
     private static final String EXEMPT_INVENTORY = "invseeplusplus.exempt.invsee";
     private static final String EXEMPT_ENDERCHEST = "invseeplusplus.exempt.endersee";
+    public static final String BYPASS_EXEMPT_INVENTORY = "invseeplusplus.bypass-exempt.invsee";
+    public static final String BYPASS_EXEMPT_ENDERCHEST = "invseeplusplus.bypass-exempt.endersee";
 
     private Server server;
 

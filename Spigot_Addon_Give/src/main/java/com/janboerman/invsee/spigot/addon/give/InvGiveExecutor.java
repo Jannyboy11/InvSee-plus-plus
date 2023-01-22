@@ -1,9 +1,11 @@
 package com.janboerman.invsee.spigot.addon.give;
 
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.*;
@@ -82,6 +84,10 @@ class InvGiveExecutor implements CommandExecutor {
         }
 
         final ItemStack finalItems = items;
+        final CreationOptions<PlayerInventorySlot> creationOptions = invseeApi.mainInventoryCreationOptions()
+                .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
+                .withUnknownPlayerSupport(plugin.unknownPlayerSupport())
+                .withBypassExemptedPlayers(plugin.bypassExemptInvsee(sender));
 
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
             if (optName.isEmpty() || optUuid.isEmpty()) {
@@ -90,7 +96,7 @@ class InvGiveExecutor implements CommandExecutor {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = invseeApi.mainSpectatorInventory(uuid, userName);
+                var responseFuture = invseeApi.mainSpectatorInventory(uuid, userName, creationOptions);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         MainSpectatorInventory inventory = response.getInventory();
