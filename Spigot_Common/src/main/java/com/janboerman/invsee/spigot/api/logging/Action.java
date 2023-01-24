@@ -11,11 +11,11 @@ import java.util.UUID;
 class Action implements Formattable {
 
     private static final String FORMAT =
-            "\nSpectator UUID: %1s" +
-            "\nSpectator Name: %2s" +
-            "\nTaken:          %3s" +
-            "\nGiven:          %4s" +
-            "\nTarget:         %5s";
+            "\nSpectator UUID: %1$s" +
+            "\nSpectator Name: %2$s" +
+            "\nTaken         : %3$s" +
+            "\nGiven         : %4$s" +
+            "\nTarget        : %5$s";
 
     final UUID spectatorId;
     final String spectatorName;

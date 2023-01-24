@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -56,26 +55,26 @@ class LogOutputImpl implements LogOutput {
 
     private static final String FORMAT =
         "\n[%1$tF %1$tT] [%2$s]:" +
-        "\nSpectator UUID: %3s" +
-        "\nSpectator Name: %4s" +
-        "\nTaken:          %5s" +
-        "\nGiven:          %6s" +
-        "\nTarget:         %7s";
+        "\nSpectator UUID: %3$s" +
+        "\nSpectator Name: %4$s" +
+        "\nTaken         : %5$s" +
+        "\nGiven         : %6$s" +
+        "\nTarget        : %7$s";
     private static final String FORMAT_WITHOUT_SPECTATOR =
         "\n[%1$tF %1$tT] [%2$s]:" +
-        "\nTaken:          %3s" +
-        "\nGiven:          %4s" +
-        "\nTarget:         %5s";
+        "\nTaken         : %3$s" +
+        "\nGiven         : %4$s" +
+        "\nTarget        : %5$s";
 
     private final UUID spectatorId;
     private final String spectatorName;
     private final Logger logger;
-    private final Target target;
+    private final Target targetPlayer;
 
     LogOutputImpl(Plugin plugin, UUID spectatorId, String spectatorName, Target targetPlayer, Set<LogTarget> logTargets) {
         this.spectatorId = spectatorId;
         this.spectatorName = spectatorName;
-        this.target = targetPlayer;
+        this.targetPlayer = targetPlayer;
         this.logger = Logger.getLogger("InvSee++." + spectatorId);
         this.logger.setLevel(Level.ALL);
 
@@ -102,7 +101,7 @@ class LogOutputImpl implements LogOutput {
                                 Date time = new Date(record.getMillis());
                                 Level level = record.getLevel();
                                 Action action = (Action) parameters[0];
-                                return String.format(FORMAT, spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
+                                return String.format(FORMAT, time, level.getLocalizedName(), spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), targetPlayer);
                             }
                         });
                         logger.addHandler(fileHandler);
@@ -123,7 +122,7 @@ class LogOutputImpl implements LogOutput {
                                 Date time = new Date(record.getMillis());
                                 Level level = record.getLevel();
                                 Action action = (Action) parameters[0];
-                                return String.format(FORMAT_WITHOUT_SPECTATOR, Taken.from(action.outcome), Given.from(action.outcome), target);
+                                return String.format(FORMAT_WITHOUT_SPECTATOR, time, level.getLocalizedName(), Taken.from(action.outcome), Given.from(action.outcome), targetPlayer);
                             }
                         });
                         logger.addHandler(fileHandler);
@@ -143,7 +142,7 @@ class LogOutputImpl implements LogOutput {
                             Date time = new Date(record.getMillis());
                             Level level = record.getLevel();
                             Action action = (Action) parameters[0];
-                            return String.format(FORMAT, spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
+                            return String.format(FORMAT, time, level.getLocalizedName(), spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), targetPlayer);
                         }
                     });
                     logger.addHandler(consoleHandler);
@@ -162,7 +161,7 @@ class LogOutputImpl implements LogOutput {
 
     @Override
     public void log(Difference difference) {
-        Action action = new Action(spectatorId, spectatorName, target, difference);
+        Action action = new Action(spectatorId, spectatorName, targetPlayer, difference);
         logger.log(Level.INFO, String.format("%s", action), action);
     }
 
@@ -252,7 +251,7 @@ class LogOutputImpl implements LogOutput {
             for (var entry : diff.entrySet()) {
                 Integer added = entry.getValue();
                 if (added != null && added < 0) {
-                    items.add(new Pair<>(entry.getKey(), added));
+                    items.add(new Pair<>(entry.getKey(), -1 * added));
                 }
             }
             return new Taken(items);
