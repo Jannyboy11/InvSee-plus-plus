@@ -23,6 +23,10 @@ public class Difference {
         return Collections.unmodifiableMap(diffs);
     }
 
+    public boolean isEmpty() {
+        return diffs == null || diffs.isEmpty() || diffs.values().stream().allMatch(Objects::isNull);
+    }
+
     public void merge(Difference other) {
         for (var entry : other.diffs.entrySet()) {
             accumulate(entry.getKey(), entry.getValue());

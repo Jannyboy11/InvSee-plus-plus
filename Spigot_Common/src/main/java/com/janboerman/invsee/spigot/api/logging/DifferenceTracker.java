@@ -24,14 +24,14 @@ public class DifferenceTracker {
 
     public void onClick(List<ItemStack> oldItems, List<ItemStack> newItems) {
         Difference diff = Difference.calculate(oldItems, newItems);
-        if (granularity == LogGranularity.LOG_EVERY_CHANGE) {
+        if (granularity == LogGranularity.LOG_EVERY_CHANGE && !diff.isEmpty()) {
             output.log(diff);
         }
         difference.merge(diff);
     }
 
     public void onClose() {
-        if (granularity == LogGranularity.LOG_ON_CLOSE) {
+        if (granularity == LogGranularity.LOG_ON_CLOSE && !difference.isEmpty()) {
             output.log(difference);
         }
     }

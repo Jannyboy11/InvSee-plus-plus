@@ -102,7 +102,7 @@ class LogOutputImpl implements LogOutput {
                                 Date time = new Date(record.getMillis());
                                 Level level = record.getLevel();
                                 Action action = (Action) parameters[0];
-                                return String.format(FORMAT, time, level.getLocalizedName(), spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
+                                return String.format(FORMAT, spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
                             }
                         });
                         logger.addHandler(fileHandler);
@@ -123,7 +123,7 @@ class LogOutputImpl implements LogOutput {
                                 Date time = new Date(record.getMillis());
                                 Level level = record.getLevel();
                                 Action action = (Action) parameters[0];
-                                return String.format(FORMAT_WITHOUT_SPECTATOR, time, level.getLocalizedName(), Taken.from(action.outcome), Given.from(action.outcome), target);
+                                return String.format(FORMAT_WITHOUT_SPECTATOR, Taken.from(action.outcome), Given.from(action.outcome), target);
                             }
                         });
                         logger.addHandler(fileHandler);
@@ -143,7 +143,7 @@ class LogOutputImpl implements LogOutput {
                             Date time = new Date(record.getMillis());
                             Level level = record.getLevel();
                             Action action = (Action) parameters[0];
-                            return String.format(FORMAT, time, level.getLocalizedName(), spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
+                            return String.format(FORMAT, spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
                         }
                     });
                     logger.addHandler(consoleHandler);
@@ -191,7 +191,7 @@ class LogOutputImpl implements LogOutput {
                             return material.name() + " & " + meta + " x " + amount;
                         }
                     })
-                    .collect(Collectors.joining(", "));
+                    .collect(Collectors.joining(", ", "[", "]"));
 
             if (precision == -1 || out.length() < precision) {
                 sb.append(out);
@@ -226,7 +226,10 @@ class LogOutputImpl implements LogOutput {
             var diff = difference.getDifference();
             List<Pair<ItemType, Integer>> items = new ArrayList<>(diff.size());
             for (var entry : diff.entrySet()) {
-                items.add(new Pair<>(entry.getKey(), entry.getValue()));
+                Integer added = entry.getValue();
+                if (added != null && added > 0) {
+                    items.add(new Pair<>(entry.getKey(), added));
+                }
             }
             return new Given(items);
         }
@@ -247,7 +250,10 @@ class LogOutputImpl implements LogOutput {
             var diff = difference.getDifference();
             List<Pair<ItemType, Integer>> items = new ArrayList<>(diff.size());
             for (var entry : diff.entrySet()) {
-                items.add(new Pair<>(entry.getKey(), -1 * entry.getValue()));
+                Integer added = entry.getValue();
+                if (added != null && added < 0) {
+                    items.add(new Pair<>(entry.getKey(), added));
+                }
             }
             return new Taken(items);
         }

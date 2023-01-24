@@ -5,7 +5,6 @@ import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.logging.LogOutput;
 import com.janboerman.invsee.spigot.api.target.Target;
-import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.world.entity.player.Inventory;
