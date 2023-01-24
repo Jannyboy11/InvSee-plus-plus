@@ -1,7 +1,8 @@
 package com.janboerman.invsee.spigot.impl_1_19_2_R1;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
-import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
 
 import net.minecraft.core.NonNullList;
@@ -24,8 +25,8 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 
 	protected NonNullList<ItemStack> storageContents;
 
-	EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
-		super(targetPlayerUuid, targetPlayerName, title, mirror);
+	EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, CreationOptions<EnderChestSlot> creationOptions) {
+		super(targetPlayerUuid, targetPlayerName, creationOptions);
 		this.storageContents = storageContents;
 	}
 
@@ -58,13 +59,13 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-		return new EnderNmsContainer(containerId, this, playerInventory, player, mirror);
+		return new EnderNmsContainer(containerId, this, playerInventory, player, creationOptions);
 	}
 
 	@Override
 	public Component getDisplayName() {
 		//return new TextComponent("minecraft:generic_9x" + (storageContents.size() / 9));
-		return CraftChatMessage.fromStringOrNull(title);
+		return CraftChatMessage.fromStringOrNull(creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)));
 	}
 
 	@Override

@@ -1,8 +1,15 @@
 package com.janboerman.invsee.spigot.impl_1_17_1_R1;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
+import com.janboerman.invsee.spigot.api.logging.LogOutput;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import net.minecraft.world.inventory.ClickType;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.InventoryView;
 
 import net.minecraft.world.entity.player.Inventory;
@@ -11,6 +18,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.bukkit.plugin.Plugin;
+
+import java.util.List;
+import java.util.Objects;
 
 class EnderNmsContainer extends AbstractContainerMenu {
 
@@ -20,6 +31,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
     private final int topRows;	//in Purpur, this is not always 3.
 
     private InventoryView bukkitView;
+    private final DifferenceTracker tracker;
 
     private static MenuType<?> determineMenuType(EnderNmsInventory inv) {
         return switch(inv.getContainerSize()) {
@@ -44,13 +56,51 @@ class EnderNmsContainer extends AbstractContainerMenu {
         }
     }
 
-    EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player, Mirror<EnderChestSlot> mirror) {
+    @Override
+    public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+        List<org.bukkit.inventory.ItemStack> contentsBefore = null, contentsAfter;
+        if (tracker != null) {
+            contentsBefore = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+        }
+
+        super.clicked(i, j, inventoryclicktype, entityhuman);
+
+        if (tracker != null) {
+            contentsAfter = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+            tracker.onClick(contentsBefore, contentsAfter);
+        }
+    }
+
+    @Override
+    public void removed(Player entityhuman) {
+        if (tracker != null && Objects.equals(entityhuman, player)) {
+            tracker.onClose();
+        }
+
+        super.removed(entityhuman);
+    }
+
+    EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player, CreationOptions<EnderChestSlot> creationOptions) {
         super(determineMenuType(nmsInventory), containerId);
 
         this.topRows = nmsInventory.getContainerSize() / 9;
         this.player = player;
         this.top = nmsInventory;
         this.bottom = playerInventory;
+
+        //mirror
+        Mirror<EnderChestSlot> mirror = creationOptions.getMirror();
+        //logging
+        LogOptions logOptions = creationOptions.getLogOptions();
+        Plugin plugin = creationOptions.getPlugin();
+        if (!LogOptions.isEmpty(logOptions)) {
+            this.tracker = new DifferenceTracker(
+                    LogOutput.make(plugin, player.getUUID(), player.getScoreboardName(), Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName), logOptions),
+                    logOptions.getGranularity());
+            this.tracker.onOpen();
+        } else {
+            this.tracker = null;
+        }
 
         //top inventory slots
         for (int yPos = 0; yPos < topRows; yPos++) {

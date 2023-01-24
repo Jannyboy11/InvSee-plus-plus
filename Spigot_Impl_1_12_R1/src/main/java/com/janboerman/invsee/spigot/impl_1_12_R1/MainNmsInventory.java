@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
-import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
 import com.janboerman.invsee.utils.ConcatList;
@@ -18,7 +19,6 @@ import net.minecraft.server.v1_12_R1.PlayerInventory;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_12_R1.util.CraftChatMessage;
-import org.bukkit.inventory.Inventory;
 
 import java.util.List;
 
@@ -32,8 +32,8 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
     protected List<ItemStack> playerCraftingContents;
     protected List<ItemStack> personalContents;  //crafting, anvil, merchant, enchanting
 
-    MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
-        super(target.getUniqueID(), target.getName(), title, mirror);
+    MainNmsInventory(EntityHuman target, CreationOptions<PlayerInventorySlot> creationOptions) {
+        super(target.getUniqueID(), target.getName(), creationOptions);
 
         PlayerInventory inv = target.inventory;
         this.storageContents = inv.items;
@@ -282,7 +282,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
     @Override
     public Container createContainer(PlayerInventory playerInventory, EntityHuman entityHuman) {
         EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
-        return new MainNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, entityHuman, mirror);
+        return new MainNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, entityHuman, creationOptions);
     }
 
     @Override
@@ -292,17 +292,17 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
     @Override
     public String getName() {
-        return title;
+        return creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName));
     }
 
     @Override
     public boolean hasCustomName() {
-        return title != null;
+        return creationOptions.getTitle() != null;
     }
 
     @Override
     public IChatBaseComponent getScoreboardDisplayName() {
-        return CraftChatMessage.fromString(title)[0];
+        return CraftChatMessage.fromString(creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)))[0];
     }
 }
 

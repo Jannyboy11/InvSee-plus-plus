@@ -1,15 +1,27 @@
 package com.janboerman.invsee.spigot.impl_1_19_3_R2;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
+import com.janboerman.invsee.spigot.api.logging.LogOutput;
+import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.plugin.Plugin;
+
+import java.util.List;
+import java.util.Objects;
 
 class MainNmsContainer extends AbstractContainerMenu {
 
@@ -19,6 +31,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 	private final boolean spectatingOwnInventory;
 	
 	private InventoryView bukkitView;
+	private final DifferenceTracker tracker;
 
 	private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
 		final PlayerInventorySlot place = mirror.getSlot(positionIndex);
@@ -53,14 +66,52 @@ class MainNmsContainer extends AbstractContainerMenu {
 			return new InaccessibleSlot(top, positionIndex, magicX, magicY); //idem?
 		}
 	}
+
+	// decorate clicked method for tracking/logging
+	@Override
+	public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+		List<org.bukkit.inventory.ItemStack> contentsBefore = null, contentsAfter;
+		if (tracker != null) {
+			contentsBefore = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+		}
+
+		super.clicked(i, j, inventoryclicktype, entityhuman);
+
+		if (tracker != null) {
+			contentsAfter = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+			tracker.onClick(contentsBefore, contentsAfter);
+		}
+	}
+
+	// decorate removed method for tracking/logging
+	@Override
+	public void removed(Player entityhuman) {
+		if (tracker != null && Objects.equals(entityhuman, player)) {
+			tracker.onClose();
+		}
+
+		super.removed(entityhuman);
+	}
 	
-	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory bottomInventory, Player spectator, Mirror<PlayerInventorySlot> mirror) {
+	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory bottomInventory, Player spectator, CreationOptions<PlayerInventorySlot> creationOptions) {
 		super(MenuType.GENERIC_9x6, id);
 		
 		this.top = nmsInventory;
 		this.bottom = bottomInventory;
 		this.player = spectator;
 		this.spectatingOwnInventory = spectator.getUUID().equals(nmsInventory.targetPlayerUuid);
+
+		Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+		LogOptions logOptions = creationOptions.getLogOptions();
+		Plugin plugin = creationOptions.getPlugin();
+		if (!LogOptions.isEmpty(logOptions)) {
+			this.tracker = new DifferenceTracker(
+					LogOutput.make(plugin, player.getUUID(), player.getScoreboardName(), Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName), logOptions),
+					logOptions.getGranularity());
+			this.tracker.onOpen();
+		} else {
+			this.tracker = null;
+		}
 
 		//top inventory slots
 		for (int yPos = 0; yPos < 6; yPos++) {

@@ -1,5 +1,8 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
@@ -38,8 +41,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
     protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 
     private MainBukkitInventory bukkit;
-    protected String title;
-    protected Mirror<PlayerInventorySlot> mirror;
+    protected CreationOptions<PlayerInventorySlot> creationOptions;
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -51,7 +53,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
         spectatedPlayerName = null;
     }
 
-    protected MainNmsInventory(EntityHuman target, String title, Mirror<PlayerInventorySlot> mirror) {
+    protected MainNmsInventory(EntityHuman target, CreationOptions<PlayerInventorySlot> creationOptions) {
         // Possibly could've used TileEntityTypes.CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
@@ -75,8 +77,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
         };
         this.personalContents = this.playerCraftingContents = target.defaultContainer.j().getContents(); //luckily getContents() does not copy
 
-        this.title = title;
-        this.mirror = mirror;
+        this.creationOptions = creationOptions;
     }
 
     public MainBukkitInventory bukkit() {
@@ -290,7 +291,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
 
     @Override
     public IChatBaseComponent getScoreboardDisplayName() {
-        return CraftChatMessage.fromStringOrNull(title);
+        return CraftChatMessage.fromStringOrNull(creationOptions.getTitle().titleFor(Target.byGameProfile(spectatedPlayerUuid, spectatedPlayerName)));
     }
 
     @Override
@@ -300,7 +301,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
 
     @Override
     protected Container createContainer(int containerId, PlayerInventory playerInventory) {
-        return new MainNmsContainer(containerId, this, playerInventory, playerInventory.player, mirror);
+        return new MainNmsContainer(containerId, this, playerInventory, playerInventory.player, creationOptions);
     }
 
     @Override

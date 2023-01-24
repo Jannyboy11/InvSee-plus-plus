@@ -1,15 +1,26 @@
 package com.janboerman.invsee.spigot.impl_1_19_2_R1;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
+import com.janboerman.invsee.spigot.api.logging.LogOutput;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventoryView;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.plugin.Plugin;
+
+import java.util.List;
+import java.util.Objects;
 
 class MainNmsContainer extends AbstractContainerMenu {
 
@@ -19,7 +30,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 	private final boolean spectatingOwnInventory;
 	
 	private InventoryView bukkitView;
-
+	private final DifferenceTracker tracker;
 
 	private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
 		final PlayerInventorySlot place = mirror.getSlot(positionIndex);
@@ -55,7 +66,34 @@ class MainNmsContainer extends AbstractContainerMenu {
 		}
 	}
 
-	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory bottomInventory, Player spectator, Mirror<PlayerInventorySlot> mirror) {
+	// decorate clicked method for tracking/logging
+	@Override
+	public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+		List<org.bukkit.inventory.ItemStack> contentsBefore = null, contentsAfter;
+		if (tracker != null) {
+			contentsBefore = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+		}
+
+		super.clicked(i, j, inventoryclicktype, entityhuman);
+
+		if (tracker != null) {
+			contentsAfter = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+			tracker.onClick(contentsBefore, contentsAfter);
+		}
+	}
+
+	// decorate removed method for tracking/logging
+	@Override
+	public void removed(Player entityhuman) {
+		if (tracker != null && Objects.equals(entityhuman, player)) {
+			tracker.onClose();
+		}
+
+		super.removed(entityhuman);
+	}
+
+
+	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory bottomInventory, Player spectator, CreationOptions<PlayerInventorySlot> creationOptions) {
 		super(MenuType.GENERIC_9x6, id);
 
 		this.top = nmsInventory;
@@ -63,21 +101,25 @@ class MainNmsContainer extends AbstractContainerMenu {
 		this.player = spectator;
 		this.spectatingOwnInventory = spectator.getUUID().equals(nmsInventory.targetPlayerUuid);
 
-		//mirror that places the hotbar items at the fourth row!
-//		mirror = new com.janboerman.invsee.spigot.internal.template.PlayerInventoryMirror("""
-//			i_09 i_10 i_11 i_12 i_13 i_14 i_15 i_16 i_17
-//			i_18 i_19 i_20 i_21 i_22 i_23 i_24 i_25 i_26
-//			i_27 i_28 i_29 i_30 i_31 i_32 i_33 i_34 i_35
-//			i_00 i_01 i_02 i_03 i_04 i_05 i_06 i_07 i_08
-//			a_b  a_l  a_c  a_h  oh   c    _    _    _  \s
-//			p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08
-//			""");
+		//mirror
+		Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+		//logging
+		LogOptions logOptions = creationOptions.getLogOptions();
+		Plugin plugin = creationOptions.getPlugin();
+		if (!LogOptions.isEmpty(logOptions)) {
+			this.tracker = new DifferenceTracker(
+					LogOutput.make(plugin, player.getUUID(), player.getScoreboardName(), Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName), logOptions),
+					logOptions.getGranularity());
+			this.tracker.onOpen();
+		} else {
+			this.tracker = null;
+		}
 
 //		final int firstFiveRows = top.storageContents.size()
 //				+ top.armourContents.size()
 //				+ top.offHand.size()
 //				+ (spectatingOwnInventory ? 0 : 1); //only include cursor when not spectating yourself
-//
+
 		//top inventory slots
 		for (int yPos = 0; yPos < 6; yPos++) {
 			for (int xPos = 0; xPos < 9; xPos++) {

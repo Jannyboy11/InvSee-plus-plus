@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.InventoryNotCreated;
 import com.janboerman.invsee.spigot.api.response.InventoryOpenEventCancelled;
@@ -70,11 +71,13 @@ class EnderseeCommandExecutor implements CommandExecutor {
         final Mirror<EnderChestSlot> mirror = Mirror.forEnderChest(plugin.getEnderChestTemplate());
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
+        final LogOptions logOptions = plugin.getLogOptions();
         final CreationOptions<EnderChestSlot> creationOptions = CreationOptions.defaultEnderInventory()
                 .withTitle(title)
                 .withMirror(mirror)
                 .withOfflinePlayerSupport(offlineSupport)
-                .withUnknownPlayerSupport(unknownPlayerSupport);
+                .withUnknownPlayerSupport(unknownPlayerSupport)
+                .withLogOptions(logOptions);
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = StringHelper.joinArray(" ", 1, args);

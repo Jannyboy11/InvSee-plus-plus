@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
 /*
@@ -61,11 +62,13 @@ class InvseeCommandExecutor implements CommandExecutor {
         final Mirror<PlayerInventorySlot> mirror = Mirror.forInventory(plugin.getInventoryTemplate());
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
+        final LogOptions logOptions = plugin.getLogOptions();
         final CreationOptions<PlayerInventorySlot> creationOptions = CreationOptions.defaultMainInventory()
                 .withTitle(title)
                 .withMirror(mirror)
                 .withOfflinePlayerSupport(offlineSupport)
-                .withUnknownPlayerSupport(unknownPlayerSupport);
+                .withUnknownPlayerSupport(unknownPlayerSupport)
+                .withLogOptions(logOptions);
 
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> pwiFuture = null;
 

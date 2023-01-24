@@ -12,4 +12,7 @@ public class InventoryOpenEventCancelled implements NotOpenedReason {
     public String toString() {
         return "Inventory open event was cancelled";
     }
+
+    //TODO also override equals and hashCode.
+
 }

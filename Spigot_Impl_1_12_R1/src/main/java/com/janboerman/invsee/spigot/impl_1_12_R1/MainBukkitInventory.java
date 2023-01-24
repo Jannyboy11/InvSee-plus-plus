@@ -186,11 +186,6 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
         }
     }
 
-    @Override
-    public Mirror<PlayerInventorySlot> getMirror() {
-        return getInventory().mirror;
-    }
-
     // org.bukkit.inventory.Inventory overrides
 
     // lookups

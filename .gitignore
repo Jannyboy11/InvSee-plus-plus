@@ -12,8 +12,6 @@ Spigot_Addon_Give_1_15_R1/target/*
 Spigot_Addon_Give_1_16_R3/target/*
 Spigot_Addon_Give_1_17_1_R1/target/*
 Spigot_Addon_Give_1_18_2_R2/target/
-Spigot_Addon_Give_1_19_R1/target/
-Spigot_Addon_Give_1_19_1_R1/target/
 Spigot_Addon_Give_1_19_2_R1/target/
 Spigot_Addon_Give_1_19_3_R2/target/
 Spigot_Addon_Clear/target/*
@@ -25,8 +23,6 @@ Spigot_Impl_1_15_R1/target/*
 Spigot_Impl_1_16_R3/target/*
 Spigot_Impl_1_17_1_R1/target/*
 Spigot_Impl_1_18_2_R2/target/*
-Spigot_Impl_1_19_R1/target/*
-Spigot_Impl_1_19_1_R1/target/*
 Spigot_Impl_1_19_2_R1/target/*
 Spigot_Impl_1_19_3_R2/target/*
 Spigot_Plugin/target/*

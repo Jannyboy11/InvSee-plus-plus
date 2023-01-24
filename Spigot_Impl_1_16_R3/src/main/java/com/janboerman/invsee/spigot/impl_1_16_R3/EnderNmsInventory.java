@@ -1,7 +1,8 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
-import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.utils.UUIDHelper;
 import net.minecraft.server.v1_16_R3.*;
@@ -26,8 +27,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
     protected NonNullList<ItemStack> storageContents;
 
     private EnderBukkitInventory bukkit;
-    protected String title;
-    protected Mirror<EnderChestSlot> mirror;
+    protected CreationOptions<EnderChestSlot> creationOptions;
 
     private int maxStack = IInventory.MAX_STACK;
     private final List<HumanEntity> transaction = new ArrayList<>();
@@ -40,7 +40,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
         storageContents = null;
     }
 
-    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
+    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, CreationOptions<EnderChestSlot> creationOptions) {
         // Possibly could've used TileEntityTypes.ENDER_CHEST, but I'm afraid that will cause troubles elsewhere.
         // So use the fake type for now.
         // All of this hadn't been necessary if craftbukkit checked whether the inventory was an instance of ITileEntityContainer instead of straight up TileEntityContainer.
@@ -48,8 +48,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
         this.spectatedPlayerUuid = UUIDHelper.copy(spectatedPlayerUuid);
         this.spectatedPlayerName = spectatedPlayerName;
         this.storageContents = storageContents;
-        this.title = title;
-        this.mirror = mirror;
+        this.creationOptions = creationOptions;
     }
 
     public EnderBukkitInventory bukkit() {
@@ -181,7 +180,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
 
     @Override
     public IChatBaseComponent getScoreboardDisplayName() {
-        return CraftChatMessage.fromStringOrNull(title);
+        return CraftChatMessage.fromStringOrNull(creationOptions.getTitle().titleFor(Target.byGameProfile(spectatedPlayerUuid, spectatedPlayerName)));
     }
 
     @Override
@@ -191,7 +190,7 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
 
     @Override
     protected Container createContainer(int containerId, PlayerInventory playerInventory) {
-        return new EnderNmsContainer(containerId, this, playerInventory, playerInventory.player, mirror);
+        return new EnderNmsContainer(containerId, this, playerInventory, playerInventory.player, creationOptions);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_15_R1;
 
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
@@ -43,7 +44,7 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
 
     @Override
     public String getTitle() {
-        return getInventory().title;
+        return getInventory().creationOptions.getTitle().titleFor(Target.byGameProfile(getSpectatedPlayerId(), getSpectatedPlayerName()));
     }
 
     @Override
@@ -202,7 +203,7 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
 
     @Override
     public Mirror<PlayerInventorySlot> getMirror() {
-        return getInventory().mirror;
+        return getInventory().creationOptions.getMirror();
     }
 
     // org.bukkit.inventory.Inventory overrides

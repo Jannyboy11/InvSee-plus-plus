@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
@@ -41,8 +43,8 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
     private final List<HumanEntity> transaction = new ArrayList<>();
     protected InventoryHolder owner;
 
-    MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
-        super(target.getUUID(), target.getScoreboardName(), title, mirror);
+    MainNmsInventory(Player target, CreationOptions<PlayerInventorySlot> creationOptions) {
+        super(target.getUUID(), target.getScoreboardName(), creationOptions);
 
         this.targetPlayerUuid = target.getUUID();
         this.targetPlayerName = target.getScoreboardName();
@@ -143,13 +145,13 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player viewer) {
-        return new MainNmsContainer(containerId, this, playerInventory, viewer, mirror);
+        return new MainNmsContainer(containerId, this, playerInventory, viewer, creationOptions);
     }
 
     @Override
     public Component getDisplayName() {
         //return new TextComponent("minecraft:generic_9x6");
-        return CraftChatMessage.fromStringOrNull(title);
+        return CraftChatMessage.fromStringOrNull(creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)));
     }
 
     @Override

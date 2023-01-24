@@ -6,6 +6,7 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.logging.Level;
 
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.InventoryNotCreated;
 import com.janboerman.invsee.spigot.api.response.InventoryOpenEventCancelled;
@@ -38,8 +39,11 @@ public abstract class InvseeAPI {
     /* TODO this class needs a BIG refactor.
      * TODO implementations should be able to override *just* the abstract methods.
      * TODO I should create a new interface for this.
-     * TODo I think I'll call this new interface "Platform".
+     * TODO I think I'll call this new interface "Platform".
      * TODO we then use composition over inheritance!
+     *
+     * TODO later, we could also return an InvseeAPI instance PER PLUGIN.
+     * TODO this is useful for logging, now that we have the PLUGIN_LOG_FILE.
      */
 
     protected final Plugin plugin;
@@ -54,6 +58,8 @@ public abstract class InvseeAPI {
 
     private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
     private Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
+
+    private LogOptions logOptions = new LogOptions();
 
     private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());    //TODO does this need to be synchronised still?
     //TODO this^ design can fail very badly when two players spectate the same player, using different profiles!
@@ -162,22 +168,27 @@ public abstract class InvseeAPI {
         this.enderchestMirror = mirror;
     }
 
+    public final void setLogOptions(LogOptions options) {
+        Objects.requireNonNull(options);
+        this.logOptions = options.clone();
+    }
+
     public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions(Player spectator) {
         final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY);
-        return new CreationOptions<>(mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, bypassExempt);
+        return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, bypassExempt, logOptions.clone());
     }
 
     public CreationOptions<EnderChestSlot> enderInventoryCreationOptions(Player spectator) {
         final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST);
-        return new CreationOptions<>(enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, bypassExempt);
+        return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, bypassExempt, logOptions.clone());
     }
 
     public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions() {
-        return new CreationOptions<>(mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, false);
+        return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, false, logOptions.clone());
     }
 
     public CreationOptions<EnderChestSlot> enderInventoryCreationOptions() {
-        return new CreationOptions<>(enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, false);
+        return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, false, logOptions.clone());
     }
 
     // ========= end of creation options =========
@@ -997,7 +1008,7 @@ public abstract class InvseeAPI {
     }
 
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
-        return mainSpectatorInventory(playerId, playerName, new CreationOptions<>(Title.of(title), offlineSupport, mirror, unknownPlayerSupport, false));
+        return mainSpectatorInventory(playerId, playerName, new CreationOptions<>(plugin, Title.of(title), offlineSupport, mirror, unknownPlayerSupport, false, LogOptions.empty()));
     }
 
     // open ender spectator inventory using parameters

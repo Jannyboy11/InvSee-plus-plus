@@ -40,3 +40,10 @@ templates:
     e_27 e_28 e_29 e_30 e_31 e_32 e_33 e_34 e_35
     e_36 e_37 e_38 e_39 e_40 e_41 e_42 e_43 e_44
     e_45 e_46 e_47 e_48 e_49 e_50 e_51 e_52 e_53
+
+# Logging options
+logging:
+  # Pick one from: [LOG_NEVER, LOG_ON_CLOSE, LOG_EVERY_CHANGE]
+  granularity: LOG_ON_CLOSE
+  # Pick zero or more from: [CONSOLE, SERVER_LOG_FILE, PLUGIN_LOG_FILE, SPECTATOR_LOG_FILE]
+  output: [PLUGIN_LOG_FILE]

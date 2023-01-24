@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.internal.inventory;
 
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 
 import java.util.UUID;
@@ -16,11 +17,11 @@ public interface StandardSpectatorInventory<Slot, NMS extends AbstractNmsInvento
     }
 
     public default String getTitle() {
-        return getInventory().title;
+        return getInventory().creationOptions.getTitle().titleFor(Target.byGameProfile(getSpectatedPlayerId(), getSpectatedPlayerName()));
     }
 
     public default Mirror<Slot> getMirror() {
-        return getInventory().mirror;
+        return getInventory().creationOptions.getMirror();
     }
 
 }

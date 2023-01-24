@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_19_3_R2;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
@@ -29,8 +31,8 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	protected List<ItemStack> craftingContents;
 	protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
 	
-	protected MainNmsInventory(Player target, String title, Mirror<PlayerInventorySlot> mirror) {
-		super(target.getUUID(), target.getScoreboardName(), title, mirror);
+	protected MainNmsInventory(Player target, CreationOptions<PlayerInventorySlot> creationOptions) {
+		super(target.getUUID(), target.getScoreboardName(), creationOptions);
 		Inventory inv = target.getInventory();
 		this.storageContents = inv.items;
 		this.armourContents = inv.armor;
@@ -121,13 +123,13 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player viewer) {
-		return new MainNmsContainer(containerId, this, playerInventory, viewer, mirror);
+		return new MainNmsContainer(containerId, this, playerInventory, viewer, creationOptions);
 	}
 
 	@Override
 	public Component getDisplayName() {
 		//return new TextComponent("minecraft:generic_9x6");
-		return CraftChatMessage.fromStringOrNull(title);
+		return CraftChatMessage.fromStringOrNull(creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)));
 	}
 
 	@Override

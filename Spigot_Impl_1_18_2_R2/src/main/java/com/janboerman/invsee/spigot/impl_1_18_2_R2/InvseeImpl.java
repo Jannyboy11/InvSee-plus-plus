@@ -55,7 +55,6 @@ public class InvseeImpl extends InvseeAPI {
     public InventoryView openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, CreationOptions<PlayerInventorySlot> options) {
         var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
         var title = options.getTitle().titleFor(target);
-        var mirror = options.getMirror();
 
         CraftPlayer bukkitPlayer = (CraftPlayer) spectator;
         ServerPlayer nmsPlayer = bukkitPlayer.getHandle();
@@ -66,7 +65,7 @@ public class InvseeImpl extends InvseeAPI {
         //so let's emulate that!
         int windowId = nmsPlayer.nextContainerCounter();
         Inventory bottom = nmsPlayer.getInventory();
-        MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, mirror);
+        MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
         boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
         if (eventCancelled) {
@@ -81,7 +80,7 @@ public class InvseeImpl extends InvseeAPI {
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, CreationOptions<PlayerInventorySlot> options) {
-        MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), options.getTitle().titleFor(Target.byPlayer(player)), options.getMirror());
+        MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), options);
         MainBukkitInventory bukkitInventory = spectatorInv.bukkit();
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
@@ -103,7 +102,6 @@ public class InvseeImpl extends InvseeAPI {
     public InventoryView openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, CreationOptions<EnderChestSlot> options) {
         var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
         var title = options.getTitle().titleFor(target);
-        var mirror = options.getMirror();
 
         CraftPlayer bukkitPlayer = (CraftPlayer) spectator;
         ServerPlayer nmsPlayer = bukkitPlayer.getHandle();
@@ -114,7 +112,7 @@ public class InvseeImpl extends InvseeAPI {
         //so let's emulate that!
         int windowId = nmsPlayer.nextContainerCounter();
         Inventory bottom = nmsPlayer.getInventory();
-        EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, mirror);
+        EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
         boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
         if (eventCancelled) {
@@ -133,7 +131,7 @@ public class InvseeImpl extends InvseeAPI {
         String name = player.getName();
         CraftInventory craftInventory = (CraftInventory) player.getEnderChest();
         PlayerEnderChestContainer nmsInventory = (PlayerEnderChestContainer) craftInventory.getInventory();
-        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, options.getTitle().titleFor(Target.byPlayer(player)), options.getMirror());
+        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, options);
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
         cache(bukkitInventory);
         return bukkitInventory;

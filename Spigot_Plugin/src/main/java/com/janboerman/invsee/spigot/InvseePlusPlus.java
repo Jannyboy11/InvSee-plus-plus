@@ -4,6 +4,9 @@ import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.api.Title;
+import com.janboerman.invsee.spigot.api.logging.LogGranularity;
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
+import com.janboerman.invsee.spigot.api.logging.LogTarget;
 import com.janboerman.invsee.spigot.api.target.Target;
 /*
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
@@ -15,10 +18,15 @@ import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.EnumSet;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class InvseePlusPlus extends JavaPlugin {
 
@@ -58,6 +66,7 @@ public class InvseePlusPlus extends JavaPlugin {
         api.setEnderInventoryTitle(this::getTitleForEnderChest);
         api.setMainInventoryMirror(Mirror.forInventory(getInventoryTemplate()));
         api.setEnderInventoryMirror(Mirror.forEnderChest(getEnderChestTemplate()));
+        api.setLogOptions(getLogOptions());
 
         //commands
         PluginCommand invseeCommand = getCommand("invsee");
@@ -161,5 +170,20 @@ public class InvseePlusPlus extends JavaPlugin {
             "e_36 e_37 e_38 e_39 e_40 e_41 e_42 e_43 e_44\n" +
             "e_45 e_46 e_47 e_48 e_49 e_50 e_51 e_52 e_53");
     }
-    
+
+    public LogOptions getLogOptions() {
+        FileConfiguration config = getConfig();
+        ConfigurationSection logging = config.getConfigurationSection("logging");
+        if (logging == null) {
+            return LogOptions.empty();
+        } else {
+            String granularity = logging.getString("granularity", "LOG_ON_CLOSE");
+            LogGranularity logGranularity = LogGranularity.valueOf(granularity);
+            List<String> output = logging.getStringList("output");
+            EnumSet<LogTarget> logTargets = output.stream()
+                    .map(LogTarget::valueOf)
+                    .collect(Collectors.toCollection(() -> EnumSet.noneOf(LogTarget.class)));
+            return LogOptions.of(logGranularity, logTargets);
+        }
+    }
 }

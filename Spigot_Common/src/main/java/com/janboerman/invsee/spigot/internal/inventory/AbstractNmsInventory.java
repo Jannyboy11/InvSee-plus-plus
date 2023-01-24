@@ -1,7 +1,7 @@
 package com.janboerman.invsee.spigot.internal.inventory;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.utils.UUIDHelper;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
@@ -19,20 +19,18 @@ public abstract class AbstractNmsInventory<Slot, Bukkit extends SpectatorInvento
     public final UUID targetPlayerUuid;
     public final String targetPlayerName;
 
-    public final String title;
-    public final Mirror<Slot> mirror;
+    public final CreationOptions<Slot> creationOptions;
     private Bukkit bukkit;
 
     protected int maxStack; //can't abstract out the getters and setters because of remapping.
     private final List<HumanEntity> transaction = new ArrayList<>(1);
     protected InventoryHolder owner;
 
-    protected AbstractNmsInventory(UUID targetPlayerUuid, String targetPlayerName, String title, Mirror<Slot> mirror) {
+    protected AbstractNmsInventory(UUID targetPlayerUuid, String targetPlayerName, CreationOptions<Slot> creationOptions) {
         this.targetPlayerUuid = UUIDHelper.copy(targetPlayerUuid);
         this.targetPlayerName = targetPlayerName;
-        this.title = title;
-        this.mirror = mirror;
         this.maxStack = defaultMaxStack();
+        this.creationOptions = creationOptions;
     }
 
     protected abstract Bukkit createBukkit();

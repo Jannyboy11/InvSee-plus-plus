@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
@@ -14,8 +16,8 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 
     protected NonNullList<ItemStack> storageContents;
 
-    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, String title, Mirror<EnderChestSlot> mirror) {
-        super(spectatedPlayerUuid, spectatedPlayerName, title, mirror);
+    EnderNmsInventory(UUID spectatedPlayerUuid, String spectatedPlayerName, NonNullList<ItemStack> storageContents, CreationOptions<EnderChestSlot> creationOptions) {
+        super(spectatedPlayerUuid, spectatedPlayerName, creationOptions);
         this.storageContents = storageContents;
     }
 
@@ -171,23 +173,23 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 
     @Override
     public String getName() {
-        return title;
+        return creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName));
     }
 
     @Override
     public boolean hasCustomName() {
-        return title != null;
+        return creationOptions.getTitle() != null;
     }
 
     @Override
     public IChatBaseComponent getScoreboardDisplayName() {
-        return CraftChatMessage.fromString(title)[0];
+        return CraftChatMessage.fromString(creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)))[0];
     }
 
     @Override
     public Container createContainer(PlayerInventory playerInventory, EntityHuman entityHuman) {
         EntityPlayer entityPlayer = (EntityPlayer) entityHuman;
-        return new EnderNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, playerInventory.player, mirror);
+        return new EnderNmsContainer(entityPlayer.nextContainerCounter(), this, playerInventory, playerInventory.player, creationOptions);
     }
 
     @Override
