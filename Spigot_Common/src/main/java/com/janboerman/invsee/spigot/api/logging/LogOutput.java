@@ -20,6 +20,7 @@ import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -54,17 +55,17 @@ class LogOutputImpl implements LogOutput {
     private static final String LOG_FOLDER_NAME = "InvSee++ logs";
 
     private static final String FORMAT =
-        "\n[%1$tF %1$tT] [%2$-7s]" +
+        "\n[%1$tF %1$tT] [%2$s]:" +
         "\nSpectator UUID: %3s" +
         "\nSpectator Name: %4s" +
         "\nTaken:          %5s" +
         "\nGiven:          %6s" +
         "\nTarget:         %7s";
     private static final String FORMAT_WITHOUT_SPECTATOR =
-        "\n[%1$tF %1$tT] [%2$-7s]" +
-        "\nTaken:          %5s" +
-        "\nGiven:          %6s" +
-        "\nTarget:         %7s";
+        "\n[%1$tF %1$tT] [%2$s]:" +
+        "\nTaken:          %3s" +
+        "\nGiven:          %4s" +
+        "\nTarget:         %5s";
 
     private final UUID spectatorId;
     private final String spectatorName;
@@ -78,6 +79,11 @@ class LogOutputImpl implements LogOutput {
         this.logger = Logger.getLogger("InvSee++." + spectatorId);
         this.logger.setLevel(Level.ALL);
 
+        File logFileFolder = new File(plugin.getDataFolder(), LOG_FOLDER_NAME);
+        if (!logTargets.isEmpty()) {
+            logFileFolder.mkdirs();
+        }
+
         for (LogTarget target : logTargets) {
             switch (target) {
                 case SERVER_LOG_FILE:
@@ -85,8 +91,9 @@ class LogOutputImpl implements LogOutput {
                     break;
                 case PLUGIN_LOG_FILE:
                     try {
-                        File file = new File(new File(plugin.getDataFolder(), LOG_FOLDER_NAME), "_global.log");
-                        FileHandler fileHandler = new FileHandler(file.getAbsolutePath());
+                        File file = new File(logFileFolder, "_global.log");
+                        if (!file.exists()) file.createNewFile();
+                        FileHandler fileHandler = new FileHandler(file.getAbsolutePath(), true);
                         fileHandler.setLevel(Level.ALL);
                         fileHandler.setFormatter(new SimpleFormatter() {
                             @Override
@@ -95,7 +102,7 @@ class LogOutputImpl implements LogOutput {
                                 Date time = new Date(record.getMillis());
                                 Level level = record.getLevel();
                                 Action action = (Action) parameters[0];
-                                return LogOutputImpl.this.format(FORMAT, time, level, action.outcome);
+                                return String.format(FORMAT, time, level.getLocalizedName(), spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
                             }
                         });
                         logger.addHandler(fileHandler);
@@ -105,8 +112,9 @@ class LogOutputImpl implements LogOutput {
                     break;
                 case SPECTATOR_LOG_FILE:
                     try {
-                        File file = new File(new File(plugin.getDataFolder(), LOG_FOLDER_NAME), spectatorId + ".log");
-                        FileHandler fileHandler = new FileHandler(file.getAbsolutePath());
+                        File file = new File(logFileFolder, spectatorId + ".log");
+                        if (!file.exists()) file.createNewFile();
+                        FileHandler fileHandler = new FileHandler(file.getAbsolutePath(), true);
                         fileHandler.setLevel(Level.ALL);
                         fileHandler.setFormatter(new SimpleFormatter() {
                             @Override
@@ -115,7 +123,7 @@ class LogOutputImpl implements LogOutput {
                                 Date time = new Date(record.getMillis());
                                 Level level = record.getLevel();
                                 Action action = (Action) parameters[0];
-                                return LogOutputImpl.this.format(FORMAT_WITHOUT_SPECTATOR, time, level, action.outcome);
+                                return String.format(FORMAT_WITHOUT_SPECTATOR, time, level.getLocalizedName(), Taken.from(action.outcome), Given.from(action.outcome), target);
                             }
                         });
                         logger.addHandler(fileHandler);
@@ -135,7 +143,7 @@ class LogOutputImpl implements LogOutput {
                             Date time = new Date(record.getMillis());
                             Level level = record.getLevel();
                             Action action = (Action) parameters[0];
-                            return LogOutputImpl.this.format(FORMAT, time, level, action.outcome);
+                            return String.format(FORMAT, time, level.getLocalizedName(), spectatorId, spectatorName, Taken.from(action.outcome), Given.from(action.outcome), target);
                         }
                     });
                     logger.addHandler(consoleHandler);
@@ -152,14 +160,10 @@ class LogOutputImpl implements LogOutput {
         return new LogOutputImpl(plugin, spectatorId, spectatorName, target, options.getTargets());
     }
 
-    private final String format(String format, Date date, Level level, Difference difference) {
-        assert format == FORMAT || format == FORMAT_WITHOUT_SPECTATOR : "invalid format";
-        return String.format(format, date, level.getLocalizedName(), spectatorId, spectatorName, Taken.from(difference), Given.from(difference), target);
-    }
-
     @Override
     public void log(Difference difference) {
-        logger.log(Level.INFO, "%s", new Action(spectatorId, spectatorName, target, difference));
+        Action action = new Action(spectatorId, spectatorName, target, difference);
+        logger.log(Level.INFO, String.format("%s", action), action);
     }
 
     private static class DiffFormattable implements Formattable {

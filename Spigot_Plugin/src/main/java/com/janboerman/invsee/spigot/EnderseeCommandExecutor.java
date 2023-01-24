@@ -72,7 +72,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
         final LogOptions logOptions = plugin.getLogOptions();
-        final CreationOptions<EnderChestSlot> creationOptions = CreationOptions.defaultEnderInventory()
+        final CreationOptions<EnderChestSlot> creationOptions = CreationOptions.defaultEnderInventory(plugin)
                 .withTitle(title)
                 .withMirror(mirror)
                 .withOfflinePlayerSupport(offlineSupport)

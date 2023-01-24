@@ -63,7 +63,7 @@ class InvseeCommandExecutor implements CommandExecutor {
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
         final LogOptions logOptions = plugin.getLogOptions();
-        final CreationOptions<PlayerInventorySlot> creationOptions = CreationOptions.defaultMainInventory()
+        final CreationOptions<PlayerInventorySlot> creationOptions = CreationOptions.defaultMainInventory(plugin)
                 .withTitle(title)
                 .withMirror(mirror)
                 .withOfflinePlayerSupport(offlineSupport)
