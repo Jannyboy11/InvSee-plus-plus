@@ -59,12 +59,13 @@ public class Difference {
 
         while (one.hasNext()) {
             assert two.hasNext();
+            
             final ItemStack oldStack = one.next();
             final ItemStack newStack = two.next();
 
             if (!Objects.equals(oldStack, newStack)) {
-                res.accumulate(newStack);
-                res.accumulate(oldStack);
+                res.accumulate(ItemType.of(newStack), newStack.getAmount());
+                res.accumulate(ItemType.of(oldStack), -oldStack.getAmount());
             }
         }
 

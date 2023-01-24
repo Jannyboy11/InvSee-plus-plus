@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.api.logging;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.utils.Pair;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
@@ -184,7 +185,7 @@ class LogOutputImpl implements LogOutput {
                         ItemMeta meta = type.getItemMeta();
                         int amount = pair.getSecond();
 
-                        if (meta == null) {
+                        if (meta == null || meta.equals(new ItemStack(material).getItemMeta())) {
                             return material.name() + " x " + amount;
                         } else {
                             return material.name() + " & " + meta + " x " + amount;
