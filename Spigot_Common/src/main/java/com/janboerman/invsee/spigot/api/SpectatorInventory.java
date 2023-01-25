@@ -22,4 +22,7 @@ public interface SpectatorInventory<Slot> extends Inventory {
     /** get the default Mirror this inventory is viewed through */
     public Mirror<Slot> getMirror();
 
+    /** get the options this inventory was created with */
+    public CreationOptions<Slot> getCreationOptions();
+
 }

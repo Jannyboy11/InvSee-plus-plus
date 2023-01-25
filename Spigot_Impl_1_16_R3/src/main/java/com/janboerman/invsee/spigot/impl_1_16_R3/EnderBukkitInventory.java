@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
@@ -38,6 +39,11 @@ public class EnderBukkitInventory extends CraftInventory implements EnderSpectat
     @Override
     public Mirror<EnderChestSlot> getMirror() {
         return getInventory().creationOptions.getMirror();
+    }
+
+    @Override
+    public CreationOptions<EnderChestSlot> getCreationOptions() {
+        return getInventory().creationOptions.clone();
     }
 
 }

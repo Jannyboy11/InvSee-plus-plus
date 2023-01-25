@@ -7,6 +7,7 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
@@ -30,15 +31,15 @@ public class CreationOptions<Slot> implements Cloneable {
         this.logOptions = Objects.requireNonNull(logOptions);
     }
 
-    @Deprecated
-    public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport) {
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("InvseePlusPlus");
+    @Deprecated(forRemoval = true)
+    public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport) throws Exception {
+        Plugin plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, false, new LogOptions().withGranularity(LogGranularity.LOG_NEVER));
     }
 
-    @Deprecated
-    public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt) {
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("InvseePlusPlus");
+    @Deprecated(forRemoval = true)
+    public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt) throws Exception {
+        Plugin plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, new LogOptions().withGranularity(LogGranularity.LOG_NEVER));
     }
 

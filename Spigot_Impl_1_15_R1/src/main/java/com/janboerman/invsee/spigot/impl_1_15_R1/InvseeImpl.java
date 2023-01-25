@@ -5,7 +5,6 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
@@ -195,11 +194,7 @@ public class InvseeImpl extends InvseeAPI {
             } //else: no player save file exists
 
             FakeCraftPlayer craftHumanEntity = fakeEntityPlayer.getBukkitEntity();
-            CreationOptions<Slot> creationOptions = CreationOptions.of(
-                    Title.of(newInventory.getTitle()),
-                    true,
-                    newInventory.getMirror(),
-                    true);
+            CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
             SI currentInv = currentInvProvider.apply(craftHumanEntity, creationOptions);
 
             transfer.accept(currentInv, newInventory);

@@ -208,11 +208,7 @@ public class InvseeImpl extends InvseeAPI {
             } //else: no player save file exists
 
             FakeCraftPlayer craftHumanEntity = fakeEntityPlayer.getBukkitEntity();
-            CreationOptions<Slot> creationOptions = CreationOptions.of(
-                    Title.of(newInventory.getTitle()),
-                    true,
-                    newInventory.getMirror(),
-                    true);
+            CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
             SI currentInv = currentInvProvider.apply(craftHumanEntity, creationOptions);
 
             transfer.accept(currentInv, newInventory);

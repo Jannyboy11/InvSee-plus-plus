@@ -198,11 +198,7 @@ public class InvseeImpl extends InvseeAPI {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
             fakeCraftPlayer.loadData();
 
-            CreationOptions<Slot> creationOptions = CreationOptions.of(
-                    Title.of(newInventory.getTitle()),
-                    true,
-                    newInventory.getMirror(),
-                    true);
+            CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
     		SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
     		transfer.accept(currentInv, newInventory);
 

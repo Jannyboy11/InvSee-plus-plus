@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.internal.inventory;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
@@ -22,6 +23,10 @@ public interface StandardSpectatorInventory<Slot, NMS extends AbstractNmsInvento
 
     public default Mirror<Slot> getMirror() {
         return getInventory().creationOptions.getMirror();
+    }
+
+    public default CreationOptions<Slot> getCreationOptions() {
+        return getInventory().creationOptions.clone();
     }
 
 }

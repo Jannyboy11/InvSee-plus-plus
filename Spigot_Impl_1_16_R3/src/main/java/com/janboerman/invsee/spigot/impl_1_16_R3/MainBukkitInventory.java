@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
@@ -201,6 +202,11 @@ public class MainBukkitInventory extends CraftInventory implements MainSpectator
     @Override
     public Mirror<PlayerInventorySlot> getMirror() {
         return getInventory().creationOptions.getMirror();
+    }
+
+    @Override
+    public CreationOptions<PlayerInventorySlot> getCreationOptions() {
+        return getInventory().creationOptions.clone();
     }
 
     // org.bukkit.inventory.Inventory overrides

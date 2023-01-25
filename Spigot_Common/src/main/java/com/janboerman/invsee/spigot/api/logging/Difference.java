@@ -59,7 +59,7 @@ public class Difference {
 
         while (one.hasNext()) {
             assert two.hasNext();
-            
+
             final ItemStack oldStack = one.next();
             final ItemStack newStack = two.next();
 
