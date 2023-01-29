@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 
@@ -25,8 +26,14 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 	public CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId) {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
-		
-		File playerDirectory = worldNBTStorage.getPlayerDir();
+
+		File playerDirectory;
+		try {
+			playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
+		} catch (Exception e) {
+			plugin.getLogger().log(Level.SEVERE, "getPlayerDir method not available", e);
+			return CompletedEmpty.the();
+		}
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return CompletedEmpty.the();
 		

@@ -43,7 +43,13 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
 
-		File playerDirectory = worldNBTStorage.getPlayerDir();
+		File playerDirectory;
+		try {
+			playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
+		} catch (Exception e) {
+			plugin.getLogger().log(Level.SEVERE, "getPlayerDir method not available", e);
+			return CompletedEmpty.the();
+		}
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return CompletedEmpty.the();
 
