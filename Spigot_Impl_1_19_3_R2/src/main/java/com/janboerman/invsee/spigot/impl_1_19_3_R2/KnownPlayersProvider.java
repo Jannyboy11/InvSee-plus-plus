@@ -28,13 +28,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
 
-		File playerDirectory;
-		try {
-			playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
-		} catch (Exception e) {
-			plugin.getLogger().log(Level.SEVERE, "getPlayerDir method not available", e);
-			return;
-		}
+		File playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 
@@ -62,13 +56,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
 
-		File playerDirectory;
-		try {
-			playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
-		} catch (Exception e) {
-			plugin.getLogger().log(Level.SEVERE, "getPlayerDir method not available", e);
-			return;
-		}
+		File playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 
