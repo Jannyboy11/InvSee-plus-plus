@@ -22,11 +22,11 @@ public interface Mirror<Slot> {
     public Slot getSlot(int index);
 
     public static Mirror<PlayerInventorySlot> defaultPlayerInventory() {
-        return PlayerInventoryMirror.DEFAULT;
+        return DefaultMirrors.DEFAULT_PLAYERINVENTORY_MIRROR;
     }
 
     public static Mirror<EnderChestSlot> defaultEnderChest() {
-        return EnderChestMirror.DEFAULT;
+        return DefaultMirrors.DEFAULT_ENDERCHEST_MIRROR;
     }
 
     public static Mirror<PlayerInventorySlot> forInventory(String template) {
@@ -38,3 +38,30 @@ public interface Mirror<Slot> {
     }
 }
 
+class DefaultMirrors {
+
+    private DefaultMirrors() {}
+
+    static final Mirror<PlayerInventorySlot> DEFAULT_PLAYERINVENTORY_MIRROR = new Mirror<>() {
+        @Override public Integer getIndex(PlayerInventorySlot playerInventorySlot) {
+            if (playerInventorySlot == null) return null;
+            return playerInventorySlot.defaultIndex();
+        }
+
+        @Override public PlayerInventorySlot getSlot(int index) {
+            return PlayerInventorySlot.byDefaultIndex(index);
+        }
+    };
+
+    static final Mirror<EnderChestSlot> DEFAULT_ENDERCHEST_MIRROR = new Mirror<>() {
+        @Override public Integer getIndex(EnderChestSlot enderChestSlot) {
+            if (enderChestSlot == null) return null;
+            return enderChestSlot.defaultIndex();
+        }
+
+        @Override public EnderChestSlot getSlot(int index) {
+            return EnderChestSlot.byDefaultIndex(index);
+        }
+    };
+
+}

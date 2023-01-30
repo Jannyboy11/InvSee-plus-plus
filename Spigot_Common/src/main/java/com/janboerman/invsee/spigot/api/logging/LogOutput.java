@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.api.logging;
 
+import com.janboerman.invsee.spigot.api.logging.LogOutputImpl.Given;
+import com.janboerman.invsee.spigot.api.logging.LogOutputImpl.Taken;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.utils.Pair;
 import org.bukkit.Material;
@@ -202,7 +204,7 @@ class LogOutputImpl implements LogOutput {
             int len = sb.length();
             if (len < width)
                 for (int i = 0; i < width - len; i++)
-                    if ((flags | FormattableFlags.LEFT_JUSTIFY) == FormattableFlags.LEFT_JUSTIFY)
+                    if ((flags & FormattableFlags.LEFT_JUSTIFY) == FormattableFlags.LEFT_JUSTIFY)
                         sb.append(' ');
                     else
                         sb.insert(0, ' ');
@@ -263,6 +265,34 @@ class LogOutputImpl implements LogOutput {
             return "Taken(" + super.toString() + ")";
         }
 
+    }
+
+}
+
+class Action implements Formattable {
+
+    private static final String FORMAT =
+            "\nSpectator UUID: %1$s" +
+            "\nSpectator Name: %2$s" +
+            "\nTaken         : %3$s" +
+            "\nGiven         : %4$s" +
+            "\nTarget        : %5$s";
+
+    final UUID spectatorId;
+    final String spectatorName;
+    final Target targetPlayer;
+    final Difference outcome;
+
+    Action(UUID spectatorId, String spectatorName, Target target, Difference outcome) {
+        this.spectatorId = spectatorId;
+        this.spectatorName = spectatorName;
+        this.targetPlayer = target;
+        this.outcome = outcome;
+    }
+
+    @Override
+    public void formatTo(Formatter formatter, int flags, int width, int precision) {
+        formatter.format(FORMAT, spectatorId, spectatorName, Taken.from(outcome), Given.from(outcome), targetPlayer);
     }
 
 }
