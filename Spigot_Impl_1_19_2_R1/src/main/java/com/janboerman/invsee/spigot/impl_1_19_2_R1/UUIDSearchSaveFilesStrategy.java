@@ -52,8 +52,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 		try {
 			playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
 		} catch (Exception e) {
-			plugin.getLogger().log(Level.SEVERE, "getPlayerDir method not available", e);
-			return CompletedEmpty.the();
+			return CompletableFuture.failedFuture(e);
 		}
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return CompletedEmpty.the();
