@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>InvSee</artifactId>
-        <version>0.18.2-SNAPSHOT</version>
+        <version>0.18.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
