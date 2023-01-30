@@ -21,15 +21,12 @@ public class PlayerDirectory {
             } catch (NoSuchMethodException forgeMethodNotFound) {
                 Field[] fields = FuzzyReflection.getFieldOfType(PlayerDataStorage.class, File.class);
                 for (Field field : fields) {
-                    File file = (File) field.get(worldNBTStorage);
-                    if (file.isDirectory()) {
-                        return file;
-                    }
+                    return (File) field.get(worldNBTStorage);
                 }
-                RuntimeException re = new RuntimeException("No method known of getting the player directory");
-                re.addSuppressed(craftbukkitMethodNotFound);
-                re.addSuppressed(forgeMethodNotFound);
-                throw re;
+                Exception ex = new Exception("No method known of getting the player directory");
+                ex.addSuppressed(craftbukkitMethodNotFound);
+                ex.addSuppressed(forgeMethodNotFound);
+                throw ex;
             }
         }
     }
