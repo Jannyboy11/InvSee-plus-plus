@@ -4,6 +4,7 @@ main: com.janboerman.invsee.spigot.addon.clear.ClearPlugin
 depend: [InvSeePlusPlus]
 api-version: 1.13
 prefix: "InvSee++_Clear"
+description: Remove items from (offline) players.
 
 permissions:
   invseeplusplus.clear.*:

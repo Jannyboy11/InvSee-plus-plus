@@ -4,6 +4,7 @@ main: com.janboerman.invsee.spigot.addon.give.GivePlugin
 depend: [InvSeePlusPlus]
 api-version: 1.13
 prefix: "InvSee++_Give"
+description: Give items to (offline) players.
 
 permissions:
   invseeplusplus.give.*:

@@ -37,7 +37,7 @@
 
     <name>InvSeePlusPlus</name>
 
-    <description>A plugin to view and manipulate player's inventories.</description>
+    <description>A plugin to view and manipulate players' inventories.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.8.2</junit.version>
