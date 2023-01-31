@@ -76,11 +76,11 @@ public class MainNmsContainer extends Container {
     //removed
     @Override
     public void b(EntityHuman entityhuman) {
+        super.b(entityhuman);
+
         if (tracker != null && Objects.equals(entityhuman, player)) {
             tracker.onClose();
         }
-
-        super.b(entityhuman);
     }
 
     MainNmsContainer(int containerId, MainNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player, CreationOptions<PlayerInventorySlot> creationOptions) {

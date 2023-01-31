@@ -84,11 +84,11 @@ class MainNmsContainer extends AbstractContainerMenu {
 
 	@Override
 	public void removed(Player entityhuman) {
+		super.removed(entityhuman);
+
 		if (tracker != null && Objects.equals(entityhuman, player)) {
 			tracker.onClose();
 		}
-
-		super.removed(entityhuman);
 	}
 
 	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory bottomInventory, Player spectator, CreationOptions<PlayerInventorySlot> creationOptions) {

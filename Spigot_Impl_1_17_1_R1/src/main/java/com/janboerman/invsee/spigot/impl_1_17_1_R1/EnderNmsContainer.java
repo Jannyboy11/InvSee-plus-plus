@@ -73,11 +73,11 @@ class EnderNmsContainer extends AbstractContainerMenu {
 
     @Override
     public void removed(Player entityhuman) {
+        super.removed(entityhuman);
+
         if (tracker != null && Objects.equals(entityhuman, player)) {
             tracker.onClose();
         }
-
-        super.removed(entityhuman);
     }
 
     EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player, CreationOptions<EnderChestSlot> creationOptions) {

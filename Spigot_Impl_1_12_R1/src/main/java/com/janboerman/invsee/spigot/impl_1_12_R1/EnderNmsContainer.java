@@ -59,11 +59,11 @@ public class EnderNmsContainer extends Container {
     //removed
     @Override
     public void b(EntityHuman entityhuman) {
+        super.b(entityhuman);
+
         if (tracker != null && Objects.equals(entityhuman, player)) {
             tracker.onClose();
         }
-
-        super.b(entityhuman);
     }
 
     EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, PlayerInventory playerInventory, EntityHuman player, CreationOptions<EnderChestSlot> creationOptions) {
