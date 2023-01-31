@@ -8,13 +8,13 @@ public interface OfflinePlayerProvider {
 
     public void getAll(Consumer<String> consumer);
 
+    @Deprecated
     public default Set<String> getAll() {
         Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
         getAll(result::add);
         return result;
     }
 
-    @Deprecated
     public void getWithPrefix(String prefix, Consumer<String> consumer);
 
     @Deprecated
