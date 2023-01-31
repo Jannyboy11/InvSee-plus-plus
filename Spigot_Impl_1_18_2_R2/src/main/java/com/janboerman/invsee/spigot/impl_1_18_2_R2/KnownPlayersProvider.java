@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_18_2_R2;
 
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import static com.janboerman.invsee.spigot.impl_1_18_2_R2.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.utils.StringHelper;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 import net.minecraft.ReportedException;
@@ -28,7 +29,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
 
-		File playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
+		File playerDirectory = getPlayerDir(worldNBTStorage);
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 
@@ -56,7 +57,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
 
-		File playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
+		File playerDirectory = getPlayerDir(worldNBTStorage);
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 

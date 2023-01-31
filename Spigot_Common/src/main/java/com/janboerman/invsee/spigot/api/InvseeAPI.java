@@ -280,6 +280,7 @@ public abstract class InvseeAPI {
     public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
 
     //by default: ignore creation options, implementations can override!
+    //TODO change return type: Either<NotOpenedReason, MainSpectatorInventoryView> (allows for actually capturing the InventoryOpenEvent instance)
     public InventoryView openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
         return spectator.openInventory(spectatorInventory);
     }
@@ -292,6 +293,7 @@ public abstract class InvseeAPI {
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
     //by default: ignore creation options, implementation can override!
+    //TODO change return type: Either<NotOpenedReason, EnderSpectatorInventoryView> (allows for actually capturing the InventoryOpenEvent instance)
     public InventoryView openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
         return spectator.openInventory(spectatorInventory);
     }
@@ -677,11 +679,16 @@ public abstract class InvseeAPI {
     // ================================== Open Main/Ender Inventory ==================================
 
     private final CompletableFuture<OpenResponse<InventoryView>> spectateInventory(Player spectator, CompletableFuture<SpectateResponse<MainSpectatorInventory>> future, CreationOptions<PlayerInventorySlot> options) {
-        CompletableFuture<OpenResponse<InventoryView>> result = new CompletableFuture<>();
-        future.whenComplete((response, throwable) -> {
+        final CompletableFuture<OpenResponse<InventoryView>> result = new CompletableFuture<>();
+        future.whenComplete((SpectateResponse<MainSpectatorInventory> response, Throwable throwable) -> {
             if (throwable == null) {
                 if (response.isSuccess()) {
-                    result.complete(OpenResponse.ofNullable(openMainSpectatorInventory(spectator, response.getInventory(), options), NotOpenedReason.inventoryOpenEventCancelled()));
+                    try {
+                        InventoryView view = openMainSpectatorInventory(spectator, response.getInventory(), options);
+                        result.complete(OpenResponse.ofNullable(view, NotOpenedReason.inventoryOpenEventCancelled()));
+                    } catch (Throwable ex) {
+                        result.completeExceptionally(ex);
+                    }
                 } else {
                     result.complete(OpenResponse.closed(NotOpenedReason.notCreated(response.getReason())));
                 }
@@ -694,10 +701,15 @@ public abstract class InvseeAPI {
 
     private final CompletableFuture<OpenResponse<InventoryView>> spectateEnderChest(Player spectator, CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future, CreationOptions<EnderChestSlot> options) {
         CompletableFuture<OpenResponse<InventoryView>> result = new CompletableFuture<>();
-        future.whenComplete((response, throwable) -> {
+        future.whenComplete((SpectateResponse<EnderSpectatorInventory> response, Throwable throwable) -> {
             if (throwable == null) {
                 if (response.isSuccess()) {
-                    result.complete(OpenResponse.ofNullable(openEnderSpectatorInventory(spectator, response.getInventory(), options), NotOpenedReason.inventoryOpenEventCancelled()));
+                    try {
+                        InventoryView view = openEnderSpectatorInventory(spectator, response.getInventory(), options);
+                        result.complete(OpenResponse.ofNullable(view, NotOpenedReason.inventoryOpenEventCancelled()));
+                    } catch (Throwable ex) {
+                        result.completeExceptionally(ex);
+                    }
                 } else {
                     result.complete(OpenResponse.closed(NotOpenedReason.notCreated(response.getReason())));
                 }

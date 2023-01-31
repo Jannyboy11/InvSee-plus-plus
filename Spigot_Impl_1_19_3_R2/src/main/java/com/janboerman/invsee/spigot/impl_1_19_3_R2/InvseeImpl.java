@@ -11,6 +11,7 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import static com.janboerman.invsee.spigot.impl_1_19_3_R2.HybridServerSupport.nextContainerCounter;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -63,7 +64,7 @@ public class InvseeImpl extends InvseeAPI {
 
         //this is what the nms does: nmsPlayer.openMenu(nmsWindow);
         //so let's emulate that!
-        int windowId = nmsPlayer.nextContainerCounter();
+        int windowId = nextContainerCounter(nmsPlayer);
         Inventory bottom = nmsPlayer.getInventory();
         MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
@@ -110,7 +111,7 @@ public class InvseeImpl extends InvseeAPI {
 
         //this is what the nms does: nmsPlayer.openMenu(nmsWindow);
         //so let's emulate that!
-        int windowId = nmsPlayer.nextContainerCounter();
+        int windowId = nextContainerCounter(nmsPlayer);
         Inventory bottom = nmsPlayer.getInventory();
         EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);

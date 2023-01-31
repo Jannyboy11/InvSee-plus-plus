@@ -33,6 +33,7 @@ import org.bukkit.inventory.InventoryView;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 class EnderseeCommandExecutor implements CommandExecutor {
@@ -123,6 +124,9 @@ class EnderseeCommandExecutor implements CommandExecutor {
             } else {
                 fut = api.spectateEnderChest(player, playerNameOrUUID, creationOptions);
             }
+
+            //TODO remove this
+            fut = fut.orTimeout(20, TimeUnit.SECONDS); //TODO on Magma we get a time-out. Why?
 
             fut.whenComplete((openResponse, throwable) -> {
                 if (throwable != null) {

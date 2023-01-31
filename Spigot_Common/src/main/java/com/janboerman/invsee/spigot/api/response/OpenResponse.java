@@ -22,6 +22,7 @@ public interface OpenResponse<IV extends InventoryView> {
         return new Closed<>(reason);
     }
 
+    @Deprecated
     public static <IV extends InventoryView> OpenResponse<IV> ofNullable(IV nullableView, NotOpenedReason ifNull) {
         if (nullableView == null) {
             return closed(ifNull);

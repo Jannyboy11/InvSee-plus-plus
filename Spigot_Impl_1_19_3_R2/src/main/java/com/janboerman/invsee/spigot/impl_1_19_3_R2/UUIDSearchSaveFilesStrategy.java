@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_19_3_R2;
 
 import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
+import static com.janboerman.invsee.spigot.impl_1_19_3_R2.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.LogRecord;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
@@ -48,7 +49,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 		CraftServer craftServer = (CraftServer) plugin.getServer();
 		PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
 
-		File playerDirectory = PlayerDirectory.getPlayerDir(worldNBTStorage);
+		File playerDirectory = getPlayerDir(worldNBTStorage);
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return CompletedEmpty.the();
 		
