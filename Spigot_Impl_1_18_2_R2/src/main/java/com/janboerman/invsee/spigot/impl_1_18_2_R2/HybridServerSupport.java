@@ -73,21 +73,19 @@ public class HybridServerSupport {
         try {
             return slot.slot;
         } catch (IllegalAccessError craftbukkitFieldIsActuallyPrivate) {
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
             try {
-                MethodHandle methodHandle = lookup.findVirtual(slot.getClass(), "getSlotIndex", MethodType.methodType(int.class));
-                //this should work on Magma as well as Mohist.
-                return (int) methodHandle.invoke(slot);
-            } catch (Throwable magmaMethodNotFound) {
+                return slot.getContainerSlot();
+            } catch (Throwable vanillaMethodNotFound) {
                 try {
-                    //getContainerSlot
-                    Method[] methods = FuzzyReflection.getMethodOfType(Slot.class, int.class);
-                    return (int) methods[0].invoke(slot);
-                } catch (Throwable vanillaMethodNotFound) {
+                    MethodHandles.Lookup lookup = MethodHandles.lookup();
+                    MethodHandle methodHandle = lookup.findVirtual(slot.getClass(), "getSlotIndex", MethodType.methodType(int.class));
+                    //this should work on Magma as well as Mohist.
+                    return (int) methodHandle.invoke(slot);
+                } catch (Throwable forgeMethodNotFound) {
                     RuntimeException ex = new RuntimeException("No method known of getting the slot's inventory index");
                     ex.addSuppressed(craftbukkitFieldIsActuallyPrivate);
-                    ex.addSuppressed(magmaMethodNotFound);
                     ex.addSuppressed(vanillaMethodNotFound);
+                    ex.addSuppressed(forgeMethodNotFound);
                     throw ex;
                 }
             }
