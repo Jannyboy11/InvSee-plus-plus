@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
+import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.slot;
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.ItemStack;
 import net.minecraft.server.v1_12_R1.Slot;
@@ -16,7 +17,7 @@ public class PersonalSlot extends Slot {
     private boolean works() {
         MainNmsInventory inv = (MainNmsInventory) inventory;
         int personalSize = inv.personalContents.size();
-        boolean inRange = 45 <= index && index < 45 + personalSize;
+        boolean inRange = 45 <= slot(this) && slot(this) < 45 + personalSize;
         return inRange;
     }
 

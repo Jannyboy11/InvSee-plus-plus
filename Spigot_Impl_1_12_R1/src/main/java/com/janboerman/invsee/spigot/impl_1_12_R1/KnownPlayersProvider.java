@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.utils.StringHelper;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 import net.minecraft.server.v1_12_R1.NBTCompressedStreamTools;
@@ -29,7 +30,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         CraftServer craftServer = (CraftServer) plugin.getServer();
         WorldNBTStorage worldNBTStorage = (WorldNBTStorage) craftServer.getHandle().playerFileData;
 
-        File playerDirectory = worldNBTStorage.getPlayerDir();
+        File playerDirectory = getPlayerDir(worldNBTStorage);
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 

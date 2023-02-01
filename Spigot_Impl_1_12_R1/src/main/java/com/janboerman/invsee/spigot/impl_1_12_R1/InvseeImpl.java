@@ -11,6 +11,8 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.enderChestItems;
+import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.nextContainerCounter;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_12_R1.DedicatedPlayerList;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
@@ -66,7 +68,7 @@ public class InvseeImpl extends InvseeAPI {
 
         //this is what the nms does: nmsPlayer.openTileEntity(nmsWindow);
         //so let's emulate that!
-        int windowId = nmsPlayer.nextContainerCounter();
+        int windowId = nextContainerCounter(nmsPlayer);
         PlayerInventory bottom = nmsPlayer.inventory;
         MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         IChatBaseComponent titleComponent = title != null ? CraftChatMessage.fromString(title)[0] : nmsInventory.getScoreboardDisplayName();
@@ -93,7 +95,7 @@ public class InvseeImpl extends InvseeAPI {
 
         //this is what the nms does: nmsPlayer.openTileEntity(nmsWindow);
         //so let's emulate that!
-        int windowId = nmsPlayer.nextContainerCounter();
+        int windowId = nextContainerCounter(nmsPlayer);
         PlayerInventory bottom = nmsPlayer.inventory;
         EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         IChatBaseComponent titleComponent = title != null ? CraftChatMessage.fromString(title)[0] : nmsInventory.getScoreboardDisplayName();
@@ -124,7 +126,7 @@ public class InvseeImpl extends InvseeAPI {
         String name = player.getName();
         CraftInventory craftInventory = (CraftInventory) player.getEnderChest();
         InventoryEnderChest nmsInventory = (InventoryEnderChest) craftInventory.getInventory();
-        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, options);
+        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, enderChestItems(nmsInventory), options);
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
         cache(bukkitInventory);
         return bukkitInventory;
