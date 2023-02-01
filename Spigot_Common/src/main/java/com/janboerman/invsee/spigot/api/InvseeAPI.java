@@ -700,7 +700,7 @@ public abstract class InvseeAPI {
     }
 
     private final CompletableFuture<OpenResponse<InventoryView>> spectateEnderChest(Player spectator, CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future, CreationOptions<EnderChestSlot> options) {
-        CompletableFuture<OpenResponse<InventoryView>> result = new CompletableFuture<>();
+        final CompletableFuture<OpenResponse<InventoryView>> result = new CompletableFuture<>();
         future.whenComplete((SpectateResponse<EnderSpectatorInventory> response, Throwable throwable) -> {
             if (throwable == null) {
                 if (response.isSuccess()) {
