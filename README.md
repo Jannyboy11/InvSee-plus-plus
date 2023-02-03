@@ -10,7 +10,9 @@ Do you like this plugin? Then please leave a rating anda review on [SpigotMC](ht
 
 ### Running the plugin
 
-Just drop the InvSee++.jar file in your server's /plugins folder and make sure your servers runs on [Java 17](https://openjdk.java.net/projects/jdk/) or newer.
+Just drop the InvSee++.jar file in your server's /plugins folder and make sure your servers runs on [Java 11](https://openjdk.java.net/projects/jdk/) or newer.
+
+See also: [What Server Software does InvSee++ support?](#supported-server-software)
 
 ### Commands
 - `/invsee <userName>|<uniqueId> [PWI{...}]`
@@ -87,3 +89,35 @@ LGPLv2.1. See the LICENSE.txt file.
 
 ### Credits
 Special thanks to Icodak ([Discord](https://discordapp.com/users/345308025331908619)) ([SpigotMC](https://www.spigotmc.org/members/icodak.473813/)) for creating the logo!
+
+### Supported server software
+
+InvSee++ supports servers implementing the [Bukkit](https://dev.bukkit.org) api which is currently maintained by [SpigotMC](https://spigotmc.org).
+There are two types of support, Tier 1 support and Tier 2 support.
+- Tier 1 support: I regularly test new versions of InvSee++ on this server software to make sure that it runs smooth.
+- Tier 2 support: I don't test InvSee++ regularly on this server software, but will make an effort to fix bugs encountered when running on this server software when [an issue](https://github.com/Jannyboy11/InvSee-plus-plus/issues) is reported.
+
+In general I support the latest patch release of popularly used Minecraft version, as well as multiple recent versions of the latest major release.
+
+Server support matrix:
+| Server Software             | 1.8.8           | 1.12.2          | 1.15.2          | 1.16.5          | 1.17.1    | 1.18.2    | 1.19.2    | 1.19.3    |
+|-----------------------------|-----------------|-----------------|-----------------|-----------------|-----------|-----------|-----------|-----------|
+| CraftBukkit                 | [Planned](37)   | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
+| Paper                       | [Planned](37)   | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
+| Other forks of CraftBukkit  | [Planned](37)   | Tier 2          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Forge/Bukkit hybrids        | [Planned](37)*  | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Fabric/Bukkit hybrids       | [Planned](37)*  | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Glowstone                   | Not supported   | [Planned](37)   | n/a             | n/a             | n/a       | n/a       | n/a       | n/a       |
+
+*The modding frameworks that these servers are based on were released at a time when Minecraft's minimum supported version was Java 8 (or lower),
+and there is a good chance they won't be able to load mods and plugins compiled for newer Java versions.
+Since I am not going to downgrade InvSee++ to Java 8, I won't fix any bugs related to the plugin loader not being able to load plugins compiled for Java 11.
+The only hybrid server that I'm currently aware of that is taking effort to let their 1.12.2 server run on Java 11 (or newer) is [Magma](https://magmafoundation.org/), see [!571](https://git.magmafoundation.org/magmafoundation/Magma/-/merge_requests/571).
+
+### Supported Java versions
+| Minecraft version: | 1.8.x                                | 1.12.x      | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      |
+|--------------------|--------------------------------------|-------------|-------------|-------------|-------------|-------------|-------------|
+| Java version:      | 11 or newer ([when implemented](37)) | 11 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer |
+
+
+[37]: https://github.com/Jannyboy11/InvSee-plus-plus/issues/37 "37"
