@@ -14,6 +14,7 @@ class MainBukkitInventoryView extends MainSpectatorInventoryView {
     private final MainNmsContainer nms;
 
     MainBukkitInventoryView(MainNmsContainer nms) {
+        super(nms.creationOptions);
         this.nms = nms;
     }
 

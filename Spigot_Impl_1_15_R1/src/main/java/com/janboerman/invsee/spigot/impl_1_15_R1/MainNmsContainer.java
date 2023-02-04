@@ -21,6 +21,7 @@ public class MainNmsContainer extends Container {
     final MainNmsInventory top;
     final PlayerInventory bottom;
     final String title;
+    final CreationOptions creationOptions;
 
     private final boolean spectatingOwnInventory;
     private MainBukkitInventoryView bukkitView;
@@ -87,6 +88,8 @@ public class MainNmsContainer extends Container {
         //setTitle(nmsInventory.getScoreboardDisplayName()); //setTitle is actually called when the thing actually opens. or something.
         this.spectatingOwnInventory = player.getUniqueID().equals(playerInventory.player.getUniqueID());
 
+        //creation options
+        this.creationOptions = creationOptions;
         //title
         this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.spectatedPlayerUuid, nmsInventory.spectatedPlayerName));
         //mirror

@@ -27,6 +27,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	final Inventory bottom;
 	final String title;
 
+	final CreationOptions<EnderChestSlot> creationOptions;
 	private final int topRows;	//in Purpur, this is not always 3.
 	private EnderBukkitInventoryView bukkitView;
 	final DifferenceTracker tracker;
@@ -88,6 +89,8 @@ class EnderNmsContainer extends AbstractContainerMenu {
 		this.top = nmsInventory;
 		this.bottom = playerInventory;
 
+		//creation options
+		this.creationOptions = creationOptions;
 		//title
 		this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName));
 		//mirror

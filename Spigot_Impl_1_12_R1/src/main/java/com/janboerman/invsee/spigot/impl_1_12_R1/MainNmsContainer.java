@@ -28,6 +28,7 @@ class MainNmsContainer extends Container {
     final MainNmsInventory top;
     final PlayerInventory bottom;
     final String title;
+    final CreationOptions<PlayerInventorySlot> creationOptions;
 
     private final boolean spectatingOwnInventory;
     private MainBukkitInventoryView bukkitView;
@@ -96,6 +97,8 @@ class MainNmsContainer extends Container {
 
         nmsInventory.startOpen(player);
 
+        //creation options
+        this.creationOptions = creationOptions;
         //title
         this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName));
         //mirror

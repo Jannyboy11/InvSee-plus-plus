@@ -21,6 +21,7 @@ public class EnderNmsContainer extends Container {
     final EnderNmsInventory top;
     final IInventory bottom;
     final String title;
+    final CreationOptions<EnderChestSlot> creationOptions;
 
     private final int topRows;  //https://github.com/pl3xgaming/Purpur a fork of paper that has configurable rows for the enderchest inventory
     private EnderBukkitInventoryView bukkitView;
@@ -84,6 +85,8 @@ public class EnderNmsContainer extends Container {
         this.top = nmsInventory;
         this.bottom = playerInventory;
 
+        //creation options
+        this.creationOptions = creationOptions;
         //title
         this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.spectatedPlayerUuid, nmsInventory.spectatedPlayerName));
         //mirror

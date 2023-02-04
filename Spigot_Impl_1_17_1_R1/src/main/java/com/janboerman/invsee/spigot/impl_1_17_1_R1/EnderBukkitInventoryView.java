@@ -14,6 +14,7 @@ class EnderBukkitInventoryView extends EnderSpectatorInventoryView {
     private final EnderNmsContainer nms;
 
     EnderBukkitInventoryView(EnderNmsContainer nms) {
+        super(nms.creationOptions);
         this.nms = nms;
     }
 

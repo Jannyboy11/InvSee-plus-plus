@@ -27,6 +27,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 	final Inventory bottom;
 	final String title;
 
+	final CreationOptions<PlayerInventorySlot> creationOptions;
 	private final boolean spectatingOwnInventory;
 	private MainBukkitInventoryView bukkitView;
 	final DifferenceTracker tracker;
@@ -100,6 +101,8 @@ class MainNmsContainer extends AbstractContainerMenu {
 		this.player = spectator;
 		this.spectatingOwnInventory = spectator.getUUID().equals(nmsInventory.targetPlayerUuid);
 
+		//creation options
+		this.creationOptions = creationOptions;
 		//title
 		this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName));
 		//mirror

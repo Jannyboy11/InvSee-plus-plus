@@ -27,6 +27,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 	final MainNmsInventory top;
 	final Inventory bottom;
 	final String title;
+	final CreationOptions<PlayerInventorySlot> creationOptions;
 
 	private final boolean spectatingOwnInventory;
 	private MainBukkitInventoryView bukkitView;
@@ -98,6 +99,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 		this.player = spectator;
 		this.spectatingOwnInventory = spectator.getUUID().equals(nmsInventory.targetPlayerUuid);
 
+		this.creationOptions = creationOptions;
 		this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName));
 		Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
 		LogOptions logOptions = creationOptions.getLogOptions();
