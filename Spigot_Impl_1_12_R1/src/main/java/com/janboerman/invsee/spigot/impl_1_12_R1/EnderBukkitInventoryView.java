@@ -2,8 +2,12 @@ package com.janboerman.invsee.spigot.impl_1_12_R1;
 
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.logging.Difference;
+import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.PlayerInventory;
+
+import javax.annotation.Nullable;
 
 class EnderBukkitInventoryView extends EnderSpectatorInventoryView {
 
@@ -26,6 +30,12 @@ class EnderBukkitInventoryView extends EnderSpectatorInventoryView {
     @Override
     public HumanEntity getPlayer() {
         return nms.player.getBukkitEntity();
+    }
+
+    @Override
+    public @Nullable Difference getTrackedDifference() {
+        DifferenceTracker tracker = nms.tracker;
+        return tracker == null ? null : tracker.getDifference();
     }
 
 }

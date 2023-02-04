@@ -32,7 +32,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 
     private final boolean spectatingOwnInventory;
     private MainBukkitInventoryView bukkitView;
-    private final DifferenceTracker tracker;
+    final DifferenceTracker tracker;
 
     private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
         final PlayerInventorySlot place = mirror.getSlot(positionIndex);

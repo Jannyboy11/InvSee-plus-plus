@@ -14,7 +14,4 @@ public abstract class MainSpectatorInventoryView extends SpectatorInventoryView<
         return InventoryType.CHEST;
     }
 
-    //TODO
-    //public abstract @Nullable Difference getTrackedDifference();
-
 }

@@ -26,7 +26,7 @@ public class EnderNmsContainer extends Container {
 
     private final int topRows;  //https://github.com/pl3xgaming/Purpur a fork of paper that has configurable rows for the enderchest inventory
     private EnderBukkitInventoryView bukkitView;
-    private final DifferenceTracker tracker;
+    final DifferenceTracker tracker;
 
     private static Slot makeSlot(Mirror<EnderChestSlot> mirror, EnderNmsInventory top, int positionIndex, int magicX, int magicY) {
         final EnderChestSlot place = mirror.getSlot(positionIndex);

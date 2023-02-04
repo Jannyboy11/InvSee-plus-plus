@@ -35,4 +35,7 @@ public class DifferenceTracker {
         }
     }
 
+    public Difference getDifference() {
+        return difference;
+    }
 }

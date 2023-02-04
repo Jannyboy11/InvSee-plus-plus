@@ -29,7 +29,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 
 	private final int topRows;	//in Purpur, this is not always 3.
 	private EnderBukkitInventoryView bukkitView;
-	private final DifferenceTracker tracker;
+	final DifferenceTracker tracker;
 	
 	private static MenuType<?> determineMenuType(EnderNmsInventory inv) {
 		return switch(inv.getContainerSize()) {
