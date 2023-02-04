@@ -63,7 +63,7 @@ public class HybridServerSupport {
             return enderChest.items;
         } catch (NoSuchFieldError | IllegalAccessError craftbukkitFildIsActuallyPrivate) {
             try {
-                //call the forge method: getContents()Ljava/util/List<net.minecraft.server.v1_12_R1.ItemStack>
+                //call the forge method: getContents()Ljava/util/List<net.minecraft.server.v1_12_R1.ItemStack>;
                 MethodHandles.Lookup lookup = MethodHandles.lookup();
                 MethodHandle methodHandle = lookup.findVirtual(enderChest.getClass(), "getContents", MethodType.methodType(List.class));
                 return (NonNullList<ItemStack>) methodHandle.invoke(enderChest);

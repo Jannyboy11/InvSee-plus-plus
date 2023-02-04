@@ -1,8 +1,11 @@
 package com.janboerman.invsee.spigot.impl_1_19_2_R1;
 
 import com.janboerman.invsee.utils.FuzzyReflection;
+import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 
 import java.io.File;
@@ -12,6 +15,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class HybridServerSupport {
 
@@ -79,6 +83,24 @@ public class HybridServerSupport {
                     ex.addSuppressed(forgeMethodNotFound);
                     throw ex;
                 }
+            }
+        }
+    }
+
+    public static NonNullList<ItemStack> enderChestItems(PlayerEnderChestContainer enderChest) {
+        try {
+            return enderChest.items;
+        } catch (NoSuchFieldError | IllegalAccessError craftbukkitFildIsActuallyPrivate) {
+            try {
+                //call the forge method: getContents()Ljava/util/List<net/minecraft/world/item/ItemStack>;
+                MethodHandles.Lookup lookup = MethodHandles.lookup();
+                MethodHandle methodHandle = lookup.findVirtual(enderChest.getClass(), "getContents", MethodType.methodType(List.class));
+                return (NonNullList<ItemStack>) methodHandle.invoke(enderChest);
+            } catch (Throwable forgeMethodNotFound) {
+                RuntimeException ex = new RuntimeException("No method known of getting the enderchest items");
+                ex.addSuppressed(craftbukkitFildIsActuallyPrivate);
+                ex.addSuppressed(forgeMethodNotFound);
+                throw ex;
             }
         }
     }

@@ -14,6 +14,7 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import static com.janboerman.invsee.spigot.impl_1_18_2_R2.HybridServerSupport.enderChestItems;
 import static com.janboerman.invsee.spigot.impl_1_18_2_R2.HybridServerSupport.nextContainerCounter;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
@@ -139,7 +140,7 @@ public class InvseeImpl extends InvseeAPI {
         String name = player.getName();
         CraftInventory craftInventory = (CraftInventory) player.getEnderChest();
         PlayerEnderChestContainer nmsInventory = (PlayerEnderChestContainer) craftInventory.getInventory();
-        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, options);
+        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, enderChestItems(nmsInventory), options);
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
         cache(bukkitInventory);
         return bukkitInventory;
