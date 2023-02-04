@@ -11,7 +11,6 @@ public class DifferenceTracker {
 
     private Difference difference;
 
-    //TODO instantiate in Container (nms InventoryView when LogGranularity is not LOG_NEVER)
     public DifferenceTracker(LogOutput output, LogGranularity granularity) {
         assert granularity != LogGranularity.LOG_NEVER : "Should not be instantiated with " + LogGranularity.class.getSimpleName() + "." + LogGranularity.LOG_NEVER.name();
         this.output = output;

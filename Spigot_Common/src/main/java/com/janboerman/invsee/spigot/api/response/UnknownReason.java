@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.api.response;
 
-public class UnknownReason implements NotCreatedReason {
+public class UnknownReason implements NotCreatedReason, NotOpenedReason {
 
     static final UnknownReason INSTANCE = new UnknownReason();
 

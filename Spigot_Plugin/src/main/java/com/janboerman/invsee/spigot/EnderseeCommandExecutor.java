@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
@@ -115,7 +116,7 @@ class EnderseeCommandExecutor implements CommandExecutor {
         if (future == null) {   //TODO get rid of this, actually extend pwi api to also accept mirrors.
             //No PWI argument - just continue with the regular method
 
-            CompletableFuture<OpenResponse<InventoryView>> fut;
+            CompletableFuture<OpenResponse<EnderSpectatorInventoryView>> fut;
 
             if (isUuid) {
                 final UUID finalUuid = uuid;

@@ -43,11 +43,11 @@ public class HybridServerSupport {
     public static int slot(Slot slot) {
         try {
             return slot.index;
-        } catch (IllegalAccessError craftbukkitFieldIsActuallyPrivate) {
+        } catch (NoSuchFieldError | IllegalAccessError craftbukkitFieldIsActuallyPrivate) {
             try {
+                //call the forge method: getSlotIndex()I
                 MethodHandles.Lookup lookup = MethodHandles.lookup();
                 MethodHandle methodHandle = lookup.findVirtual(slot.getClass(), "getSlotIndex", MethodType.methodType(int.class));
-                //this should work on Magma as well as Mohist.
                 return (int) methodHandle.invoke(slot);
             } catch (Throwable forgeMethodNotFound) {
                 RuntimeException ex = new RuntimeException("No method known of getting the slot's inventory index");
@@ -61,8 +61,9 @@ public class HybridServerSupport {
     public static NonNullList<ItemStack> enderChestItems(InventoryEnderChest enderChest) {
         try {
             return enderChest.items;
-        } catch (NoSuchFieldError craftbukkitFildIsActuallyPrivate) {
+        } catch (NoSuchFieldError | IllegalAccessError craftbukkitFildIsActuallyPrivate) {
             try {
+                //call the forge method: getContents()Ljava/util/List<net.minecraft.server.v1_12_R1.ItemStack>
                 MethodHandles.Lookup lookup = MethodHandles.lookup();
                 MethodHandle methodHandle = lookup.findVirtual(enderChest.getClass(), "getContents", MethodType.methodType(List.class));
                 return (NonNullList<ItemStack>) methodHandle.invoke(enderChest);

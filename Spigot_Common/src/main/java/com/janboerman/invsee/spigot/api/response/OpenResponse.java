@@ -1,43 +1,43 @@
 package com.janboerman.invsee.spigot.api.response;
 
-import org.bukkit.inventory.InventoryView;
+import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.template.SpectatorInventoryView;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
 // Either<NotCreatedReason, InventoryView>
-public interface OpenResponse<IV extends InventoryView> {
+public interface OpenResponse<SIV extends SpectatorInventoryView<?>> {
 
     public boolean isOpen();
 
-    public IV getOpenInventory() throws NoSuchElementException;
+    public SIV getOpenInventory() throws NoSuchElementException;
 
     public NotOpenedReason getReason() throws NoSuchElementException;
 
-    public static <IV extends InventoryView> OpenResponse<IV> open(IV inventoryView) {
+    public static <SIV extends SpectatorInventoryView<?>> OpenResponse<SIV> open(SIV inventoryView) {
         return new Open<>(inventoryView);
     }
 
-    public static <IV extends InventoryView> OpenResponse<IV> closed(NotOpenedReason reason) {
+    public static <SIV extends SpectatorInventoryView<?>> OpenResponse<SIV> closed(NotOpenedReason reason) {
         return new Closed<>(reason);
     }
 
     @Deprecated
-    public static <IV extends InventoryView> OpenResponse<IV> ofNullable(IV nullableView, NotOpenedReason ifNull) {
+    public static <SIV extends SpectatorInventoryView<?>> OpenResponse<SIV> ofNullable(SIV nullableView, NotOpenedReason ifNull) {
         if (nullableView == null) {
             return closed(ifNull);
         } else {
             return open(nullableView);
         }
     }
-
 }
 
-class Open<IV extends InventoryView> implements OpenResponse<IV> {
+class Open<SIV extends SpectatorInventoryView<?>> implements OpenResponse<SIV> {
 
-    private final IV inventoryView;
+    private final SIV inventoryView;
 
-    Open(IV inventoryView) {
+    Open(SIV inventoryView) {
         this.inventoryView = Objects.requireNonNull(inventoryView);
     }
 
@@ -47,7 +47,7 @@ class Open<IV extends InventoryView> implements OpenResponse<IV> {
     }
 
     @Override
-    public IV getOpenInventory() {
+    public SIV getOpenInventory() {
         return inventoryView;
     }
 
@@ -71,7 +71,7 @@ class Open<IV extends InventoryView> implements OpenResponse<IV> {
     }
 }
 
-class Closed<IV extends InventoryView> implements OpenResponse<IV> {
+class Closed<SIV extends SpectatorInventoryView<?>> implements OpenResponse<SIV> {
 
     private final NotOpenedReason reason;
 
@@ -85,7 +85,7 @@ class Closed<IV extends InventoryView> implements OpenResponse<IV> {
     }
 
     @Override
-    public IV getOpenInventory() throws NoSuchElementException {
+    public SIV getOpenInventory() throws NoSuchElementException {
         throw new NoSuchElementException("Closed");
     }
 

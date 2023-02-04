@@ -2,11 +2,15 @@ package com.janboerman.invsee.spigot.impl_1_16_R3;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
+import com.janboerman.invsee.spigot.api.response.OpenResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
@@ -25,9 +29,11 @@ import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -49,7 +55,7 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    public InventoryView openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, CreationOptions<PlayerInventorySlot> options) {
+    public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, CreationOptions<PlayerInventorySlot> options) {
         var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
         var title = options.getTitle().titleFor(target);
 
@@ -64,19 +70,19 @@ public class InvseeImpl extends InvseeAPI {
         PlayerInventory bottom = nmsPlayer.inventory;
         MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
-        boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
-        if (eventCancelled) {
-            return null;
+        var eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
+        if (eventCancelled.isPresent()) {
+            return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(eventCancelled.get()));
         } else {
             nmsPlayer.activeContainer = nmsWindow;
             nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, nmsWindow.getType(), nmsWindow.getTitle()));
             nmsWindow.addSlotListener(nmsPlayer);
-            return nmsWindow.getBukkitView();
+            return OpenResponse.open(nmsWindow.getBukkitView());
         }
     }
 
     @Override
-    public InventoryView openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, CreationOptions<EnderChestSlot> options) {
+    public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, CreationOptions<EnderChestSlot> options) {
         var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
         var title = options.getTitle().titleFor(target);
 
@@ -91,14 +97,14 @@ public class InvseeImpl extends InvseeAPI {
         PlayerInventory bottom = nmsPlayer.inventory;
         EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
-        boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
-        if (eventCancelled) {
-            return null;
+        var eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
+        if (eventCancelled.isPresent()) {
+            return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(eventCancelled.get()));
         } else {
             nmsPlayer.activeContainer = nmsWindow;
             nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, nmsWindow.getType(), nmsWindow.getTitle()));
             nmsWindow.addSlotListener(nmsPlayer);
-            return nmsWindow.getBukkitView();
+            return OpenResponse.open(nmsWindow.getBukkitView());
         }
     }
 
@@ -208,6 +214,24 @@ public class InvseeImpl extends InvseeAPI {
 
             worldNBTStorage.save(fakeEntityPlayer);
         }, serverThreadExecutor);
+    }
+
+    private static Optional<InventoryOpenEvent> callInventoryOpenEvent(EntityPlayer player, Container container) {
+        if (player.activeContainer != player.defaultContainer) {
+            player.playerConnection.a(new PacketPlayInCloseWindow(player.activeContainer.windowId));
+        }
+
+        CraftServer server = player.world.getServer();
+        CraftPlayer craftPlayer = player.getBukkitEntity();
+        player.activeContainer.transferTo(container, craftPlayer);
+        InventoryOpenEvent event = new InventoryOpenEvent(container.getBukkitView());
+        server.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            container.transferTo(player.activeContainer, craftPlayer);
+            return Optional.of(event);
+        } else {
+            return Optional.empty();
+        }
     }
 
 }

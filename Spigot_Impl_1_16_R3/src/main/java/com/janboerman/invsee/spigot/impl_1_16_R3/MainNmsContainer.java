@@ -5,14 +5,11 @@ import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.logging.LogOutput;
 import com.janboerman.invsee.spigot.api.target.Target;
-import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import net.minecraft.server.v1_16_R3.*;
 
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
@@ -21,12 +18,13 @@ import java.util.stream.Collectors;
 
 public class MainNmsContainer extends Container {
 
-    private final EntityHuman player;
-    private final MainNmsInventory top;
-    private final PlayerInventory bottom;
-    private final boolean spectatingOwnInventory;
+    final EntityHuman player;
+    final MainNmsInventory top;
+    final PlayerInventory bottom;
+    final String title;
 
-    private InventoryView bukkitView;
+    private final boolean spectatingOwnInventory;
+    private MainBukkitInventoryView bukkitView;
     private final DifferenceTracker tracker;
 
     private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
@@ -91,6 +89,8 @@ public class MainNmsContainer extends Container {
         //setTitle(nmsInventory.getScoreboardDisplayName()); //setTitle is actually called when the thing actually opens. or something.
         this.spectatingOwnInventory = player.getUniqueID().equals(playerInventory.player.getUniqueID());
 
+        //title
+        this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.spectatedPlayerUuid, nmsInventory.spectatedPlayerName));
         //mirror
         Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
         //logging
@@ -138,9 +138,9 @@ public class MainNmsContainer extends Container {
     }
 
     @Override
-    public InventoryView getBukkitView() {
+    public MainBukkitInventoryView getBukkitView() {
         if (bukkitView == null) {
-            bukkitView = new CraftInventoryView(player.getBukkitEntity(), top.bukkit(), this);
+            bukkitView = new MainBukkitInventoryView(this);
         }
         return bukkitView;
     }

@@ -2,11 +2,14 @@ package com.janboerman.invsee.spigot.impl_1_19_3_R2;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
+import com.janboerman.invsee.spigot.api.response.OpenResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
@@ -16,9 +19,11 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Location;
@@ -26,14 +31,15 @@ import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_19_R2.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -53,7 +59,7 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    public InventoryView openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, CreationOptions<PlayerInventorySlot> options) {
+    public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, CreationOptions<PlayerInventorySlot> options) {
         var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
         var title = options.getTitle().titleFor(target);
 
@@ -68,14 +74,14 @@ public class InvseeImpl extends InvseeAPI {
         Inventory bottom = nmsPlayer.getInventory();
         MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
-        boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
-        if (eventCancelled) {
-            return null;
+        var eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
+        if (eventCancelled.isPresent()) {
+            return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(eventCancelled.get()));
         } else {
             nmsPlayer.containerMenu = nmsWindow;
             nmsPlayer.connection.send(new ClientboundOpenScreenPacket(windowId, nmsWindow.getType(), nmsWindow.getTitle()));
             nmsPlayer.initMenu(nmsWindow);
-            return nmsWindow.getBukkitView();
+            return OpenResponse.open(nmsWindow.getBukkitView());
         }
     }
 
@@ -100,7 +106,7 @@ public class InvseeImpl extends InvseeAPI {
     }
 
     @Override
-    public InventoryView openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, CreationOptions<EnderChestSlot> options) {
+    public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, CreationOptions<EnderChestSlot> options) {
         var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
         var title = options.getTitle().titleFor(target);
 
@@ -115,14 +121,14 @@ public class InvseeImpl extends InvseeAPI {
         Inventory bottom = nmsPlayer.getInventory();
         EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
-        boolean eventCancelled = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, nmsWindow, false) == null; //closes current open inventory if one is already open
-        if (eventCancelled) {
-            return null;
+        var eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
+        if (eventCancelled.isPresent()) {
+            return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(eventCancelled.get()));
         } else {
             nmsPlayer.containerMenu = nmsWindow;
             nmsPlayer.connection.send(new ClientboundOpenScreenPacket(windowId, nmsWindow.getType(), nmsWindow.getTitle()));
             nmsPlayer.initMenu(nmsWindow);
-            return nmsWindow.getBukkitView();
+            return OpenResponse.open(nmsWindow.getBukkitView());
         }
     }
 
@@ -207,4 +213,22 @@ public class InvseeImpl extends InvseeAPI {
     	}, serverThreadExecutor);   //saving must occur on the main thread.
     }
 
+    private static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer nmsPlayer, AbstractContainerMenu nmsView) {
+        //copy-pasta from CraftEventFactory, but returns the cancelled event in case it was cancelled.
+        if (nmsPlayer.containerMenu != nmsPlayer.inventoryMenu) {
+            nmsPlayer.connection.handleContainerClose(new ServerboundContainerClosePacket(nmsPlayer.containerMenu.containerId));
+        }
+
+        CraftServer server = nmsPlayer.level.getCraftServer();
+        CraftPlayer bukkitPlayer = nmsPlayer.getBukkitEntity();
+        nmsPlayer.containerMenu.transferTo(nmsView, bukkitPlayer);
+        InventoryOpenEvent event = new InventoryOpenEvent(nmsView.getBukkitView());
+        server.getPluginManager().callEvent(event);
+        if (event.isCancelled()) {
+            nmsView.transferTo(nmsPlayer.containerMenu, bukkitPlayer);
+            return Optional.of(event);
+        } else {
+            return Optional.empty();
+        }
+    }
 }

@@ -14,22 +14,21 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 import java.util.Objects;
 
 class EnderNmsContainer extends AbstractContainerMenu {
-	
-	private final Player player;
-	private final EnderNmsInventory top;
-	private final Inventory bottom;
+
+	final Player player;
+	final EnderNmsInventory top;
+	final Inventory bottom;
+	final String title;
+
 	private final int topRows;	//in Purpur, this is not always 3.
-	
-	private InventoryView bukkitView;
+	private EnderBukkitInventoryView bukkitView;
 	private final DifferenceTracker tracker;
 	
 	private static MenuType<?> determineMenuType(EnderNmsInventory inv) {
@@ -74,11 +73,11 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	// decorate removed method for tracking/logging
 	@Override
 	public void removed(Player entityhuman) {
+		super.removed(entityhuman);
+
 		if (tracker != null && Objects.equals(entityhuman, player)) {
 			tracker.onClose();
 		}
-
-		super.removed(entityhuman);
 	}
 
 	EnderNmsContainer(int containerId, EnderNmsInventory nmsInventory, Inventory playerInventory, Player player, CreationOptions<EnderChestSlot> creationOptions) {
@@ -89,6 +88,8 @@ class EnderNmsContainer extends AbstractContainerMenu {
 		this.top = nmsInventory;
 		this.bottom = playerInventory;
 
+		//title
+		this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName));
 		//mirror
 		Mirror<EnderChestSlot> mirror = creationOptions.getMirror();
 		//logging
@@ -139,9 +140,9 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	}
 
 	@Override
-	public InventoryView getBukkitView() {
+	public EnderBukkitInventoryView getBukkitView() {
 		if (bukkitView == null) {
-			bukkitView = new CraftInventoryView(player.getBukkitEntity(), top.bukkit(), this);
+			bukkitView = new EnderBukkitInventoryView(this);
 		}
 		return bukkitView;
 	}

@@ -9,9 +9,7 @@ import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.server.v1_16_R3.*;
 
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
@@ -20,12 +18,13 @@ import java.util.stream.Collectors;
 
 public class EnderNmsContainer extends Container {
 
-    private final EntityHuman player;
-    private final EnderNmsInventory top;
-    private final IInventory bottom;
-    private final int topRows;  //https://github.com/pl3xgaming/Purpur a fork of paper that has configurable rows for the enderchest inventory
+    final EntityHuman player;
+    final EnderNmsInventory top;
+    final IInventory bottom;
+    final String title;
 
-    private InventoryView bukkitView;
+    private final int topRows;  //https://github.com/pl3xgaming/Purpur a fork of paper that has configurable rows for the enderchest inventory
+    private EnderBukkitInventoryView bukkitView;
     private final DifferenceTracker tracker;
 
     private static Containers determineContainerType(EnderNmsInventory inv) {
@@ -86,6 +85,8 @@ public class EnderNmsContainer extends Container {
         this.top = nmsInventory;
         this.bottom = playerInventory;
 
+        //title
+        this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.spectatedPlayerUuid, nmsInventory.spectatedPlayerName));
         //mirror
         Mirror<EnderChestSlot> mirror = creationOptions.getMirror();
         //logging
@@ -133,9 +134,9 @@ public class EnderNmsContainer extends Container {
     }
 
     @Override
-    public InventoryView getBukkitView() {
+    public EnderBukkitInventoryView getBukkitView() {
         if (bukkitView == null) {
-            bukkitView = new CraftInventoryView(player.getBukkitEntity(), top.bukkit(), this);
+            bukkitView = new EnderBukkitInventoryView(this);
         }
         return bukkitView;
     }

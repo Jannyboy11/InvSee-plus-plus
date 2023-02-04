@@ -24,12 +24,13 @@ import java.util.stream.Collectors;
 
 class MainNmsContainer extends Container {
 
-    private final EntityHuman player;
-    private final MainNmsInventory top;
-    private final PlayerInventory bottom;
-    private final boolean spectatingOwnInventory;
+    final EntityHuman player;
+    final MainNmsInventory top;
+    final PlayerInventory bottom;
+    final String title;
 
-    private InventoryView bukkitView;
+    private final boolean spectatingOwnInventory;
+    private MainBukkitInventoryView bukkitView;
     private final DifferenceTracker tracker;
 
     private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
@@ -95,6 +96,8 @@ class MainNmsContainer extends Container {
 
         nmsInventory.startOpen(player);
 
+        //title
+        this.title = creationOptions.getTitle().titleFor(Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName));
         //mirror
         Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
         //logging
@@ -142,9 +145,9 @@ class MainNmsContainer extends Container {
     }
 
     @Override
-    public InventoryView getBukkitView() {
+    public MainBukkitInventoryView getBukkitView() {
         if (bukkitView == null) {
-            bukkitView = new CraftInventoryView(player.getBukkitEntity(), top.bukkit(), this);
+            bukkitView = new MainBukkitInventoryView(this);
         }
         return bukkitView;
     }
