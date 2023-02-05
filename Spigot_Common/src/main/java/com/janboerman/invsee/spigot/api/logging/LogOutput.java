@@ -135,8 +135,6 @@ class LogOutputImpl implements LogOutput {
         Given given = Given.from(difference);
 
         String message = LogOutputImpl.format(format, Level.INFO, now, spectatorId, spectatorName, taken, given, targetPlayer);
-        //System.out.println("DEBUG log difference format = " + format);
-        //System.out.println("DEBUG log difference message= " + message);
         logger.log(Level.INFO, message, new Object[] { spectatorId, spectatorName, taken, given, targetPlayer });
     }
 
@@ -158,7 +156,6 @@ class LogOutputImpl implements LogOutput {
             Taken taken = (Taken) parameters[TAKEN_IDX];
             Given given = (Given) parameters[GIVEN_IDX];
             Target targetPlayer = (Target) parameters[TARGET_IDX];
-            //System.out.println("DEBUG difference format = " + format);
             return LogOutputImpl.format(format, level, time, spectatorId, spectatorName, taken, given, targetPlayer);
         }
     }

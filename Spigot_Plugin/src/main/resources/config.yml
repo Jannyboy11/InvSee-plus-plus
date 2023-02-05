@@ -48,6 +48,17 @@ logging:
   granularity: LOG_ON_CLOSE
   # Pick zero or more from: [SERVER_LOG_FILE, PLUGIN_LOG_FILE, SPECTATOR_LOG_FILE, CONSOLE]
   output: [PLUGIN_LOG_FILE]
+  #
+  # Logging formats strings:
+  # The following macros will be replaced by the plugin:
+  #   <date> - will be replaced by the current date in yy-MM-dd notation
+  #   <time> - will be replaced by the current time in HH:mm:ss notation
+  #   <spectator_uuid> - will be replaced by the unique id of the spectator player
+  #   <spectator_name> - will be replaced by the username of the spectator player
+  #   <taken> - will be replaced by the items taken from the spectator inventory
+  #   <given> - will be replaced by the items given to the spectator inventory
+  #   <target> - will be replaced by the target player
+  #
   # Format for logging to the server log file:
   format-server-log-file: |
     
