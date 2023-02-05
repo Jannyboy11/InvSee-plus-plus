@@ -22,6 +22,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Level;
@@ -182,7 +183,16 @@ public class InvseePlusPlus extends JavaPlugin {
             EnumSet<LogTarget> logTargets = output.stream()
                     .map(LogTarget::valueOf)
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(LogTarget.class)));
-            return LogOptions.of(logGranularity, logTargets);
+            EnumMap<LogTarget, String> formats = new EnumMap<>(LogTarget.class);
+            String formatServerLogFile = logging.getString("format-server-log-file");
+            if (formatServerLogFile != null) formats.put(LogTarget.SERVER_LOG_FILE, formatServerLogFile);
+            String formatPluginLogFile = logging.getString("format-plugin-log-file");
+            if (formatPluginLogFile != null) formats.put(LogTarget.PLUGIN_LOG_FILE, formatPluginLogFile);
+            String formatSpectatorLogFile = logging.getString("format-spectator-log-file");
+            if (formatSpectatorLogFile != null) formats.put(LogTarget.SPECTATOR_LOG_FILE, formatSpectatorLogFile);
+            String formatConsole = logging.getString("format-console");
+            if (formatConsole != null) formats.put(LogTarget.CONSOLE, formatConsole);
+            return LogOptions.of(logGranularity, logTargets, formats);
         }
     }
 }

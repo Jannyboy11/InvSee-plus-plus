@@ -46,5 +46,35 @@ templates:
 logging:
   # Pick one from: [LOG_NEVER, LOG_ON_CLOSE, LOG_EVERY_CHANGE]
   granularity: LOG_ON_CLOSE
-  # Pick zero or more from: [CONSOLE, SERVER_LOG_FILE, PLUGIN_LOG_FILE, SPECTATOR_LOG_FILE]
+  # Pick zero or more from: [SERVER_LOG_FILE, PLUGIN_LOG_FILE, SPECTATOR_LOG_FILE, CONSOLE]
   output: [PLUGIN_LOG_FILE]
+  # Format for logging to the server log file:
+  format-server-log-file: |
+    
+    Spectator UUID: <spectator_uuid>
+    Spectator Name: <spectator_name>
+    Taken         : <taken>
+    Given         : <given>
+    Target        : <target>
+  # Format for logging to the plugin's log file:
+  format-plugin-log-file: |
+    [<date> <time>] [<level>]:
+    Spectator UUID: <spectator_uuid>
+    Spectator Name: <spectator_name>
+    Taken         : <taken>
+    Given         : <given>
+    Target        : <target>
+  # Format for logging to the spectator's log file
+  format-spectator-log-file: |
+    [<date> <time>] [<level>]:
+    Taken         : <taken>
+    Given         : <given>
+    Target        : <target>
+  # Format for logging to the console:
+  format-console: |
+    [<date> <time>] [<level>]:
+    Spectator UUID: <spectator_uuid>
+    Spectator Name: <spectator_name>
+    Taken         : <taken>
+    Given         : <given>
+    Target        : <target>
