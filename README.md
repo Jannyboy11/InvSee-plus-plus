@@ -102,11 +102,11 @@ In general I support the latest patch release of popularly used Minecraft versio
 Server support matrix:
 | Server Software             | 1.8.8           | 1.12.2          | 1.15.2          | 1.16.5          | 1.17.1    | 1.18.2    | 1.19.2    | 1.19.3    |
 |-----------------------------|-----------------|-----------------|-----------------|-----------------|-----------|-----------|-----------|-----------|
-| CraftBukkit                 | [Planned](37)   | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
-| Paper                       | [Planned](37)   | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
-| Other forks of CraftBukkit  | [Planned](37)   | Tier 2          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
-| Forge/Bukkit hybrids        | [Planned](37)*  | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
-| Fabric/Bukkit hybrids       | [Planned](37)*  | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| CraftBukkit                 | Tier 1          | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
+| Paper                       | Tier 1          | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
+| Other forks of CraftBukkit  | Tier 1          | Tier 2          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Forge/Bukkit hybrids        | Tier 1*         | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Fabric/Bukkit hybrids       | Tier 1*         | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
 | Glowstone                   | Not supported   | [Planned](37)   | n/a             | n/a             | n/a       | n/a       | n/a       | n/a       |
 
 *The modding frameworks that these servers are based on were released at a time when Minecraft's minimum supported version was Java 8 (or lower),
@@ -115,9 +115,9 @@ Since I am not going to downgrade InvSee++ to Java 8, I won't fix any bugs relat
 The only hybrid server that I'm currently aware of that is taking effort to let their 1.12.2 server run on Java 11 (or newer) is [Magma](https://magmafoundation.org/), see [!571](https://git.magmafoundation.org/magmafoundation/Magma/-/merge_requests/571).
 
 ### Supported Java versions
-| Minecraft version: | 1.8.x                                | 1.12.x      | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      |
-|--------------------|--------------------------------------|-------------|-------------|-------------|-------------|-------------|-------------|
-| Java version:      | 11 or newer ([when implemented](37)) | 11 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer |
+| Minecraft version: | 1.8.x       | 1.12.x      | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      |
+|--------------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
+| Java version:      | 11 or newer | 11 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer |
 
 
 [37]: https://github.com/Jannyboy11/InvSee-plus-plus/issues/37 "37"

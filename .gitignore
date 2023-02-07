@@ -7,6 +7,7 @@ target/*
 Mojang_API/target/*
 Spigot_Addon_Give/target/*
 Spigot_Addon_Give_Common/target/*
+Spigot_Addon_Give_1_8_R3/target/*
 Spigot_Addon_Give_1_12_R1/target/*
 Spigot_Addon_Give_1_15_R1/target/*
 Spigot_Addon_Give_1_16_R3/target/*
@@ -17,7 +18,8 @@ Spigot_Addon_Give_1_19_3_R2/target/
 Spigot_Addon_Clear/target/*
 Spigot_Common/target/*
 Spigot_PerWorldInventory/target/*
-Spigot_MultiverseInventories/target/*
+Spigot_MultiverseInventories/target/
+Spigot_Impl_1_8_R3/target/*
 Spigot_Impl_1_12_R1/target/*
 Spigot_Impl_1_15_R1/target/*
 Spigot_Impl_1_16_R3/target/*
