@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.Exempt;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
@@ -22,12 +23,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 class InvseeCommandExecutor implements CommandExecutor {
@@ -64,12 +63,14 @@ class InvseeCommandExecutor implements CommandExecutor {
         final Mirror<PlayerInventorySlot> mirror = Mirror.forInventory(plugin.getInventoryTemplate());
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
+        final boolean bypassExempt = player.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY);
         final LogOptions logOptions = plugin.getLogOptions();
         final CreationOptions<PlayerInventorySlot> creationOptions = CreationOptions.defaultMainInventory(plugin)
                 .withTitle(title)
                 .withMirror(mirror)
                 .withOfflinePlayerSupport(offlineSupport)
                 .withUnknownPlayerSupport(unknownPlayerSupport)
+                .withBypassExemptedPlayers(bypassExempt)
                 .withLogOptions(logOptions);
 
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> pwiFuture = null;

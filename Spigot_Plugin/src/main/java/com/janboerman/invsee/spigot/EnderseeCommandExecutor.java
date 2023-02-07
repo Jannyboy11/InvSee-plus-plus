@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.Exempt;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
@@ -29,7 +30,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -73,12 +73,14 @@ class EnderseeCommandExecutor implements CommandExecutor {
         final Mirror<EnderChestSlot> mirror = Mirror.forEnderChest(plugin.getEnderChestTemplate());
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
+        final boolean bypassExempt = player.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST);
         final LogOptions logOptions = plugin.getLogOptions();
         final CreationOptions<EnderChestSlot> creationOptions = CreationOptions.defaultEnderInventory(plugin)
                 .withTitle(title)
                 .withMirror(mirror)
                 .withOfflinePlayerSupport(offlineSupport)
                 .withUnknownPlayerSupport(unknownPlayerSupport)
+                .withBypassExemptedPlayers(bypassExempt)
                 .withLogOptions(logOptions);
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
