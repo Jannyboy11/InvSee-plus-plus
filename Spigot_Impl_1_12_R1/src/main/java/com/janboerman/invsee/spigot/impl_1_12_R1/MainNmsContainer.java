@@ -93,7 +93,7 @@ class MainNmsContainer extends Container {
         this.top = nmsInventory;
         this.bottom = playerInventory;
         this.player = player;
-        this.spectatingOwnInventory = player.getUniqueID().equals(playerInventory.player.getUniqueID());
+        this.spectatingOwnInventory = player.getUniqueID().equals(nmsInventory.targetPlayerUuid);
 
         nmsInventory.startOpen(player);
 

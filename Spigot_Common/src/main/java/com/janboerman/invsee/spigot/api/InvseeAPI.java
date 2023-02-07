@@ -56,8 +56,8 @@ public abstract class InvseeAPI {
     private boolean offlinePlayerSupport = true;
     private boolean unknownPlayerSupport = true;
 
-    private Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
-    private Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
+    protected Mirror<PlayerInventorySlot> inventoryMirror = Mirror.defaultPlayerInventory();
+    protected Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
 
     private LogOptions logOptions = new LogOptions();
 

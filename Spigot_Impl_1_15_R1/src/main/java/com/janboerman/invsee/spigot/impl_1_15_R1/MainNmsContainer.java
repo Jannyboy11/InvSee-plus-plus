@@ -86,7 +86,7 @@ public class MainNmsContainer extends Container {
         this.bottom = playerInventory;
         this.player = player;
         //setTitle(nmsInventory.getScoreboardDisplayName()); //setTitle is actually called when the thing actually opens. or something.
-        this.spectatingOwnInventory = player.getUniqueID().equals(playerInventory.player.getUniqueID());
+        this.spectatingOwnInventory = player.getUniqueID().equals(nmsInventory.spectatedPlayerUuid);
 
         //creation options
         this.creationOptions = creationOptions;

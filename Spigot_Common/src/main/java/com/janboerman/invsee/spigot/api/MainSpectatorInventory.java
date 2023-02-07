@@ -11,6 +11,12 @@ import org.bukkit.inventory.ItemStack;
  */
 public interface MainSpectatorInventory extends SpectatorInventory<PlayerInventorySlot> {
 
+    /** Get the items in the player's storage slots. */
+    ItemStack[] getStorageContents();
+
+    /** Set the items in the player's storage slots. */
+    void setStorageContents(ItemStack[] storageContents);
+
     /** Get the items in the player's armour slots. */
     ItemStack[] getArmourContents();
 

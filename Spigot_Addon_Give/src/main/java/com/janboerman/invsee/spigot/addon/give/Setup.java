@@ -12,7 +12,9 @@ interface Setup {
         Server server = plugin.getServer();
         String serverClassName = server.getClass().getName();
 
-        if ("org.bukkit.craftbukkit.v1_12_R1.CraftServer".equals(serverClassName)) {
+        if ("org.bukkit.craftbukkit.v1_8_R3.CraftServer".equals(serverClassName)) {
+            return new Impl_1_8_8();
+        } else if ("org.bukkit.craftbukkit.v1_12_R1.CraftServer".equals(serverClassName)) {
             return new Impl_1_12_2();
         } else if ("org.bukkit.craftbukkit.v1_15_R1.CraftServer".equals(serverClassName)) {
             return new Impl_1_15_2();
@@ -41,7 +43,7 @@ interface Setup {
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
-            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.3]. Are you running the latest InvSee++_Give?");
+            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.3]. Are you running the latest InvSee++_Give?");
         } else {
             throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
         }
@@ -101,5 +103,11 @@ class Impl_1_15_2 extends SetupImpl {
 class Impl_1_12_2 extends SetupImpl {
     Impl_1_12_2() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_12_R1.GiveImpl.INSTANCE);
+    }
+}
+
+class Impl_1_8_8 extends SetupImpl {
+    Impl_1_8_8() {
+        super(com.janboerman.invsee.spigot.addon.give.impl_1_8_R3.GiveImpl.INSTANCE);
     }
 }

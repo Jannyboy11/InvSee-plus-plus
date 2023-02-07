@@ -18,7 +18,9 @@ public interface Setup {
         final Server server = plugin.getServer();
         final String serverClassName = server.getClass().getName();
 
-        if ("org.bukkit.craftbukkit.v1_12_R1.CraftServer".equals(serverClassName)) {
+        if ("org.bukkit.craftbukkit.v1_8_R3.CraftServer".equals(serverClassName)) {
+            return new Impl_1_8_8(plugin);
+        } else if ("org.bukkit.craftbukkit.v1_12_R1.CraftServer".equals(serverClassName)) {
             return new Impl_1_12_2(plugin);
         } else if ("org.bukkit.craftbukkit.v1_15_R1.CraftServer".equals(serverClassName)) {
             return new Impl_1_15_2(plugin);
@@ -47,7 +49,7 @@ public interface Setup {
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
-            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.3]. Are you running the latest InvSee++?");
+            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.3]. Are you running the latest InvSee++?");
         } else {
             throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
         }
@@ -57,6 +59,12 @@ public interface Setup {
 
 //we use separate classes per implementation, to prevent classloading of an incorrect version.
 //previously, the Setup#setup(Plugin) method tried to load all implementation classes, even before any of them was needed.
+
+class Impl_1_8_8 extends SetupImpl {
+    Impl_1_8_8(Plugin plugin) {
+        super(new com.janboerman.invsee.spigot.impl_1_8_R3.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_8_R3.KnownPlayersProvider(plugin));
+    }
+}
 
 class Impl_1_12_2 extends SetupImpl {
     Impl_1_12_2(Plugin plugin) {

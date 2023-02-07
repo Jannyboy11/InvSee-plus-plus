@@ -12,6 +12,7 @@
         <module>Utils</module>
         <module>Mojang_API</module>
         <module>Spigot_Common</module>
+        <module>Spigot_Impl_1_8_R3</module>
         <module>Spigot_Impl_1_12_R1</module>
         <module>Spigot_Impl_1_15_R1</module>
         <module>Spigot_Impl_1_16_R3</module>
@@ -24,6 +25,7 @@
         <module>Spigot_Plugin</module>
         <module>Spigot_Addon_Give</module>
         <module>Spigot_Addon_Give_Common</module>
+        <module>Spigot_Addon_Give_1_8_R3</module>
         <module>Spigot_Addon_Give_1_12_R1</module>
         <module>Spigot_Addon_Give_1_15_R1</module>
         <module>Spigot_Addon_Give_1_16_R3</module>

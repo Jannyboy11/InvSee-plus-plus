@@ -137,6 +137,12 @@
         <!-- implementations -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
+            <artifactId>Spigot_Impl_1_8_R3</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
             <artifactId>Spigot_Impl_1_12_R1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
