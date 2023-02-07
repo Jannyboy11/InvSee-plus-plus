@@ -16,8 +16,9 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
           cache: 'maven'
-      - name: Install CraftBukkit 1.12.2, 1.15.2, 1.16.5
+      - name: Install CraftBukkit 1.8.8, 1.12.2, 1.15.2, 1.16.5
         run: |
+          java -jar BuildTools.jar --rev 1.8.8 --compile craftbukkit
           java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit
           java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit
           java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit
