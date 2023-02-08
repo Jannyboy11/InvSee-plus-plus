@@ -104,10 +104,10 @@ Server support matrix:
 | Server Software             | 1.8.8           | 1.12.2          | 1.15.2          | 1.16.5          | 1.17.1    | 1.18.2    | 1.19.2    | 1.19.3    |
 |-----------------------------|-----------------|-----------------|-----------------|-----------------|-----------|-----------|-----------|-----------|
 | CraftBukkit                 | Tier 1          | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
-| Paper                       | Tier 1          | Tier 1          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
-| Other forks of CraftBukkit  | Tier 1          | Tier 2          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
-| Forge/Bukkit hybrids        | Tier 1*         | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
-| Fabric/Bukkit hybrids       | Tier 1*         | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Paper                       | Tier 2          | Tier 2          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 1    |
+| Other forks of CraftBukkit  | Tier 2          | Tier 2          | Tier 2          | Tier 2          | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Forge/Bukkit hybrids        | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
+| Fabric/Bukkit hybrids       | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2*         | Tier 2    | Tier 2    | Tier 2    | Tier 2    |
 | Glowstone                   | Not supported   | [Planned](37)   | n/a             | n/a             | n/a       | n/a       | n/a       | n/a       |
 
 *The modding frameworks that these servers are based on were released at a time when Minecraft's minimum supported version was Java 8 (or lower),

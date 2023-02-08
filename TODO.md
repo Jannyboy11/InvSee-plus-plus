@@ -8,5 +8,4 @@
 - integration with MyWorlds: https://www.spigotmc.org/resources/myworlds.39594/
 - (possibly?) integration with Polyverse (once it's actually implemented, lol): https://github.com/ArcanePlugins/Polyverse
 
-- CraftBukkit 1.8.8 support
 - Glowstone support

@@ -435,15 +435,6 @@ public abstract class InvseeAPI {
         final Mirror<PlayerInventorySlot> mirror = options.getMirror();
         final boolean offlineSupport = options.isOfflinePlayerSupported();
 
-        //try cache
-        WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
-        if (alreadyOpen != null) {
-            MainSpectatorInventory inv = alreadyOpen.get();
-            if (inv != null) {
-                return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
-            }
-        }
-
         //try online
         Player targetPlayer = plugin.getServer().getPlayer(playerId);
         Target target;
@@ -482,6 +473,16 @@ public abstract class InvseeAPI {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(SpectateResponse.fail(maybeReason.get()));
             } else {
+                //try cache
+                WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
+                if (alreadyOpen != null) {
+                    MainSpectatorInventory inv = alreadyOpen.get();
+                    if (inv != null) {
+                        return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
+                    }
+                }
+
+                //not in cache: create offline inventory
                 return createOfflineInventory(playerId, playerName, options);
             }
         });
@@ -637,15 +638,6 @@ public abstract class InvseeAPI {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
 
-        //try cache (can actually do this, because if the target is exempted, then he/she is absent from the cache!)
-        WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(playerId);
-        if (alreadyOpen != null) {
-            EnderSpectatorInventory inv = alreadyOpen.get();
-            if (inv != null) {
-                return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
-            }
-        }
-
         target = Target.byGameProfile(playerId, playerName);
 
         final CompletableFuture<Boolean> isExemptedFuture;
@@ -669,6 +661,16 @@ public abstract class InvseeAPI {
             if (maybeReason.isPresent()) {
                 return CompletableFuture.completedFuture(SpectateResponse.fail(maybeReason.get()));
             } else {
+                //try cache
+                WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(playerId);
+                if (alreadyOpen != null) {
+                    EnderSpectatorInventory inv = alreadyOpen.get();
+                    if (inv != null) {
+                        return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
+                    }
+                }
+
+                //not in cache: create offline inventory
                 return createOfflineEnderChest(playerId, playerName, options);
             }
         });
