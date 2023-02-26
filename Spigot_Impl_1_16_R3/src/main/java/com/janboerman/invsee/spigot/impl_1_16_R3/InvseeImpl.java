@@ -66,7 +66,7 @@ public class InvseeImpl extends InvseeAPI {
 
         //this is what the nms does: nmsPlayer.openContainer(nmsWindow);
         //so let's emulate that!
-        int windowId = nmsPlayer.nextContainerCounter();
+        int windowId = HybridServerSupport.nextContainerCounter(nmsPlayer);
         PlayerInventory bottom = nmsPlayer.inventory;
         MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
@@ -93,7 +93,7 @@ public class InvseeImpl extends InvseeAPI {
 
         //this is what the nms does: nmsPlayer.openContainer(nmsWindow);
         //so let's emulate that!
-        int windowId = nmsPlayer.nextContainerCounter();
+        int windowId = HybridServerSupport.nextContainerCounter(nmsPlayer);
         PlayerInventory bottom = nmsPlayer.inventory;
         EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         nmsWindow.setTitle(CraftChatMessage.fromString(title != null ? title : inv.getTitle())[0]);
@@ -124,7 +124,7 @@ public class InvseeImpl extends InvseeAPI {
         String name = player.getName();
         CraftInventory craftInventory = (CraftInventory) player.getEnderChest();
         InventoryEnderChest nmsInventory = (InventoryEnderChest) craftInventory.getInventory();
-        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, nmsInventory.items, options);
+        EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, HybridServerSupport.enderChestItems(nmsInventory), options);
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
         cache(bukkitInventory);
         return bukkitInventory;

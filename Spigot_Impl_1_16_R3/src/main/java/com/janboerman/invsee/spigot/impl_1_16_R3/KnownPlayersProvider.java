@@ -31,7 +31,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         CraftServer craftServer = (CraftServer) plugin.getServer();
         WorldNBTStorage worldNBTStorage = craftServer.getHandle().playerFileData;
 
-        File playerDirectory = worldNBTStorage.getPlayerDir();
+        File playerDirectory = HybridServerSupport.getPlayerDir(worldNBTStorage);
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 
@@ -58,7 +58,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         CraftServer craftServer = (CraftServer) plugin.getServer();
         WorldNBTStorage worldNBTStorage = (WorldNBTStorage) craftServer.getHandle().playerFileData;
 
-        File playerDirectory = worldNBTStorage.getPlayerDir();
+        File playerDirectory = HybridServerSupport.getPlayerDir(worldNBTStorage);
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 

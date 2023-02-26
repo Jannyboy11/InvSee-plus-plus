@@ -26,7 +26,7 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
         CraftServer craftServer = (CraftServer) plugin.getServer();
         WorldNBTStorage worldNBTStorage = craftServer.getHandle().playerFileData;
 
-        File playerDirectory = worldNBTStorage.getPlayerDir();
+        File playerDirectory = HybridServerSupport.getPlayerDir(worldNBTStorage);
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return CompletedEmpty.the();
 
