@@ -16,7 +16,6 @@ public class HybridServerSupport {
 
     private HybridServerSupport() {}
 
-    //not really needed on Magma 1.12.2
     public static File getPlayerDir(WorldNBTStorage worldNBTStorage) {
         try {
             return worldNBTStorage.getPlayerDir();
@@ -27,7 +26,6 @@ public class HybridServerSupport {
         }
     }
 
-    //not really needed on Magma 1.12.2
     public static int nextContainerCounter(EntityPlayer nmsPlayer) {
         try {
             return nmsPlayer.nextContainerCounter();

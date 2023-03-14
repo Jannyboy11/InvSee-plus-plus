@@ -5,12 +5,11 @@
     <parent>
         <artifactId>InvSee</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.19.5-SNAPSHOT</version>
+        <version>0.19.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>Spigot_Addon_Give_1_8_R3</artifactId>
-
 
     <properties>
         <bukkit.version>1.8.8-R0.1-SNAPSHOT</bukkit.version>
