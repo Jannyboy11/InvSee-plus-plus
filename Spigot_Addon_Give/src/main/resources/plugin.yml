@@ -5,6 +5,7 @@ depend: [InvSeePlusPlus]
 api-version: 1.13
 prefix: "InvSee++_Give"
 description: Give items to (offline) players.
+folia-supported: true
 
 permissions:
   invseeplusplus.give.*:
