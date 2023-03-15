@@ -105,7 +105,7 @@ Server support matrix:
 | Server Software            | 1.8.8         | 1.12.2        | 1.15.2  | 1.16.5  | 1.17.1 | 1.18.2 | 1.19.3 | 1.19.4 |
 |----------------------------|---------------|---------------|---------|---------|--------|--------|--------|--------|
 | CraftBukkit                | Tier 1        | Tier 1        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 1 |
-| Paper                      | Tier 2        | Tier 2        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | n/a    |
+| Paper                      | Tier 2        | Tier 2        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
 | Other forks of CraftBukkit | Tier 2        | Tier 2        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
 | Forge/Bukkit hybrids       | Tier 2*       | Tier 2*       | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
 | Fabric/Bukkit hybrids      | Tier 2*       | Tier 2*       | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
