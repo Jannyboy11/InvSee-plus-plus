@@ -48,7 +48,7 @@ interface Setup {
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
-            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.2, 1.19.3, 1.19.4]. Are you running the latest InvSee++_Give?");
+            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.3, 1.19.4]. Are you running the latest InvSee++_Give?");
         } else {
             throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit.");
         }

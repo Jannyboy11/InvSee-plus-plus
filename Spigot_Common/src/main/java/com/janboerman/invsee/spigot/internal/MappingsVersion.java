@@ -39,4 +39,5 @@ public class MappingsVersion {
             return null;
         }
     }
+
 }
