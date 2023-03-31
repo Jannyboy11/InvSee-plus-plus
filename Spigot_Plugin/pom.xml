@@ -191,7 +191,7 @@
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.janboerman.invsee</groupId>-->
-<!--            <artifactId>Spigot_MultiverseInventories</artifactId>-->
+<!--            <artifactId>spigot_multiverse-inventories</artifactId>-->
 <!--            <version>${project.version}</version>-->
 <!--            <scope>compile</scope>-->
 <!--        </dependency>-->
