@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_Common</artifactId>
+    <artifactId>spigot_common</artifactId>
 
     <build>
         <defaultGoal>clean package</defaultGoal>
@@ -82,13 +82,13 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Mojang_API</artifactId>
+            <artifactId>mojang-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

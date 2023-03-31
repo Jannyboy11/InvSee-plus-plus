@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_MultiverseInventories</artifactId>
+    <artifactId>spigot_multiverse-inventories</artifactId>
 
     <repositories>
         <repository>
@@ -39,13 +39,13 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Common</artifactId>
+            <artifactId>spigot_common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

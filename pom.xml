@@ -5,8 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.janboerman.invsee</groupId>
-    <artifactId>InvSee</artifactId>
+    <artifactId>invsee-plus-plus</artifactId>
     <version>0.19.8-SNAPSHOT</version>
+
     <!-- TODO make this more hierarchical: InvSee++ (includes impls), InvSee++_Common, InvSee++_Give (includes impls), InvSee++_Clear, Mojang_API, Utils -->
     <modules>
         <module>Utils</module>
@@ -40,8 +41,16 @@
     <packaging>pom</packaging>
 
     <name>InvSeePlusPlus</name>
-
     <description>A plugin to view and manipulate players' inventories.</description>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Jannyboy11 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Jannyboy11/InvSee-plus-plus</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.8.2</junit.version>

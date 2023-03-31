@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.janboerman.invsee</groupId>
-        <artifactId>InvSee</artifactId>
+        <artifactId>invsee-plus-plus</artifactId>
         <version>0.19.8-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_Plugin</artifactId>
+    <artifactId>spigot_plugin</artifactId>
 
     <pluginRepositories>
         <pluginRepository>
@@ -117,19 +117,19 @@
         <!-- first-party libraries -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Common</artifactId>
+            <artifactId>spigot_common</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Mojang_API</artifactId>
+            <artifactId>mojang-api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -137,55 +137,55 @@
         <!-- implementations -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_8_R3</artifactId>
+            <artifactId>spigot_impl_1_8_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_12_R1</artifactId>
+            <artifactId>spigot_impl_1_12_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_15_R1</artifactId>
+            <artifactId>spigot_impl_1_15_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_16_R3</artifactId>
+            <artifactId>spigot_impl_1_16_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_17_1_R1</artifactId>
+            <artifactId>spigot_impl_1_17_1_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_18_2_R2</artifactId>
+            <artifactId>spigot_impl_1_18_2_r2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_19_2_R1</artifactId>
+            <artifactId>spigot_impl_1_19_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_19_3_R2</artifactId>
+            <artifactId>spigot_impl_1_19_3_r2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Impl_1_19_4_R3</artifactId>
+            <artifactId>spigot_impl_1_19_4_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -197,7 +197,7 @@
 <!--        </dependency>-->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_PerWorldInventory</artifactId>
+            <artifactId>spigot_per-world-inventory</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

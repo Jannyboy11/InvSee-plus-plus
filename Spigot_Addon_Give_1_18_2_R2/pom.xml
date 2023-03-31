@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_Addon_Give_1_18_2_R2</artifactId>
+    <artifactId>spigot_addon_give_1_18_2_r2</artifactId>
 
     <properties>
         <bukkit.version>1.18.2-R0.1-SNAPSHOT</bukkit.version>
@@ -72,7 +72,7 @@
     <dependencies>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Addon_Give_Common</artifactId>
+            <artifactId>spigot_addon_give_common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

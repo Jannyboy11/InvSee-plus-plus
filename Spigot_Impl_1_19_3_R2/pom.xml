@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_Impl_1_19_3_R2</artifactId>
+    <artifactId>spigot_impl_1_19_3_r2</artifactId>
 
     <properties>
         <bukkit.version>1.19.3-R0.1-SNAPSHOT</bukkit.version>
@@ -105,13 +105,13 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Common</artifactId>
+            <artifactId>spigot_common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

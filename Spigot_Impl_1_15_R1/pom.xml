@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Spigot_Impl_1_15_R1</artifactId>
+    <artifactId>spigot_impl_1_15_r1</artifactId>
 
     <pluginRepositories>
         <pluginRepository>
@@ -60,13 +60,13 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Spigot_Common</artifactId>
+            <artifactId>spigot_common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>Utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
