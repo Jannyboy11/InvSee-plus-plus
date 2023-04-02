@@ -14,7 +14,7 @@ public class PersonalSlot extends Slot {
     }
 
     private boolean works() {
-        MainNmsInventory inv = (MainNmsInventory) inventory;
+        MainNmsInventory inv = (MainNmsInventory) super.inventory;  //because of bug in Magma's remapper, call super.inventory instead of this.inventory.
         int personalSize = inv.personalContents.size();
         boolean inRange = 45 <= HybridServerSupport.slot(this) && HybridServerSupport.slot(this) < 45 + personalSize;
         return inRange;
@@ -65,6 +65,39 @@ public class PersonalSlot extends Slot {
     public boolean isAllowed(EntityHuman player) {
         if (!works()) return false;
         return super.isAllowed(player);
+    }
+
+
+    // ===== Magma compatibility =====
+    // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
+
+    public boolean func_75214_a(ItemStack stack) {
+        return isAllowed(stack);
+    }
+
+    public boolean func_82869_a(EntityHuman playerEntity) {
+        return isAllowed(playerEntity);
+    }
+
+    public ItemStack func_75211_c() {
+        return getItem();
+    }
+
+    public boolean func_75216_d() {
+        return hasItem();
+    }
+
+    public void func_75215_d(ItemStack stack) {
+        set(stack);
+    }
+
+    public int func_75219_a() {
+        return getMaxStackSize();
+    }
+
+    public ItemStack func_75209_a(int subtractAmount) {
+        //receiveSplit
+        return a(subtractAmount);
     }
 
 }

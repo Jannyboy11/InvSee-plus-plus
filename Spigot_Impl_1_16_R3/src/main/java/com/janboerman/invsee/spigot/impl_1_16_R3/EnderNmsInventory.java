@@ -131,6 +131,13 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
     public void update() {
         //called after an item in the inventory was removed, added or updated.
         //looking at InventorySubContainer, I don't think we need to do anything here.
+
+        //for now, let's update every viewer's window:
+        for (HumanEntity viewer : getViewers()) {
+            if (viewer instanceof org.bukkit.entity.Player) {
+                ((org.bukkit.entity.Player) viewer).updateInventory();
+            }
+        }
     }
 
     @Override
@@ -197,6 +204,46 @@ class EnderNmsInventory extends TileEntityContainer /* cannot extend AbstractNms
     public boolean e(EntityHuman entityhuman) {
         //there is no chestlock here
         return true;
+    }
+
+
+    // ===== Magma compatibility =====
+    // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
+
+    public boolean func_191420_l() {
+        return isEmpty();
+    }
+
+    public ItemStack func_70301_a(int idx) {
+        return getItem(idx);
+    }
+
+    public int func_70302_i_() {
+        return getSize();
+    }
+
+    public ItemStack func_70298_a(int slot, int subtractAmount) {
+        return splitStack(slot, subtractAmount);
+    }
+
+    public ItemStack func_70304_b(int slot) {
+        return splitWithoutUpdate(slot);
+    }
+
+    public void func_70299_a(int slot, ItemStack itemStack) {
+        setItem(slot, itemStack);
+    }
+
+    public int func_70297_j_() {
+        return getMaxStackSize();
+    }
+
+    public void func_70296_d() {
+        update();
+    }
+
+    public boolean func_70300_a(EntityHuman playerEntity) {
+        return a(playerEntity);
     }
 
 }

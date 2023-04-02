@@ -224,11 +224,13 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
 
         //but we might want to update our viewers? cause of the craftingOrWorkbench switching thing?
         //in that case, we only need to update those specific slots, not the entire inventory.
-//        for (HumanEntity viewer : getViewers()) {
-//            if (viewer instanceof Player) {
-//                ((Player) viewer).updateInventory();
-//            }
-//        }
+
+        //for now, let's update every viewer's window:
+        for (HumanEntity viewer : getViewers()) {
+            if (viewer instanceof org.bukkit.entity.Player) {
+                ((org.bukkit.entity.Player) viewer).updateInventory();
+            }
+        }
     }
 
     @Override
@@ -308,6 +310,46 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
     public boolean e(EntityHuman entityhuman) {
         //there is no chestlock here
         return true;
+    }
+
+
+    // ===== Magma compatibility =====
+    // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
+
+    public boolean func_191420_l() {
+        return isEmpty();
+    }
+
+    public ItemStack func_70301_a(int idx) {
+        return getItem(idx);
+    }
+
+    public int func_70302_i_() {
+        return getSize();
+    }
+
+    public ItemStack func_70298_a(int slot, int subtractAmount) {
+        return splitStack(slot, subtractAmount);
+    }
+
+    public ItemStack func_70304_b(int slot) {
+        return splitWithoutUpdate(slot);
+    }
+
+    public void func_70299_a(int slot, ItemStack itemStack) {
+        setItem(slot, itemStack);
+    }
+
+    public int func_70297_j_() {
+        return getMaxStackSize();
+    }
+
+    public void func_70296_d() {
+        update();
+    }
+
+    public boolean func_70300_a(EntityHuman playerEntity) {
+        return a(playerEntity);
     }
 
 }

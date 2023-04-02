@@ -21,4 +21,16 @@ class FakeEntityHuman extends EntityHuman {
         return false;
     }
 
+
+    // ===== Magma =====
+    // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
+
+    public boolean func_184812_l_() {
+        return isCreative();
+    }
+
+    public boolean func_175149_v() {
+        return isSpectator();
+    }
+
 }

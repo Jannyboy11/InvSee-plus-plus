@@ -7,7 +7,6 @@ import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
 import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
@@ -24,7 +23,6 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
@@ -177,7 +175,7 @@ public class InvseeImpl extends InvseeAPI {
                 // if we get here, then we create a spectator inventory for the non-existent player anyway.
             } else {
                 // player file already exists, load the data from the compound onto the player
-                fakeEntityHuman.loadData(playerCompound);   //only player-specific stuff
+                ((EntityHuman) fakeEntityHuman).loadData(playerCompound);   //only player-specific stuff    //cast to EntityHuman in order for Magma support
             }
 
             CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
@@ -203,7 +201,7 @@ public class InvseeImpl extends InvseeAPI {
         return CompletableFuture.runAsync(() -> {
             NBTTagCompound playerCompound = worldNBTStorage.load(fakeEntityPlayer);
             if (playerCompound != null) {
-                fakeEntityPlayer.load(playerCompound);   //all entity stuff + player stuff
+                ((EntityPlayer) fakeEntityPlayer).load(playerCompound);   //all entity stuff + player stuff     //cast to EntityPlayer to work around a Magma bug
             } //else: no player save file exists
 
             FakeCraftPlayer craftHumanEntity = fakeEntityPlayer.getBukkitEntity();

@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
 import com.janboerman.invsee.utils.FuzzyReflection;
+import net.minecraft.server.v1_16_R3.Container;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.InventoryEnderChest;
 import net.minecraft.server.v1_16_R3.ItemStack;
@@ -12,6 +13,8 @@ import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.invoke.VarHandle;
+import java.lang.invoke.VarHandle.AccessMode;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,13 +50,21 @@ public class HybridServerSupport {
 
     public static int nextContainerCounter(EntityPlayer nmsPlayer) {
         try {
-            return nmsPlayer.nextContainerCounter();
+            return nmsPlayer.nextContainerCounter();    //works on CraftBukkit as well as Mohist.
         } catch (NoSuchMethodError craftbukkitMethodNotFound) {
             MethodHandles.Lookup lookup = MethodHandles.lookup();
             try {
-                MethodHandle methodHandle = lookup.findVirtual(nmsPlayer.getClass(), "nextContainerCounterInt", MethodType.methodType(int.class));
-                //this should work on Magma as well as Mohist.
-                return (int) methodHandle.invoke(nmsPlayer);
+                //workaround for Magma
+
+                //invoke nmsPlayer.nextContainerCounter() -> void
+                MethodHandle nextContainerCounter = lookup.findVirtual(EntityPlayer.class, "func_71117_bO"/*nextContainerCounter*/, MethodType.methodType(void.class));
+                nextContainerCounter.invoke(nmsPlayer);
+
+                //invoke nmsPlayer.containerCounter -> int
+                lookup = MethodHandles.privateLookupIn(EntityPlayer.class, lookup);
+                MethodHandle containerCounter = lookup.findGetter(EntityPlayer.class, "field_71139_cq"/*containerCounter*/, int.class);
+                return (int) containerCounter.invoke(nmsPlayer);
+
             } catch (Throwable magmaMethodNotFound) {
                 //look up the obfuscated field name and get it by reflection?
                 RuntimeException ex = new RuntimeException("No method known of incrementing the player's container counter");

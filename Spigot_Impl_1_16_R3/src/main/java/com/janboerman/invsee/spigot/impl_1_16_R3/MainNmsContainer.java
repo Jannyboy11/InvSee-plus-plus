@@ -108,13 +108,17 @@ class MainNmsContainer extends Container {
             this.tracker = null;
         }
 
+        // Magma compatability:
+        // IT IS IMPORTANT THAT WE CALL super.a AND NOT this.a. THIS IS BECAUSE OF A BUG IN THE MAGMA REMAPPER!
+        // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
+
         //top inventory slots
         for (int yPos = 0; yPos < 6; yPos++) {
             for (int xPos = 0; xPos < 9; xPos++) {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;
                 int magicY = 18 + yPos * 18;
-                a(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY));
+                super.a(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY));
             }
         }
 
@@ -127,7 +131,7 @@ class MainNmsContainer extends Container {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;
                 int magicY = 103 + yPos * 18 + magicAddY;
-                a(new Slot(playerInventory, index, magicX, magicY));
+                super.a(new Slot(playerInventory, index, magicX, magicY));
             }
         }
 
@@ -136,7 +140,7 @@ class MainNmsContainer extends Container {
             int index = xPos;
             int magicX = 8 + xPos * 18;
             int magicY = 161 + magicAddY;
-            a(new Slot(playerInventory, index, magicX, magicY));
+            super.a(new Slot(playerInventory, index, magicX, magicY));
         }
     }
 
@@ -161,8 +165,10 @@ class MainNmsContainer extends Container {
         if (spectatingOwnInventory)
             return InvseeImpl.EMPTY_STACK;
 
+        List<Slot> slots = super.slots; //HybridServerSupport.getSlots(this);
+
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
-        Slot slot = this.slots.get(rawIndex);
+        Slot slot = slots.get(rawIndex);
         final int topRows = 6;
 
         if (slot != null && slot.hasItem()) {
@@ -171,7 +177,7 @@ class MainNmsContainer extends Container {
             itemstack = clickedSlotItem.cloneItemStack();
             if (rawIndex < topRows * 9) {
                 //clicked in the top inventory
-                if (!doShiftClickTransfer(clickedSlotItem, topRows * 9, this.slots.size(), true)) {
+                if (!doShiftClickTransfer(clickedSlotItem, topRows * 9, slots.size(), true)) {
                     return InvseeImpl.EMPTY_STACK;
                 }
             } else {
@@ -195,4 +201,37 @@ class MainNmsContainer extends Container {
         //returns true is something if part of the clickedSlotItem was transferred, otherwise false
         return super.a(clickedSlotItem, targetMinIndex, targetMaxIndex, topClicked);
     }
+
+
+    // ===== Magma Compatibility =====
+    // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
+
+    //because this is being called from InvSee++, and Magma has a bug, we need to override this.
+    public Containers<?> getType() {
+        return Containers.GENERIC_9X6;
+    }
+
+    //idem.
+    public void addSlotListener(ICrafting icrafting) {
+        super.addSlotListener(icrafting);
+    }
+
+    public boolean func_75145_c(EntityHuman playerEntity) {
+        return canUse(playerEntity);
+    }
+
+    public ItemStack func_184996_a(int a, int b, InventoryClickType clickType, EntityHuman playerEntity) {
+        //clicked
+        return a(a, b, clickType, playerEntity);
+    }
+
+    public void func_75134_a(EntityHuman playerEntity) {
+        //removed
+        b(playerEntity);
+    }
+
+    public ItemStack func_82846_b(EntityHuman playerEntity, int rawIndex) {
+        return shiftClick(playerEntity, rawIndex);
+    }
+
 }
