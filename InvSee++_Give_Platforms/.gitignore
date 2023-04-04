@@ -3,7 +3,7 @@
 **.iml
 
 #Maven
-target/*
+Give_Impl_**/target/*
 
 #Eclipse
 **/.settings/*
