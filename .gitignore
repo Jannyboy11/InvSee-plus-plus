@@ -1,6 +1,8 @@
 #IntelliJ
 .idea/*
 **.iml
+.bsp
+.scala-build
 
 #Maven
 target/*
@@ -9,7 +11,3 @@ target/*
 **/.settings/*
 **/.project
 **/.classpath
-
-#InvSee++
-SetVersion.java
-SetVersion.scala

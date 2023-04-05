@@ -1,12 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.19.9-SNAPSHOT</version>
+    <version>0.20.0-SNAPSHOT</version>
 
     <modules>
         <module>Utils</module>
@@ -36,6 +33,7 @@
         <module>InvSee++_Give_Platforms/Give_Impl_1_19_4_R3</module>
         <module>InvSee++_Clear_Plugin</module>
         <module>InvSee++_Give_Plugin</module>
+        <module>VersionUpdater</module>
     </modules>
     <packaging>pom</packaging>
 
