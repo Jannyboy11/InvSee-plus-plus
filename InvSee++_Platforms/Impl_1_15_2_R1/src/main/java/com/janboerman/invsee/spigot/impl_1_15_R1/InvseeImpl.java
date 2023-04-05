@@ -14,6 +14,7 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
@@ -34,7 +35,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class InvseeImpl extends InvseeAPI {
+public class InvseeImpl extends InvseeAPI implements InvseePlatform {
 
     static ItemStack EMPTY_STACK = ItemStack.a;
 
@@ -47,6 +48,11 @@ public class InvseeImpl extends InvseeAPI {
             lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin));
         }
         lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
+    }
+
+    @Override
+    protected InvseePlatform getPlatform() {
+        return this;
     }
 
     @Override

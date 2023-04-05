@@ -31,13 +31,13 @@ public class CreationOptions<Slot> implements Cloneable {
         this.logOptions = Objects.requireNonNull(logOptions);
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport) throws Exception {
         Plugin plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, false, new LogOptions().withGranularity(LogGranularity.LOG_NEVER));
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt) throws Exception {
         Plugin plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, new LogOptions().withGranularity(LogGranularity.LOG_NEVER));
@@ -47,7 +47,7 @@ public class CreationOptions<Slot> implements Cloneable {
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, logOptions);
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "0.20.0")
     public static CreationOptions<PlayerInventorySlot> defaultMainInventory() {
         return defaultMainInventory(Bukkit.getPluginManager().getPlugin("InvseePlusPlus"));
     }
@@ -56,7 +56,7 @@ public class CreationOptions<Slot> implements Cloneable {
         return new CreationOptions<>(plugin, Title.defaultMainInventory(), true, Mirror.defaultPlayerInventory(), true, false, new LogOptions());
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "0.20.0")
     public static CreationOptions<EnderChestSlot> defaultEnderInventory() {
         return defaultEnderInventory(Bukkit.getPluginManager().getPlugin("InvseePlusPlus"));
     }
@@ -67,7 +67,7 @@ public class CreationOptions<Slot> implements Cloneable {
 
     @Override
     public CreationOptions<Slot> clone() {
-        return new CreationOptions<>(getPlugin(), getTitle(), isOfflinePlayerSupported(), getMirror(), isUnknownPlayerSupported(), canBypassExemptedPlayers(), logOptions.clone());
+        return new CreationOptions<>(getPlugin(), getTitle(), isOfflinePlayerSupported(), getMirror(), isUnknownPlayerSupported(), canBypassExemptedPlayers(), getLogOptions().clone());
     }
 
     public CreationOptions<Slot> withPlugin(Plugin plugin) {

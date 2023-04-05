@@ -83,6 +83,11 @@ public class LogOptions implements Cloneable {
         return this;
     }
 
+    public LogOptions withFormats(Map<LogTarget, String> logFormats) {
+        this.formats = logFormats == null ? null : new EnumMap<>(logFormats);
+        return this;
+    }
+
     public LogGranularity getGranularity() {
         if (granularity == null) return LogGranularity.LOG_ON_CLOSE;
 
@@ -120,6 +125,15 @@ public class LogOptions implements Cloneable {
         } else {
             return formats.get(logTarget);
         }
+    }
+
+    public static EnumMap<LogTarget, String> defaultLogFormats() {
+        EnumMap<LogTarget, String> map = new EnumMap<>(LogTarget.class);
+        map.put(SERVER_LOG_FILE, FORMAT_SERVER_LOG_FILE);
+        map.put(PLUGIN_LOG_FILE, FORMAT_PLUGIN_LOG_FILE);
+        map.put(SPECTATOR_LOG_FILE, FORMAT_SPECTATOR_LOG_FILE);
+        map.put(CONSOLE, FORMAT_CONSOLE);
+        return map;
     }
 
     @Override

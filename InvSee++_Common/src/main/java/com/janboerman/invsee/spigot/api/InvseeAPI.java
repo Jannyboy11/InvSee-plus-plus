@@ -22,6 +22,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
@@ -39,14 +40,16 @@ public abstract class InvseeAPI {
     /* TODO this class needs a BIG refactor.
      * TODO implementations should be able to override *just* the abstract methods.
      * TODO I should create a new interface for this.
-     * TODO I think I'll call this new interface "Platform".
+     * TODO This new interface will be called InvseePlatform
      * TODO we then use composition over inheritance!
+     * TODO this must also means that Platforms cannot use fields declared in this class!
      *
-     * TODO later, we could also return an InvseeAPI instance PER PLUGIN.
+     * TODO later, we could also return an InvseeAPI instance PER PLUGIN. <-- That is going to be annoying with event listeners though.
      * TODO this is useful for logging, now that we have the PLUGIN_LOG_FILE.
      */
 
     protected final Plugin plugin;
+    protected final InvseePlatform platform;
     protected final NamesAndUUIDs lookup;
     protected final Exempt exempt;
 
@@ -92,7 +95,11 @@ public abstract class InvseeAPI {
         this.exempt = new Exempt(plugin.getServer());
 
         registerListeners();
+        this.platform = getPlatform();
     }
+
+    @Deprecated //restructure this.
+    protected abstract InvseePlatform getPlatform();
 
     public void shutDown() {
         for (var future : pendingInventoriesByUuid.values())
@@ -271,51 +278,19 @@ public abstract class InvseeAPI {
     // =========== end of internal apis ===========
 
 
-    // ================================== implementation methods ==================================
-
-    public abstract MainSpectatorInventory spectateInventory(HumanEntity target, CreationOptions<PlayerInventorySlot> options);
-
-    public abstract CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options);
-
-    public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
-
-    //TODO should probably make this abstract.
-    //by default: ignore creation options, implementations can override!
-    public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
-        MainSpectatorInventoryView view = (MainSpectatorInventoryView) spectator.openInventory(spectatorInventory);
-        if (view != null) {
-            return OpenResponse.open(view);
-        } else {
-            return OpenResponse.closed(NotOpenedReason.generic());
-        }
-    }
-
-
-    public abstract EnderSpectatorInventory spectateEnderChest(HumanEntity target, CreationOptions<EnderChestSlot> options);
-
-    public abstract CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options);
-
-    public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
-
-    //TODO should probably make this abstract.
-    //by default: ignore creation options, implementation can override!
-    public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
-        EnderSpectatorInventoryView view = (EnderSpectatorInventoryView) spectator.openInventory(spectatorInventory);
-        if (view != null) {
-            return OpenResponse.open(view);
-        } else {
-            return OpenResponse.closed(NotOpenedReason.generic());
-        }
-    }
-
     // ================================== API methods: Main Inventory ==================================
+
+    //TODO make this final.
+    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
+        return platform.saveInventory(inventory);
+    }
 
     // HumanEntity
 
     public final OpenResponse<MainSpectatorInventoryView> spectateInventory(Player spectator, HumanEntity target, CreationOptions<PlayerInventorySlot> options) {
         SpectateResponse<MainSpectatorInventory> response = mainSpectatorInventory(target, options);
         if (response.isSuccess()) {
-            return openMainSpectatorInventory(spectator, response.getInventory(), options);
+            return platform.openMainSpectatorInventory(spectator, response.getInventory(), options);
         } else {
             return OpenResponse.closed(NotOpenedReason.notCreated(response.getReason()));
         }
@@ -330,7 +305,7 @@ public abstract class InvseeAPI {
         if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
-            MainSpectatorInventory inv = spectateInventory(target, options);
+            MainSpectatorInventory inv = platform.spectateInventory(target, options);
             cache(inv);
             return SpectateResponse.succeed(inv);
         }
@@ -358,7 +333,7 @@ public abstract class InvseeAPI {
             if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, options);
+            MainSpectatorInventory spectatorInventory = platform.spectateInventory(targetPlayer, options);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
             cache(spectatorInventory);
@@ -483,7 +458,7 @@ public abstract class InvseeAPI {
                 }
 
                 //not in cache: create offline inventory
-                return createOfflineInventory(playerId, playerName, options);
+                return platform.createOfflineInventory(playerId, playerName, options);
             }
         });
 
@@ -502,12 +477,17 @@ public abstract class InvseeAPI {
 
     // ================================== API methods: Enderchest ==================================
 
+    //TODO make this final.
+    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
+        return platform.saveEnderChest(enderChest);
+    }
+
     // HumanEntity
 
     public final OpenResponse<EnderSpectatorInventoryView> spectateEnderChest(Player spectator, HumanEntity target, CreationOptions<EnderChestSlot> options) {
         SpectateResponse<EnderSpectatorInventory> response = enderSpectatorInventory(target, options);
         if (response.isSuccess()) {
-            return openEnderSpectatorInventory(spectator, response.getInventory(), options);
+            return platform.openEnderSpectatorInventory(spectator, response.getInventory(), options);
         } else {
             return OpenResponse.closed(NotOpenedReason.notCreated(response.getReason()));
         }
@@ -522,7 +502,7 @@ public abstract class InvseeAPI {
         if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
-            EnderSpectatorInventory inv = spectateEnderChest(target, options);
+            EnderSpectatorInventory inv = platform.spectateEnderChest(target, options);
             cache(inv);
             return SpectateResponse.succeed(inv);
         }
@@ -550,7 +530,7 @@ public abstract class InvseeAPI {
             if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, options);
+            EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
             cache(spectatorInventory);
@@ -630,7 +610,7 @@ public abstract class InvseeAPI {
             if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            EnderSpectatorInventory spectatorInventory = spectateEnderChest(targetPlayer, options);
+            EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
             lookup.cacheNameAndUniqueId(playerId, playerName);
             cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
@@ -671,7 +651,7 @@ public abstract class InvseeAPI {
                 }
 
                 //not in cache: create offline inventory
-                return createOfflineEnderChest(playerId, playerName, options);
+                return platform.createOfflineEnderChest(playerId, playerName, options);
             }
         });
 
@@ -696,7 +676,7 @@ public abstract class InvseeAPI {
             if (throwable == null) {
                 if (response.isSuccess()) {
                     try {
-                        OpenResponse<MainSpectatorInventoryView> openResponse = openMainSpectatorInventory(spectator, response.getInventory(), options);
+                        OpenResponse<MainSpectatorInventoryView> openResponse = platform.openMainSpectatorInventory(spectator, response.getInventory(), options);
                         result.complete(openResponse);
                     } catch (Throwable ex) {
                         result.completeExceptionally(ex);
@@ -717,7 +697,7 @@ public abstract class InvseeAPI {
             if (throwable == null) {
                 if (response.isSuccess()) {
                     try {
-                        OpenResponse<EnderSpectatorInventoryView> openResponse = openEnderSpectatorInventory(spectator, response.getInventory(), options);
+                        OpenResponse<EnderSpectatorInventoryView> openResponse = platform.openEnderSpectatorInventory(spectator, response.getInventory(), options);
                         result.complete(openResponse);
                     } catch (Throwable ex) {
                         result.completeExceptionally(ex);
@@ -748,13 +728,13 @@ public abstract class InvseeAPI {
 
             //check if somebody was looking up the player and make sure they get the player's live inventory
             CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvNameFuture = pendingInventoriesByName.remove(userName);
-            if (mainInvNameFuture != null) mainInvNameFuture.complete(SpectateResponse.succeed(newInventorySpectator = spectateInventory(player, mainInventoryCreationOptions())));
+            if (mainInvNameFuture != null) mainInvNameFuture.complete(SpectateResponse.succeed(newInventorySpectator = platform.spectateInventory(player, mainInventoryCreationOptions())));
             CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainInvUuidFuture = pendingInventoriesByUuid.remove(uuid);
-            if (mainInvUuidFuture != null) mainInvUuidFuture.complete(SpectateResponse.succeed(newInventorySpectator != null ? newInventorySpectator : (newInventorySpectator = spectateInventory(player, mainInventoryCreationOptions()))));
+            if (mainInvUuidFuture != null) mainInvUuidFuture.complete(SpectateResponse.succeed(newInventorySpectator != null ? newInventorySpectator : (newInventorySpectator = platform.spectateInventory(player, mainInventoryCreationOptions()))));
             CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderNameFuture = pendingEnderChestsByName.remove(userName);
-            if (enderNameFuture != null) enderNameFuture.complete(SpectateResponse.succeed(newEnderSpectator = spectateEnderChest(player, enderInventoryCreationOptions())));
+            if (enderNameFuture != null) enderNameFuture.complete(SpectateResponse.succeed(newEnderSpectator = platform.spectateEnderChest(player, enderInventoryCreationOptions())));
             CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderUuidFuture = pendingEnderChestsByUuid.remove(uuid);
-            if (enderUuidFuture != null) enderUuidFuture.complete(SpectateResponse.succeed(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = spectateEnderChest(player, enderInventoryCreationOptions()))));
+            if (enderUuidFuture != null) enderUuidFuture.complete(SpectateResponse.succeed(newEnderSpectator != null ? newEnderSpectator : (newEnderSpectator = platform.spectateEnderChest(player, enderInventoryCreationOptions()))));
 
 
             //check if somebody was looking in the offline inventory and update player's inventory.
@@ -767,7 +747,7 @@ public abstract class InvseeAPI {
                 final MainSpectatorInventory oldMainSpectator = invRef.get();
                 if (oldMainSpectator != null && transferInvToLivePlayer.test(oldMainSpectator, player)) {
                     if (newInventorySpectator == null) {
-                        newInventorySpectator = spectateInventory(player, mainInventoryCreationOptions());
+                        newInventorySpectator = platform.spectateInventory(player, mainInventoryCreationOptions());
                         newInventorySpectator.setContents(oldMainSpectator); //set the contents of the player's inventory to the contents that the spectators have.
                     }
 
@@ -790,7 +770,7 @@ public abstract class InvseeAPI {
                 final EnderSpectatorInventory oldEnderSpectator = enderRef.get();
                 if (oldEnderSpectator != null && transferEnderToLivePlayer.test(oldEnderSpectator, player)) {
                     if (newEnderSpectator == null) {
-                        newEnderSpectator = spectateEnderChest(player, enderInventoryCreationOptions());
+                        newEnderSpectator = platform.spectateEnderChest(player, enderInventoryCreationOptions());
                         newEnderSpectator.setContents(oldEnderSpectator); //set the contents of the player's enderchest to the contents that the spectators have.
                     }
 
@@ -1078,55 +1058,55 @@ public abstract class InvseeAPI {
     // apis that open immideately:
 
     @Deprecated public final void openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, String title, Mirror<PlayerInventorySlot> mirror) {
-        openMainSpectatorInventory(spectator, spectatorInventory, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
+        platform.openMainSpectatorInventory(spectator, spectatorInventory, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
 
     @Deprecated public final void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, String title, Mirror<EnderChestSlot> mirror) {
-        openEnderSpectatorInventory(spectator, spectatorInventory, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
+        platform.openEnderSpectatorInventory(spectator, spectatorInventory, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
 
     // =================================== deprecated private apis ===================================
 
     // implementation methods:
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
-        return createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title).withMirror(mirror))
+        return platform.createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title).withMirror(mirror))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
-        return createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title))
+        return platform.createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
-        return spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
+        return platform.spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
-        return spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title));
+        return platform.spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title));
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
-        return createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title).withMirror(mirror))
+        return platform.createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title).withMirror(mirror))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
-        return createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title))
+        return platform.createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
-        return spectateInventory(player, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
+        return platform.spectateInventory(player, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.19.6")
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
-        return spectateInventory(player, mainInventoryCreationOptions().withTitle(title));
+        return platform.spectateInventory(player, mainInventoryCreationOptions().withTitle(title));
     }
 
 

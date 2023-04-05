@@ -21,13 +21,13 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
 
-public class MultiverseInventoriesSeeApi extends InvseeAPI {
+public class MultiverseInventoriesSeeApi extends InvseeAPI implements InvseePlatform {
 
     private final InvseeAPI wrapped;
     private final MultiverseInventoriesHook mviHook;
@@ -109,49 +109,55 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI {
     @Override
     public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
         //TODO
-        return wrapped.openMainSpectatorInventory(spectator, spectatorInventory, options);
+        return platform.openMainSpectatorInventory(spectator, spectatorInventory, options);
     }
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, CreationOptions<PlayerInventorySlot> options) {
         //TODO
-        return wrapped.spectateInventory(player, options);
+        return platform.spectateInventory(player, options);
+    }
+
+    @Deprecated //will be refactored.
+    @Override
+    protected InvseePlatform getPlatform() {
+        return this;
     }
 
     @Override
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options) {
         //TODO decide whether to load from vanilla save file, or MVI save file
-        return wrapped.createOfflineInventory(playerId, playerName, options);
+        return platform.createOfflineInventory(playerId, playerName, options);
     }
 
     @Override
     public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
         //TODO decide whether to save to MVI save file or not
-        return wrapped.saveInventory(inventory);
+        return platform.saveInventory(inventory);
     }
 
     @Override
     public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
         //TODO
-        return wrapped.openEnderSpectatorInventory(spectator, spectatorInventory, options);
+        return platform.openEnderSpectatorInventory(spectator, spectatorInventory, options);
     }
 
     @Override
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, CreationOptions<EnderChestSlot> options) {
         //TODO
-        return wrapped.spectateEnderChest(player, options);
+        return platform.spectateEnderChest(player, options);
     }
 
     @Override
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options) {
         //TODO decide whether to load from vanilla save file, or MVI save file
-        return wrapped.createOfflineEnderChest(playerId, playerName, options);
+        return platform.createOfflineEnderChest(playerId, playerName, options);
     }
 
     @Override
     public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
         //TODO decide whether to save to MVI save file or not
-        return wrapped.saveEnderChest(enderChest);
+        return platform.saveEnderChest(enderChest);
     }
 
 }

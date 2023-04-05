@@ -15,6 +15,7 @@ import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import me.ebonjaeger.perworldinventory.Group;
@@ -47,7 +48,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-public class PerWorldInventorySeeApi extends InvseeAPI {
+public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform {
 
     private final InvseeAPI wrapped;
     private final PerWorldInventoryHook pwiHook;
@@ -99,6 +100,11 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             //check whether world and gamemode match
             return pwiHook.isMatchedByProfile(player, profileKey);
         });
+    }
+
+    @Override
+    protected InvseePlatform getPlatform() {
+        return this;
     }
 
     public void registerListeners() {
@@ -331,12 +337,12 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
     @Override
     public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
-        return wrapped.openMainSpectatorInventory(spectator, spectatorInventory, options);
+        return platform.openMainSpectatorInventory(spectator, spectatorInventory, options);
     } //TODO overload with ProfileKey?
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, CreationOptions<PlayerInventorySlot> options) {
-        return wrapped.spectateInventory(player, options);
+        return platform.spectateInventory(player, options);
     }
 
     public MainSpectatorInventory spectateInventory(HumanEntity player, CreationOptions<PlayerInventorySlot> options, ProfileKey profileKey) {
@@ -390,16 +396,16 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
 
     @Override
     public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
-        return wrapped.openEnderSpectatorInventory(spectator, spectatorInventory, options);
+        return platform.openEnderSpectatorInventory(spectator, spectatorInventory, options);
     } //TODO overload with ProfileKey?
 
     @Override
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, CreationOptions<EnderChestSlot> options) {
-        return wrapped.spectateEnderChest(player, options);
+        return platform.spectateEnderChest(player, options);
     }
 
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, CreationOptions<EnderChestSlot> options, ProfileKey profileKey) {
-        EnderSpectatorInventory spectatorInv = spectateEnderChest(player, options);
+        EnderSpectatorInventory spectatorInv = platform.spectateEnderChest(player, options);
         enderchests.put(profileKey, spectatorInv);
         enderchestKeys.put(spectatorInv, profileKey);
         return spectatorInv;
@@ -462,7 +468,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
         //try non-managed
-        CompletableFuture<SpectateResponse<MainSpectatorInventory>> fromVanillaStorageOfflineInv = wrapped.createOfflineInventory(playerId, playerName, options);
+        CompletableFuture<SpectateResponse<MainSpectatorInventory>> fromVanillaStorageOfflineInv = platform.createOfflineInventory(playerId, playerName, options);
         if (!pwiHook.pwiManagedInventories()) return fromVanillaStorageOfflineInv;
 
         //create a fake player for PWI so that we can load data onto it!
@@ -576,7 +582,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
         //try non-managed
-        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> nonPwiEnderSpectatorFuture = wrapped.createOfflineEnderChest(playerId, playerName, options);
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> nonPwiEnderSpectatorFuture = platform.createOfflineEnderChest(playerId, playerName, options);
         if (!pwiHook.pwiManagedEnderChests()) return nonPwiEnderSpectatorFuture;
 
         //create a fake player for PWI so that we can load data onto it!

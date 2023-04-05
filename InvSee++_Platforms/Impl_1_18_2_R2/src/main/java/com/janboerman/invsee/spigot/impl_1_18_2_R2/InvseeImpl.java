@@ -16,6 +16,7 @@ import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import static com.janboerman.invsee.spigot.impl_1_18_2_R2.HybridServerSupport.enderChestItems;
 import static com.janboerman.invsee.spigot.impl_1_18_2_R2.HybridServerSupport.nextContainerCounter;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -47,7 +48,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class InvseeImpl extends InvseeAPI {
+public class InvseeImpl extends InvseeAPI implements InvseePlatform {
 
     public InvseeImpl(Plugin plugin) {
         super(plugin);
@@ -58,6 +59,11 @@ public class InvseeImpl extends InvseeAPI {
             lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin));
         }
         lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
+    }
+
+    @Override
+    protected InvseePlatform getPlatform() {
+        return this;
     }
 
     @Override

@@ -5,13 +5,20 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.Title;
+import com.janboerman.invsee.spigot.api.logging.LogGranularity;
+import com.janboerman.invsee.spigot.api.logging.LogOptions;
+import com.janboerman.invsee.spigot.api.logging.LogTarget;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,7 +30,9 @@ public interface InvseePlatform {
 
     //we do want to dependency-inject the Scheduler, I think. Or should we just pass the Scheduler as a parameter of every method that returns a CompletableFuture?
     //I might like the latter approach better.
-    //TODO load InvSee++ as a Paper Plugin, that way we can name ourselves "InvSee++" instead of "InvSeePlusPlus" :)
+
+
+    // main inventory spectator methods
 
     public abstract MainSpectatorInventory spectateInventory(HumanEntity target, CreationOptions<PlayerInventorySlot> options);
 
@@ -33,6 +42,7 @@ public interface InvseePlatform {
 
     public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options);
 
+    // ender chest spectator methods
 
     public abstract EnderSpectatorInventory spectateEnderChest(HumanEntity target, CreationOptions<EnderChestSlot> options);
 
@@ -41,5 +51,18 @@ public interface InvseePlatform {
     public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
 
     public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options);
+
+
+    // default creation options
+
+    public default CreationOptions<PlayerInventorySlot> defaultInventoryCreationOptions(Plugin plugin) {
+        return CreationOptions.of(plugin, Title.defaultMainInventory(), true, Mirror.defaultPlayerInventory(), true, false, LogOptions
+                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()));
+    }
+
+    public default CreationOptions<EnderChestSlot> defaultEnderChestCreationOptions(Plugin plugin) {
+        return CreationOptions.of(plugin, Title.defaultEnderInventory(), true, Mirror.defaultEnderChest(), true, false, LogOptions
+                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()));
+    }
 
 }
