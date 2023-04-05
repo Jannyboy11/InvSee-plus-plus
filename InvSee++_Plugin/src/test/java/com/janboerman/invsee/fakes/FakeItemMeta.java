@@ -98,7 +98,7 @@ public class FakeItemMeta implements ItemMeta, Damageable {
     }
 
     @Override
-    public void lore(@Nullable List<Component> list) {
+    public void lore(@Nullable List<? extends Component> list) {
         throw new UnsupportedOperationException();
     }
 

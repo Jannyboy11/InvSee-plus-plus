@@ -3,6 +3,10 @@ package com.janboerman.invsee.fakes;
 import com.destroystokyo.paper.entity.ai.MobGoals;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.datapack.DatapackManager;
+import io.papermc.paper.math.Position;
+import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
+import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
+import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.BanList;
@@ -929,6 +933,61 @@ public class FakeServer implements Server {
 
     @Override
     public @NotNull PotionBrewer getPotionBrewer() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull RegionScheduler getRegionScheduler() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull AsyncScheduler getAsyncScheduler() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull GlobalRegionScheduler getGlobalRegionScheduler() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isOwnedByCurrentRegion(@NotNull World world, @NotNull Position position) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isOwnedByCurrentRegion(@NotNull World world, @NotNull Position position, int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isOwnedByCurrentRegion(@NotNull Location location) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isOwnedByCurrentRegion(@NotNull Location location, int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isOwnedByCurrentRegion(@NotNull World world, int i, int i1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isOwnedByCurrentRegion(@NotNull World world, int i, int i1, int i2) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isOwnedByCurrentRegion(@NotNull Entity entity) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isGlobalTickThread() {
         throw new UnsupportedOperationException();
     }
 

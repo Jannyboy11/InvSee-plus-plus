@@ -29,11 +29,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
-class InvseeCommandExecutor implements CommandExecutor {
+public class InvseeCommandExecutor implements CommandExecutor {
 
     private final InvseePlusPlus plugin;
 
-    InvseeCommandExecutor(InvseePlusPlus plugin) {
+    public InvseeCommandExecutor(InvseePlusPlus plugin) {
         this.plugin = plugin;
     }
 

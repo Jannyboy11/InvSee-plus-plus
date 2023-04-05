@@ -8,7 +8,6 @@
     <artifactId>invsee-plus-plus</artifactId>
     <version>0.19.8-SNAPSHOT</version>
 
-    <!-- TODO make this more hierarchical: InvSee++ (includes impls), InvSee++_Common, InvSee++_Give (includes impls), InvSee++_Clear, Mojang_API, Utils -->
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>

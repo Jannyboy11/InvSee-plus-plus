@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spigot_addon_give</artifactId>
+    <artifactId>invsee-plus-plus_give_bukkit</artifactId>
 
     <build>
         <finalName>InvSee++_Give</finalName>
@@ -64,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_common</artifactId>
+            <artifactId>invsee-plus-plus_bukkit</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

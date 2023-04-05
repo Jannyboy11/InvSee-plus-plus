@@ -187,12 +187,12 @@ public class FakeUnsafeValues implements UnsafeValues {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    //@Override
     public String getTranslationKey(Material material) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    //@Override
     public String getTranslationKey(Block block) {
         throw new UnsupportedOperationException();
     }
@@ -212,7 +212,7 @@ public class FakeUnsafeValues implements UnsafeValues {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    //@Override
     public @NotNull <T extends Keyed> Registry<T> registryFor(Class<T> aClass) {
         throw new UnsupportedOperationException();
     }
@@ -265,6 +265,16 @@ public class FakeUnsafeValues implements UnsafeValues {
 
     @Override
     public CreativeCategory getCreativeCategory(Material material) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getBlockTranslationKey(Material material) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getItemTranslationKey(Material material) {
         throw new UnsupportedOperationException();
     }
 

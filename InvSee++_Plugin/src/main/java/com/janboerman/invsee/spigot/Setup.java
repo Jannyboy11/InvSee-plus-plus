@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.internal.MappingsVersion;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 
@@ -14,9 +15,11 @@ public interface Setup {
         return OfflinePlayerProvider.Dummy.INSTANCE;
     }
 
-    public static Setup setup(Plugin plugin) {
+    public static Setup setup(Plugin plugin, Scheduler scheduler) {
         final Server server = plugin.getServer();
         final String serverClassName = server.getClass().getName();
+        //TODO actually use scheduler.
+
 
         if ("org.bukkit.craftbukkit.v1_8_R3.CraftServer".equals(serverClassName)) {
             return new Impl_1_8_8(plugin);

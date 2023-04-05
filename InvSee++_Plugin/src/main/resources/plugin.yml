@@ -16,7 +16,7 @@ commands:
     usage: "/invsee <username>|<uuid>"
     aliases: [inventorysee, isee]
   endersee:
-    description: View a player's enderchest
+    description: View a player's ender chest
     permission: invseeplusplus.endersee.view
     usage: "/endersee <username>|<uuid>"
     aliases: [enderchestsee, esee]

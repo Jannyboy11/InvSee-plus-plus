@@ -37,11 +37,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-class EnderseeCommandExecutor implements CommandExecutor {
+public class EnderseeCommandExecutor implements CommandExecutor {
 
     private final InvseePlusPlus plugin;
 
-    EnderseeCommandExecutor(InvseePlusPlus plugin) {
+    public EnderseeCommandExecutor(InvseePlusPlus plugin) {
         this.plugin = plugin;
     }
 

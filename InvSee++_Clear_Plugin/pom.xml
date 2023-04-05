@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spigot_addon_clear</artifactId>
+    <artifactId>invsee-plus-plus_clear_bukkit</artifactId>
 
     <build>
         <finalName>InvSee++_Clear</finalName>
@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_plugin</artifactId>
+            <artifactId>invsee-plus-plus_bukkit</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

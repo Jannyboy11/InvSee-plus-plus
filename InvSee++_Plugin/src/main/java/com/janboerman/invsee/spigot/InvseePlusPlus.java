@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.paper.AsyncTabCompleter;
+import com.janboerman.invsee.paper.FoliaScheduler;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.api.logging.LogGranularity;
@@ -12,6 +13,7 @@ import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesH
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
  */
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
@@ -33,13 +35,31 @@ public class InvseePlusPlus extends JavaPlugin {
     private InvseeAPI api;
     private OfflinePlayerProvider offlinePlayerProvider;
 
+    private final Scheduler scheduler;
+
+    public InvseePlusPlus() {
+        boolean folia;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+            folia = true;
+        } catch (ClassNotFoundException e) {
+            folia = false;
+        }
+
+        if (folia) {
+            this.scheduler = new FoliaScheduler(this);
+        } else {
+            this.scheduler = new DefaultScheduler(this);
+        }
+    }
+
     @Override
     public void onEnable() {
         //configuration
         saveDefaultConfig();
 
         //initialisation
-        Setup setup = Setup.setup(this);
+        Setup setup = Setup.setup(this, this.scheduler);
         this.api = setup.api();
         this.offlinePlayerProvider = setup.offlinePlayerProvider();
 
@@ -69,17 +89,32 @@ public class InvseePlusPlus extends JavaPlugin {
         api.setLogOptions(getLogOptions());
 
         //commands
+        setupCommands();
+
+        //event listeners
+        setupEvents();
+
+        //TODO idea: shoulder look functionality. an admin will always see the same inventory that the target player sees.
+        //TODO can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
+
+        //bStats
+        setupBStats();
+    }
+
+    private void setupCommands() {
+        InvseeTabCompleter tabCompleter = new InvseeTabCompleter(this);
+
         PluginCommand invseeCommand = getCommand("invsee");
         PluginCommand enderseeCommand = getCommand("endersee");
 
         invseeCommand.setExecutor(new InvseeCommandExecutor(this));
         enderseeCommand.setExecutor(new EnderseeCommandExecutor(this));
 
-        InvseeTabCompleter tabCompleter = new InvseeTabCompleter(this);
         invseeCommand.setTabCompleter(tabCompleter);
         enderseeCommand.setTabCompleter(tabCompleter);
+    }
 
-        //event listeners
+    private void setupEvents() {
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
 
@@ -93,11 +128,9 @@ public class InvseePlusPlus extends JavaPlugin {
                 getLogger().log(Level.WARNING, "See https://papermc.io/ for more information.");
             }
         }
+    }
 
-        //TODO idea: shoulder look functionality. an admin will always see the same inventory that the target player sees.
-        //TODO can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
-
-        //bStats
+    private void setupBStats() {
         int pluginId = 9309;
         Metrics metrics = new Metrics(this, pluginId);
         metrics.addCustomChart(new SimplePie("Back-end", () -> {

@@ -1,13 +1,13 @@
 package com.janboerman.invsee.spigot.internal;
 
-//TODO add implementations for regular Bukkit, and for Folia
+import java.util.UUID;
+
 public interface Scheduler {
 
-    public void executeSync(Runnable task);
+    public void executeSyncPlayer(UUID playerId, Runnable task, Runnable retired);
+
+    public void executeSyncGlobal(Runnable task);
 
     public void executeAsync(Runnable task);
-
-    //TODO might need extra methods for executing tasks on a player-specific entity-scheduler thread
-    //TODO also look carefully at which scheduler to use for saving player data files!
 
 }
