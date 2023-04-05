@@ -1,7 +1,7 @@
 package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.paper.AsyncTabCompleter;
-import com.janboerman.invsee.paper.FoliaScheduler;
+import com.janboerman.invsee.folia.FoliaScheduler;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.api.logging.LogGranularity;
@@ -79,7 +79,7 @@ public class InvseePlusPlus extends JavaPlugin {
         // else if (MyWorlds)
         // else if (Separe-World-Items)
 
-        //set configured values
+        //set configured values //TODO platform implementation must be responsible for default CreationOptions.
         api.setOfflinePlayerSupport(offlinePlayerSupport());
         api.setUnknownPlayerSupport(unknownPlayerSupport());
         api.setMainInventoryTitle(this::getTitleForInventory);

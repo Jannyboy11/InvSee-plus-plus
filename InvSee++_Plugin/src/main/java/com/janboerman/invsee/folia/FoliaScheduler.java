@@ -1,4 +1,4 @@
-package com.janboerman.invsee.paper;
+package com.janboerman.invsee.folia;
 
 import com.janboerman.invsee.spigot.InvseePlusPlus;
 import com.janboerman.invsee.spigot.internal.Scheduler;

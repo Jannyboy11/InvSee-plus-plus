@@ -6,7 +6,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.19.8-SNAPSHOT</version>
+    <version>0.19.9-SNAPSHOT</version>
 
     <modules>
         <module>Utils</module>
@@ -39,7 +39,7 @@
     </modules>
     <packaging>pom</packaging>
 
-    <name>InvSeePlusPlus</name>
+    <name>InvSee++</name>
     <description>A plugin to view and manipulate players' inventories.</description>
 
     <distributionManagement>

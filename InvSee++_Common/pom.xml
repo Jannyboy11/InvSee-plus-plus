@@ -5,11 +5,12 @@
     <parent>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.19.8-SNAPSHOT</version>
+        <version>0.19.9-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spigot_common</artifactId>
+    <artifactId>invsee-plus-plus_common</artifactId>
+    <name>InvSee++ Common</name>
 
     <build>
         <defaultGoal>clean package</defaultGoal>

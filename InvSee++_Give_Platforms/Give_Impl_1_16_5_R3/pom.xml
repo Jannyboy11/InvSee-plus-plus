@@ -3,13 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
+        <relativePath>../../pom.xml</relativePath>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.19.8-SNAPSHOT</version>
+        <version>0.19.9-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>spigot_addon_give_1_16_r3</artifactId>
+    <artifactId>give_impl_1_16_5_r3</artifactId>
+    <name>InvSee++ Give implementation for CraftBukkit 1.16.5</name>
 
     <properties>
         <bukkit.version>1.16.5-R0.1-SNAPSHOT</bukkit.version>
@@ -25,7 +27,7 @@
     <dependencies>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_common</artifactId>
+            <artifactId>invsee-plus-plus_give_common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

@@ -5,11 +5,12 @@
     <parent>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.19.8-SNAPSHOT</version>
+        <version>0.19.9-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>invsee-plus-plus_give_bukkit</artifactId>
+    <artifactId>invsee-plus-plus_give_plugin</artifactId>
+    <name>InvSee++ Give Plugin</name>
 
     <build>
         <finalName>InvSee++_Give</finalName>
@@ -58,13 +59,7 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_plugin</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>invsee-plus-plus_bukkit</artifactId>
+            <artifactId>invsee-plus-plus_plugin</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -77,61 +72,61 @@
 
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_common</artifactId>
+            <artifactId>invsee-plus-plus_give_common</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_19_4_r3</artifactId>
+            <artifactId>give_impl_1_19_4_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_19_3_r2</artifactId>
+            <artifactId>give_impl_1_19_3_r2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_19_2_r1</artifactId>
+            <artifactId>give_impl_1_19_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_18_2_r2</artifactId>
+            <artifactId>give_impl_1_18_2_r2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_17_1_r1</artifactId>
+            <artifactId>give_impl_1_17_1_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_16_r3</artifactId>
+            <artifactId>give_impl_1_16_5_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_15_r1</artifactId>
+            <artifactId>give_impl_1_15_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_12_r1</artifactId>
+            <artifactId>give_impl_1_12_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_addon_give_1_8_r3</artifactId>
+            <artifactId>give_impl_1_8_8_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

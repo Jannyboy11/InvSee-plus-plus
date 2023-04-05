@@ -5,11 +5,12 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>invsee-plus-plus</artifactId>
-        <version>0.19.8-SNAPSHOT</version>
+        <version>0.19.9-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>invsee-plus-plus_bukkit</artifactId>
+    <artifactId>invsee-plus-plus_plugin</artifactId>
+    <name>InvSee++ Plugin</name>
 
     <pluginRepositories>
         <pluginRepository>
@@ -83,10 +84,6 @@
     </build>
 
     <repositories>
-<!--        <repository>-->
-<!--            <id>spigotmc-repo</id>-->
-<!--            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>-->
-<!--        </repository>-->
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
@@ -117,7 +114,7 @@
         <!-- first-party libraries -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_common</artifactId>
+            <artifactId>invsee-plus-plus_common</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -137,67 +134,67 @@
         <!-- implementations -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_8_r3</artifactId>
+            <artifactId>impl_1_8_8_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_12_r1</artifactId>
+            <artifactId>impl_1_12_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_15_r1</artifactId>
+            <artifactId>impl_1_15_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_16_r3</artifactId>
+            <artifactId>impl_1_16_5_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_17_1_r1</artifactId>
+            <artifactId>impl_1_17_1_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_18_2_r2</artifactId>
+            <artifactId>impl_1_18_2_r2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_19_2_r1</artifactId>
+            <artifactId>impl_1_19_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_19_3_r2</artifactId>
+            <artifactId>impl_1_19_3_r2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_impl_1_19_4_r3</artifactId>
+            <artifactId>impl_1_19_4_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.janboerman.invsee</groupId>-->
-<!--            <artifactId>spigot_multiverse-inventories</artifactId>-->
+<!--            <artifactId>invsee-plus-plus_multiverse-inventories</artifactId>-->
 <!--            <version>${project.version}</version>-->
 <!--            <scope>compile</scope>-->
 <!--        </dependency>-->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>spigot_per-world-inventory</artifactId>
+            <artifactId>invsee-plus-plus_per-world-inventory</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

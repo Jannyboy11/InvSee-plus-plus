@@ -10,3 +10,6 @@ target/*
 **/.project
 **/.classpath
 
+#InvSee++
+SetVersion.java
+SetVersion.scala
