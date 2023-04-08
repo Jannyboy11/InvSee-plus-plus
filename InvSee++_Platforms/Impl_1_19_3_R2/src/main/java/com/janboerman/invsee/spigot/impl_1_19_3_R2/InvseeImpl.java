@@ -196,7 +196,7 @@ public class InvseeImpl implements InvseePlatform {
                 fakeEntityHuman.readAdditionalSaveData(playerCompound);		//only player-specific stuff
             }
 
-    		CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
+    		CraftHumanEntity craftHumanEntity = new FakeCraftHumanEntity(server, fakeEntityHuman);
             return SpectateResponse.succeed(invCreator.apply(craftHumanEntity, options));
     	}, runnable -> scheduler.executeSyncPlayer(player, runnable, null));   //loading must occur on the main thread.
     }

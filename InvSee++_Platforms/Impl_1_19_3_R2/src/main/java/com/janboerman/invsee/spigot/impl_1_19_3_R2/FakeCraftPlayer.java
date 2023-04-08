@@ -2,12 +2,11 @@ package com.janboerman.invsee.spigot.impl_1_19_3_R2;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
 
 public class FakeCraftPlayer extends CraftPlayer {
-    public FakeCraftPlayer(CraftServer server, ServerPlayer entity) {
+    public FakeCraftPlayer(CraftServer server, FakeEntityPlayer entity) {
         super(server, entity);
     }
 
@@ -33,6 +32,11 @@ public class FakeCraftPlayer extends CraftPlayer {
 
     private CompoundTag loadPlayerTag() {
         return server.getHandle().playerIo.getPlayerData(getUniqueId().toString());
+    }
+
+    @Override
+    public FakeEntityPlayer getHandle() {
+        return (FakeEntityPlayer) this.entity;
     }
 
 }

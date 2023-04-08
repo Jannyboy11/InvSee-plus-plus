@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.InvseePlusPlus;
 import com.janboerman.invsee.spigot.internal.Scheduler;
 import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
 import org.bukkit.Server;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -25,6 +26,10 @@ public class FoliaScheduler implements Scheduler {
         } else {
             executeSyncGlobal(task);
         }
+    }
+
+    public void executeSyncPlayer(HumanEntity player, Runnable task, Runnable retired) {
+        player.getScheduler().run(plugin, scheduledTask -> task.run(), retired);
     }
 
     @Override

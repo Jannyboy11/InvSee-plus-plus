@@ -3,7 +3,6 @@ package com.janboerman.invsee.spigot.impl_1_19_4_R3;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
-import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
@@ -196,9 +195,9 @@ public class InvseeImpl implements InvseePlatform {
                 fakeEntityHuman.readAdditionalSaveData(playerCompound);		//only player-specific stuff
             }
 
-    		CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
+    		CraftHumanEntity craftHumanEntity = new FakeCraftHumanEntity(server, fakeEntityHuman);
             return SpectateResponse.succeed(invCreator.apply(craftHumanEntity, options));
-    	}, runnable -> scheduler.executeSyncPlayer(player, runnable, null));   //loading must occur on the main thread.
+    	}, runnable -> scheduler.executeSyncPlayer(player, runnable, null));
     }
 
     private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
@@ -223,7 +222,7 @@ public class InvseeImpl implements InvseePlatform {
             transfer.accept(currentInv, newInventory);
 
             fakeCraftPlayer.saveData();
-    	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));   //saving must occur on the main thread.
+    	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer nmsPlayer, AbstractContainerMenu nmsView) {
