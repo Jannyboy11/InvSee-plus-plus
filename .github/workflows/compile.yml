@@ -49,9 +49,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            Spigot_Plugin/target/InvSee++.jar
-            Spigot_Addon_Give/target/InvSee++_Give.jar
-            Spigot_Addon_Clear/target/InvSee++_Clear.jar
+            InvSee++_Plugin/target/InvSee++.jar
+            InvSee++_Give_Plugin/target/InvSee++_Give.jar
+            InvSee++_Clear_Plugin/target/InvSee++_Clear.jar
       - name: Deploy to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

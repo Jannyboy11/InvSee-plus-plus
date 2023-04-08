@@ -79,7 +79,9 @@ public class InvseeAPI {
     private BiPredicate<EnderSpectatorInventory, Player> transferEnderToLivePlayer = (spectatorInv, player) -> true;
 
     private final Scheduler scheduler;
+    /** @deprecated use {@link #getScheduler()} instead */
     @Deprecated(forRemoval = true, since = "0.20.0") public final Executor serverThreadExecutor;
+    /** @deprecated use {@link #getScheduler()} instead */
     @Deprecated(forRemoval = true, since = "0.20.0") public final Executor asyncExecutor;
 
     protected final PlayerListener playerListener = new PlayerListener();
