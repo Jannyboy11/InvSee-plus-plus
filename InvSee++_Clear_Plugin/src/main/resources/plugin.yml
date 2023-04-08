@@ -5,7 +5,7 @@ depend: [InvSeePlusPlus]
 api-version: 1.13
 prefix: "InvSee++_Clear"
 description: Remove items from (offline) players.
-#TODO folia-supported: true
+folia-supported: true
 
 permissions:
   invseeplusplus.clear.*:
