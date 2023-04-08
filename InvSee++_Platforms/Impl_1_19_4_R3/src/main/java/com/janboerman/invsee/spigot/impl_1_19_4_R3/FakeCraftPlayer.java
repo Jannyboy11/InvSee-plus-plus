@@ -36,6 +36,7 @@ public class FakeCraftPlayer extends CraftPlayer {
 
     @Override
     public FakeEntityPlayer getHandle() {
+        //circumvent Folia's thread check by not calling the super.getHandle() method.
         return (FakeEntityPlayer) this.entity;
     }
 
