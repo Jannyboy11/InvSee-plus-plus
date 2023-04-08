@@ -157,7 +157,7 @@ public class InvseePlusPlus extends JavaPlugin {
         return api;
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.20.0")
     public OfflinePlayerProvider getOfflinePlayerProvider() {
         return offlinePlayerProvider;
     }
