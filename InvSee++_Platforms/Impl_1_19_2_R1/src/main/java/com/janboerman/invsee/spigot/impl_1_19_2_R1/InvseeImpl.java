@@ -3,11 +3,9 @@ package com.janboerman.invsee.spigot.impl_1_19_2_R1;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
-import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
 import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
@@ -18,6 +16,9 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import static com.janboerman.invsee.spigot.impl_1_19_2_R1.HybridServerSupport.enderChestItems;
 import static com.janboerman.invsee.spigot.impl_1_19_2_R1.HybridServerSupport.nextContainerCounter;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
+import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -35,7 +36,6 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_19_R1.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
@@ -50,22 +50,24 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class InvseeImpl extends InvseeAPI implements InvseePlatform {
+public class InvseeImpl implements InvseePlatform {
 
-    public InvseeImpl(Plugin plugin) {
-        super(plugin);
+    private final Plugin plugin;
+    private final OpenSpectatorsCache cache;
+    private final Scheduler scheduler;
+
+    public InvseeImpl(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        this.plugin = plugin;
+        this.cache = cache;
+        this.scheduler = scheduler;
+
         if (lookup.onlineMode(plugin.getServer())) {
-            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin));
+            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin, scheduler));
         } else {
             // If we are in offline mode, then we should insert this strategy *before* the UUIDOfflineModeStrategy.
-            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin));
+            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin, scheduler));
         }
-        lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
-    }
-
-    @Override
-    protected InvseePlatform getPlatform() {
-        return this;
+        lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin, scheduler));
     }
 
     @Override
@@ -101,7 +103,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
         MainBukkitInventory bukkitInventory = spectatorInv.bukkit();
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
-        cache(bukkitInventory);
+        cache.cache(bukkitInventory);
         return bukkitInventory;
     }
 
@@ -150,7 +152,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
         PlayerEnderChestContainer nmsInventory = (PlayerEnderChestContainer) craftInventory.getInventory();
         EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, enderChestItems(nmsInventory), options);
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
-        cache(bukkitInventory);
+        cache.cache(bukkitInventory);
         return bukkitInventory;
     }
 
@@ -200,7 +202,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
 
             CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
             return SpectateResponse.succeed(invCreator.apply(craftHumanEntity, options));
-        }, serverThreadExecutor);   //loading must occur on the main thread.
+        }, runnable -> scheduler.executeSyncPlayer(player, runnable, null));   //loading must occur on the main thread.
     }
 
     private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
@@ -208,7 +210,8 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
         CraftServer server = (CraftServer) plugin.getServer();
 
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
-    	GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayerId(), newInventory.getSpectatedPlayerName());
+        UUID playerId = newInventory.getSpectatedPlayerId();
+        GameProfile gameProfile = new GameProfile(playerId, newInventory.getSpectatedPlayerName());
         ProfilePublicKey profilePublicKey = null;
         //ProfilePublicKey is only ever non-null for 'real' online players, used for the new chat reporting system.
         //For the purposes of saving player data, it is fine to leave this null.
@@ -228,7 +231,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
             transfer.accept(currentInv, newInventory);
 
             fakeCraftPlayer.saveData();
-    	}, serverThreadExecutor);   //saving must occur on the main thread.
+    	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));   //saving must occur on the main thread.
     }
 
     public static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer player, AbstractContainerMenu container) {

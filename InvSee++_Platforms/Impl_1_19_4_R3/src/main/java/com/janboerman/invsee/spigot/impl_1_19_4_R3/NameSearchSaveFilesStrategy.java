@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.api.resolve.NameResolveStrategy;
 import static com.janboerman.invsee.spigot.impl_1_19_4_R3.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
@@ -16,11 +17,13 @@ import java.util.concurrent.CompletableFuture;
 
 public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 
-    private final Plugin plugin;
+	private final Plugin plugin;
+	private final Scheduler scheduler;
 
-    public NameSearchSaveFilesStrategy(Plugin plugin) {
-        this.plugin = plugin;
-    }
+	public NameSearchSaveFilesStrategy(Plugin plugin, Scheduler scheduler) {
+		this.plugin = plugin;
+		this.scheduler = scheduler;
+	}
 
 	@Override
 	public CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId) {
@@ -41,7 +44,7 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 				}
 			}
 			return Optional.empty();
-		}, runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable));
+		}, scheduler::executeAsync);
 	}
 
 }

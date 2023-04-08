@@ -17,6 +17,9 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.enderChestItems;
 import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.nextContainerCounter;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
+import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_12_R1.Container;
 import net.minecraft.server.v1_12_R1.DedicatedPlayerList;
@@ -48,24 +51,26 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class InvseeImpl extends InvseeAPI implements InvseePlatform {
+public class InvseeImpl implements InvseePlatform {
 
     static ItemStack EMPTY_STACK = ItemStack.a;
 
-    public InvseeImpl(Plugin plugin) {
-        super(plugin);
+    private final Plugin plugin;
+    private final OpenSpectatorsCache cache;
+    private final Scheduler scheduler;
+
+    public InvseeImpl(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        this.plugin = plugin;
+        this.cache = cache;
+        this.scheduler = scheduler;
+
         if (lookup.onlineMode(plugin.getServer())) {
-            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin));
+            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin, scheduler));
         } else {
             // If we are in offline mode, then we should insert this strategy *before* the UUIDOfflineModeStrategy.
-            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin));
+            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin, scheduler));
         }
-        lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin));
-    }
-
-    @Override
-    protected InvseePlatform getPlatform() {
-        return this;
+        lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin, scheduler));
     }
 
     @Override
@@ -128,7 +133,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
         MainBukkitInventory bukkitInventory = spectatorInv.bukkit();
         InventoryView targetView = player.getOpenInventory();
         bukkitInventory.watch(targetView);
-        cache(bukkitInventory);
+        cache.cache(bukkitInventory);
         return bukkitInventory;
     }
 
@@ -140,7 +145,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
         InventoryEnderChest nmsInventory = (InventoryEnderChest) craftInventory.getInventory();
         EnderNmsInventory spectatorInv = new EnderNmsInventory(uuid, name, enderChestItems(nmsInventory), options);
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
-        cache(bukkitInventory);
+        cache.cache(bukkitInventory);
         return bukkitInventory;
     }
 
@@ -193,7 +198,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
             CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
             return SpectateResponse.succeed(invCreator.apply(craftHumanEntity, options));
 
-        }, serverThreadExecutor);
+        }, runnable -> scheduler.executeSyncPlayer(player, runnable, null));
     }
 
     private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
@@ -203,7 +208,8 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
         IPlayerFileData worldNBTStorage = playerList.playerFileData;
 
         CraftWorld world = (CraftWorld) server.getWorlds().get(0);
-        GameProfile gameProfile = new GameProfile(newInventory.getSpectatedPlayerId(), newInventory.getSpectatedPlayerName());
+        UUID playerId = newInventory.getSpectatedPlayerId();
+        GameProfile gameProfile = new GameProfile(playerId, newInventory.getSpectatedPlayerName());
 
         FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(
                 server.getServer(),
@@ -224,7 +230,7 @@ public class InvseeImpl extends InvseeAPI implements InvseePlatform {
             transfer.accept(currentInv, newInventory);
 
             worldNBTStorage.save(fakeEntityPlayer);
-        }, serverThreadExecutor);
+        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(EntityPlayer player, Container container) {

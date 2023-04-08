@@ -5,6 +5,7 @@ import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import com.janboerman.invsee.spigot.InvseePlusPlus;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.StringHelper;
@@ -12,7 +13,6 @@ import com.janboerman.invsee.utils.UsernameTrie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -21,15 +21,13 @@ import java.util.stream.Collectors;
 
 public class AsyncTabCompleter implements Listener {
 
-    private final InvseePlusPlus plugin;
     private final Set<String> knownLabels;
     private final InvseeAPI api;
 
     private final UsernameTrie<Void> knownPlayerNames = new UsernameTrie<>();
     private final ConcurrentLinkedQueue<String> nameQueue = new ConcurrentLinkedQueue<>();
 
-    public AsyncTabCompleter(InvseePlusPlus plugin) {
-        this.plugin = plugin;
+    public AsyncTabCompleter(InvseePlusPlus plugin, Scheduler scheduler, OfflinePlayerProvider playerDatabase) {
         this.api = plugin.getApi();
 
         this.knownLabels = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
@@ -39,9 +37,7 @@ public class AsyncTabCompleter implements Listener {
         List<String> withPrefix = this.knownLabels.stream().map(s -> pluginNameLower + ":" + s).collect(Collectors.toList());
         this.knownLabels.addAll(withPrefix);
 
-        final OfflinePlayerProvider provider = plugin.getOfflinePlayerProvider();
-        final BukkitScheduler scheduler = plugin.getServer().getScheduler();
-        scheduler.runTaskAsynchronously(plugin, () -> provider.getAll(this::enqueue));
+        scheduler.executeAsync(() -> playerDatabase.getAll(this::enqueue));
     }
 
     private void enqueue(String name) {

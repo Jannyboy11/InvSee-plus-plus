@@ -70,26 +70,17 @@ public class NamesAndUUIDs {
     private boolean bungeeCord = false, bungeeCordOnline = false;
     private boolean velocity = false, velocityOnline = false;
 
-    public NamesAndUUIDs(Plugin plugin) {
-
-        Executor asyncExecutor = runnable -> {
-            if (plugin.getServer().isPrimaryThread()) { plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable); }
-            else { runnable.run(); }
-        };
-        Executor syncExecutor = runnable -> {
-            if (plugin.getServer().isPrimaryThread()) { runnable.run(); }
-            else { plugin.getServer().getScheduler().runTask(plugin, runnable); }
-        };
+    public NamesAndUUIDs(Plugin plugin, Scheduler scheduler) {
 
         MojangAPI mojangApi = new MojangAPI(HttpClient.newBuilder()
-                .executor(asyncExecutor)
+                .executor(scheduler::executeAsync)
                 .build());
 
         this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
         this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
 
-        this.uuidResolveStrategies.add(new UUIDOnlinePlayerStrategy(plugin.getServer(), syncExecutor));
-        this.nameResolveStrategies.add(new NameOnlinePlayerStrategy(plugin.getServer(), syncExecutor));
+        this.uuidResolveStrategies.add(new UUIDOnlinePlayerStrategy(plugin.getServer(), scheduler::executeSyncGlobal));
+        this.nameResolveStrategies.add(new NameOnlinePlayerStrategy(plugin.getServer(), scheduler::executeSyncGlobal));
 
         this.uuidResolveStrategies.add(new UUIDInMemoryStrategy(uuidCache));
         this.nameResolveStrategies.add(new NameInMemoryStrategy(userNameCache));
@@ -103,7 +94,7 @@ public class NamesAndUUIDs {
         }
 
         if (PAPER) {
-            this.uuidResolveStrategies.add(new UUIDPaperCacheStrategy(plugin));
+            this.uuidResolveStrategies.add(new UUIDPaperCacheStrategy(plugin, scheduler));
 
             YamlConfiguration paperConfig = plugin.getServer().spigot().getPaperConfig();
             ConfigurationSection proxiesSection = paperConfig.getConfigurationSection("proxies");
@@ -122,8 +113,8 @@ public class NamesAndUUIDs {
             }
         }
 
-        this.uuidResolveStrategies.add(new UUIDPermissionPluginStategy(plugin));
-        this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin));
+        this.uuidResolveStrategies.add(new UUIDPermissionPluginStategy(plugin, scheduler));
+        this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin, scheduler));
 
         if (bungeeCord || velocity) {
             this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin));

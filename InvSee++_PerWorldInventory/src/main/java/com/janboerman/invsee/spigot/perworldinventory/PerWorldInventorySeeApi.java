@@ -16,8 +16,10 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
+import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
-import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import me.ebonjaeger.perworldinventory.Group;
 import me.ebonjaeger.perworldinventory.data.PlayerProfile;
 import me.ebonjaeger.perworldinventory.data.ProfileKey;
@@ -37,7 +39,6 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -45,12 +46,13 @@ import org.bukkit.plugin.PluginManager;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform {
 
-    private final InvseeAPI wrapped;
+    private final InvseePlatform wrapped;
     private final PerWorldInventoryHook pwiHook;
 
     //there can be more than one open spectator inventories per target player.
@@ -64,14 +66,18 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
     private TiedInventoryListener tiedInventoryListener;
     private TiedPlayerListener tiedPlayerListener;
 
-    public PerWorldInventorySeeApi(Plugin plugin, InvseeAPI wrapped, PerWorldInventoryHook pwiHook) {
-        super(plugin);
+    private final OpenSpectatorsCache cache;
+    private final Scheduler scheduler;
+
+    public PerWorldInventorySeeApi(Plugin plugin,
+                                   NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cachedInventories,
+                                   InvseePlatform wrapped, PerWorldInventoryHook pwiHook) {
+        super(plugin, null, lookup, scheduler, cachedInventories);
         this.wrapped = Objects.requireNonNull(wrapped);
         this.pwiHook = Objects.requireNonNull(pwiHook);
 
-        wrapped.unregisterListeners();
-        setOpenInventories(getOpenInventories(wrapped));
-        setOpenEnderChests(getOpenEnderChests(wrapped));
+        this.cache = Objects.requireNonNull(cachedInventories);
+        this.scheduler = Objects.requireNonNull(scheduler);
 
         //these influence the PlayerListener
         setMainInventoryTransferPredicate((spectatorInventory, player) -> {
@@ -159,7 +165,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
 
                 ProfileKey key = inventoryKeys.get(main);
                 if (key != null) {
-                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                    scheduler.executeLaterGlobal(() -> {
                         //remove from maps if nobody is watching
                         if (main.getViewers().isEmpty()) {
                             inventories.remove(key, main);
@@ -172,7 +178,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
 
                 ProfileKey key = enderchestKeys.get(ender);
                 if (key != null) {
-                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                    scheduler.executeLaterGlobal(() -> {
                         //remove from maps if nobody is watching
                         if (ender.getViewers().isEmpty()) {
                             enderchests.remove(key, ender);
@@ -193,11 +199,10 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 ((Personal) mainSpectator).watch(event.getView());
             }
 
-            wrapped.getOpenMainSpectatorInventory(player.getUniqueId()).ifPresent(spectator -> {
-                if (spectator instanceof Personal) {
-                    ((Personal) spectator).watch(event.getView());
-                }
-            });
+            var spectator = cache.getMainSpectatorInventory(player.getUniqueId());
+            if (spectator instanceof Personal) {
+                ((Personal) spectator).watch(event.getView());
+            }
         }
 
         @EventHandler
@@ -210,11 +215,10 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 ((Personal) mainSpectator).unwatch();
             }
 
-            wrapped.getOpenMainSpectatorInventory(player.getUniqueId()).ifPresent(spectator -> {
-                if (spectator instanceof Personal) {
-                    ((Personal) spectator).unwatch();
-                }
-            });
+            var spectator = cache.getMainSpectatorInventory(player.getUniqueId());
+            if (spectator instanceof Personal) {
+                ((Personal) spectator).unwatch();
+            }
         }
     }
 
@@ -304,7 +308,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 ItemStack[] contents = mainSpectator.getContents();                         //already is a copy
                 viewers.forEach(HumanEntity::closeInventory);
 
-                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                Executor executor = runnable -> scheduler.executeSyncPlayer(newProfileKey.getUuid(), runnable, null);
+                executor.execute(() -> {
                     //run in the next tick to ensure that the player has changed worlds and the live inventory is actually really live
                     Optional<MainSpectatorInventory> liveFuture = asLiveInventory(mainSpectator, false);
                     liveFuture.ifPresentOrElse(liveSpectator -> {
@@ -321,7 +326,8 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 ItemStack[] contents = enderSpectator.getContents();                         //already is a copy
                 viewers.forEach(HumanEntity::closeInventory);
 
-                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                Executor executor = runnable -> scheduler.executeSyncPlayer(newProfileKey.getUuid(), runnable, null);
+                executor.execute(() -> {
                     //run in the next tick to ensure that the player has changed worlds and the live inventory is actually really live
                     Optional<EnderSpectatorInventory> liveFuture = asLiveInventory(enderSpectator, false);
                     liveFuture.ifPresentOrElse(liveSpectator -> {
@@ -422,7 +428,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
 
     @Override
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options) {
-        Optional<EnderSpectatorInventory> cached = wrapped.getOpenEnderSpectatorInventory(playerId);
+        Optional<EnderSpectatorInventory> cached = Optional.ofNullable(cache.getEnderSpectatorInventory(playerId));
         if (cached.isPresent()) return CompletableFuture.completedFuture(SpectateResponse.succeed(cached.get()));
 
         Location logoutLocation = pwiHook.getDataSource().getLogout(new FakePlayer(playerId, playerName, plugin.getServer()));
@@ -510,7 +516,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
             });
 
             return optionalSpectatorInv;
-        }, serverThreadExecutor);
+        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
     public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory, ProfileKey profileKey, boolean saveVanilla) {
@@ -563,7 +569,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                     profile.getBalance());
             pwiHook.getProfileCache().put(profileKey, updatedProfile);
 
-            CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), asyncExecutor);
+            CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), scheduler::executeAsync);
             if (saveVanilla) saveTask = CompletableFuture.allOf(saveTask, wrapped.saveInventory(inventory));
             return saveTask;
         }
@@ -617,7 +623,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
             });
 
             return optionalSpectatorInv;
-        }, serverThreadExecutor);
+        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
     public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest, ProfileKey profileKey, boolean saveVanilla) {
@@ -662,7 +668,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                     profile.getBalance());
             pwiHook.getProfileCache().put(profileKey, updatedProfile);
 
-            CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), asyncExecutor);
+            CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), scheduler::executeAsync);
             if (saveVanilla) saveTask = CompletableFuture.allOf(saveTask, wrapped.saveEnderChest(enderChest));
             return saveTask;
         }
@@ -730,7 +736,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
             CreationOptions<PlayerInventorySlot> options = CreationOptions.defaultMainInventory().withTitle(title).withMirror(mirror);
 
             //who needs type safety anyway?
-            return (CompletableFuture<Optional<S>>) (Object) createOfflineInventory(id, name, options, profileKey).thenApplyAsync(Function.identity(), serverThreadExecutor);
+            return (CompletableFuture<Optional<S>>) (Object) createOfflineInventory(id, name, options, profileKey).thenApplyAsync(Function.identity(), runnable -> scheduler.executeSyncPlayer(id, runnable, null));
 
         } else if (liveSpectatorInventory instanceof EnderSpectatorInventory) {
             EnderSpectatorInventory liveSpectator = (EnderSpectatorInventory) liveSpectatorInventory;
@@ -738,7 +744,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
             CreationOptions<EnderChestSlot> options = CreationOptions.defaultEnderInventory().withTitle(title).withMirror(mirror);
 
             //who needs type safety anyway?
-            return (CompletableFuture<Optional<S>>) (Object) createOfflineEnderChest(id, name, options, profileKey).thenApplyAsync(Function.identity(), serverThreadExecutor);
+            return (CompletableFuture<Optional<S>>) (Object) createOfflineEnderChest(id, name, options, profileKey).thenApplyAsync(Function.identity(), runnable -> scheduler.executeSyncPlayer(id, runnable, null));
         }
 
         //unreachable

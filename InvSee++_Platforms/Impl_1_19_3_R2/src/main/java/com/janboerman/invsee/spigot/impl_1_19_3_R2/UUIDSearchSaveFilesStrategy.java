@@ -5,6 +5,7 @@ import static com.janboerman.invsee.spigot.impl_1_19_3_R2.HybridServerSupport.ge
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.LogRecord;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
@@ -24,24 +25,12 @@ import java.util.logging.Level;
 
 public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 
-    private final Plugin plugin;
+	private final Plugin plugin;
+	private final Scheduler scheduler;
 
-    public UUIDSearchSaveFilesStrategy(Plugin plugin) {
-        this.plugin = plugin;
-    }
-
-	private Executor serverThreadExecutor() {
-		return runnable -> {
-			if (plugin.getServer().isPrimaryThread()) { runnable.run(); }
-			else { plugin.getServer().getScheduler().runTask(plugin, runnable); }
-		};
-	}
-
-	private Executor asyncExecutor() {
-		return runnable -> {
-			if (plugin.getServer().isPrimaryThread()) { plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable); }
-			else { runnable.run(); }
-		};
+	public UUIDSearchSaveFilesStrategy(Plugin plugin, Scheduler scheduler) {
+		this.plugin = plugin;
+		this.scheduler = scheduler;
 	}
 
 	@Override
@@ -62,6 +51,8 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 				playerFilesLoop:
 				for (File playerFile : playerFiles) {
 					final String fileName = playerFile.getName();
+					final UUID playerId = uuidFromFileName(fileName);
+					final Executor syncExecutor = playerId == null ? scheduler::executeSyncGlobal : runnable -> scheduler.executeSyncPlayer(playerId, runnable, null);
 
 					//I now finally understand the appeal of libraries like Cats Effect / ZIO.
 					try {
@@ -75,7 +66,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 								syncEx.addSuppressed(asyncEx);
 								throw new CompletionException(syncEx);
 							}
-						}, serverThreadExecutor());
+						}, syncExecutor);
 
 						try {
 							CompoundTag compound = compoundFuture.get(); // we join the (possibly synchronous!) future back into our async future!
@@ -110,7 +101,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 				}
 			}
 			return Optional.empty();
-		}, asyncExecutor());
+		}, scheduler::executeAsync);
 	}
 
 	private static final boolean tagHasLastKnownName(CompoundTag compound, String userName) {
@@ -123,6 +114,16 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 		}
 
 		return false;
+	}
+
+	private static UUID uuidFromFileName(String fileName) {
+		if (fileName == null || fileName.length() < 36) return null;
+		String uuidChars = fileName.substring(0, 36);
+		try {
+			return UUID.fromString(uuidChars);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
 	}
 
 }

@@ -1,34 +1,22 @@
 package com.janboerman.invsee.spigot.api.resolve;
 
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 public class NamePermissionPluginStrategy implements NameResolveStrategy {
     private final Plugin plugin;
     private final Server server;
+    private final Scheduler scheduler;
 
-    public NamePermissionPluginStrategy(Plugin plugin) {
+    public NamePermissionPluginStrategy(Plugin plugin, Scheduler scheduler) {
         this.plugin = plugin;
         this.server = plugin.getServer();
-    }
-
-    private Executor serverThreadExecutor() {
-        return runnable -> {
-            if (server.isPrimaryThread()) runnable.run();
-            else server.getScheduler().runTask(plugin, runnable);
-        };
-    }
-
-    private Executor asyncExecutor() {
-        return runnable -> {
-            if (server.isPrimaryThread()) server.getScheduler().runTaskAsynchronously(plugin, runnable);
-            else runnable.run();
-        };
+        this.scheduler = scheduler;
     }
 
     private static Optional<String> firstPresentOptional(Optional<String> one, Optional<String> two) {
@@ -48,7 +36,7 @@ public class NamePermissionPluginStrategy implements NameResolveStrategy {
     private CompletableFuture<Optional<String>> resolveUsingLuckPerms(UUID uniqueId) {
         final CompletableFuture<Optional<String>> resultFuture = new CompletableFuture<>();
 
-        serverThreadExecutor().execute(() -> {
+        scheduler.executeSyncGlobal(() -> {
             if (server.getPluginManager().isPluginEnabled("LuckPerms")) {
                 net.luckperms.api.LuckPerms api = net.luckperms.api.LuckPermsProvider.get();
                 net.luckperms.api.model.user.UserManager userManager = api.getUserManager();
@@ -74,7 +62,7 @@ public class NamePermissionPluginStrategy implements NameResolveStrategy {
     private CompletableFuture<Optional<String>> resolveUsingGroupManager(UUID uniqueId) {
         final CompletableFuture<Optional<String>> resultFuture = new CompletableFuture<>();
 
-        serverThreadExecutor().execute(() -> {
+        scheduler.executeSyncGlobal(() -> {
             if (server.getPluginManager().isPluginEnabled("GroupManager")) {
                 if (server.getPluginManager().isPluginEnabled("GroupManager")) {
                     org.anjocaido.groupmanager.GroupManager groupManager = (org.anjocaido.groupmanager.GroupManager) server.getPluginManager().getPlugin("GroupManager");
@@ -98,13 +86,13 @@ public class NamePermissionPluginStrategy implements NameResolveStrategy {
     private CompletableFuture<Optional<String>> resolveUsingBungeePerms(UUID uniqueId) {
         final CompletableFuture<Optional<String>> resultFuture = new CompletableFuture<>();
 
-        serverThreadExecutor().execute(() -> {
+        scheduler.executeSyncGlobal(() -> {
             if (server.getPluginManager().isPluginEnabled("BungeePerms")) {
                 net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin bukkitPlugin = (net.alpenblock.bungeeperms.platform.bukkit.BukkitPlugin) server.getPluginManager().getPlugin("BungeePerms");
                 net.alpenblock.bungeeperms.BungeePerms bungeePerms = bukkitPlugin.getBungeeperms();
                 net.alpenblock.bungeeperms.PermissionsManager permissionsManager = bungeePerms.getPermissionsManager();
 
-                asyncExecutor().execute(() -> {
+                scheduler.executeAsync(() -> {
                     try {
                         net.alpenblock.bungeeperms.User user = permissionsManager.getUser(uniqueId, true);
                         if (user == null) {
@@ -127,11 +115,11 @@ public class NamePermissionPluginStrategy implements NameResolveStrategy {
     private CompletableFuture<Optional<String>> resolveUsingUltraPermissions(UUID uniqueId) {
         final CompletableFuture<Optional<String>> resultFuture = new CompletableFuture<>();
 
-        serverThreadExecutor().execute(() -> {
+        scheduler.executeSyncGlobal(() -> {
             if (server.getPluginManager().isPluginEnabled("UltraPermissions")) {
                 me.TechsCode.UltraPermissions.UltraPermissionsAPI api = me.TechsCode.UltraPermissions.UltraPermissions.getAPI();
 
-                asyncExecutor().execute(() -> {
+                scheduler.executeAsync(() -> {
                     try {
                         me.TechsCode.UltraPermissions.storage.collection.UserList userList = api.getUsers();
                         Optional<me.TechsCode.UltraPermissions.storage.objects.User> optUser = userList.uuid(uniqueId);

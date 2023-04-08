@@ -13,6 +13,9 @@ import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesH
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
  */
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
+import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
@@ -33,25 +36,7 @@ import java.util.stream.Collectors;
 public class InvseePlusPlus extends JavaPlugin {
 
     private InvseeAPI api;
-    private OfflinePlayerProvider offlinePlayerProvider;
-
-    private final Scheduler scheduler;
-
-    public InvseePlusPlus() {
-        boolean folia;
-        try {
-            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
-            folia = true;
-        } catch (ClassNotFoundException e) {
-            folia = false;
-        }
-
-        if (folia) {
-            this.scheduler = new FoliaScheduler(this);
-        } else {
-            this.scheduler = new DefaultScheduler(this);
-        }
-    }
+    @Deprecated(forRemoval = true) private OfflinePlayerProvider offlinePlayerProvider;
 
     @Override
     public void onEnable() {
@@ -59,16 +44,22 @@ public class InvseePlusPlus extends JavaPlugin {
         saveDefaultConfig();
 
         //initialisation
-        Setup setup = Setup.setup(this, this.scheduler);
-        this.api = setup.api();
-        this.offlinePlayerProvider = setup.offlinePlayerProvider();
+        final Scheduler scheduler = makeScheduler(this);
+        final NamesAndUUIDs lookup = new NamesAndUUIDs(this, scheduler);
+        final OpenSpectatorsCache cache = new OpenSpectatorsCache();
+        Setup setup = Setup.setup(this, scheduler, lookup, cache);
+        final InvseePlatform platform = setup.platform();
+        final OfflinePlayerProvider playerDatabase = setup.offlinePlayerProvider();
+
+        //TODO @Deprecated
+        this.offlinePlayerProvider = playerDatabase;
 
         //interop
         PerWorldInventoryHook pwiHook;
         //MultiverseInventoriesHook mviHook;
         if (offlinePlayerSupport() && (pwiHook = new PerWorldInventoryHook(this)).trySetup()) {
             if (pwiHook.managesEitherInventory()) {
-                this.api = new PerWorldInventorySeeApi(this, api, pwiHook);
+                this.api = new PerWorldInventorySeeApi(this, lookup, scheduler, cache, platform, pwiHook);
                 getLogger().info("Enabled PerWorldInventory integration.");
             }
         }
@@ -79,7 +70,15 @@ public class InvseePlusPlus extends JavaPlugin {
         // else if (MyWorlds)
         // else if (Separe-World-Items)
 
-        //set configured values //TODO platform implementation must be responsible for default CreationOptions.
+        else {
+            this.api = new InvseeAPI(this, platform, lookup, scheduler, cache);
+        }
+
+        assert this.api != null : "did not set the InvseeAPI instance!";
+
+        //set up default creation options
+        //TODO if no values are configured, use the platform default CreationOptions, and save these to config.
+        //TODO rewrite configuration logic.
         api.setOfflinePlayerSupport(offlinePlayerSupport());
         api.setUnknownPlayerSupport(unknownPlayerSupport());
         api.setMainInventoryTitle(this::getTitleForInventory);
@@ -92,7 +91,7 @@ public class InvseePlusPlus extends JavaPlugin {
         setupCommands();
 
         //event listeners
-        setupEvents();
+        setupEvents(scheduler, playerDatabase);
 
         //TODO idea: shoulder look functionality. an admin will always see the same inventory that the target player sees.
         //TODO can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
@@ -114,14 +113,14 @@ public class InvseePlusPlus extends JavaPlugin {
         enderseeCommand.setTabCompleter(tabCompleter);
     }
 
-    private void setupEvents() {
+    private void setupEvents(Scheduler scheduler, OfflinePlayerProvider playerDB) {
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
 
         if (offlinePlayerSupport() && tabCompleteOfflinePlayers()) {
             try {
                 Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-                pluginManager.registerEvents(new AsyncTabCompleter(this), this);
+                pluginManager.registerEvents(new AsyncTabCompleter(this, scheduler, playerDB), this);
             } catch (ClassNotFoundException e) {
                 getLogger().log(Level.WARNING, "InvSee++ is not running on a Paper API-enabled server.");
                 getLogger().log(Level.WARNING, "Tab-completion for offline players will not work for all players!");
@@ -158,6 +157,7 @@ public class InvseePlusPlus extends JavaPlugin {
         return api;
     }
 
+    @Deprecated(forRemoval = true)
     public OfflinePlayerProvider getOfflinePlayerProvider() {
         return offlinePlayerProvider;
     }
@@ -226,6 +226,22 @@ public class InvseePlusPlus extends JavaPlugin {
             String formatConsole = logging.getString("format-console");
             if (formatConsole != null) formats.put(LogTarget.CONSOLE, formatConsole);
             return LogOptions.of(logGranularity, logTargets, formats);
+        }
+    }
+
+    private static Scheduler makeScheduler(InvseePlusPlus plugin) {
+        boolean folia;
+        try {
+            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+            folia = true;
+        } catch (ClassNotFoundException e) {
+            folia = false;
+        }
+
+        if (folia) {
+            return new FoliaScheduler(plugin);
+        } else {
+            return new DefaultScheduler(plugin);
         }
     }
 }

@@ -1,58 +1,58 @@
 package com.janboerman.invsee.spigot;
 
-import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.MappingsVersion;
+import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.spigot.internal.Scheduler;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 
 public interface Setup {
 
-    public InvseeAPI api();
+    public InvseePlatform platform();
 
     public default OfflinePlayerProvider offlinePlayerProvider() {
         return OfflinePlayerProvider.Dummy.INSTANCE;
     }
 
-    public static Setup setup(Plugin plugin, Scheduler scheduler) {
+    public static Setup setup(Plugin plugin, Scheduler scheduler, NamesAndUUIDs lookup, OpenSpectatorsCache cache) {
         final Server server = plugin.getServer();
         final String serverClassName = server.getClass().getName();
-        //TODO actually use scheduler.
-
 
         if ("org.bukkit.craftbukkit.v1_8_R3.CraftServer".equals(serverClassName)) {
-            return new Impl_1_8_8(plugin);
+            return new Impl_1_8_8(plugin, lookup, scheduler, cache);
         } else if ("org.bukkit.craftbukkit.v1_12_R1.CraftServer".equals(serverClassName)) {
-            return new Impl_1_12_2(plugin);
+            return new Impl_1_12_2(plugin, lookup, scheduler, cache);
         } else if ("org.bukkit.craftbukkit.v1_15_R1.CraftServer".equals(serverClassName)) {
-            return new Impl_1_15_2(plugin);
+            return new Impl_1_15_2(plugin, lookup, scheduler, cache);
         } else if ("org.bukkit.craftbukkit.v1_16_R3.CraftServer".equals(serverClassName)) {
-            return new Impl_1_16_5(plugin);
+            return new Impl_1_16_5(plugin, lookup, scheduler, cache);
         } else if ("org.bukkit.craftbukkit.v1_17_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_17_1:
-                    return new Impl_1_17_1(plugin);
+                    return new Impl_1_17_1(plugin, lookup, scheduler, cache);
             }
         } else if ("org.bukkit.craftbukkit.v1_18_R2.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_18_2:
-                    return new Impl_1_18_2(plugin);
+                    return new Impl_1_18_2(plugin, lookup, scheduler, cache);
             }
         } else if ("org.bukkit.craftbukkit.v1_19_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_19_2:
-                    return new Impl_1_19_2(plugin);
+                    return new Impl_1_19_2(plugin, lookup, scheduler, cache);
             }
         } else if ("org.bukkit.craftbukkit.v1_19_R2.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_19_3:
-                    return new Impl_1_19_3(plugin);
+                    return new Impl_1_19_3(plugin, lookup, scheduler, cache);
             }
         } else if ("org.bukkit.craftbukkit.v1_19_R3.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_19_4:
-                    return new Impl_1_19_4(plugin);
+                    return new Impl_1_19_4(plugin, lookup, scheduler, cache);
             }
         }
 
@@ -69,56 +69,56 @@ public interface Setup {
 //previously, the Setup#setup(Plugin) method tried to load all implementation classes, even before any of them was needed.
 
 class Impl_1_8_8 extends SetupImpl {
-    Impl_1_8_8(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_8_R3.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_8_R3.KnownPlayersProvider(plugin));
+    Impl_1_8_8(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_8_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_8_R3.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_12_2 extends SetupImpl {
-    Impl_1_12_2(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_12_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_12_R1.KnownPlayersProvider(plugin));
+    Impl_1_12_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_12_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_12_R1.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_15_2 extends SetupImpl {
-    Impl_1_15_2(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_15_R1.KnownPlayersProvider(plugin));
+    Impl_1_15_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_15_R1.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_16_5 extends SetupImpl {
-    Impl_1_16_5(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_16_R3.KnownPlayersProvider(plugin));
+    Impl_1_16_5(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_16_R3.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_17_1 extends SetupImpl {
-    Impl_1_17_1(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_17_1_R1.KnownPlayersProvider(plugin));
+    Impl_1_17_1(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_17_1_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_17_1_R1.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_18_2 extends SetupImpl {
-    Impl_1_18_2(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin));
+    Impl_1_18_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_19_2 extends SetupImpl {
-    Impl_1_19_2(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_19_2_R1.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_2_R1.KnownPlayersProvider(plugin));
+    Impl_1_19_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_19_2_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_19_2_R1.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_19_3 extends SetupImpl {
-    Impl_1_19_3(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_19_3_R2.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_3_R2.KnownPlayersProvider(plugin));
+    Impl_1_19_3(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_19_3_R2.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_19_3_R2.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
 class Impl_1_19_4 extends SetupImpl {
-    Impl_1_19_4(Plugin plugin) {
-        super(new com.janboerman.invsee.spigot.impl_1_19_4_R3.InvseeImpl(plugin), new com.janboerman.invsee.spigot.impl_1_19_4_R3.KnownPlayersProvider(plugin));
+    Impl_1_19_4(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_19_4_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_19_4_R3.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
@@ -126,17 +126,17 @@ class Impl_1_19_4 extends SetupImpl {
 
 class SetupImpl implements Setup {
 
-    private final InvseeAPI api;
+    private final InvseePlatform platform;
     private final OfflinePlayerProvider offlinePlayerProvider;
 
-    SetupImpl(InvseeAPI api, OfflinePlayerProvider offlinePlayerProvider) {
-        this.api = api;
+    SetupImpl(InvseePlatform platform, OfflinePlayerProvider offlinePlayerProvider) {
+        this.platform = platform;
         this.offlinePlayerProvider = offlinePlayerProvider;
     }
 
     @Override
-    public InvseeAPI api() {
-        return api;
+    public InvseePlatform platform() {
+        return platform;
     }
 
     @Override

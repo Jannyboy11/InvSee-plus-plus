@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_15_R1;
 
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.janboerman.invsee.utils.StringHelper;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 
@@ -15,15 +16,19 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class KnownPlayersProvider implements OfflinePlayerProvider {
 
     private final Plugin plugin;
+    private final Scheduler scheduler;
 
-    public KnownPlayersProvider(Plugin plugin) {
+    public KnownPlayersProvider(Plugin plugin, Scheduler scheduler) {
         this.plugin = plugin;
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -41,7 +46,10 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
                 readName(result, playerFile);
             } catch (IOException | ReportedException e1) {
                 //did not work, try again on main thread:
-                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                UUID playerId = uuidFromFileName(playerFile.getName());
+                Executor executor = playerId == null ? scheduler::executeSyncGlobal : runnable -> scheduler.executeSyncPlayer(playerId, runnable, null);
+
+                executor.execute(() -> {
                     try {
                         readName(result, playerFile);
                     } catch (IOException | ReportedException e2) {
@@ -68,7 +76,10 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
                 readName(prefix, result, playerFile);
             } catch (IOException | ReportedException e1) {
                 //did not work, try again on main thread:
-                plugin.getServer().getScheduler().runTask(plugin, () -> {
+                UUID playerId = uuidFromFileName(playerFile.getName());
+                Executor executor = playerId == null ? scheduler::executeSyncGlobal : runnable -> scheduler.executeSyncPlayer(playerId, runnable, null);
+
+                executor.execute(() -> {
                     try {
                         readName(prefix, result, playerFile);
                     } catch (IOException | ReportedException e2) {
@@ -77,6 +88,15 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
                     }
                 });
             }
+        }
+    }
+
+    private static UUID uuidFromFileName(String fileName) {
+        if (fileName == null | fileName.length() < 36) return null;
+        try {
+            return UUID.fromString(fileName.substring(0, 36));
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 

@@ -14,17 +14,34 @@ public class DefaultScheduler implements Scheduler {
 
     @Override
     public void executeSyncPlayer(UUID playerId, Runnable task, Runnable retired) {
-        plugin.getServer().getScheduler().runTask(plugin, task);
+        executeSync(task);
     }
 
     @Override
     public void executeSyncGlobal(Runnable task) {
-        plugin.getServer().getScheduler().runTask(plugin, task);
+        executeSync(task);
+    }
+
+    private void executeSync(Runnable task) {
+        if (plugin.getServer().isPrimaryThread()) {
+            task.run();
+        } else {
+            plugin.getServer().getScheduler().runTask(plugin, task);
+        }
     }
 
     @Override
     public void executeAsync(Runnable task) {
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, task);
+        if (!plugin.getServer().isPrimaryThread()) {
+            task.run();
+        } else {
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, task);
+        }
+    }
+
+    @Override
+    public void executeLaterGlobal(Runnable task, long delayTicks) {
+        plugin.getServer().getScheduler().runTaskLater(plugin, task, delayTicks);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.api.resolve;
 
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
@@ -15,12 +16,14 @@ import java.util.concurrent.Executor;
 public class UUIDPaperCacheStrategy implements UUIDResolveStrategy {
 
     private final Plugin plugin;
+    private final Scheduler scheduler;
     private final Server server;
     private final Method method;
 
-    public UUIDPaperCacheStrategy(Plugin plugin) {
+    public UUIDPaperCacheStrategy(Plugin plugin, Scheduler scheduler) {
         this.plugin = plugin;
         this.server = plugin.getServer();
+        this.scheduler = scheduler;
 
         Method method;
         try {
@@ -29,13 +32,6 @@ public class UUIDPaperCacheStrategy implements UUIDResolveStrategy {
             method = null;
         }
         this.method = method;
-    }
-
-    private final Executor serverThreadExecutor() {
-        return runnable -> {
-            if (server.isPrimaryThread()) runnable.run();
-            else server.getScheduler().runTask(plugin, runnable);
-        };
     }
 
     @Override
@@ -50,7 +46,7 @@ public class UUIDPaperCacheStrategy implements UUIDResolveStrategy {
                 e.printStackTrace();
                 return Optional.empty();
             }
-        }, serverThreadExecutor());
+        }, scheduler::executeSyncGlobal);
     }
 
 }

@@ -24,6 +24,8 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.utils.*;
@@ -35,7 +37,7 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
 import org.bukkit.plugin.*;
 
-public abstract class InvseeAPI {
+public class InvseeAPI {
 
     /* TODO this class needs a BIG refactor.
      * TODO implementations should be able to override *just* the abstract methods.
@@ -46,11 +48,13 @@ public abstract class InvseeAPI {
      *
      * TODO later, we could also return an InvseeAPI instance PER PLUGIN. <-- That is going to be annoying with event listeners though.
      * TODO this is useful for logging, now that we have the PLUGIN_LOG_FILE.
+     * TODO so, maybe the InvSeePlusPlus plugin does the event stuff, that way we can create multiple api instances (with shared NamesAndUUIDs as well as the Scheduler)
      */
 
     protected final Plugin plugin;
     protected final InvseePlatform platform;
     protected final NamesAndUUIDs lookup;
+    protected final OpenSpectatorsCache cachedInventories;
     protected final Exempt exempt;
 
     private Title mainInventoryTitle = target -> target.toString() + "'s inventory";
@@ -64,13 +68,9 @@ public abstract class InvseeAPI {
 
     private LogOptions logOptions = new LogOptions();
 
-    private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());    //TODO does this need to be synchronised still?
-    //TODO this^ design can fail very badly when two players spectate the same player, using different profiles!
     private final Map<String, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByUuid = new ConcurrentHashMap<>();
 
-    private Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests = Collections.synchronizedMap(new WeakHashMap<>());   //TODO does this need to be synchronised still?
-    //TODO this^ design can fail very badly when two players spectate the same player, using different profiles!
     private final Map<String, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<SpectateResponse<EnderSpectatorInventory>>> pendingEnderChestsByUuid = new ConcurrentHashMap<>();
 
@@ -79,27 +79,27 @@ public abstract class InvseeAPI {
     private BiPredicate<MainSpectatorInventory, Player> transferInvToLivePlayer = (spectatorInv, player) -> true;
     private BiPredicate<EnderSpectatorInventory, Player> transferEnderToLivePlayer = (spectatorInv, player) -> true;
 
-    public final Executor serverThreadExecutor;
-    public final Executor asyncExecutor;
+    private final Scheduler scheduler;
 
     protected final PlayerListener playerListener = new PlayerListener();
     protected final InventoryListener inventoryListener = new InventoryListener();
 
-    protected InvseeAPI(Plugin plugin) {
+    public InvseeAPI(Plugin plugin, InvseePlatform platform, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cachedInventories) {
         this.plugin = Objects.requireNonNull(plugin);
 
-        this.serverThreadExecutor = runnable -> plugin.getServer().getScheduler().runTask(plugin, runnable);
-        this.asyncExecutor = runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable);
-
-        this.lookup = new NamesAndUUIDs(plugin);
+        this.lookup = Objects.requireNonNull(lookup);
+        this.platform = Objects.requireNonNull(platform == null ? getPlatform() : platform);
+        this.scheduler = Objects.requireNonNull(scheduler);
+        this.cachedInventories = Objects.requireNonNull(cachedInventories);
         this.exempt = new Exempt(plugin.getServer());
 
         registerListeners();
-        this.platform = getPlatform();
     }
 
-    @Deprecated //restructure this.
-    protected abstract InvseePlatform getPlatform();
+    @Deprecated //TODO refactor/remote this.
+    protected InvseePlatform getPlatform() {
+        return platform;
+    }
 
     public void shutDown() {
         for (var future : pendingInventoriesByUuid.values())
@@ -215,64 +215,40 @@ public abstract class InvseeAPI {
         this.transferEnderToLivePlayer = bip;
     }
 
-    protected static Map<UUID, WeakReference<MainSpectatorInventory>> getOpenInventories(InvseeAPI api) {
-        return api.openInventories;
-    }
-
-    protected static Map<UUID, WeakReference<EnderSpectatorInventory>> getOpenEnderChests(InvseeAPI api) {
-        return api.openEnderChests;
-    }
-
-    //TODO I don't like the design of this
-    protected void setOpenInventories(Map<UUID, WeakReference<MainSpectatorInventory>> openInventories) {
-        this.openInventories = openInventories;
-    }
-
-    //TODO I don't like the design of this
-    protected void setOpenEnderChests(Map<UUID, WeakReference<EnderSpectatorInventory>> openEnderChests) {
-        this.openEnderChests = openEnderChests;
-    }
-
     public Optional<MainSpectatorInventory> getOpenMainSpectatorInventory(UUID player) {
-        return Optional.ofNullable(openInventories.get(player))
-                .flatMap(ref -> Optional.ofNullable(ref.get()));
+        return Optional.ofNullable(cachedInventories.getMainSpectatorInventory(player));
     }
 
     public Optional<EnderSpectatorInventory> getOpenEnderSpectatorInventory(UUID player) {
-        return Optional.ofNullable(openEnderChests.get(player))
-                .flatMap(ref -> Optional.ofNullable(ref.get()));
+        return Optional.ofNullable(cachedInventories.getEnderSpectatorInventory(player));
     }
 
     public final CompletableFuture<Optional<UUID>> fetchUniqueId(String userName) {
-        return lookup.resolveUUID(userName).thenApplyAsync(Function.identity(), serverThreadExecutor);
+        return lookup.resolveUUID(userName).thenApplyAsync(Function.identity(), scheduler::executeSyncGlobal);
     }
 
     public final CompletableFuture<Optional<String>> fetchUserName(UUID uniqueId) {
-        return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), serverThreadExecutor);
+        return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), scheduler::executeSyncGlobal);
     }
 
+    @Deprecated(forRemoval = true)
     protected void cache(MainSpectatorInventory spectatorInventory) {
-        cache(spectatorInventory, false);
+        cachedInventories.cache(spectatorInventory, false);
     }
 
+    @Deprecated(forRemoval = true)
     protected void cache(MainSpectatorInventory spectatorInventory, boolean force) {
-        WeakReference<MainSpectatorInventory> ref;
-        MainSpectatorInventory oldSpectatorInv;
-        if (force || (ref = openInventories.get(spectatorInventory.getSpectatedPlayerId())) == null || (oldSpectatorInv = ref.get()) == null) {
-            openInventories.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-        }
+        cachedInventories.cache(spectatorInventory, force);
     }
 
+    @Deprecated(forRemoval = true)
     protected void cache(EnderSpectatorInventory spectatorInventory) {
-        cache(spectatorInventory, false);
+        cachedInventories.cache(spectatorInventory);
     }
 
+    @Deprecated(forRemoval = true)
     protected void cache(EnderSpectatorInventory spectatorInventory, boolean force) {
-        WeakReference<EnderSpectatorInventory> ref;
-        EnderSpectatorInventory oldSpectatorInv;
-        if (force || (ref = openEnderChests.get(spectatorInventory.getSpectatedPlayerId())) == null || (oldSpectatorInv = ref.get()) == null) {
-            openEnderChests.put(spectatorInventory.getSpectatedPlayerId(), new WeakReference<>(spectatorInventory));
-        }
+        cachedInventories.cache(spectatorInventory, force);
     }
 
     // =========== end of internal apis ===========
@@ -353,7 +329,7 @@ public abstract class InvseeAPI {
             // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
             isExemptedFuture = CompletableFuture.completedFuture(false);
         } else {
-            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), scheduler::executeAsync);
         }
 
         final CompletableFuture<Optional<UUID>> uuidFuture = fetchUniqueId(targetName);
@@ -381,10 +357,7 @@ public abstract class InvseeAPI {
                 NotCreatedReason reason = eitherReasonOrUuid.getLeft();
                 return CompletableFuture.completedFuture(SpectateResponse.fail(reason));
             }
-        }).handleAsync((success, error) -> {
-            if (error == null) return success;
-            return Rethrow.unchecked(error);
-        }, serverThreadExecutor);
+        });
         pendingInventoriesByName.put(targetName, future);
         future.whenComplete((result, error) -> pendingInventoriesByName.remove(targetName));
         return future;
@@ -432,7 +405,7 @@ public abstract class InvseeAPI {
             isExemptedFuture = CompletableFuture.completedFuture(false);
         } else {
             //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
-            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), asyncExecutor);
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingMainInventorySpectated(target), scheduler::executeAsync);
         }
 
         final CompletableFuture<Optional<NotCreatedReason>> reasonFuture = isExemptedFuture.thenApply(isExempted -> {
@@ -449,12 +422,9 @@ public abstract class InvseeAPI {
                 return CompletableFuture.completedFuture(SpectateResponse.fail(maybeReason.get()));
             } else {
                 //try cache
-                WeakReference<MainSpectatorInventory> alreadyOpen = openInventories.get(playerId);
+                MainSpectatorInventory alreadyOpen = cachedInventories.getMainSpectatorInventory(playerId);
                 if (alreadyOpen != null) {
-                    MainSpectatorInventory inv = alreadyOpen.get();
-                    if (inv != null) {
-                        return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
-                    }
+                    return CompletableFuture.completedFuture(SpectateResponse.succeed(alreadyOpen));
                 }
 
                 //not in cache: create offline inventory
@@ -469,7 +439,7 @@ public abstract class InvseeAPI {
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
-        }, serverThreadExecutor);
+        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
         pendingInventoriesByUuid.put(playerId, future);
         future.whenComplete((result, error) -> pendingInventoriesByUuid.remove(playerId));
         return future;
@@ -550,7 +520,7 @@ public abstract class InvseeAPI {
             // See: https://www.spigotmc.org/threads/invsee.456148/page-5#post-4371623
             isExemptedFuture = CompletableFuture.completedFuture(false);
         } else {
-            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), scheduler::executeAsync);
         }
 
         final CompletableFuture<Optional<UUID>> uuidFuture = fetchUniqueId(targetName);
@@ -578,10 +548,7 @@ public abstract class InvseeAPI {
                 NotCreatedReason reason = eitherReasonOrUuid.getLeft();
                 return CompletableFuture.completedFuture(SpectateResponse.fail(reason));
             }
-        }).handleAsync((success, error) -> {
-            if (error == null) return success;
-            return Rethrow.unchecked(error);
-        }, serverThreadExecutor);
+        });
         pendingEnderChestsByName.put(targetName, future);
         future.whenComplete((result, error) -> pendingEnderChestsByName.remove(targetName));
         return future;
@@ -625,7 +592,7 @@ public abstract class InvseeAPI {
             isExemptedFuture = CompletableFuture.completedFuture(false);
         } else {
             //make LuckPerms happy by doing the permission lookup async. I am not sure how well other permission plugins handle this, but everybody uses LuckPerms nowadays so...
-            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), asyncExecutor);
+            isExemptedFuture = CompletableFuture.supplyAsync(() -> exempt.isExemptedFromHavingEnderchestSpectated(target), scheduler::executeAsync);
         }
 
         final CompletableFuture<Optional<NotCreatedReason>> reasonFuture = isExemptedFuture.thenApply(isExempted -> {
@@ -642,12 +609,9 @@ public abstract class InvseeAPI {
                 return CompletableFuture.completedFuture(SpectateResponse.fail(maybeReason.get()));
             } else {
                 //try cache
-                WeakReference<EnderSpectatorInventory> alreadyOpen = openEnderChests.get(playerId);
+                EnderSpectatorInventory alreadyOpen = cachedInventories.getEnderSpectatorInventory(playerId);
                 if (alreadyOpen != null) {
-                    EnderSpectatorInventory inv = alreadyOpen.get();
-                    if (inv != null) {
-                        return CompletableFuture.completedFuture(SpectateResponse.succeed(inv));
-                    }
+                    return CompletableFuture.completedFuture(SpectateResponse.succeed(alreadyOpen));
                 }
 
                 //not in cache: create offline inventory
@@ -662,7 +626,7 @@ public abstract class InvseeAPI {
         }).handleAsync((success, error) -> {
             if (error == null) return success;
             return Rethrow.unchecked(error);
-        }, serverThreadExecutor);
+        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
         pendingEnderChestsByUuid.put(playerId, future);
         future.whenComplete((result, error) -> pendingEnderChestsByUuid.remove(playerId));
         return future;
@@ -740,52 +704,46 @@ public abstract class InvseeAPI {
             //check if somebody was looking in the offline inventory and update player's inventory.
             //idem for ender.
 
-            final WeakReference<MainSpectatorInventory> invRef = openInventories.get(uuid);
-            final WeakReference<EnderSpectatorInventory> enderRef = openEnderChests.get(uuid);
+            final MainSpectatorInventory oldMainSpectator = cachedInventories.getMainSpectatorInventory(uuid);
+            final EnderSpectatorInventory oldEnderSpectator = cachedInventories.getEnderSpectatorInventory(uuid);
 
-            if (invRef != null) {
-                final MainSpectatorInventory oldMainSpectator = invRef.get();
-                if (oldMainSpectator != null && transferInvToLivePlayer.test(oldMainSpectator, player)) {
-                    if (newInventorySpectator == null) {
-                        newInventorySpectator = platform.spectateInventory(player, mainInventoryCreationOptions());
-                        newInventorySpectator.setContents(oldMainSpectator); //set the contents of the player's inventory to the contents that the spectators have.
-                    }
+            if (oldMainSpectator != null && transferInvToLivePlayer.test(oldMainSpectator, player)) {
+                if (newInventorySpectator == null) {
+                    newInventorySpectator = platform.spectateInventory(player, mainInventoryCreationOptions());
+                    newInventorySpectator.setContents(oldMainSpectator); //set the contents of the player's inventory to the contents that the spectators have.
+                }
 
-                    if (oldMainSpectator instanceof ShallowCopy) {
-                        //shallow-copy the live itemstack lists into the open spectator inventory.
-                        ((ShallowCopy<MainSpectatorInventory>) oldMainSpectator).shallowCopyFrom(newInventorySpectator);
-                        //no need to update the cache because oldMainSpectator already came from the cache!
-                    } else {
-                        //does not support shallow copying, just close and re-open, and update the cache!
-                        for (HumanEntity viewer : List.copyOf(oldMainSpectator.getViewers())) {
-                            viewer.closeInventory();
-                            viewer.openInventory(newInventorySpectator);
-                        }
-                        cache(newInventorySpectator, true);
+                if (oldMainSpectator instanceof ShallowCopy) {
+                    //shallow-copy the live itemstack lists into the open spectator inventory.
+                    ((ShallowCopy<MainSpectatorInventory>) oldMainSpectator).shallowCopyFrom(newInventorySpectator);
+                    //no need to update the cache because oldMainSpectator already came from the cache!
+                } else {
+                    //does not support shallow copying, just close and re-open, and update the cache!
+                    for (HumanEntity viewer : List.copyOf(oldMainSpectator.getViewers())) {
+                        viewer.closeInventory();
+                        viewer.openInventory(newInventorySpectator);
                     }
+                    cache(newInventorySpectator, true);
                 }
             }
 
-            if (enderRef != null) {
-                final EnderSpectatorInventory oldEnderSpectator = enderRef.get();
-                if (oldEnderSpectator != null && transferEnderToLivePlayer.test(oldEnderSpectator, player)) {
-                    if (newEnderSpectator == null) {
-                        newEnderSpectator = platform.spectateEnderChest(player, enderInventoryCreationOptions());
-                        newEnderSpectator.setContents(oldEnderSpectator); //set the contents of the player's enderchest to the contents that the spectators have.
-                    }
+            if (oldEnderSpectator != null && transferEnderToLivePlayer.test(oldEnderSpectator, player)) {
+                if (newEnderSpectator == null) {
+                    newEnderSpectator = platform.spectateEnderChest(player, enderInventoryCreationOptions());
+                    newEnderSpectator.setContents(oldEnderSpectator); //set the contents of the player's enderchest to the contents that the spectators have.
+                }
 
-                    if (oldEnderSpectator instanceof ShallowCopy) {
-                        //shallow-copy the live itemstack list into the open spectator inventory.
-                        ((ShallowCopy<EnderSpectatorInventory>) oldEnderSpectator).shallowCopyFrom(newEnderSpectator);
-                        //no need to update the cache because oldEnderSpectator already came from the cache!
-                    } else {
-                        //does not support shallow copying, just close and re-open, and update the cache!
-                        for (HumanEntity viewer : List.copyOf(oldEnderSpectator.getViewers())) {
-                            viewer.closeInventory();
-                            viewer.openInventory(newEnderSpectator);
-                        }
-                        cache(newEnderSpectator, true);
+                if (oldEnderSpectator instanceof ShallowCopy) {
+                    //shallow-copy the live itemstack list into the open spectator inventory.
+                    ((ShallowCopy<EnderSpectatorInventory>) oldEnderSpectator).shallowCopyFrom(newEnderSpectator);
+                    //no need to update the cache because oldEnderSpectator already came from the cache!
+                } else {
+                    //does not support shallow copying, just close and re-open, and update the cache!
+                    for (HumanEntity viewer : List.copyOf(oldEnderSpectator.getViewers())) {
+                        viewer.closeInventory();
+                        viewer.openInventory(newEnderSpectator);
                     }
+                    cache(newEnderSpectator, true);
                 }
             }
         }
@@ -846,9 +804,8 @@ public abstract class InvseeAPI {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onTargetOpen(InventoryOpenEvent event) {
             HumanEntity target = event.getPlayer();
-            WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
-            MainSpectatorInventory spectatorInventory;
-            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Personal) {
+            MainSpectatorInventory spectatorInventory = cachedInventories.getMainSpectatorInventory(target.getUniqueId());
+            if (spectatorInventory instanceof Personal) {
                 //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
                 //set the cursor reference and crafting inventory
                 ((Personal) spectatorInventory).watch(event.getView());
@@ -858,9 +815,8 @@ public abstract class InvseeAPI {
         @EventHandler(priority = EventPriority.MONITOR)
         public void onTargetClose(InventoryCloseEvent event) {
             HumanEntity target = event.getPlayer();
-            WeakReference<MainSpectatorInventory> spectatorInvRef = openInventories.get(target.getUniqueId());
-            MainSpectatorInventory spectatorInventory;
-            if (spectatorInvRef != null && (spectatorInventory = spectatorInvRef.get()) instanceof Personal) {
+            MainSpectatorInventory spectatorInventory = cachedInventories.getMainSpectatorInventory(target.getUniqueId());
+            if (spectatorInventory instanceof Personal) {
                 //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
                 //reset personal contents to the player's own crafting contents
                 ((Personal) spectatorInventory).unwatch();

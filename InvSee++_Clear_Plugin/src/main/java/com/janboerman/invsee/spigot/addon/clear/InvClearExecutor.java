@@ -123,11 +123,11 @@ class InvClearExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "Cannot clear from " + inputPlayer + "'s inventory for an unknown reason.");
                         }
                     }
-                }, api.serverThreadExecutor);
+                }, api.scheduler::executeSyncPlayer);
             }
 
             return null;
-        }, api.serverThreadExecutor);
+        }, api.scheduler::executeSyncGlobal);
         return true;
     }
 

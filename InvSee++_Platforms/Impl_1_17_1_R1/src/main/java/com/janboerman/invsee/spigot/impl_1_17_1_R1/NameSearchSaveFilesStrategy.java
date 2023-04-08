@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
+import com.janboerman.invsee.spigot.internal.Scheduler;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
@@ -18,9 +19,11 @@ import net.minecraft.world.level.storage.PlayerDataStorage;
 public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 
     private final Plugin plugin;
+    private final Scheduler scheduler;
 
-    public NameSearchSaveFilesStrategy(Plugin plugin) {
+    public NameSearchSaveFilesStrategy(Plugin plugin, Scheduler scheduler) {
         this.plugin = plugin;
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
                 }
             }
             return Optional.empty();
-        }, runnable -> plugin.getServer().getScheduler().runTaskAsynchronously(plugin, runnable));
+        }, scheduler::executeAsync);
     }
 
 }
