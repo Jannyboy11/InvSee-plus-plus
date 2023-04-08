@@ -122,10 +122,10 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
     }
 
     public void unregisterListeners() {
-        super.unregisterListeners();
         HandlerList.unregisterAll(pwiEventListener);
         HandlerList.unregisterAll(tiedInventoryListener);
         HandlerList.unregisterAll(tiedPlayerListener);
+        super.unregisterListeners();
     }
 
     public PerWorldInventoryHook getHook() {

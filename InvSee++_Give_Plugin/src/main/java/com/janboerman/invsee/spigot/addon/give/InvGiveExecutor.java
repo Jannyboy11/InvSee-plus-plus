@@ -148,11 +148,11 @@ class InvGiveExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "Cannot give to " + inputPlayer + "'s inventory for an unknown reason.");
                         }
                     }
-                }, invseeApi.serverThreadExecutor);
+                }, runnable -> invseeApi.getScheduler().executeSyncPlayer(uuid, runnable, null));
             }
 
             return null;
-        }, invseeApi.serverThreadExecutor);
+        }, invseeApi.getScheduler()::executeSyncGlobal);
 
         return true;
     }

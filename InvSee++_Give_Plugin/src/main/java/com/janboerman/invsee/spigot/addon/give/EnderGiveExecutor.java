@@ -154,11 +154,11 @@ class EnderGiveExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "Cannot give to " + inputPlayer + "'s enderchest for an unknown reason.");
                         }
                     }
-                }, api.serverThreadExecutor);
+                }, runnable -> api.getScheduler().executeSyncPlayer(uuid, runnable, null));
             }
 
             return null;
-        }, api.serverThreadExecutor);
+        }, api.getScheduler()::executeSyncGlobal);
 
         return true;
     }

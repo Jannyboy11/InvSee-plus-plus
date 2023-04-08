@@ -1,6 +1,5 @@
 package com.janboerman.invsee.spigot.api;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
@@ -80,6 +79,8 @@ public class InvseeAPI {
     private BiPredicate<EnderSpectatorInventory, Player> transferEnderToLivePlayer = (spectatorInv, player) -> true;
 
     private final Scheduler scheduler;
+    @Deprecated(forRemoval = true, since = "0.20.0") public final Executor serverThreadExecutor;
+    @Deprecated(forRemoval = true, since = "0.20.0") public final Executor asyncExecutor;
 
     protected final PlayerListener playerListener = new PlayerListener();
     protected final InventoryListener inventoryListener = new InventoryListener();
@@ -94,6 +95,14 @@ public class InvseeAPI {
         this.exempt = new Exempt(plugin.getServer());
 
         registerListeners();
+
+        this.serverThreadExecutor = scheduler::executeSyncGlobal;
+        this.asyncExecutor = scheduler::executeAsync;
+    }
+
+    /** @apiNote unstable api */
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     @Deprecated //TODO refactor/remote this.

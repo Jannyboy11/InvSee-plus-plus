@@ -8,7 +8,7 @@ public interface OfflinePlayerProvider {
 
     public void getAll(Consumer<String> consumer);
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.20.0")
     public default Set<String> getAll() {
         Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
         getAll(result::add);
@@ -17,7 +17,7 @@ public interface OfflinePlayerProvider {
 
     public void getWithPrefix(String prefix, Consumer<String> consumer);
 
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.20.0")
     public default Set<String> getWithPrefix(String prefix) {
         Set<String> result = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
         getWithPrefix(prefix, result::add);

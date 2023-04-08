@@ -123,11 +123,11 @@ class EnderClearExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "Cannot clear from " + inputPlayer + "'s enderchest for an unknown reason.");
                         }
                     }
-                }, api.scheduler::executeSyncPlayer);
+                }, runnable -> api.getScheduler().executeSyncPlayer(uuid, runnable, null));
             }
 
             return null;
-        }, api.scheduler::executeSyncPlayer);
+        }, api.getScheduler()::executeSyncGlobal);
         return true;
     }
 
