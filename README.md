@@ -122,6 +122,4 @@ The only hybrid server that I'm currently aware of that is taking effort to let 
 |--------------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
 | Java version:      | 11 or newer | 11 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer |
 
-
 [37]: https://github.com/Jannyboy11/InvSee-plus-plus/issues/37 "37"
-[42]: https://github.com/Jannyboy11/InvSee-plus-plus/issues/42 "42"
