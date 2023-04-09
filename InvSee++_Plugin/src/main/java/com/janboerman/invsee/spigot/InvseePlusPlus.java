@@ -62,12 +62,6 @@ public class InvseePlusPlus extends JavaPlugin {
         this.asyncTabcompleteEvent = asyncTabCompleteEvent;
     }
 
-    /** @deprecated use your own player database instead. */
-    @Deprecated(forRemoval = true)
-    public OfflinePlayerProvider getOfflinePlayerProvider() {
-        return offlinePlayerProvider;
-    }
-
     @Override
     public void onEnable() {
         //if config is absent, save default config
@@ -413,6 +407,12 @@ public class InvseePlusPlus extends JavaPlugin {
                 "e_27 e_28 e_29 e_30 e_31 e_32 e_33 e_34 e_35\n" +
                 "e_36 e_37 e_38 e_39 e_40 e_41 e_42 e_43 e_44\n" +
                 "e_45 e_46 e_47 e_48 e_49 e_50 e_51 e_52 e_53");
+    }
+
+    /** @deprecated use your own player database instead. */
+    @Deprecated(forRemoval = true)
+    public OfflinePlayerProvider getOfflinePlayerProvider() {
+        return offlinePlayerProvider;
     }
 
 }
