@@ -9,6 +9,10 @@
     <artifactId>invsee-plus-plus_plugin</artifactId>
     <name>InvSee++ Plugin</name>
 
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
     <pluginRepositories>
         <pluginRepository>
             <id>apache-snapshots</id>
