@@ -1,7 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_18_2_R2;
 
 import static com.janboerman.invsee.spigot.impl_1_18_2_R2.HybridServerSupport.getPlayerDir;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;

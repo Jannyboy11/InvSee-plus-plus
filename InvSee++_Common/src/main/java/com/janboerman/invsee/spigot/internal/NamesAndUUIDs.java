@@ -1,7 +1,7 @@
 package com.janboerman.invsee.spigot.internal;
 
 import com.janboerman.invsee.mojangapi.MojangAPI;
-import com.janboerman.invsee.spigot.api.InvseeAPI;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.resolve.*;
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import com.janboerman.invsee.utils.Maybe;
@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 public class NamesAndUUIDs {
 

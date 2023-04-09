@@ -3,7 +3,7 @@ package com.janboerman.invsee.spigot.impl_1_19_4_R3;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import static com.janboerman.invsee.spigot.impl_1_19_4_R3.HybridServerSupport.getPlayerDir;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.utils.StringHelper;
 import net.minecraft.ReportedException;
 import net.minecraft.nbt.CompoundTag;

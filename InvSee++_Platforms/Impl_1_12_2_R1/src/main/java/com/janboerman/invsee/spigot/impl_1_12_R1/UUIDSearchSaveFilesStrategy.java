@@ -6,7 +6,7 @@ import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.LogRecord;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import net.minecraft.server.v1_12_R1.NBTCompressedStreamTools;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.WorldNBTStorage;

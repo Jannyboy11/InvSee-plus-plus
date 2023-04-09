@@ -5,7 +5,7 @@ import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.MappingsVersion;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 

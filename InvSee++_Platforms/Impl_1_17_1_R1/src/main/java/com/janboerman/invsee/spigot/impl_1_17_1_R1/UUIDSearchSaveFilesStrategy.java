@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_17_1_R1;
 
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;

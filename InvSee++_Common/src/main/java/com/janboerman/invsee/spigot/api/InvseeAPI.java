@@ -24,7 +24,6 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
-import com.janboerman.invsee.spigot.internal.Scheduler;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.utils.*;

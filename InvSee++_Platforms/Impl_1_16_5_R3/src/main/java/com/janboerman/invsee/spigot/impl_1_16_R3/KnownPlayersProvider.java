@@ -1,7 +1,7 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.utils.StringHelper;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 

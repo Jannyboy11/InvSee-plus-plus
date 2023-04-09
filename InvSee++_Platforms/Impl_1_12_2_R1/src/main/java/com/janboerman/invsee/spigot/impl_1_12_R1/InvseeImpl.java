@@ -3,7 +3,6 @@ package com.janboerman.invsee.spigot.impl_1_12_R1;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
-import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
@@ -19,7 +18,7 @@ import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.next
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_12_R1.Container;
 import net.minecraft.server.v1_12_R1.DedicatedPlayerList;

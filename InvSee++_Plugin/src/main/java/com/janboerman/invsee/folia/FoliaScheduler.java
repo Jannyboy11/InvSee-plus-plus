@@ -1,7 +1,7 @@
 package com.janboerman.invsee.folia;
 
 import com.janboerman.invsee.spigot.InvseePlusPlus;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import io.papermc.paper.threadedregions.scheduler.EntityScheduler;
 import org.bukkit.Server;
 import org.bukkit.entity.HumanEntity;

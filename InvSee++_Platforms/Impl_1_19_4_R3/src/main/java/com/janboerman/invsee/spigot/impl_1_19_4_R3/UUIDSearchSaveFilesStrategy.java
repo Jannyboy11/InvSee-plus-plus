@@ -5,7 +5,7 @@ import static com.janboerman.invsee.spigot.impl_1_19_4_R3.HybridServerSupport.ge
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.LogRecord;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;

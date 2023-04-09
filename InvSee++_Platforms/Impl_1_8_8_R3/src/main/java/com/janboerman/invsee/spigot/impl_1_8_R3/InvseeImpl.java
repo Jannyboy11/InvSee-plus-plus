@@ -18,7 +18,7 @@ import static com.janboerman.invsee.spigot.impl_1_8_R3.HybridServerSupport.nextC
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_8_R3.Container;
 import net.minecraft.server.v1_8_R3.DedicatedPlayerList;

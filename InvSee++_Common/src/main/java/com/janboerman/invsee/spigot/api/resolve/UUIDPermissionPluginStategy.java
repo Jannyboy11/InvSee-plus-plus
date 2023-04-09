@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.api.resolve;
 
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 

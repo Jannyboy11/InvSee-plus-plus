@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot;
 
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import org.bukkit.entity.HumanEntity;
 
 import java.util.UUID;

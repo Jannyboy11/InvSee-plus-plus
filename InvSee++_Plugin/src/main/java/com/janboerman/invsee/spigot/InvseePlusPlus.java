@@ -16,7 +16,7 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;

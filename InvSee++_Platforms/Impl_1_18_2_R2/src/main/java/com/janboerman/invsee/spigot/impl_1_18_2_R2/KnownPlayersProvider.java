@@ -2,7 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_18_2_R2;
 
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import static com.janboerman.invsee.spigot.impl_1_18_2_R2.HybridServerSupport.getPlayerDir;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.utils.StringHelper;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 import net.minecraft.ReportedException;

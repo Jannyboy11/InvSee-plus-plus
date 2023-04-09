@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.internal;
+package com.janboerman.invsee.spigot.api;
 
 import java.util.UUID;
 

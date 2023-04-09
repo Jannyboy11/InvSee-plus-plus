@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 

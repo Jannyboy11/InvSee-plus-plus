@@ -16,7 +16,7 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.craftbukkit.v1_15_R1.CraftServer;

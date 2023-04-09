@@ -7,7 +7,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 

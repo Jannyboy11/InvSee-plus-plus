@@ -4,7 +4,7 @@ import com.janboerman.invsee.spigot.api.resolve.NameResolveStrategy;
 import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.WorldNBTStorage;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;

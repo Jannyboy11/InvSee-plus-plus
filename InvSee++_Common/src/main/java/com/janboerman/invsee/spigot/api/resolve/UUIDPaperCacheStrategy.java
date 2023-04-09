@@ -1,7 +1,7 @@
 package com.janboerman.invsee.spigot.api.resolve;
 
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 public class UUIDPaperCacheStrategy implements UUIDResolveStrategy {
 

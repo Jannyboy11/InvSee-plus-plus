@@ -5,7 +5,7 @@ import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 import com.janboerman.invsee.spigot.InvseePlusPlus;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
-import com.janboerman.invsee.spigot.internal.Scheduler;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.StringHelper;
