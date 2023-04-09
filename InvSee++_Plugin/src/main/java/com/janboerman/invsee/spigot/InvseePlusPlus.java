@@ -28,9 +28,12 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
@@ -46,6 +49,7 @@ public class InvseePlusPlus extends JavaPlugin {
 
     private CreationOptions<PlayerInventorySlot> platformCreationOptionsMainInventory;
     private CreationOptions<EnderChestSlot> platformCreationOptionsEnderInventory;
+    private boolean dirtyConfig = false;
 
     public InvseePlusPlus() {
         boolean asyncTabCompleteEvent;
@@ -60,7 +64,7 @@ public class InvseePlusPlus extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        //configuration
+        //if config is absent, save default config
         saveDefaultConfig();
 
         //initialisation
@@ -70,6 +74,10 @@ public class InvseePlusPlus extends JavaPlugin {
         Setup setup = Setup.setup(this, scheduler, lookup, cache);
         final InvseePlatform platform = setup.platform();
         final OfflinePlayerProvider playerDatabase = setup.offlinePlayerProvider();
+
+        //set up default creation options
+        this.platformCreationOptionsMainInventory = platform.defaultInventoryCreationOptions(this);
+        this.platformCreationOptionsEnderInventory = platform.defaultEnderChestCreationOptions(this);
 
         //TODO @Deprecated
         this.offlinePlayerProvider = playerDatabase;
@@ -96,21 +104,16 @@ public class InvseePlusPlus extends JavaPlugin {
 
         assert this.api != null : "did not set the InvseeAPI instance!";
 
-        //set up default creation options
-        //TODO if no values are configured, use the platform default CreationOptions, and save these to config.
-        //TODO rewrite configuration logic.
-        this.platformCreationOptionsMainInventory = platform.defaultInventoryCreationOptions(this);
-        this.platformCreationOptionsEnderInventory = platform.defaultEnderChestCreationOptions(this);
-
-        api.setOfflinePlayerSupport(offlinePlayerSupport());
-        api.setUnknownPlayerSupport(unknownPlayerSupport());
-        api.setMainInventoryTitle(getTitleForInventory());
-        api.setEnderInventoryTitle(getTitleForEnderChest());
-        api.setMainInventoryMirror(getInventoryMirror());
-        api.setEnderInventoryMirror(getEnderChestMirror());
-        api.setLogOptions(getLogOptions());
-        //TODO save config (creates unconfigured values)
-        //TODO ideally, I only overwrite the yaml properties that have no configured value. Is there an option to do this?
+        //set up api creation options
+        FileConfiguration config = loadConfig();
+        tabCompleteOfflinePlayers(config); //set config value
+        api.setOfflinePlayerSupport(offlinePlayerSupport(config));
+        api.setUnknownPlayerSupport(unknownPlayerSupport(config));
+        api.setMainInventoryTitle(getTitleForInventory(config));
+        api.setEnderInventoryTitle(getTitleForEnderChest(config));
+        api.setMainInventoryMirror(getInventoryMirror(config));
+        api.setEnderInventoryMirror(getEnderChestMirror(config));
+        api.setLogOptions(getLogOptions(config));
 
         //commands
         setupCommands();
@@ -123,6 +126,16 @@ public class InvseePlusPlus extends JavaPlugin {
 
         //idea: shoulder look functionality. an admin will always see the same inventory that the target player sees.
         //can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
+
+        //save new config options
+        if (dirtyConfig) {
+            try {
+                config.save(getConfigFile());
+                dirtyConfig = false;
+            } catch (IOException e) {
+                getLogger().log(Level.SEVERE, "Could not update config file!", e);
+            }
+        }
     }
 
     private void setupCommands() {
@@ -139,6 +152,8 @@ public class InvseePlusPlus extends JavaPlugin {
     }
 
     private void setupEvents(Scheduler scheduler, OfflinePlayerProvider playerDatabase) {
+        // Pass FileConfiguration config parameter?
+
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
 
@@ -181,35 +196,64 @@ public class InvseePlusPlus extends JavaPlugin {
         return api;
     }
 
-    @Deprecated(forRemoval = true, since = "0.20.0")
-    public OfflinePlayerProvider getOfflinePlayerProvider() {
-        return offlinePlayerProvider;
+    public boolean tabCompleteOfflinePlayers() {
+        return tabCompleteOfflinePlayers(getConfig());
     }
 
-    public boolean tabCompleteOfflinePlayers() {
-        boolean value = getConfig().getBoolean("tabcomplete-offline-players", asyncTabcompleteEvent);
-        getConfig().set("tabcomplete-offline-players", value);
-        return value;
+    public boolean tabCompleteOfflinePlayers(FileConfiguration config) {
+        Object value = config.get("tabcomplete-offline-players");
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue();
+        } else {
+            dirtyConfig = true;
+            config.set("tabcomplete-offline-players", asyncTabcompleteEvent);
+            return asyncTabcompleteEvent;
+        }
     }
 
     public boolean offlinePlayerSupport() {
-        boolean value = getConfig().getBoolean("enable-offline-player-support", platformCreationOptionsMainInventory.isOfflinePlayerSupported());
-        getConfig().set("enable-offline-player-support", value);
-        return value;
+        return offlinePlayerSupport(getConfig());
+    }
+
+    public boolean offlinePlayerSupport(FileConfiguration config) {
+        Object value = config.get("enable-offline-player-support");
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue();
+        } else {
+            dirtyConfig = true;
+            boolean offlinePlayerSupport = platformCreationOptionsMainInventory.isOfflinePlayerSupported();
+            config.set("enable-offline-player-support", offlinePlayerSupport);
+            return offlinePlayerSupport;
+        }
     }
 
     public boolean unknownPlayerSupport() {
-        boolean value = getConfig().getBoolean("enable-unknown-player-support", platformCreationOptionsMainInventory.isUnknownPlayerSupported());
-        getConfig().set("enable-unknown-player-support", value);
-        return value;
+        return unknownPlayerSupport(getConfig());
+    }
+
+    public boolean unknownPlayerSupport(FileConfiguration config) {
+        Object value = config.get("enable-unknown-player-support");
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue();
+        } else {
+            dirtyConfig = true;
+            boolean unknownPlayerSupport = platformCreationOptionsMainInventory.isUnknownPlayerSupported();
+            config.set("enable-unknown-player-support", unknownPlayerSupport);
+            return unknownPlayerSupport;
+        }
     }
 
     public Title getTitleForInventory() {
-        String configuredTitle = getConfig().getString("titles.inventory");
+        return getTitleForInventory(getConfig());
+    }
+
+    public Title getTitleForInventory(FileConfiguration config) {
+        String configuredTitle = config.getString("titles.inventory");
         if (configuredTitle == null) {
+            dirtyConfig = true;
             Title value = platformCreationOptionsMainInventory.getTitle();
             if (value == Title.defaultMainInventory())
-                getConfig().set("titles.inventory", "<player>'s inventory");
+                config.set("titles.inventory", "<player>'s inventory");
             return value;
         } else {
             return target -> configuredTitle.replace("<player>", target.toString());
@@ -217,99 +261,98 @@ public class InvseePlusPlus extends JavaPlugin {
     }
 
     public Title getTitleForEnderChest() {
-        String configuredTitle = getConfig().getString("titles.enderchest");
+        return getTitleForEnderChest(getConfig());
+    }
+
+    public Title getTitleForEnderChest(FileConfiguration config) {
+        String configuredTitle = config.getString("titles.enderchest");
 
         if (configuredTitle == null) {
+            dirtyConfig = true;
             Title value = platformCreationOptionsEnderInventory.getTitle();
             if (value == Title.defaultEnderInventory())
-                getConfig().set("titles.enderchest", "<player>'s enderchest");
+                config.set("titles.enderchest", "<player>'s enderchest");
             return value;
         } else {
             return target -> configuredTitle.replace("<player>", target.toString());
         }
     }
 
-    @Deprecated(forRemoval = true)
-    public String getTitleForInventory(Target target) {
-        return getConfig().getString("titles.inventory", "<player>'s inventory")
-                .replace("<player>", target.toString());
-    }
-
-    @Deprecated(forRemoval = true)
-    public String getTitleForEnderChest(Target target) {
-        return getConfig().getString("titles.enderchest", "<player>'s enderchest")
-                .replace("<player>", target.toString());
-    }
-
     public Mirror<PlayerInventorySlot> getInventoryMirror() {
-        String template = getConfig().getString("templates.inventory");
+        return getInventoryMirror(getConfig());
+    }
+
+    public Mirror<PlayerInventorySlot> getInventoryMirror(FileConfiguration config) {
+        String template = config.getString("templates.inventory");
         if (template != null) {
             return Mirror.forInventory(template);
         } else {
-            //TODO Mirror -> template
-            //TODO set in config
-            return platformCreationOptionsMainInventory.getMirror();
+            dirtyConfig = true;
+            Mirror<PlayerInventorySlot> value = platformCreationOptionsMainInventory.getMirror();
+            config.set("templates.inventory", Mirror.toInventoryTemplate(value));
+            return value;
         }
     }
 
     public Mirror<EnderChestSlot> getEnderChestMirror() {
-        String template = getConfig().getString("templates.enderchest");
+        return getEnderChestMirror(getConfig());
+    }
+
+    public Mirror<EnderChestSlot> getEnderChestMirror(FileConfiguration config) {
+        String template = config.getString("templates.enderchest");
         if (template != null) {
             return Mirror.forEnderChest(template);
         } else {
-            //TODO Mirror -> template
-            //TODO set in config
-            return platformCreationOptionsEnderInventory.getMirror();
+            dirtyConfig = true;
+            Mirror<EnderChestSlot> value = platformCreationOptionsEnderInventory.getMirror();
+            config.set("templates.enderchest", Mirror.toEnderChestTemplate(value));
+            return value;
         }
     }
 
-    @Deprecated(forRemoval = true)
-    public String getInventoryTemplate() {
-        return getConfig().getString("templates.inventory",
-            "i_00 i_01 i_02 i_03 i_04 i_05 i_06 i_07 i_08\n" +
-            "i_09 i_10 i_11 i_12 i_13 i_14 i_15 i_16 i_17\n" +
-            "i_18 i_19 i_20 i_21 i_22 i_23 i_24 i_25 i_26\n" +
-            "i_27 i_28 i_29 i_30 i_31 i_32 i_33 i_34 i_35\n" +
-            "a_b  a_l  a_c  a_h  oh   c    _    _    _   \n" +
-            "p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08");
-    }
-
-    @Deprecated(forRemoval = true)
-    public String getEnderChestTemplate() {
-        return getConfig().getString("templates.enderchest",
-            "e_00 e_01 e_02 e_03 e_04 e_05 e_06 e_07 e_08\n" +
-            "e_09 e_10 e_11 e_12 e_13 e_14 e_15 e_16 e_17\n" +
-            "e_18 e_19 e_20 e_21 e_22 e_23 e_24 e_25 e_26\n" +
-            "e_27 e_28 e_29 e_30 e_31 e_32 e_33 e_34 e_35\n" +
-            "e_36 e_37 e_38 e_39 e_40 e_41 e_42 e_43 e_44\n" +
-            "e_45 e_46 e_47 e_48 e_49 e_50 e_51 e_52 e_53");
-    }
-
     public LogOptions getLogOptions() {
-        FileConfiguration config = getConfig();
-        ConfigurationSection logging = config.getConfigurationSection("logging");
-        if (logging == null) {
+        return getLogOptions(getConfig());
+    }
+
+    public LogOptions getLogOptions(FileConfiguration config) {
+        ConfigurationSection loggingSection = config.getConfigurationSection("logging");
+        if (loggingSection == null) {
+            dirtyConfig = true;
             LogOptions value = platformCreationOptionsMainInventory.getLogOptions();
-            //TODO set in config
+            loggingSection = config.createSection("logging");
+            loggingSection.set("granularity", value.getGranularity().name());
+            loggingSection.set("output", value.getTargets().stream().map(LogTarget::name).collect(Collectors.toList()));
+            loggingSection.set("format-server-log-file", value.getFormat(LogTarget.SERVER_LOG_FILE));
+            loggingSection.set("format-plugin-log-file", value.getFormat(LogTarget.PLUGIN_LOG_FILE));
+            loggingSection.set("format-spectator-log-file", value.getFormat(LogTarget.SERVER_LOG_FILE));
+            loggingSection.set("format-console", value.getFormat(LogTarget.CONSOLE));
             return value;
         } else {
-            String granularity = logging.getString("granularity", "LOG_ON_CLOSE");
+            String granularity = loggingSection.getString("granularity", "LOG_ON_CLOSE");
             LogGranularity logGranularity = LogGranularity.valueOf(granularity);
-            List<String> output = logging.getStringList("output");
+            List<String> output = loggingSection.getStringList("output");
             EnumSet<LogTarget> logTargets = output.stream()
                     .map(LogTarget::valueOf)
                     .collect(Collectors.toCollection(() -> EnumSet.noneOf(LogTarget.class)));
             EnumMap<LogTarget, String> formats = new EnumMap<>(LogTarget.class);
-            String formatServerLogFile = logging.getString("format-server-log-file");
+            String formatServerLogFile = loggingSection.getString("format-server-log-file");
             if (formatServerLogFile != null) formats.put(LogTarget.SERVER_LOG_FILE, formatServerLogFile);
-            String formatPluginLogFile = logging.getString("format-plugin-log-file");
+            String formatPluginLogFile = loggingSection.getString("format-plugin-log-file");
             if (formatPluginLogFile != null) formats.put(LogTarget.PLUGIN_LOG_FILE, formatPluginLogFile);
-            String formatSpectatorLogFile = logging.getString("format-spectator-log-file");
+            String formatSpectatorLogFile = loggingSection.getString("format-spectator-log-file");
             if (formatSpectatorLogFile != null) formats.put(LogTarget.SPECTATOR_LOG_FILE, formatSpectatorLogFile);
-            String formatConsole = logging.getString("format-console");
+            String formatConsole = loggingSection.getString("format-console");
             if (formatConsole != null) formats.put(LogTarget.CONSOLE, formatConsole);
             return LogOptions.of(logGranularity, logTargets, formats);
         }
+    }
+
+    private File getConfigFile() {
+        return new File(getDataFolder(), "config.yml");
+    }
+
+    private FileConfiguration loadConfig() {
+        return YamlConfiguration.loadConfiguration(getConfigFile());
     }
 
     private static Scheduler makeScheduler(InvseePlusPlus plugin) {
@@ -327,4 +370,43 @@ public class InvseePlusPlus extends JavaPlugin {
             return new DefaultScheduler(plugin);
         }
     }
+
+    /** @deprecated use {@link #getTitleForInventory()} instead. */
+    @Deprecated(forRemoval = true, since = "0.21.0")
+    public String getTitleForInventory(Target target) {
+        return getConfig().getString("titles.inventory", "<player>'s inventory")
+                .replace("<player>", target.toString());
+    }
+
+    /** @deprecated use {@link #getTitleForEnderChest()} instead.*/
+    @Deprecated(forRemoval = true, since = "0.21.0")
+    public String getTitleForEnderChest(Target target) {
+        return getConfig().getString("titles.enderchest", "<player>'s enderchest")
+                .replace("<player>", target.toString());
+    }
+
+    /** @deprecated use {@link #getInventoryMirror()} instead. */
+    @Deprecated(forRemoval = true, since = "0.21.0")
+    public String getInventoryTemplate() {
+        return getConfig().getString("templates.inventory",
+                "i_00 i_01 i_02 i_03 i_04 i_05 i_06 i_07 i_08\n" +
+                "i_09 i_10 i_11 i_12 i_13 i_14 i_15 i_16 i_17\n" +
+                "i_18 i_19 i_20 i_21 i_22 i_23 i_24 i_25 i_26\n" +
+                "i_27 i_28 i_29 i_30 i_31 i_32 i_33 i_34 i_35\n" +
+                "a_b  a_l  a_c  a_h  oh   c    _    _    _   \n" +
+                "p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08");
+    }
+
+    /** @deprecated use {@link #getEnderChestMirror()} instead. */
+    @Deprecated(forRemoval = true, since = "0.21.0")
+    public String getEnderChestTemplate() {
+        return getConfig().getString("templates.enderchest",
+                "e_00 e_01 e_02 e_03 e_04 e_05 e_06 e_07 e_08\n" +
+                "e_09 e_10 e_11 e_12 e_13 e_14 e_15 e_16 e_17\n" +
+                "e_18 e_19 e_20 e_21 e_22 e_23 e_24 e_25 e_26\n" +
+                "e_27 e_28 e_29 e_30 e_31 e_32 e_33 e_34 e_35\n" +
+                "e_36 e_37 e_38 e_39 e_40 e_41 e_42 e_43 e_44\n" +
+                "e_45 e_46 e_47 e_48 e_49 e_50 e_51 e_52 e_53");
+    }
+
 }

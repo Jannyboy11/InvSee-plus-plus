@@ -5,6 +5,7 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.Exempt;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
+import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.InventoryNotCreated;
@@ -69,12 +70,13 @@ public class EnderseeCommandExecutor implements CommandExecutor {
         final InvseeAPI api = plugin.getApi();
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = null;
         final Target target = isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID);
-        final String title = plugin.getTitleForEnderChest(target);
-        final Mirror<EnderChestSlot> mirror = Mirror.forEnderChest(plugin.getEnderChestTemplate());
+        final Title title = plugin.getTitleForEnderChest();
+        final Mirror<EnderChestSlot> mirror = plugin.getEnderChestMirror();
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
         final boolean bypassExempt = player.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST);
         final LogOptions logOptions = plugin.getLogOptions();
+        //TODO why not just: plugin.getEnderChestCreationOptions() ?
         final CreationOptions<EnderChestSlot> creationOptions = CreationOptions.defaultEnderInventory(plugin)
                 .withTitle(title)
                 .withMirror(mirror)

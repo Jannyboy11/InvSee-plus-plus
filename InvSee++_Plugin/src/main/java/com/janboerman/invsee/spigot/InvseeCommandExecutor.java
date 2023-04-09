@@ -5,6 +5,7 @@ import com.janboerman.invsee.spigot.api.Exempt;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
@@ -59,12 +60,13 @@ public class InvseeCommandExecutor implements CommandExecutor {
 
         final InvseeAPI api = plugin.getApi();
         final Target target = isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID);
-        final String title = plugin.getTitleForInventory(target);
-        final Mirror<PlayerInventorySlot> mirror = Mirror.forInventory(plugin.getInventoryTemplate());
+        final Title title = plugin.getTitleForInventory();
+        final Mirror<PlayerInventorySlot> mirror = plugin.getInventoryMirror();
         final boolean offlineSupport = plugin.offlinePlayerSupport();
         final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
         final boolean bypassExempt = player.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY);
         final LogOptions logOptions = plugin.getLogOptions();
+        //TODO why not just: plugin.getInventoryCreationOptions() ?
         final CreationOptions<PlayerInventorySlot> creationOptions = CreationOptions.defaultMainInventory(plugin)
                 .withTitle(title)
                 .withMirror(mirror)
