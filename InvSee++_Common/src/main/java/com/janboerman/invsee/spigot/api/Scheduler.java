@@ -2,6 +2,11 @@ package com.janboerman.invsee.spigot.api;
 
 import java.util.UUID;
 
+/**
+ * Scheduler abstraction for scheduling tasks.
+ *
+ * @see <a href="https://github.com/Jannyboy11/InvSee-plus-plus/wiki/Folia-support">Folia support</a>
+ */
 public interface Scheduler {
 
     //TODO on places where this is called, the argument provided to the 'retired' parameter

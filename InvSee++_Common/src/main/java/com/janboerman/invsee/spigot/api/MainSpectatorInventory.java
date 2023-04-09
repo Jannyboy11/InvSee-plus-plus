@@ -2,7 +2,6 @@ package com.janboerman.invsee.spigot.api;
 
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 /**
