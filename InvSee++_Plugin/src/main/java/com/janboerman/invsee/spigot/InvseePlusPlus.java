@@ -62,6 +62,12 @@ public class InvseePlusPlus extends JavaPlugin {
         this.asyncTabcompleteEvent = asyncTabCompleteEvent;
     }
 
+    /** @deprecated use your own player database instead. */
+    @Deprecated(forRemoval = true)
+    public OfflinePlayerProvider getOfflinePlayerProvider() {
+        return offlinePlayerProvider;
+    }
+
     @Override
     public void onEnable() {
         //if config is absent, save default config

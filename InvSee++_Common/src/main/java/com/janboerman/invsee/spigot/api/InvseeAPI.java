@@ -37,13 +37,7 @@ import org.bukkit.plugin.*;
 
 public class InvseeAPI {
 
-    /* TODO this class needs a BIG refactor.
-     * TODO implementations should be able to override *just* the abstract methods.
-     * TODO I should create a new interface for this.
-     * TODO This new interface will be called InvseePlatform
-     * TODO we then use composition over inheritance!
-     * TODO this must also means that Platforms cannot use fields declared in this class!
-     *
+    /*
      * TODO later, we could also return an InvseeAPI instance PER PLUGIN. <-- That is going to be annoying with event listeners though.
      * TODO this is useful for logging, now that we have the PLUGIN_LOG_FILE.
      * TODO so, maybe the InvSeePlusPlus plugin does the event stuff, that way we can create multiple api instances (with shared NamesAndUUIDs as well as the Scheduler)
@@ -856,13 +850,13 @@ public class InvseeAPI {
     //
 
     @Deprecated public final CompletableFuture<Void> spectateInventory(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
-        return spectateInventory(spectator, targetName, mainInventoryCreationOptions().withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
+        return spectateInventory(spectator, targetName, mainInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleMainInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetName))
                 .thenApply(__ -> null);
     }
 
     @Deprecated public final CompletableFuture<Void> spectateInventory(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
-        return spectateInventory(spectator, targetId, targetName, mainInventoryCreationOptions().withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
+        return spectateInventory(spectator, targetId, targetName, mainInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleMainInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetId.toString()))
                 .thenApply(__ -> null);
     }

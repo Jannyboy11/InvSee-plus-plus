@@ -56,5 +56,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: startsWith(github.ref, 'refs/tags/')
-        run: mvn deploy
+        run: 'mvn deploy -pl :InvSee++_Plugin,:InvSee++_Give_Plugin,:InvSee++_Clear_Plugin'
 
