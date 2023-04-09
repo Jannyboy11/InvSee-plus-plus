@@ -109,6 +109,8 @@ public class InvseePlusPlus extends JavaPlugin {
         api.setMainInventoryMirror(getInventoryMirror());
         api.setEnderInventoryMirror(getEnderChestMirror());
         api.setLogOptions(getLogOptions());
+        //TODO save config (creates unconfigured values)
+        //TODO ideally, I only overwrite the yaml properties that have no configured value. Is there an option to do this?
 
         //commands
         setupCommands();
@@ -116,11 +118,11 @@ public class InvseePlusPlus extends JavaPlugin {
         //event listeners
         setupEvents(scheduler, playerDatabase);
 
-        //TODO idea: shoulder look functionality. an admin will always see the same inventory that the target player sees.
-        //TODO can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
-
         //bStats
         setupBStats();
+
+        //idea: shoulder look functionality. an admin will always see the same inventory that the target player sees.
+        //can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
     }
 
     private void setupCommands() {
@@ -185,21 +187,30 @@ public class InvseePlusPlus extends JavaPlugin {
     }
 
     public boolean tabCompleteOfflinePlayers() {
-        return getConfig().getBoolean("tabcomplete-offline-players", asyncTabcompleteEvent);
+        boolean value = getConfig().getBoolean("tabcomplete-offline-players", asyncTabcompleteEvent);
+        getConfig().set("tabcomplete-offline-players", value);
+        return value;
     }
 
     public boolean offlinePlayerSupport() {
-        return getConfig().getBoolean("enable-offline-player-support", platformCreationOptionsMainInventory.isOfflinePlayerSupported());
+        boolean value = getConfig().getBoolean("enable-offline-player-support", platformCreationOptionsMainInventory.isOfflinePlayerSupported());
+        getConfig().set("enable-offline-player-support", value);
+        return value;
     }
 
     public boolean unknownPlayerSupport() {
-        return getConfig().getBoolean("enable-unknown-player-support", platformCreationOptionsMainInventory.isUnknownPlayerSupported());
+        boolean value = getConfig().getBoolean("enable-unknown-player-support", platformCreationOptionsMainInventory.isUnknownPlayerSupported());
+        getConfig().set("enable-unknown-player-support", value);
+        return value;
     }
 
     public Title getTitleForInventory() {
         String configuredTitle = getConfig().getString("titles.inventory");
         if (configuredTitle == null) {
-            return platformCreationOptionsMainInventory.getTitle();
+            Title value = platformCreationOptionsMainInventory.getTitle();
+            if (value == Title.defaultMainInventory())
+                getConfig().set("titles.inventory", "<player>'s inventory");
+            return value;
         } else {
             return target -> configuredTitle.replace("<player>", target.toString());
         }
@@ -209,7 +220,10 @@ public class InvseePlusPlus extends JavaPlugin {
         String configuredTitle = getConfig().getString("titles.enderchest");
 
         if (configuredTitle == null) {
-            return platformCreationOptionsEnderInventory.getTitle();
+            Title value = platformCreationOptionsEnderInventory.getTitle();
+            if (value == Title.defaultEnderInventory())
+                getConfig().set("titles.enderchest", "<player>'s enderchest");
+            return value;
         } else {
             return target -> configuredTitle.replace("<player>", target.toString());
         }
@@ -232,6 +246,8 @@ public class InvseePlusPlus extends JavaPlugin {
         if (template != null) {
             return Mirror.forInventory(template);
         } else {
+            //TODO Mirror -> template
+            //TODO set in config
             return platformCreationOptionsMainInventory.getMirror();
         }
     }
@@ -241,6 +257,8 @@ public class InvseePlusPlus extends JavaPlugin {
         if (template != null) {
             return Mirror.forEnderChest(template);
         } else {
+            //TODO Mirror -> template
+            //TODO set in config
             return platformCreationOptionsEnderInventory.getMirror();
         }
     }
@@ -271,7 +289,9 @@ public class InvseePlusPlus extends JavaPlugin {
         FileConfiguration config = getConfig();
         ConfigurationSection logging = config.getConfigurationSection("logging");
         if (logging == null) {
-            return platformCreationOptionsMainInventory.getLogOptions();
+            LogOptions value = platformCreationOptionsMainInventory.getLogOptions();
+            //TODO set in config
+            return value;
         } else {
             String granularity = logging.getString("granularity", "LOG_ON_CLOSE");
             LogGranularity logGranularity = LogGranularity.valueOf(granularity);
