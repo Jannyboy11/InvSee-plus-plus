@@ -2,8 +2,10 @@ package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.folia.FoliaScheduler;
+import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
+import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.logging.LogGranularity;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.logging.LogTarget;
@@ -12,7 +14,9 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
  */
+import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
@@ -35,8 +39,24 @@ import java.util.stream.Collectors;
 
 public class InvseePlusPlus extends JavaPlugin {
 
+    private final boolean asyncTabcompleteEvent;
+
     private InvseeAPI api;
     @Deprecated(forRemoval = true) private OfflinePlayerProvider offlinePlayerProvider;
+
+    private CreationOptions<PlayerInventorySlot> platformCreationOptionsMainInventory;
+    private CreationOptions<EnderChestSlot> platformCreationOptionsEnderInventory;
+
+    public InvseePlusPlus() {
+        boolean asyncTabCompleteEvent;
+        try {
+            Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
+            asyncTabCompleteEvent = true;
+        } catch (ClassNotFoundException e) {
+            asyncTabCompleteEvent = false;
+        }
+        this.asyncTabcompleteEvent = asyncTabCompleteEvent;
+    }
 
     @Override
     public void onEnable() {
@@ -79,12 +99,15 @@ public class InvseePlusPlus extends JavaPlugin {
         //set up default creation options
         //TODO if no values are configured, use the platform default CreationOptions, and save these to config.
         //TODO rewrite configuration logic.
+        this.platformCreationOptionsMainInventory = platform.defaultInventoryCreationOptions(this);
+        this.platformCreationOptionsEnderInventory = platform.defaultEnderChestCreationOptions(this);
+
         api.setOfflinePlayerSupport(offlinePlayerSupport());
         api.setUnknownPlayerSupport(unknownPlayerSupport());
-        api.setMainInventoryTitle(this::getTitleForInventory);
-        api.setEnderInventoryTitle(this::getTitleForEnderChest);
-        api.setMainInventoryMirror(Mirror.forInventory(getInventoryTemplate()));
-        api.setEnderInventoryMirror(Mirror.forEnderChest(getEnderChestTemplate()));
+        api.setMainInventoryTitle(getTitleForInventory());
+        api.setEnderInventoryTitle(getTitleForEnderChest());
+        api.setMainInventoryMirror(getInventoryMirror());
+        api.setEnderInventoryMirror(getEnderChestMirror());
         api.setLogOptions(getLogOptions());
 
         //commands
@@ -113,15 +136,14 @@ public class InvseePlusPlus extends JavaPlugin {
         enderseeCommand.setTabCompleter(tabCompleter);
     }
 
-    private void setupEvents(Scheduler scheduler, OfflinePlayerProvider playerDB) {
+    private void setupEvents(Scheduler scheduler, OfflinePlayerProvider playerDatabase) {
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new SpectatorInventoryEditListener(), this);
 
         if (offlinePlayerSupport() && tabCompleteOfflinePlayers()) {
-            try {
-                Class.forName("com.destroystokyo.paper.event.server.AsyncTabCompleteEvent");
-                pluginManager.registerEvents(new AsyncTabCompleter(this, scheduler, playerDB), this);
-            } catch (ClassNotFoundException e) {
+            if (asyncTabcompleteEvent) {
+                pluginManager.registerEvents(new AsyncTabCompleter(this, scheduler, playerDatabase), this);
+            } else {
                 getLogger().log(Level.WARNING, "InvSee++ is not running on a Paper API-enabled server.");
                 getLogger().log(Level.WARNING, "Tab-completion for offline players will not work for all players!");
                 getLogger().log(Level.WARNING, "See https://papermc.io/ for more information.");
@@ -163,27 +185,67 @@ public class InvseePlusPlus extends JavaPlugin {
     }
 
     public boolean tabCompleteOfflinePlayers() {
-        return getConfig().getBoolean("tabcomplete-offline-players", true);
+        return getConfig().getBoolean("tabcomplete-offline-players", asyncTabcompleteEvent);
     }
 
     public boolean offlinePlayerSupport() {
-        return getConfig().getBoolean("enable-offline-player-support", true);
+        return getConfig().getBoolean("enable-offline-player-support", platformCreationOptionsMainInventory.isOfflinePlayerSupported());
     }
 
     public boolean unknownPlayerSupport() {
-        return getConfig().getBoolean("enable-unknown-player-support", true);
+        return getConfig().getBoolean("enable-unknown-player-support", platformCreationOptionsMainInventory.isUnknownPlayerSupported());
     }
 
+    public Title getTitleForInventory() {
+        String configuredTitle = getConfig().getString("titles.inventory");
+        if (configuredTitle == null) {
+            return platformCreationOptionsMainInventory.getTitle();
+        } else {
+            return target -> configuredTitle.replace("<player>", target.toString());
+        }
+    }
+
+    public Title getTitleForEnderChest() {
+        String configuredTitle = getConfig().getString("titles.enderchest");
+
+        if (configuredTitle == null) {
+            return platformCreationOptionsEnderInventory.getTitle();
+        } else {
+            return target -> configuredTitle.replace("<player>", target.toString());
+        }
+    }
+
+    @Deprecated(forRemoval = true)
     public String getTitleForInventory(Target target) {
         return getConfig().getString("titles.inventory", "<player>'s inventory")
-            .replace("<player>", target.toString());
+                .replace("<player>", target.toString());
     }
 
+    @Deprecated(forRemoval = true)
     public String getTitleForEnderChest(Target target) {
         return getConfig().getString("titles.enderchest", "<player>'s enderchest")
-            .replace("<player>", target.toString());
+                .replace("<player>", target.toString());
     }
 
+    public Mirror<PlayerInventorySlot> getInventoryMirror() {
+        String template = getConfig().getString("templates.inventory");
+        if (template != null) {
+            return Mirror.forInventory(template);
+        } else {
+            return platformCreationOptionsMainInventory.getMirror();
+        }
+    }
+
+    public Mirror<EnderChestSlot> getEnderChestMirror() {
+        String template = getConfig().getString("templates.enderchest");
+        if (template != null) {
+            return Mirror.forEnderChest(template);
+        } else {
+            return platformCreationOptionsEnderInventory.getMirror();
+        }
+    }
+
+    @Deprecated(forRemoval = true)
     public String getInventoryTemplate() {
         return getConfig().getString("templates.inventory",
             "i_00 i_01 i_02 i_03 i_04 i_05 i_06 i_07 i_08\n" +
@@ -194,6 +256,7 @@ public class InvseePlusPlus extends JavaPlugin {
             "p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08");
     }
 
+    @Deprecated(forRemoval = true)
     public String getEnderChestTemplate() {
         return getConfig().getString("templates.enderchest",
             "e_00 e_01 e_02 e_03 e_04 e_05 e_06 e_07 e_08\n" +
@@ -208,7 +271,7 @@ public class InvseePlusPlus extends JavaPlugin {
         FileConfiguration config = getConfig();
         ConfigurationSection logging = config.getConfigurationSection("logging");
         if (logging == null) {
-            return LogOptions.empty();
+            return platformCreationOptionsMainInventory.getLogOptions();
         } else {
             String granularity = logging.getString("granularity", "LOG_ON_CLOSE");
             LogGranularity logGranularity = LogGranularity.valueOf(granularity);
