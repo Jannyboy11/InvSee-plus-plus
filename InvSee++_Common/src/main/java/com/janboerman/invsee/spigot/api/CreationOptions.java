@@ -11,6 +11,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
+/**
+ * Options used to customise how {@link SpectatorInventory}s are opened.
+ * @param <Slot> the spectator inventory slot type. Usually {@link PlayerInventorySlot} or {@link EnderChestSlot}.
+ */
 public class CreationOptions<Slot> implements Cloneable {
 
     private Plugin plugin;
@@ -43,6 +47,18 @@ public class CreationOptions<Slot> implements Cloneable {
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, new LogOptions().withGranularity(LogGranularity.LOG_NEVER));
     }
 
+    /**
+     * Create new CreationOptions.
+     * @param plugin the plugin which wants to create the {@linkplain SpectatorInventory}
+     * @param title the title of the {@linkplain SpectatorInventory}
+     * @param offlinePlayerSupport whether offline players can be spectated
+     * @param mirror the mirror which to view items through
+     * @param unknownPlayerSupport whether unknown players can be spectated
+     * @param bypassExempt whether exempted players can be spectated
+     * @param logOptions the logging options used by the created {@link SpectatorInventoryView}.
+     * @return new creation options
+     * @param <Slot> the slot type
+     */
     public static <Slot> CreationOptions<Slot> of(Plugin plugin, Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt, LogOptions logOptions) {
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, logOptions);
     }
@@ -52,6 +68,11 @@ public class CreationOptions<Slot> implements Cloneable {
         return defaultMainInventory(Bukkit.getPluginManager().getPlugin("InvseePlusPlus"));
     }
 
+    /**
+     * Get default creation options
+     * @param plugin the plugin which wants to create {@linkplain MainSpectatorInventory}s.
+     * @return new creation options
+     */
     public static CreationOptions<PlayerInventorySlot> defaultMainInventory(Plugin plugin) {
         return new CreationOptions<>(plugin, Title.defaultMainInventory(), true, Mirror.defaultPlayerInventory(), true, false, new LogOptions());
     }
@@ -60,50 +81,98 @@ public class CreationOptions<Slot> implements Cloneable {
     public static CreationOptions<EnderChestSlot> defaultEnderInventory() {
         return defaultEnderInventory(Bukkit.getPluginManager().getPlugin("InvseePlusPlus"));
     }
-
+    /**
+     * Get default creation options
+     * @param plugin the plugin which wants to create {@linkplain EnderSpectatorInventory}s.
+     * @return new creation options
+     */
     public static CreationOptions<EnderChestSlot> defaultEnderInventory(Plugin plugin) {
         return new CreationOptions<>(plugin, Title.defaultEnderInventory(), true, Mirror.defaultEnderChest(), true, false, new LogOptions());
     }
 
+    /**
+     * Creates a deep copy of these creation options.
+     * @return new creation options with the same configured values as this one
+     */
     @Override
     public CreationOptions<Slot> clone() {
         return new CreationOptions<>(getPlugin(), getTitle(), isOfflinePlayerSupported(), getMirror(), isUnknownPlayerSupported(), canBypassExemptedPlayers(), getLogOptions().clone());
     }
 
+    /**
+     * Set the plugin.
+     * @param plugin the plugin
+     * @return this
+     */
     public CreationOptions<Slot> withPlugin(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin, "plugin cannot be null");
         return this;
     }
 
+    /**
+     * Set the title.
+     * @param title the title
+     * @return this
+     */
     public CreationOptions<Slot> withTitle(Title title) {
         this.title = Objects.requireNonNull(title, "title cannot be null");
         return this;
     }
 
+    /**
+     * Set the title.
+     * @param title the title
+     * @return this
+     */
     public CreationOptions<Slot> withTitle(String title) {
         return withTitle(Title.of(title));
     }
 
+    /**
+     * Set offline player support.
+     * @param offlinePlayerSupport true if offline players must be able to be spectated, otherwise false
+     * @return this
+     */
     public CreationOptions<Slot> withOfflinePlayerSupport(boolean offlinePlayerSupport) {
         this.offlinePlayerSupport = offlinePlayerSupport;
         return this;
     }
 
+    /**
+     * Set the mirror.
+     * @param mirror the mirror
+     * @return this
+     */
     public CreationOptions<Slot> withMirror(Mirror<Slot> mirror) {
         this.mirror = Objects.requireNonNull(mirror, "mirror cannot be null");
         return this;
     }
 
+    /**
+     * Set unknown player support.
+     * @param unknownPlayerSupport true if players who have not played on the server before must be able to be spectated, otherwise false
+     * @return this
+     */
     public CreationOptions<Slot> withUnknownPlayerSupport(boolean unknownPlayerSupport) {
         this.unknownPlayerSupport = unknownPlayerSupport;
         return this;
     }
 
+    /**
+     * Set exemption bypass.
+     * @param bypassExemptedPlayers true if exempted players can still be spectated, false if exempted players cannot be spectated
+     * @return this
+     */
     public CreationOptions<Slot> withBypassExemptedPlayers(boolean bypassExemptedPlayers) {
         this.bypassExempt = bypassExemptedPlayers;
         return this;
     }
 
+    /**
+     * Set the logging options.
+     * @param logOptions the logging options
+     * @return this
+     */
     public CreationOptions<Slot> withLogOptions(LogOptions logOptions) {
         this.logOptions = Objects.requireNonNull(logOptions, "logOptions cannot be null");
         return this;
@@ -142,30 +211,37 @@ public class CreationOptions<Slot> implements Cloneable {
                 + "}";
     }
 
+    /** Get the configured plugin. */
     public Plugin getPlugin() {
         return plugin;
     }
 
+    /** Get the configured title. */
     public Title getTitle() {
         return title;
     }
 
+    /** Get the configured support for offline players. */
     public boolean isOfflinePlayerSupported() {
         return offlinePlayerSupport;
     }
 
+    /** Get the configured mirror. */
     public Mirror<Slot> getMirror() {
         return mirror;
     }
 
+    /** Get the configured support for unknown players. */
     public boolean isUnknownPlayerSupported() {
         return unknownPlayerSupport;
     }
 
+    /** Get whether exempted players can still be spectated. */
     public boolean canBypassExemptedPlayers() {
         return bypassExempt;
     }
 
+    /** Get the logging options */
     public LogOptions getLogOptions() {
         return logOptions;
     }

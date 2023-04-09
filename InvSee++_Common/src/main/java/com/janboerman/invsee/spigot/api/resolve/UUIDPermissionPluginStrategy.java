@@ -8,13 +8,16 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class UUIDPermissionPluginStategy implements UUIDResolveStrategy {
+/**
+ * A strategy which tries to resolve players' Unique IDs using a handful of popular permission plugins.
+ */
+public class UUIDPermissionPluginStrategy implements UUIDResolveStrategy {
 
     private final Plugin plugin;
     private final Server server;
     private final Scheduler scheduler;
 
-    public UUIDPermissionPluginStategy(Plugin plugin, Scheduler scheduler) {
+    public UUIDPermissionPluginStrategy(Plugin plugin, Scheduler scheduler) {
         this.plugin = plugin;
         this.server = plugin.getServer();
         this.scheduler = scheduler;
@@ -28,9 +31,9 @@ public class UUIDPermissionPluginStategy implements UUIDResolveStrategy {
     @Override
     public CompletableFuture<Optional<UUID>> resolveUniqueId(String userName) {
         return resolveUsingLuckPerms(userName)
-                .thenCombine(resolveUsingGroupManager(userName), UUIDPermissionPluginStategy::firstPresentOptional)
-                .thenCombine(resolveUsingBungeePerms(userName), UUIDPermissionPluginStategy::firstPresentOptional)
-                .thenCombine(resolveUsingUltraPermissions(userName), UUIDPermissionPluginStategy::firstPresentOptional);
+                .thenCombine(resolveUsingGroupManager(userName), UUIDPermissionPluginStrategy::firstPresentOptional)
+                .thenCombine(resolveUsingBungeePerms(userName), UUIDPermissionPluginStrategy::firstPresentOptional)
+                .thenCombine(resolveUsingUltraPermissions(userName), UUIDPermissionPluginStrategy::firstPresentOptional);
         //PermissionsEx? version 1.x seems to be deprecated, but 2.0's development seems to be halted.
         //Any other permission plugins we're forgetting?
     }

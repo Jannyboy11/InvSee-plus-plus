@@ -1,6 +1,5 @@
 package com.janboerman.invsee.spigot.api.resolve;
 
-import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
@@ -10,6 +9,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+/**
+ * A strategy which resolves player's usernames if they are online.
+ */
 public class NameOnlinePlayerStrategy implements NameResolveStrategy {
 
     private final Server server;

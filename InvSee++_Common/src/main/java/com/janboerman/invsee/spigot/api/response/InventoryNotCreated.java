@@ -2,6 +2,9 @@ package com.janboerman.invsee.spigot.api.response;
 
 import java.util.Objects;
 
+/**
+ * The {@link com.janboerman.invsee.spigot.api.SpectatorInventory} could not be opened, because the {@linkplain com.janboerman.invsee.spigot.api.SpectatorInventory} could not be created!
+ */
 public class InventoryNotCreated implements NotOpenedReason {
 
     private final NotCreatedReason notCreatedReason;
@@ -10,6 +13,10 @@ public class InventoryNotCreated implements NotOpenedReason {
         this.notCreatedReason = Objects.requireNonNull(notCreatedReason);
     }
 
+    /**
+     * Get why the {@link com.janboerman.invsee.spigot.api.SpectatorInventory} could not be created.
+     * @return the reason
+     */
     public NotCreatedReason getNotCreatedReason() {
         return notCreatedReason;
     }

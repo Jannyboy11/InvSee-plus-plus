@@ -17,6 +17,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
+/**
+ * Strategy which resolves Unique IDs using BungeeCord's plugin messaging channel.
+ *
+ * @see <a href="https://www.spigotmc.org/wiki/bukkit-bungee-plugin-messaging-channel/#uuidother">BungeeCord Plugin Messagin Channel</a> on the SpigotMC wiki
+ */
 public class UUIDBungeeCordStrategy implements UUIDResolveStrategy, PluginMessageListener {
 
     private static final String BUNGEECORD_CHANNEL = "BungeeCord";

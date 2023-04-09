@@ -8,6 +8,7 @@ public class PlayerTarget implements Target {
 
     private final HumanEntity player;
 
+    /** @deprecated Use {@link Target#byPlayer(HumanEntity)} instead. */
     public PlayerTarget(HumanEntity player) {
         this.player = Objects.requireNonNull(player);
     }

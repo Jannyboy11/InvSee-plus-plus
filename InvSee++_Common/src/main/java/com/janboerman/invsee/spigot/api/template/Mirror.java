@@ -10,6 +10,8 @@ import com.janboerman.invsee.spigot.internal.template.PlayerInventoryMirror;
  * they don't change the outcome of {@link com.janboerman.invsee.spigot.api.SpectatorInventory#getItem(int)} and related methods.
  *
  * @param <Slot> type of slot that this mirror works on
+ *
+ * @see <a href="https://github.com/Jannyboy11/InvSee-plus-plus/wiki/Customising-spectator-inventories#mirror">Mirror explanation on the InvSee++ wiki</a>
  */
 public interface Mirror<Slot> {
 
@@ -21,22 +23,27 @@ public interface Mirror<Slot> {
      * This method must satisfy the equation {@code Objects.equals(slot, getSlot(getIndex(slot)))}.*/
     public Slot getSlot(int index);
 
+    /** The default mirror which assigns each slot to its default index. */
     public static Mirror<PlayerInventorySlot> defaultPlayerInventory() {
         return DefaultMirrors.DEFAULT_PLAYERINVENTORY_MIRROR;
     }
 
+    /** The default mirror which assigns each slot to its default index. */
     public static Mirror<EnderChestSlot> defaultEnderChest() {
         return DefaultMirrors.DEFAULT_ENDERCHEST_MIRROR;
     }
 
+    /** Convert a template into a Mirror. */
     public static Mirror<PlayerInventorySlot> forInventory(String template) {
         return PlayerInventoryMirror.ofTemplate(template);
     }
 
+    /** Convert a template into a Mirror. */
     public static Mirror<EnderChestSlot> forEnderChest(String template) {
         return EnderChestMirror.ofTemplate(template);
     }
 
+    /** Convert a Mirror into a template. */
     public static String toInventoryTemplate(Mirror<PlayerInventorySlot> mirror) {
         if (mirror == DefaultMirrors.DEFAULT_PLAYERINVENTORY_MIRROR) {
             return PlayerInventoryMirror.DEFAULT_TEMPLATE;
@@ -45,6 +52,7 @@ public interface Mirror<Slot> {
         }
     }
 
+    /** Convert a Mirror into a template. */
     public static String toEnderChestTemplate(Mirror<EnderChestSlot> mirror) {
         if (mirror == DefaultMirrors.DEFAULT_ENDERCHEST_MIRROR) {
             return EnderChestMirror.DEFAULT_TEMPLATE;

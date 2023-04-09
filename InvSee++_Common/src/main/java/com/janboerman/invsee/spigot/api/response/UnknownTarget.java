@@ -4,6 +4,8 @@ import com.janboerman.invsee.spigot.api.target.Target;
 
 import java.util.Objects;
 
+
+/** The target player has not been on the server before. */
 public class UnknownTarget extends AbstractNotCreatedReason {
 
     UnknownTarget(Target target) {

@@ -5,6 +5,9 @@ import org.bukkit.entity.HumanEntity;
 
 import java.util.UUID;
 
+/**
+ * Scheduler implementation based on the {@link org.bukkit.scheduler.BukkitScheduler}.
+ */
 public class DefaultScheduler implements Scheduler {
 
     private final InvseePlusPlus plugin;

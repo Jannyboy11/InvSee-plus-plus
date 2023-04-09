@@ -12,6 +12,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A strategy which tries to resolve players' Unique IDs using the Paper Server's offline player cache.
+ */
 public class UUIDPaperCacheStrategy implements UUIDResolveStrategy {
 
     private final Plugin plugin;

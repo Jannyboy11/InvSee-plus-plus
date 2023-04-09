@@ -6,6 +6,7 @@ public class UsernameTarget implements Target {
 
     private final String username;
 
+    /** @deprecated Use {@link Target#byUsername(String)} instead. */
     public UsernameTarget(String username) {
         this.username = Objects.requireNonNull(username);
     }

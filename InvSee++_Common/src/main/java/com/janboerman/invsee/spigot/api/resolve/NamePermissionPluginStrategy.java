@@ -7,7 +7,9 @@ import org.bukkit.plugin.Plugin;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
+/**
+ * A strategy which tries to resolve players' usernames using a handful of popular permission plugins.
+ */
 public class NamePermissionPluginStrategy implements NameResolveStrategy {
     private final Plugin plugin;
     private final Server server;

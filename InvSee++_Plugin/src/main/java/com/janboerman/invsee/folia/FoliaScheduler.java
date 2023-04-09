@@ -9,6 +9,10 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
+/**
+ * Scheduler implementation based on {@link io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler},
+ * {@link io.papermc.paper.threadedregions.scheduler.AsyncScheduler} and {@link EntityScheduler}.
+ */
 public class FoliaScheduler implements Scheduler {
 
     private InvseePlusPlus plugin;

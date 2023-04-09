@@ -57,3 +57,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: startsWith(github.ref, 'refs/tags/')
         run: mvn deploy
+      - name: Deploy Javadoc
+        uses: MathieuSoysal/Javadoc-publisher.yml@v2.4.0
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          javadoc-branch: javadoc
+          java-distribution: temurin
+          java-version: 20
+          custom-command: 'mvn package javadoc:aggregate -pl :invsee-plus-plus,:invsee-plus-plus_plugin,:invsee-plus-plus_common'
+          target-folder: javadoc
+          project: maven

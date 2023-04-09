@@ -17,6 +17,7 @@ import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesS
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.ConstantTitle;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
@@ -192,10 +193,18 @@ public class InvseePlusPlus extends JavaPlugin {
         }
 	}
 
+    /**
+     * Get the InvseeAPI instance.
+     * @return the api
+     */
     public InvseeAPI getApi() {
         return api;
     }
 
+    /**
+     * Get whether InvSee++ should tabcomplete names of players who are offline.
+     * @return true if tabcompletion is enabled for offline players, otherwise false
+     */
     public boolean tabCompleteOfflinePlayers() {
         return tabCompleteOfflinePlayers(getConfig());
     }
@@ -211,6 +220,10 @@ public class InvseePlusPlus extends JavaPlugin {
         }
     }
 
+    /**
+     * Get whether InvSee++ should support spectating inventories of players who are offline.
+     * @return true if spectating offline players' inventories is supported, otherwise false
+     */
     public boolean offlinePlayerSupport() {
         return offlinePlayerSupport(getConfig());
     }
@@ -227,6 +240,10 @@ public class InvseePlusPlus extends JavaPlugin {
         }
     }
 
+    /**
+     * Get whether InvSee++ should support spectating inventories of players who have not played on the server before.
+     * @return true if spectating unknown players is supported, otherwise false
+     */
     public boolean unknownPlayerSupport() {
         return unknownPlayerSupport(getConfig());
     }
@@ -243,6 +260,10 @@ public class InvseePlusPlus extends JavaPlugin {
         }
     }
 
+    /**
+     * Get the Title used for {@link com.janboerman.invsee.spigot.api.MainSpectatorInventory}s.
+     * @return the title
+     */
     public Title getTitleForInventory() {
         return getTitleForInventory(getConfig());
     }
@@ -254,12 +275,18 @@ public class InvseePlusPlus extends JavaPlugin {
             Title value = platformCreationOptionsMainInventory.getTitle();
             if (value == Title.defaultMainInventory())
                 config.set("titles.inventory", "<player>'s inventory");
+            else if (value instanceof ConstantTitle)
+                config.set("titles.inventory", ((ConstantTitle) value).getTitle());
             return value;
         } else {
             return target -> configuredTitle.replace("<player>", target.toString());
         }
     }
 
+    /**
+     * Get the title used for {@link com.janboerman.invsee.spigot.api.EnderSpectatorInventory}s.
+     * @return the title
+     */
     public Title getTitleForEnderChest() {
         return getTitleForEnderChest(getConfig());
     }
@@ -272,12 +299,18 @@ public class InvseePlusPlus extends JavaPlugin {
             Title value = platformCreationOptionsEnderInventory.getTitle();
             if (value == Title.defaultEnderInventory())
                 config.set("titles.enderchest", "<player>'s enderchest");
+            else if (value instanceof ConstantTitle)
+                config.set("titles.enderchest", ((ConstantTitle) value).getTitle());
             return value;
         } else {
             return target -> configuredTitle.replace("<player>", target.toString());
         }
     }
 
+    /**
+     * Get the Mirror used for {@link com.janboerman.invsee.spigot.api.MainSpectatorInventory}s.
+     * @return the mirror
+     */
     public Mirror<PlayerInventorySlot> getInventoryMirror() {
         return getInventoryMirror(getConfig());
     }
@@ -294,6 +327,10 @@ public class InvseePlusPlus extends JavaPlugin {
         }
     }
 
+    /**
+     * Get the Mirror used for {@link com.janboerman.invsee.spigot.api.EnderSpectatorInventory}s.
+     * @return the mirror
+     */
     public Mirror<EnderChestSlot> getEnderChestMirror() {
         return getEnderChestMirror(getConfig());
     }
@@ -310,6 +347,10 @@ public class InvseePlusPlus extends JavaPlugin {
         }
     }
 
+    /**
+     * Get the logging options.
+     * @return the logging otpions
+     */
     public LogOptions getLogOptions() {
         return getLogOptions(getConfig());
     }

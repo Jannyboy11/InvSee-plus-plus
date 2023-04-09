@@ -35,6 +35,15 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.*;
 import org.bukkit.plugin.*;
 
+/**
+ * InvSee++'s api main entrypoint. Instance can be obtained via:
+ * <pre>
+ * <code>
+ * InvseePlusPlus plugin = (InvseePlusPlus) Bukkit.getPluginManager().getPlugin("InvSeePlusPlus");
+ * InvseeAPI api = plugin.getApi();
+ * </code>
+ * </pre>
+ */
 public class InvseeAPI {
 
     /*
@@ -80,6 +89,7 @@ public class InvseeAPI {
     protected final PlayerListener playerListener = new PlayerListener();
     protected final InventoryListener inventoryListener = new InventoryListener();
 
+    /** @deprecated internal api */
     public InvseeAPI(Plugin plugin, InvseePlatform platform, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cachedInventories) {
         this.plugin = Objects.requireNonNull(plugin);
 
@@ -105,6 +115,7 @@ public class InvseeAPI {
         return platform;
     }
 
+    /** Called when InvSee++ disables. DO NOT CALL! */
     public void shutDown() {
         for (var future : pendingInventoriesByUuid.values())
             try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
@@ -112,10 +123,12 @@ public class InvseeAPI {
             try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
     }
 
+    /** Get the known mappings from players' usernames to unique IDs. */
     public Map<String, UUID> getUuidCache() {
         return lookup.getUuidCache();
     }
 
+    /** Get the known mappings from players' unique IDs to usernames. */
     public Map<UUID, String> getUserNameCache() {
         return lookup.getUserNameCache();
     }
@@ -129,12 +142,14 @@ public class InvseeAPI {
     //TODO un-hack this registerListeners thing.
     //TODO should I make a protected constructor that takes a delegate InvseeAPI as a parameter?
 
+    /** @deprecated internal api, subject to change */
     public void registerListeners() {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         pluginManager.registerEvents(playerListener, plugin);
         pluginManager.registerEvents(inventoryListener, plugin);
     }
 
+    /** @deprecated internal api, subject to change */
     public void unregisterListeners() {
         HandlerList.unregisterAll(playerListener);
         HandlerList.unregisterAll(inventoryListener);
@@ -143,61 +158,91 @@ public class InvseeAPI {
 
     // ========= creation options =========
 
+    /** Set the offline player support status for {@link #mainInventoryCreationOptions()} and {@link #enderInventoryCreationOptions()}. */
     public final void setOfflinePlayerSupport(boolean offlinePlayerSupport) {
         this.offlinePlayerSupport = offlinePlayerSupport;
     }
 
+    /** Set the unknown player support status for {@link #mainInventoryCreationOptions()} and {@link #enderInventoryCreationOptions()}. */
     public final void setUnknownPlayerSupport(boolean unknownPlayerSupport) {
         this.unknownPlayerSupport = unknownPlayerSupport;
     }
 
+    /** Get whether the CreationOptions returned by {@link #mainInventoryCreationOptions()} and {@link #enderInventoryCreationOptions()}
+     * will support spectating offline players. */
     public final boolean offlinePlayerSupport() {
         return this.offlinePlayerSupport;
     }
-
+    /** Get whether the CreationOptions returned by {@link #mainInventoryCreationOptions()} and {@link #enderInventoryCreationOptions()}
+     * will support spectating unknown players. */
     public final boolean unknownPlayerSupport() {
         return this.unknownPlayerSupport;
     }
 
-    public final void setMainInventoryTitle(Title titleFactory) {
-        Objects.requireNonNull(titleFactory);
-        this.mainInventoryTitle = titleFactory;
+    /** Set the {@link Title} to be used by {@link #mainInventoryCreationOptions()}. */
+    public final void setMainInventoryTitle(Title title) {
+        Objects.requireNonNull(title);
+        this.mainInventoryTitle = title;
     }
 
-    public final void setEnderInventoryTitle(Title titleFactory) {
-        Objects.requireNonNull(titleFactory);
-        this.enderInventoryTitle = titleFactory;
+    /** Set the {@link Title} to be used by {@link #enderInventoryCreationOptions()}. */
+    public final void setEnderInventoryTitle(Title title) {
+        Objects.requireNonNull(title);
+        this.enderInventoryTitle = title;
     }
 
+    /** Set the {@link Mirror} to be used by {@link #mainInventoryCreationOptions()}. */
     public final void setMainInventoryMirror(Mirror<PlayerInventorySlot> mirror) {
         Objects.requireNonNull(mirror);
         this.inventoryMirror = mirror;
     }
 
+    /** Set the {@link Mirror} to be used by {@link #enderInventoryCreationOptions()}. */
     public final void setEnderInventoryMirror(Mirror<EnderChestSlot> mirror) {
         Objects.requireNonNull(mirror);
         this.enderchestMirror = mirror;
     }
 
+    /** Set the {@link LogOptions} to be used by {@link #mainInventoryCreationOptions()} and {@link #enderInventoryCreationOptions()}. */
     public final void setLogOptions(LogOptions options) {
         Objects.requireNonNull(options);
         this.logOptions = options.clone();
     }
 
+    /**
+     * Get the configured CreationOptions for {@link MainSpectatorInventory}s.
+     * @param spectator the spectating player
+     * @return the creation options
+     */
     public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions(Player spectator) {
         final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY);
         return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, bypassExempt, logOptions.clone());
     }
 
+    /**
+     * Get the configured CreationOptions for {@link EnderSpectatorInventory}s.
+     * @param spectator the spectating player
+     * @return the creation options
+     */
     public CreationOptions<EnderChestSlot> enderInventoryCreationOptions(Player spectator) {
         final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST);
         return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, bypassExempt, logOptions.clone());
     }
 
+    /**
+     * Get the configured CreationOptions for {@link MainSpectatorInventory}s.
+     * These creation options will always bypass the target's exemption status.
+     * @return the creation options
+     */
     public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions() {
         return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, false, logOptions.clone());
     }
 
+    /**
+     * Get the configured CreationOptions for {@link EnderSpectatorInventory}s.
+     * These creation options will always bypass the target's exemption status.
+     * @return the creation options
+     */
     public CreationOptions<EnderChestSlot> enderInventoryCreationOptions() {
         return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, false, logOptions.clone());
     }
@@ -207,49 +252,65 @@ public class InvseeAPI {
 
     // ============== internal apis ==============
 
+    /** @deprecated internal api */
     //TODO I don't like the design of this.
     public final void setMainInventoryTransferPredicate(BiPredicate<MainSpectatorInventory, Player> bip) {
         Objects.requireNonNull(bip);
         this.transferInvToLivePlayer = bip;
     }
 
+    /** @deprecated internal api */
     //TODO I don't like the design of this.
     public final void setEnderChestTransferPredicate(BiPredicate<EnderSpectatorInventory, Player> bip) {
         Objects.requireNonNull(bip);
         this.transferEnderToLivePlayer = bip;
     }
 
+    /** Get a cached {@link MainSpectatorInventory} for the target player.
+     * @deprecated internal api */
+    @Deprecated
     public Optional<MainSpectatorInventory> getOpenMainSpectatorInventory(UUID player) {
         return Optional.ofNullable(cachedInventories.getMainSpectatorInventory(player));
     }
 
+    /** Get a cached {@link EnderSpectatorInventory} for the target player.
+     * @deprecated internal api */
+    @Deprecated
     public Optional<EnderSpectatorInventory> getOpenEnderSpectatorInventory(UUID player) {
         return Optional.ofNullable(cachedInventories.getEnderSpectatorInventory(player));
     }
 
+    /** Fetches the unique ID of the player with the provided username.
+     * @see NamesAndUUIDs */
     public final CompletableFuture<Optional<UUID>> fetchUniqueId(String userName) {
         return lookup.resolveUUID(userName).thenApplyAsync(Function.identity(), scheduler::executeSyncGlobal);
     }
 
+    /** Fetches the username of the player with the provided unique ID.
+     * @see NamesAndUUIDs */
     public final CompletableFuture<Optional<String>> fetchUserName(UUID uniqueId) {
         return lookup.resolveUserName(uniqueId).thenApplyAsync(Function.identity(), scheduler::executeSyncGlobal);
     }
 
+    /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(MainSpectatorInventory spectatorInventory) {
         cachedInventories.cache(spectatorInventory, false);
     }
 
+    /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(MainSpectatorInventory spectatorInventory, boolean force) {
         cachedInventories.cache(spectatorInventory, force);
     }
 
+    /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(EnderSpectatorInventory spectatorInventory) {
         cachedInventories.cache(spectatorInventory);
     }
 
+    /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(EnderSpectatorInventory spectatorInventory, boolean force) {
         cachedInventories.cache(spectatorInventory, force);
@@ -260,6 +321,11 @@ public class InvseeAPI {
 
     // ================================== API methods: Main Inventory ==================================
 
+    /**
+     * Save the target player's inventory contents to his/her player data file.
+     * @param inventory the inventory contents
+     * @return a future which completes once the contents is saved
+     */
     //TODO make this final.
     public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
         return platform.saveInventory(inventory);
@@ -267,6 +333,13 @@ public class InvseeAPI {
 
     // HumanEntity
 
+    /**
+     * Opens a {@link MainSpectatorInventory} for a player.
+     * @param spectator the spectating player
+     * @param target the target player
+     * @param options the creation options
+     * @return an {@link OpenResponse} which, if successful, gives access to an {@link MainSpectatorInventoryView} which represents the open window
+     */
     public final OpenResponse<MainSpectatorInventoryView> spectateInventory(Player spectator, HumanEntity target, CreationOptions<PlayerInventorySlot> options) {
         SpectateResponse<MainSpectatorInventory> response = mainSpectatorInventory(target, options);
         if (response.isSuccess()) {
@@ -276,31 +349,60 @@ public class InvseeAPI {
         }
     }
 
+    /**
+     * Create a {@link MainSpectatorInventory} which will provide access to the inventory contents of a target player.
+     * @param target the target player
+     * @return a {@link SpectateResponse} which, if successful, will give access to the {@link MainSpectatorInventory}
+     */
     public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target) {
         return mainSpectatorInventory(target, mainInventoryCreationOptions());
     }
 
+    /**
+     * Create a {@link MainSpectatorInventory} which will provide access to the inventory contents of a target player.
+     * @param target the target player
+     * @param options the creation options
+     * @return a {@link SpectateResponse} which, if successful, will give access to the {@link MainSpectatorInventory}
+     */
     public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target, CreationOptions<PlayerInventorySlot> options) {
         Target theTarget = Target.byPlayer(target);
         if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
             MainSpectatorInventory inv = platform.spectateInventory(target, options);
-            cache(inv);
+            cachedInventories.cache(inv);
             return SpectateResponse.succeed(inv);
         }
     }
 
     // UserName
 
+    /**
+     * Opens a {@link MainSpectatorInventory} for a player.
+     * @param spectator the spectating player
+     * @param targetName the name of the target player
+     * @param options the creation options
+     * @return a future which will complete with an {@link OpenResponse} which, if successful, gives access to an {@link MainSpectatorInventoryView} which represents the open window
+     */
     public final CompletableFuture<OpenResponse<MainSpectatorInventoryView>> spectateInventory(Player spectator, String targetName, CreationOptions<PlayerInventorySlot> options) {
         return spectateInventory(spectator, mainSpectatorInventory(targetName, options), options);
     }
 
+    /**
+     * Create a {@link MainSpectatorInventory} which will provide access to the inventory contents of a target player.
+     * @param targetName the username of the target player
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link MainSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName) {
         return mainSpectatorInventory(targetName, mainInventoryCreationOptions());
     }
 
+    /**
+     * Create a {@link MainSpectatorInventory} which will provide access to the inventory contents of a target player.
+     * @param targetName the username of the target player
+     * @param options the creation options
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link MainSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, CreationOptions<PlayerInventorySlot> options) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
         Objects.requireNonNull(options, "options cannot be null!");
@@ -316,7 +418,7 @@ public class InvseeAPI {
             MainSpectatorInventory spectatorInventory = platform.spectateInventory(targetPlayer, options);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
-            cache(spectatorInventory);
+            cachedInventories.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -369,14 +471,35 @@ public class InvseeAPI {
 
     // UUID
 
+    /**
+     * Opens a {@link MainSpectatorInventory} for a player.
+     * @param spectator the spectating player
+     * @param targetId the unique ID of the target player
+     * @param targetName the name of the target player
+     * @param options the creation options
+     * @return a future which will complete with an {@link OpenResponse} which, if successful, gives access to an {@link MainSpectatorInventoryView} which represents the open window
+     */
     public final CompletableFuture<OpenResponse<MainSpectatorInventoryView>> spectateInventory(Player spectator, UUID targetId, String targetName, CreationOptions<PlayerInventorySlot> options) {
         return spectateInventory(spectator, mainSpectatorInventory(targetId, targetName, options), options);
     }
 
+    /**
+     * Create a {@link MainSpectatorInventory} which will provide access to the inventory contents of a target player.
+     * @param playerId the unique ID of the target player
+     * @param playerName the username of the target player
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link MainSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName) {
         return mainSpectatorInventory(playerId, playerName, mainInventoryCreationOptions());
     }
 
+    /**
+     * Create a {@link MainSpectatorInventory} which will provide access to the inventory contents of a target player.
+     * @param playerId the unique ID of the target player
+     * @param playerName the username of the target player
+     * @param options the creation options
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link MainSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
@@ -397,7 +520,7 @@ public class InvseeAPI {
 
             MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title, mirror);
             lookup.cacheNameAndUniqueId(playerId, playerName);
-            cache(spectatorInventory);
+            cachedInventories.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!offlineSupport) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -438,7 +561,7 @@ public class InvseeAPI {
 
         //map to SpectateResponse and cache if success
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = combinedFuture.<SpectateResponse<MainSpectatorInventory>>thenApply(eitherReasonOrInventory -> {
-            eitherReasonOrInventory.ifSuccess(this::cache);
+            eitherReasonOrInventory.ifSuccess(cachedInventories::cache);
             return eitherReasonOrInventory;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
@@ -451,6 +574,11 @@ public class InvseeAPI {
 
     // ================================== API methods: Enderchest ==================================
 
+    /**
+     * Save the target player's ender chest contents to his/her player data file.
+     * @param enderChest the ender chest contents
+     * @return a future which completes once the contents is saved
+     */
     //TODO make this final.
     public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
         return platform.saveEnderChest(enderChest);
@@ -458,6 +586,13 @@ public class InvseeAPI {
 
     // HumanEntity
 
+    /**
+     * Opens an {@link EnderSpectatorInventory} for a player.
+     * @param spectator the spectating player
+     * @param target the target player
+     * @param options the creation options
+     * @return an {@link OpenResponse} which, if successful, gives access to an {@link EnderSpectatorInventoryView} which represents the open window
+     */
     public final OpenResponse<EnderSpectatorInventoryView> spectateEnderChest(Player spectator, HumanEntity target, CreationOptions<EnderChestSlot> options) {
         SpectateResponse<EnderSpectatorInventory> response = enderSpectatorInventory(target, options);
         if (response.isSuccess()) {
@@ -467,31 +602,60 @@ public class InvseeAPI {
         }
     }
 
+    /**
+     * Create an {@link EnderSpectatorInventory} which will provide access to the ender chest contents of a target player.
+     * @param target the target player
+     * @return a {@link SpectateResponse} which, if successful, will give access to the {@link EnderSpectatorInventory}
+     */
     public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target) {
         return enderSpectatorInventory(target, enderInventoryCreationOptions());
     }
 
+    /**
+     * Create an {@link EnderSpectatorInventory} which will provide access to the ender chest contents of a target player.
+     * @param target the target player
+     * @param options the creation options
+     * @return a {@link SpectateResponse} which, if successful, will give access to the {@link EnderSpectatorInventory}
+     */
     public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target, CreationOptions<EnderChestSlot> options) {
         Target theTarget = Target.byPlayer(target);
         if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(theTarget)) {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
             EnderSpectatorInventory inv = platform.spectateEnderChest(target, options);
-            cache(inv);
+            cachedInventories.cache(inv);
             return SpectateResponse.succeed(inv);
         }
     }
 
     // UserName
 
+    /**
+     * Opens an {@link EnderSpectatorInventory} for a player.
+     * @param spectator the spectating player
+     * @param targetName the name of the target player
+     * @param options the creation options
+     * @return a future which will complete with an {@link OpenResponse} which, if successful, gives access to an {@link EnderSpectatorInventoryView} which represents the open window
+     */
     public final CompletableFuture<OpenResponse<EnderSpectatorInventoryView>> spectateEnderChest(Player spectator, String targetName, CreationOptions<EnderChestSlot> options) {
         return spectateEnderChest(spectator, enderSpectatorInventory(targetName, options), options);
     }
 
+    /**
+     * Create an {@link EnderSpectatorInventory} which will provide access to the ender chest contents of a target player.
+     * @param targetName the username of the target player
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link EnderSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName) {
         return enderSpectatorInventory(targetName, enderInventoryCreationOptions());
     }
 
+    /**
+     * Create an {@link EnderSpectatorInventory} which will provide access to the ender chest contents of a target player.
+     * @param targetName the username of the target player
+     * @param options the creation options
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link EnderSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, CreationOptions<EnderChestSlot> options) {
         Objects.requireNonNull(targetName, "targetName cannot be null!");
         Objects.requireNonNull(options, "options cannot be null!");
@@ -507,7 +671,7 @@ public class InvseeAPI {
             EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
-            cache(spectatorInventory);
+            cachedInventories.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -560,14 +724,35 @@ public class InvseeAPI {
 
     // UUID
 
+    /**
+     * Opens an {@link EnderSpectatorInventory} for a player.
+     * @param spectator the spectating player
+     * @param targetId the unique ID of the target player
+     * @param targetName the name of the target player
+     * @param options the creation options
+     * @return a future which will complete with an {@link OpenResponse} which, if successful, gives access to an {@link EnderSpectatorInventoryView} which represents the open window
+     */
     public final CompletableFuture<OpenResponse<EnderSpectatorInventoryView>> spectateEnderChest(Player spectator, UUID targetId, String targetName, CreationOptions<EnderChestSlot> options) {
         return spectateEnderChest(spectator, enderSpectatorInventory(targetId, targetName, options), options);
     }
 
+    /**
+     * Create an {@link EnderSpectatorInventory} which will provide access to the ender chest contents of a target player.
+     * @param playerId the unique ID of the target player
+     * @param playerName the username of the target player
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link EnderSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName) {
         return enderSpectatorInventory(playerId, playerName, enderInventoryCreationOptions());
     }
 
+    /**
+     * Create an {@link EnderSpectatorInventory} which will provide access to the ender chest contents of a target player.
+     * @param playerId the unique ID of the target player
+     * @param playerName the username of the target player
+     * @param options the creation options
+     * @return a future which will complete with a {@link SpectateResponse} which, if successful, will give access to the {@link EnderSpectatorInventory}
+     */
     public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options) {
         Objects.requireNonNull(playerId, "player UUID cannot be null!");
         Objects.requireNonNull(playerName, "player name cannot be null!");
@@ -583,7 +768,7 @@ public class InvseeAPI {
 
             EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
             lookup.cacheNameAndUniqueId(playerId, playerName);
-            cache(spectatorInventory);
+            cachedInventories.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -625,7 +810,7 @@ public class InvseeAPI {
 
         //map to SpectateResult and cache if success
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = combinedFuture.<SpectateResponse<EnderSpectatorInventory>>thenApply(eitherReasonOrInventory -> {
-            eitherReasonOrInventory.ifSuccess(this::cache);
+            eitherReasonOrInventory.ifSuccess(cachedInventories::cache);
             return eitherReasonOrInventory;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
@@ -727,7 +912,7 @@ public class InvseeAPI {
                         viewer.closeInventory();
                         viewer.openInventory(newInventorySpectator);
                     }
-                    cache(newInventorySpectator, true);
+                    cachedInventories.cache(newInventorySpectator, true);
                 }
             }
 
@@ -747,7 +932,7 @@ public class InvseeAPI {
                         viewer.closeInventory();
                         viewer.openInventory(newEnderSpectator);
                     }
-                    cache(newEnderSpectator, true);
+                    cachedInventories.cache(newEnderSpectator, true);
                 }
             }
         }
@@ -837,24 +1022,26 @@ public class InvseeAPI {
 
     // =================================== deprecated public apis ====================================
 
-    @Deprecated
-    public final void setMainInventoryTitleFactory(Function<Target, String> titleFactory) {
+    /** @deprecated use {@link #setMainInventoryTitle(Title)} */
+    @Deprecated public final void setMainInventoryTitleFactory(Function<Target, String> titleFactory) {
         setMainInventoryTitle(Title.of(titleFactory));
     }
 
-    @Deprecated
-    public final void setEnderInventoryTitleFactory(Function<Target, String> titleFactory) {
+    /** @deprecated use {@link #setEnderInventoryTitle(Title)} */
+    @Deprecated public final void setEnderInventoryTitleFactory(Function<Target, String> titleFactory) {
         setEnderInventoryTitle(Title.of(titleFactory));
     }
 
     //
 
+    /** @deprecated use {@link #spectateInventory(Player, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<Void> spectateInventory(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(spectator, targetName, mainInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleMainInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetName))
                 .thenApply(__ -> null);
     }
 
+    /** @deprecated use {@link #spectateInventory(Player, UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<Void> spectateInventory(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         return spectateInventory(spectator, targetId, targetName, mainInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleMainInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetId.toString()))
@@ -892,12 +1079,14 @@ public class InvseeAPI {
         }
     }
 
+    /** @deprecated use {@link #spectateEnderChest(Player, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<Void> spectateEnderChest(Player spectator, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(spectator, targetName, enderInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleEnderInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetName))
                 .thenApply(__ -> null);
     }
 
+    /** @deprecated use {@link #spectateEnderChest(Player, UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<Void> spectateEnderChest(Player spectator, UUID targetId, String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         return spectateEnderChest(spectator, targetId, targetName, enderInventoryCreationOptions(spectator).withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror))
                 .whenComplete((either, throwable) -> handleEnderInventoryExceptionsAndNotCreatedReasons(plugin, spectator, either, throwable, targetId.toString()))
@@ -939,38 +1128,46 @@ public class InvseeAPI {
 
     // HumanEntity target
 
+    /** @deprecated use {@link #mainSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target, String title) {
         return mainSpectatorInventory(target, mainInventoryCreationOptions().withTitle(title));
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated public final SpectateResponse<MainSpectatorInventory> mainSpectatorInventory(HumanEntity target, String title, Mirror<PlayerInventorySlot> mirror) {
         return mainSpectatorInventory(target, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
 
     // UserName target
 
+    /** @deprecated use {@link #mainSpectatorInventory(String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title) {
         return mainSpectatorInventory(targetName, title, offlinePlayerSupport);
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport) {
         return mainSpectatorInventory(targetName, title, offlineSupport, inventoryMirror);
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         return mainSpectatorInventory(targetName, mainInventoryCreationOptions().withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror));
     }
 
     // UUID target
 
+    /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title) {
         return mainSpectatorInventory(playerId, playerName, title, offlinePlayerSupport);
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
         return mainSpectatorInventory(playerId, playerName, title, offlineSupport, inventoryMirror);
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
         return mainSpectatorInventory(playerId, playerName, new CreationOptions<>(plugin, Title.of(title), offlineSupport, mirror, unknownPlayerSupport, false, LogOptions.empty()));
     }
@@ -979,48 +1176,58 @@ public class InvseeAPI {
 
     // HumanEntity target
 
+    /** @deprecated use {@link #enderSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target, String title) {
         return enderSpectatorInventory(target, enderInventoryCreationOptions().withTitle(title));
     }
 
+    /** @deprecated use {@link #enderSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated public final SpectateResponse<EnderSpectatorInventory> enderSpectatorInventory(HumanEntity target, String title, Mirror<EnderChestSlot> mirror) {
         return enderSpectatorInventory(target, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
 
     // UserName target:
 
+    /** @deprecated use {@link #enderSpectatorInventory(String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title) {
         return enderSpectatorInventory(targetName, title, offlinePlayerSupport);
     }
 
+    /** @deprecated use {@link #enderSpectatorInventory(String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport) {
         return enderSpectatorInventory(targetName, title, offlineSupport, enderchestMirror);
     }
 
+    /** @deprecated use {@link #enderSpectatorInventory(String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(String targetName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         return enderSpectatorInventory(targetName, enderInventoryCreationOptions().withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror));
     }
 
     // UUID target
 
+    /** @deprecated use {@link #enderSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title) {
         return enderSpectatorInventory(playerId, playerName, title, offlinePlayerSupport);
     }
 
+    /** @deprecated use {@link #enderSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport) {
         return enderSpectatorInventory(playerId, playerName, title, offlineSupport, enderchestMirror);
     }
 
+    /** @deprecated use {@link #enderSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<EnderSpectatorInventory>> enderSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<EnderChestSlot> mirror) {
         return enderSpectatorInventory(playerId, playerName, enderInventoryCreationOptions().withTitle(title).withOfflinePlayerSupport(offlineSupport).withMirror(mirror));
     }
 
     // apis that open immideately:
 
+    /** @deprecated use {@link #spectateInventory(Player, HumanEntity, CreationOptions)} or {@link #spectateInventory(Player, UUID, String, CreationOptions)} */
     @Deprecated public final void openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, String title, Mirror<PlayerInventorySlot> mirror) {
         platform.openMainSpectatorInventory(spectator, spectatorInventory, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
 
+    /** @deprecated use {@link #spectateEnderChest(Player, HumanEntity, CreationOptions)} or {@link #spectateEnderChest(Player, UUID, String, CreationOptions)} */
     @Deprecated public final void openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, String title, Mirror<EnderChestSlot> mirror) {
         platform.openEnderSpectatorInventory(spectator, spectatorInventory, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
@@ -1029,41 +1236,49 @@ public class InvseeAPI {
 
     // implementation methods:
 
+    /** @deprecated use {@link #enderSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
         return platform.createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title).withMirror(mirror))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
+    /** @deprecated use {@link #enderSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
         return platform.createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
 
+    /** @deprecated use {@link #enderSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
         return platform.spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
+    /** @deprecated use {@link #enderSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
         return platform.spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title));
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
         return platform.createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title).withMirror(mirror))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
+    /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
         return platform.createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
 
+    /** @deprecated use {@link #mainSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
         return platform.spectateInventory(player, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
+    /** @deprecated use {@link #mainSpectatorInventory(HumanEntity, CreationOptions)} */
     @Deprecated(forRemoval = true, since = "0.19.6")
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         return platform.spectateInventory(player, mainInventoryCreationOptions().withTitle(title));

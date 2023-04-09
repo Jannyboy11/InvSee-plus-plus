@@ -1,8 +1,8 @@
 package com.janboerman.invsee.spigot.api;
 
 import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.internal.ConstantTitle;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 @FunctionalInterface
@@ -28,39 +28,6 @@ public interface Title {
         return DefaultTitles.DEFAULT_ENDER_INVENTORY;
     }
 
-}
-
-class ConstantTitle implements Title {
-
-    private String title;
-
-    ConstantTitle(String title) {
-        this.title = Objects.requireNonNull(title);
-    }
-
-    @Override
-    public final String titleFor(Target target) {
-        return title;
-    }
-
-    @Override
-    public String toString() {
-        return title;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) return true;
-        if (!(o instanceof ConstantTitle)) return false;
-
-        ConstantTitle that = (ConstantTitle) o;
-        return this.title.equals(that.title);
-    }
-
-    @Override
-    public int hashCode() {
-        return title.hashCode();
-    }
 }
 
 class DefaultTitles {

@@ -7,6 +7,7 @@ public class UniqueIdTarget implements Target {
 
     private final UUID uniqueId;
 
+    /** @deprecated Use {@link Target#byUniqueId(UUID)} instead. */
     public UniqueIdTarget(UUID uniqueId) {
         this.uniqueId = Objects.requireNonNull(uniqueId);
     }

@@ -8,6 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A strategy which resolves player's UUID's using {@link Server#getOfflinePlayer(String)}.
+ * @deprecated {@linkplain Server#getOfflinePlayer(String)} should not be used.
+ */
 @Deprecated
 public class UUIDOfflinePlayerStrategy implements UUIDResolveStrategy {
 

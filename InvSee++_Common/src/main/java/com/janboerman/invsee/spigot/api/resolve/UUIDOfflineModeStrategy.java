@@ -5,6 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A strategy which synthesizes UUIDs for offline players.
+ */
 public class UUIDOfflineModeStrategy implements UUIDResolveStrategy {
 
     @Override

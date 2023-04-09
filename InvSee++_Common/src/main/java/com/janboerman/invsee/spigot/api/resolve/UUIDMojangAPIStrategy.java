@@ -9,6 +9,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+/**
+ * A strategy which obtains Unique IDs for players using the <a href="https://wiki.vg/Mojang_API">Mojang Rest API</a>.
+ */
 public class UUIDMojangAPIStrategy implements UUIDResolveStrategy {
 
     private final Plugin plugin;

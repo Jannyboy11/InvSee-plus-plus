@@ -6,26 +6,47 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Objects;
 
+/**
+ * An item type is a product of {@link Material} and {@link ItemMeta}.
+ */
 public class ItemType {
 
     private final Material material;
     private final ItemMeta meta;
 
+    /**
+     * Construct the ItemType
+     * @param material the material
+     * @param meta the item meta
+     */
     public ItemType(Material material, ItemMeta meta) {
         this.material = material;
         this.meta = meta;
     }
 
+    /**
+     * Construct the ItemType
+     * @param stack the stack to obtain the Material and ItemMeta from.
+     * @return a new ItemType, or null if the item stack is empty
+     */
     public static ItemType of(ItemStack stack) {
         if (isEmptyStack(stack)) return null;
 
         return new ItemType(stack.getType(), stack.hasItemMeta() ? stack.getItemMeta() : null);
     }
 
+    /**
+     * Get the material of this item type.
+     * @return the material
+     */
     public Material getMaterial() {
         return material;
     }
 
+    /**
+     * Get the item meta of this item type.
+     * @return the item meta
+     */
     public ItemMeta getItemMeta() {
         return meta;
     }

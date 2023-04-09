@@ -3,7 +3,9 @@ package com.janboerman.invsee.spigot.api.response;
 import com.janboerman.invsee.spigot.api.target.Target;
 
 /**
- * A reason explaining why a SpectatorInventory could not be created
+ * A reason explaining why a SpectatorInventory could not be created.
+ * @see <a href="https://github.com/Jannyboy11/InvSee-plus-plus/wiki/Basic-usage#a-note-on-notcreatedreason">NotCreatedReason explaination on the wiki</a>
+ * @see SpectateResponse
  */
 public interface NotCreatedReason {
 

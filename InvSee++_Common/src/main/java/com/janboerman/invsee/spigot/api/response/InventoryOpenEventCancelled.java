@@ -4,6 +4,9 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 
 import java.util.Objects;
 
+/**
+ * The {@link com.janboerman.invsee.spigot.api.SpectatorInventory} could not be opened, because the {@link InventoryOpenEvent} was cancelled.
+ */
 public class InventoryOpenEventCancelled implements NotOpenedReason {
 
     @Deprecated(forRemoval = true, since = "0.19.0")
@@ -20,6 +23,10 @@ public class InventoryOpenEventCancelled implements NotOpenedReason {
         return "Inventory open event was cancelled";
     }
 
+    /**
+     * Get the event which was cancelled.
+     * @return the event
+     */
     public InventoryOpenEvent getEvent() {
         return event;
     }

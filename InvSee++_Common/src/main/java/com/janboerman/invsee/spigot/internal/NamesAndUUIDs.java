@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.internal;
 
 import com.janboerman.invsee.mojangapi.MojangAPI;
+import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.resolve.*;
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
@@ -23,6 +24,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Cache for player usernames and unique IDs.
+ * Instance can be obtained via {@link InvseeAPI#namesAndUuidsLookup()}.
+ *
+ * @apiNote this API is not stable (yet).
+ * @see <a href="https://github.com/Jannyboy11/InvSee-plus-plus/wiki/Advanced-usage#changing-how-uuid-lookups-work-unstable-api">Changing how UUID lookups work</a>
+ */
 public class NamesAndUUIDs {
 
     //static members
@@ -63,12 +71,16 @@ public class NamesAndUUIDs {
     });
     private final Map<UUID, String> userNameCacheView = Collections.unmodifiableMap(userNameCache);
 
+    /** The list of strategies used to resolve players' unique IDs. Strategies are attempted in order. */
     public final List<UUIDResolveStrategy> uuidResolveStrategies;
+    /** The list of strategies used to resolve players' usernames. Strategies are attempted in order. */
     public final List<NameResolveStrategy> nameResolveStrategies;
 
     private boolean bungeeCord = false, bungeeCordOnline = false;
     private boolean velocity = false, velocityOnline = false;
 
+    /** @deprecated internal api */
+    @Deprecated
     public NamesAndUUIDs(Plugin plugin, Scheduler scheduler) {
 
         MojangAPI mojangApi = new MojangAPI(HttpClient.newBuilder()
@@ -112,7 +124,7 @@ public class NamesAndUUIDs {
             }
         }
 
-        this.uuidResolveStrategies.add(new UUIDPermissionPluginStategy(plugin, scheduler));
+        this.uuidResolveStrategies.add(new UUIDPermissionPluginStrategy(plugin, scheduler));
         this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin, scheduler));
 
         if (bungeeCord || velocity) {
@@ -134,29 +146,35 @@ public class NamesAndUUIDs {
         }
     }
 
+    /** Is the server in online mode? This method will consider servers behind a proxy in online mode as online. */
     public final boolean onlineMode(Server server) {
         return server.getOnlineMode() || bungeeCordOnline || velocityOnline;
     }
 
+    /** Get the known mappings from username to unique ID. */
     public Map<String, UUID> getUuidCache() {
         return uuidCacheView;
     }
 
+    /** Get the known mappings from UUID to username. */
     public Map<UUID, String> getUserNameCache() {
         return userNameCacheView;
     }
 
+    /** Cache a player's unique ID and username. */
     public void cacheNameAndUniqueId(UUID uuid, String userName) {
         this.userNameCache.put(uuid, userName);
         this.uuidCache.put(userName, uuid);
     }
 
+    /** Resolve a player's unique ID, given their username. */
     public CompletableFuture<Optional<UUID>> resolveUUID(String username) {
         var result = resolveUUID(username, new SynchronizedIterator<>(uuidResolveStrategies.iterator()));
         result.thenAccept(optUuid -> optUuid.ifPresent(uuid -> cacheNameAndUniqueId(uuid, username)));
         return result;
     }
 
+    /** Resolve a player's username, given their unique ID. */
     public CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId) {
         var result = resolveUserName(uniqueId, new SynchronizedIterator<>(nameResolveStrategies.iterator()));
         result.thenAccept(optName -> optName.ifPresent(name -> cacheNameAndUniqueId(uniqueId, name)));

@@ -65,6 +65,49 @@
                     <release>11</release>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <!-- Folia api javadoc -->
+                    <links>
+                        <link>https://jd.papermc.io/folia/1.19/</link>
+                    </links>
+
+                    <!-- make the javadoc tool stop complain about unrecognised tags -->
+                    <tags>
+                        <tag>
+                            <name>apiNote</name>
+                            <placement>a</placement>
+                            <head>API Note:</head>
+                        </tag>
+                        <tag>
+                            <name>implNote</name>
+                            <placement>a</placement>
+                            <head>Implementation Note:</head>
+                        </tag>
+                        <tag>
+                            <name>note</name>
+                            <placement>a</placement>
+                            <head>Note:</head>
+                        </tag>
+                    </tags>
+
+                    <!-- only show protected and public stuff -->
+                    <show>protected</show>
+
+                    <!-- who needs help, anyway? -->
+                    <nohelp>true</nohelp>
+
+                    <!-- the javadoc tool is too picky for me -->
+                    <failOnError>false</failOnError>
+
+                    <!-- so that proper hyperlinks to standard jdk classes are generated -->
+                    <additionalOptions>-source 17</additionalOptions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 
 import java.util.Objects;
 
+/** The target player is exempted from being spectated. */
 public class TargetHasExemptPermission extends AbstractNotCreatedReason {
 
     TargetHasExemptPermission(Target target) {
