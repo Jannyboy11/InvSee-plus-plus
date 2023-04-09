@@ -102,15 +102,15 @@ There are two types of support, Tier 1 support and Tier 2 support.
 In general I support the latest patch release of popularly used Minecraft version, as well as multiple recent versions of the latest major release.
 
 Server support matrix:
-| Server Software            | 1.8.8         | 1.12.2        | 1.15.2  | 1.16.5  | 1.17.1 | 1.18.2 | 1.19.3 | 1.19.4        |
-|----------------------------|---------------|---------------|---------|---------|--------|--------|--------|---------------|
-| CraftBukkit                | Tier 1        | Tier 1        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 1        |
-| Paper                      | Tier 2        | Tier 2        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2        |
-| Folia                      | n/a           | n/a           | n/a     | n/a     | n/a    | n/a    | Tier 2 | [Planned](42) |
-| Other forks of CraftBukkit | Tier 2        | Tier 2        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2        |
-| Forge/Bukkit hybrids       | Tier 2*       | Tier 2*       | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2        |
-| Fabric/Bukkit hybrids      | Tier 2*       | Tier 2*       | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2        |
-| Glowstone                  | Not supported | [Planned](37) | n/a     | n/a     | n/a    | n/a    | n/a    | n/a           |
+| Server Software            | 1.8.8         | 1.12.2        | 1.15.2  | 1.16.5  | 1.17.1 | 1.18.2 | 1.19.3 | 1.19.4 |
+|----------------------------|---------------|---------------|---------|---------|--------|--------|--------|--------|
+| CraftBukkit                | Tier 1        | Tier 1        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 1 |
+| Paper                      | Tier 2        | Tier 2        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
+| Folia                      | n/a           | n/a           | n/a     | n/a     | n/a    | n/a    | Tier 2 | Tier 2 |
+| Other forks of CraftBukkit | Tier 2        | Tier 2        | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
+| Forge/Bukkit hybrids       | Tier 2*       | Tier 2*       | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
+| Fabric/Bukkit hybrids      | Tier 2*       | Tier 2*       | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
+| Glowstone                  | Not supported | [Planned](37) | n/a     | n/a     | n/a    | n/a    | n/a    | n/a    |
 
 *The modding frameworks that these servers are based on were released at a time when Minecraft's minimum supported version was Java 8 (or lower),
 and there is a good chance they won't be able to load mods and plugins compiled for newer Java versions.
