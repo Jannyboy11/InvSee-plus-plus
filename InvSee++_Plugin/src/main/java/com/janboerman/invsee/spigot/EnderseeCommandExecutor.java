@@ -70,20 +70,14 @@ public class EnderseeCommandExecutor implements CommandExecutor {
         final InvseeAPI api = plugin.getApi();
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = null;
         final Target target = isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID);
-        final Title title = plugin.getTitleForEnderChest();
-        final Mirror<EnderChestSlot> mirror = plugin.getEnderChestMirror();
-        final boolean offlineSupport = plugin.offlinePlayerSupport();
-        final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
-        final boolean bypassExempt = player.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST);
-        final LogOptions logOptions = plugin.getLogOptions();
         //TODO why not just: plugin.getEnderChestCreationOptions() ?
         final CreationOptions<EnderChestSlot> creationOptions = CreationOptions.defaultEnderInventory(plugin)
-                .withTitle(title)
-                .withMirror(mirror)
-                .withOfflinePlayerSupport(offlineSupport)
-                .withUnknownPlayerSupport(unknownPlayerSupport)
-                .withBypassExemptedPlayers(bypassExempt)
-                .withLogOptions(logOptions);
+                .withTitle(plugin.getTitleForEnderChest())
+                .withMirror(plugin.getEnderChestMirror())
+                .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
+                .withUnknownPlayerSupport(plugin.unknownPlayerSupport())
+                .withBypassExemptedPlayers(player.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST))
+                .withLogOptions(plugin.getLogOptions());
 
         if (args.length > 1 && api instanceof PerWorldInventorySeeApi) {
             String pwiArgument = StringHelper.joinArray(" ", 1, args);

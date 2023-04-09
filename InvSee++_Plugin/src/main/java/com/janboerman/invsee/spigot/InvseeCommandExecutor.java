@@ -60,20 +60,14 @@ public class InvseeCommandExecutor implements CommandExecutor {
 
         final InvseeAPI api = plugin.getApi();
         final Target target = isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID);
-        final Title title = plugin.getTitleForInventory();
-        final Mirror<PlayerInventorySlot> mirror = plugin.getInventoryMirror();
-        final boolean offlineSupport = plugin.offlinePlayerSupport();
-        final boolean unknownPlayerSupport = plugin.unknownPlayerSupport();
-        final boolean bypassExempt = player.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY);
-        final LogOptions logOptions = plugin.getLogOptions();
         //TODO why not just: plugin.getInventoryCreationOptions() ?
         final CreationOptions<PlayerInventorySlot> creationOptions = CreationOptions.defaultMainInventory(plugin)
-                .withTitle(title)
-                .withMirror(mirror)
-                .withOfflinePlayerSupport(offlineSupport)
-                .withUnknownPlayerSupport(unknownPlayerSupport)
-                .withBypassExemptedPlayers(bypassExempt)
-                .withLogOptions(logOptions);
+                .withTitle(plugin.getTitleForInventory())
+                .withMirror(plugin.getInventoryMirror())
+                .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
+                .withUnknownPlayerSupport(plugin.unknownPlayerSupport())
+                .withBypassExemptedPlayers(player.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY))
+                .withLogOptions(plugin.getLogOptions());
 
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> pwiFuture = null;
 
