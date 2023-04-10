@@ -41,7 +41,7 @@ jobs:
           cd perworldinventory-kt
           mvn --batch-mode --update-snapshots clean package install -DskipTests=true
       - name: Compile InvSee++
-        run: mvn --batch-mode --update-snapshots verify
+        run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
