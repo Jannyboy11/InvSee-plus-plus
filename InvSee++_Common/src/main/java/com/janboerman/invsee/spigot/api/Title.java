@@ -29,18 +29,18 @@ public interface Title {
         return new ConstantTitle(title);
     }
 
-    /** Convert a Function into a Title */
+    /** Convert a Function into a Title. */
     public static Title of(Function<? super Target, ? extends String> function) {
         if (function == null) return null;
         return function::apply;
     }
 
-    /** Get the default main inventory title: {@code "<target>'s inventory"}*/
+    /** Get the default main spectator inventory title: {@code "<target>'s inventory"} */
     public static Title defaultMainInventory() {
         return DefaultTitles.DEFAULT_MAIN_INVENTORY;
     }
 
-    /** Get the default main inventory title: {@code "<target>'s enderchest"}*/
+    /** Get the default ender chest spectator inventory title: {@code "<target>'s enderchest"} */
     public static Title defaultEnderInventory() {
         return DefaultTitles.DEFAULT_ENDER_INVENTORY;
     }
