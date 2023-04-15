@@ -31,8 +31,8 @@
         <module>InvSee++_Give_Platforms/Give_Impl_1_19_2_R1</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_19_3_R2</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_19_4_R3</module>
-        <module>InvSee++_Clear_Plugin</module>
         <module>InvSee++_Give_Plugin</module>
+        <module>InvSee++_Clear_Plugin</module>
         <module>VersionUpdater</module>
     </modules>
     <packaging>pom</packaging>
