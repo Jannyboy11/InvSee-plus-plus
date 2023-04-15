@@ -58,6 +58,11 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	// decorate clicked method for tracking/logging
 	@Override
 	public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+		//TODO Folia: schedule task that is synchronised across both the target player's EntityScheduler as well as the spectator player's EntityScheduler.
+		//TODO because now we have a data race.
+		//TODO can I use java.util.concurrent.{Exchanger, CyclicBarrier or Phaser} perhaps??
+		//TODO when we arrive here, we are in the tick thread of the Spectator player.
+
 		List<org.bukkit.inventory.ItemStack> contentsBefore = null, contentsAfter;
 		if (tracker != null) {
 			contentsBefore = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();

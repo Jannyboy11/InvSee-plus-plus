@@ -99,7 +99,7 @@ public class HybridServerSupport {
     public static NonNullList<ItemStack> enderChestItems(PlayerEnderChestContainer enderChest) {
         try {
             return enderChest.items;
-        } catch (NoSuchFieldError | IllegalAccessError craftbukkitFildIsActuallyPrivate) {
+        } catch (NoSuchFieldError | IllegalAccessError craftbukkitFieldIsActuallyPrivate) {
             try {
                 //call the forge method: getContents()Ljava/util/List<net/minecraft/world/item/ItemStack>;
                 MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -107,7 +107,7 @@ public class HybridServerSupport {
                 return (NonNullList<ItemStack>) methodHandle.invoke(enderChest);
             } catch (Throwable forgeMethodNotFound) {
                 RuntimeException ex = new RuntimeException("No method known of getting the enderchest items");
-                ex.addSuppressed(craftbukkitFildIsActuallyPrivate);
+                ex.addSuppressed(craftbukkitFieldIsActuallyPrivate);
                 ex.addSuppressed(forgeMethodNotFound);
                 throw ex;
             }

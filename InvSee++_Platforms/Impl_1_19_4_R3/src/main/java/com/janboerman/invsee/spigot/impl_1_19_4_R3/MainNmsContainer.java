@@ -69,6 +69,12 @@ class MainNmsContainer extends AbstractContainerMenu {
 	// decorate clicked method for tracking/logging
 	@Override
 	public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+		//TODO Folia: schedule task that is synchronised across both the target player's EntityScheduler as well as the spectator player's EntityScheduler.
+		//TODO because now we have a data race.
+		//TODO when we arrive here, we are in the tick thread of the Spectator player.
+		//TODO an STM-type solution is probably the best - we make changes to a dummy top inventory and commit each change (item diffs) to the real inventory in the target entity scheduler thread.
+		//TODO need to properly take care of aborts/rollbacks if a diff can't be replayed on the real inventory.
+
 		List<org.bukkit.inventory.ItemStack> contentsBefore = null, contentsAfter;
 		if (tracker != null) {
 			contentsBefore = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
