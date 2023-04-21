@@ -200,5 +200,5 @@ class MainNmsContainer extends AbstractContainerMenu {
 		
 		return itemStack;
 	}
-	
+
 }
