@@ -46,11 +46,11 @@
             <name>GitHub Jannyboy11 Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/Jannyboy11/InvSee-plus-plus</url>
         </repository>
-        <repository>
+        <snapshotRepository>
             <id>repsy</id>
             <name>Jannyboy11 Repsy Minecraft Repo</name>
             <url>https://repo.repsy.io/mvn/jannyboy11/minecraft</url>
-        </repository>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
