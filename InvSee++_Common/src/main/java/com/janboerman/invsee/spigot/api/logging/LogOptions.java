@@ -43,8 +43,8 @@ public class LogOptions implements Cloneable {
 
     private LogOptions(LogGranularity granularity, Set<LogTarget> logTargets, Map<LogTarget, String> formats) {
         this.granularity = granularity;
-        this.logTargets = (logTargets == null || logTargets.isEmpty()) ? null : EnumSet.copyOf(logTargets);
-        this.formats = (formats == null || formats.isEmpty()) ? null : new EnumMap<>(formats);
+        this.logTargets = logTargets == null ? null : logTargets.isEmpty() ? EnumSet.noneOf(LogTarget.class) : EnumSet.copyOf(logTargets);
+        this.formats = formats == null ? null : formats.isEmpty() ? new EnumMap<>(LogTarget.class) : new EnumMap<>(formats);
     }
 
     public LogOptions() {
