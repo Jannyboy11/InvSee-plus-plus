@@ -110,7 +110,7 @@ public class InvseeAPI {
         return scheduler;
     }
 
-    @Deprecated //TODO refactor/remote this.
+    @Deprecated //TODO refactor/remove this.
     protected InvseePlatform getPlatform() {
         return platform;
     }

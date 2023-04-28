@@ -21,7 +21,7 @@ public interface NotCreatedReason {
         return new TargetHasExemptPermission(target);
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "0.21.6")
     public static ImplementationFault implementationFault(Target target) {
         return new ImplementationFault(target);
     }
