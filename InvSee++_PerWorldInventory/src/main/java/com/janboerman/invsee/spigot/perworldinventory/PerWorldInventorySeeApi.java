@@ -489,6 +489,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
         }
 
         return fromVanillaStorageOfflineInv.thenApplyAsync(optionalSpectatorInv -> {
+
             optionalSpectatorInv.ifSuccess(spectatorInv -> {
 
                 //first set the minecraft-saved contents onto the player

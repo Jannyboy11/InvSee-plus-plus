@@ -5,15 +5,12 @@ import com.janboerman.invsee.spigot.api.Exempt;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
-import com.janboerman.invsee.spigot.api.Title;
-import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
 /*
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesSeeApi;
 import com.janboerman.invsee.spigot.multiverseinventories.MviCommandArgs;
  */
-import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
@@ -57,6 +54,7 @@ public class InvseeCommandExecutor implements CommandExecutor {
         } catch (IllegalArgumentException e) {
             isUuid = false;
         }
+        final boolean finalIsUuid = isUuid;
 
         final InvseeAPI api = plugin.getApi();
         final Target target = isUuid ? Target.byUniqueId(uuid) : Target.byUsername(playerNameOrUUID);
@@ -86,7 +84,6 @@ public class InvseeCommandExecutor implements CommandExecutor {
                     ? CompletableFuture.completedFuture(Optional.of(uuid))
                     : pwiApi.fetchUniqueId(playerNameOrUUID);
 
-            final boolean finalIsUuid = isUuid;
             pwiFuture = uuidFuture.thenCompose(optId -> {
                 if (optId.isPresent()) {
                     UUID uniqueId = optId.get();
@@ -133,52 +130,63 @@ public class InvseeCommandExecutor implements CommandExecutor {
         }
          */
 
-        if (pwiFuture == null) { //TODO get rid of this. actually extend pwi api to also accept mirrors.
+        CompletableFuture<OpenResponse<MainSpectatorInventoryView>> fut;
+
+        if (pwiFuture != null) {
+            //PWI future is not null - open the inventory!
+            fut = pwiFuture.thenApply(response -> response.isSuccess()
+                        ? ((PerWorldInventorySeeApi) api).openMainSpectatorInventory(player, response.getInventory(), creationOptions)
+                        : OpenResponse.closed(NotOpenedReason.notCreated(response.getReason())));
+        }
+
+        //TODO else if (mviFuture != null) { ... }
+
+        else {
             //No PWI argument - just continue with the regular method
-
-            CompletableFuture<OpenResponse<MainSpectatorInventoryView>> fut;
-
             if (isUuid) {
                 //playerNameOrUUID is a UUID.
                 final UUID finalUuid = uuid;
 
+                //convert UUID to username, then spectate the inventory!
                 fut = api.fetchUserName(uuid).thenApply(o -> o.orElse("InvSee++ Player")).exceptionally(t -> "InvSee++ Player")
                         .thenCompose(userName -> api.spectateInventory(player, finalUuid, userName, creationOptions));
             } else {
+                //spectate the target's inventory!
                 fut = api.spectateInventory(player, playerNameOrUUID, creationOptions);
             }
-
-            fut.whenComplete((response, throwable) -> {
-                if (throwable != null) {
-                    player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s inventory.");
-                    plugin.getLogger().log(Level.SEVERE, "Error while trying to create main-inventory spectator inventory", throwable);
-                } else {
-                    if (!response.isOpen()) {
-                        NotOpenedReason notOpenedReason = response.getReason();
-                        if (notOpenedReason instanceof InventoryOpenEventCancelled) {
-                            player.sendMessage(ChatColor.RED + "Another plugin prevented you from spectating " + playerNameOrUUID + "'s inventory");
-                        } else if (notOpenedReason instanceof InventoryNotCreated) {
-                            NotCreatedReason notCreatedReason = ((InventoryNotCreated) notOpenedReason).getNotCreatedReason();
-                            if (notCreatedReason instanceof TargetDoesNotExist) {
-                                player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist.");
-                            } else if (notCreatedReason instanceof UnknownTarget) {
-                                player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " has not logged onto the server yet.");
-                            }  else if (notCreatedReason instanceof TargetHasExemptPermission) {
-                                player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " is exempted from being spectated.");
-                            } else if (notCreatedReason instanceof ImplementationFault) {
-                                player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + playerNameOrUUID + "'s inventory.");
-                            } else if (notCreatedReason instanceof OfflineSupportDisabled) {
-                                player.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
-                            } else {
-                                player.sendMessage(ChatColor.RED + "Could not create " + playerNameOrUUID + "'s inventory for an unknown reason.");
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.RED + "Could not open " + playerNameOrUUID + "'s inventory for an unknown reason.");
-                        }
-                    } //else: it opened successfully: nothing to do there!
-                }
-            });
         }
+
+        //Gracefully handle failure and faults.
+        fut.whenComplete((response, throwable) -> {
+            if (throwable != null) {
+                player.sendMessage(ChatColor.RED + "An error occurred while trying to open " + playerNameOrUUID + "'s inventory.");
+                plugin.getLogger().log(Level.SEVERE, "Error while trying to create main-inventory spectator inventory", throwable);
+            } else {
+                if (!response.isOpen()) {
+                    NotOpenedReason notOpenedReason = response.getReason();
+                    if (notOpenedReason instanceof InventoryOpenEventCancelled) {
+                        player.sendMessage(ChatColor.RED + "Another plugin prevented you from spectating " + playerNameOrUUID + "'s inventory");
+                    } else if (notOpenedReason instanceof InventoryNotCreated) {
+                        NotCreatedReason notCreatedReason = ((InventoryNotCreated) notOpenedReason).getNotCreatedReason();
+                        if (notCreatedReason instanceof TargetDoesNotExist) {
+                            player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " does not exist.");
+                        } else if (notCreatedReason instanceof UnknownTarget) {
+                            player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " has not logged onto the server yet.");
+                        }  else if (notCreatedReason instanceof TargetHasExemptPermission) {
+                            player.sendMessage(ChatColor.RED + "Player " + playerNameOrUUID + " is exempted from being spectated.");
+                        } else if (notCreatedReason instanceof ImplementationFault) {
+                            player.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + playerNameOrUUID + "'s inventory.");
+                        } else if (notCreatedReason instanceof OfflineSupportDisabled) {
+                            player.sendMessage(ChatColor.RED + "Spectating offline players' inventories is disabled.");
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Could not create " + playerNameOrUUID + "'s inventory for an unknown reason.");
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Could not open " + playerNameOrUUID + "'s inventory for an unknown reason.");
+                    }
+                } //else: it opened successfully: nothing to do there!
+            }
+        });
 
         return true;
     }
