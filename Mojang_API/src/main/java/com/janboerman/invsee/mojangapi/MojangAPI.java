@@ -69,6 +69,7 @@ public class MojangAPI {
         });
     }
 
+    @Deprecated //no longer works: https://wiki.vg/Mojang_API#UUID_to_Name_History_.28Removed.29
     public CompletableFuture<Optional<String>> lookupUserName(UUID uniqueId) {
         CompletableFuture<HttpResponse<InputStream>> future = httpClient.sendAsync(HttpRequest
                 .newBuilder(URI.create("https://api.mojang.com/user/profiles/" + UUIDHelper.unDashed(uniqueId) + "/names"))

@@ -139,7 +139,9 @@ public class NamesAndUUIDs {
         //they implement the marker interface NewPlayerSupport.
         if (onlineMode(plugin.getServer())) {
             this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
-            this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi)); //ok, theoretically this could occur if the player already played before.
+
+            //no longer works: https://help.minecraft.net/hc/en-us/articles/8969841895693-Username-History-API-Removal-FAQ-
+            //this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi)); //ok, theoretically this could occur if the player already played before.
         } else {
             this.uuidResolveStrategies.add(new UUIDOfflineModeStrategy());
             //how to fake a username given a uuid, in offline mode?
