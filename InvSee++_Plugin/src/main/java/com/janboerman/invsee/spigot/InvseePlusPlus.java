@@ -52,6 +52,8 @@ public class InvseePlusPlus extends JavaPlugin {
     private CreationOptions<EnderChestSlot> platformCreationOptionsEnderInventory;
     private boolean dirtyConfig = false;
 
+    private Metrics bstats;
+
     public InvseePlusPlus() {
         boolean asyncTabCompleteEvent;
         try {
@@ -171,8 +173,8 @@ public class InvseePlusPlus extends JavaPlugin {
 
     private void setupBStats() {
         int pluginId = 9309;
-        Metrics metrics = new Metrics(this, pluginId);
-        metrics.addCustomChart(new SimplePie("Back-end", () -> {
+        bstats = new Metrics(this, pluginId);
+        bstats.addCustomChart(new SimplePie("Back-end", () -> {
             if (this.api instanceof PerWorldInventorySeeApi) {
                 return "PerWorldInventory";
 //            } else if (this.api instanceof MultiverseInventoriesSeeApi) {
@@ -190,6 +192,10 @@ public class InvseePlusPlus extends JavaPlugin {
 	public void onDisable() {
         if (api != null) { //the api can be null if we are running on unsupported server software.
             api.shutDown(); //complete all inventory futures - ensures /invgive and /endergive will still work even if the server shuts down.
+        }
+
+        if (bstats != null) {
+            bstats.shutdown();
         }
 	}
 
