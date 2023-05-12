@@ -34,6 +34,10 @@ public interface LogOutput {
 
     public void log(Difference difference);
 
+    //TODO should there be a close method (which closes the Handlers attached to the logger) ?
+    //TODO How do I handle logging to the same output(handler) using different formats?
+    //TODO it this even possible? I guess I will have to pre-process the format myself.
+
 }
 
 class NoOutput implements LogOutput {

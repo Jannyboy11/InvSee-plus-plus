@@ -163,10 +163,6 @@ public class InvseePlusPlus extends JavaPlugin {
         if (offlinePlayerSupport() && tabCompleteOfflinePlayers()) {
             if (asyncTabcompleteEvent) {
                 pluginManager.registerEvents(new AsyncTabCompleter(this, scheduler, playerDatabase), this);
-            } else {
-                getLogger().log(Level.WARNING, "InvSee++ is not running on a Paper API-enabled server.");
-                getLogger().log(Level.WARNING, "Tab-completion for offline players will not work for all players!");
-                getLogger().log(Level.WARNING, "See https://papermc.io/ for more information.");
             }
         }
     }
