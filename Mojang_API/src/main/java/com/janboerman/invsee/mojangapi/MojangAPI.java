@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -117,10 +116,9 @@ public class MojangAPI {
 
     private static JSONObject readJSONObject(HttpResponse<InputStream> response) {
         Charset charset = charsetFromHeaders(response.headers());
-        InputStream inputStream = response.body();
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
+        try (InputStream inputStream = response.body();
+             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset)) {
 
-        try {
             Object json = new JSONParser().parse(inputStreamReader);
             if (json instanceof JSONObject) {
                 return (JSONObject) json;
@@ -134,12 +132,12 @@ public class MojangAPI {
         }
     }
 
+    /*
     private static JSONArray readJSONArray(HttpResponse<InputStream> response) {
         Charset charset = charsetFromHeaders(response.headers());
-        InputStream inputStream = response.body();
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset);
+        try (InputStream inputStream = response.body();
+             InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset)) {
 
-        try {
             Object json = new JSONParser().parse(inputStreamReader);
             if (json instanceof JSONArray) {
                 return (JSONArray) json;
@@ -152,6 +150,7 @@ public class MojangAPI {
             throw new RuntimeException("Invalid JSON from Mojang api", pe);
         }
     }
+     */
 
     private static <T> Optional<T> handleNoContent(HttpResponse<InputStream> response) {
         return Optional.empty();
