@@ -69,10 +69,11 @@ public class MojangAPI {
         });
     }
 
-    @Deprecated //no longer works: https://wiki.vg/Mojang_API#UUID_to_Name_History_.28Removed.29
     public CompletableFuture<Optional<String>> lookupUserName(UUID uniqueId) {
+        //no longer use name history api: https://wiki.vg/Mojang_API#UUID_to_Name_History_.28Removed.29,
+        //use profile api instead:
         CompletableFuture<HttpResponse<InputStream>> future = httpClient.sendAsync(HttpRequest
-                .newBuilder(URI.create("https://api.mojang.com/user/profiles/" + UUIDHelper.unDashed(uniqueId) + "/names"))
+                .newBuilder(URI.create("https://sessionserver.mojang.com/session/minecraft/profile/" + UUIDHelper.unDashed(uniqueId)))
                 .header("Accept", "application/json")
                 .header("User-Agent", "InvSee++/MojangAPI")
                 .timeout(Duration.ofSeconds(5))
@@ -83,8 +84,7 @@ public class MojangAPI {
 
            if (statusCode == 200) {
                //ok!
-               JSONArray json = readJSONArray(response);
-               JSONObject profileJson = (JSONObject) json.get(0);
+               JSONObject profileJson = readJSONObject(response);
                String userName = (String) profileJson.get("name");
                return Optional.of(userName);
            }
