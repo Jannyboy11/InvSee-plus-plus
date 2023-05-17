@@ -31,12 +31,12 @@ final class ResponseUtils {
         } catch (IOException ioe) {
             throw new RuntimeException("Could not read http response body", ioe);
         } catch (ParseException pe) {
-            throw new RuntimeException("Invalid JSON from Mojang api", pe);
+            throw new RuntimeException("Invalid JSON from api", pe);
         }
     }
 
-        /*
-    private static JSONArray readJSONArray(HttpResponse<InputStream> response) {
+    /*
+    static JSONArray readJSONArray(HttpResponse<InputStream> response) {
         Charset charset = charsetFromHeaders(response.headers());
         try (InputStream inputStream = response.body();
              InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset)) {
@@ -53,7 +53,7 @@ final class ResponseUtils {
             throw new RuntimeException("Invalid JSON from Mojang api", pe);
         }
     }
-     */
+    */
 
     private static Charset charsetFromHeaders(HttpHeaders headers) {
         Optional<String> optionalContentType = headers.firstValue("Content-Type");
