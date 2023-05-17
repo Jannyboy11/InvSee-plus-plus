@@ -13,11 +13,11 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public final class ResponseUtils {
+final class ResponseUtils {
 
     private ResponseUtils() {}
 
-    public static JSONObject readJSONObject(HttpResponse<InputStream> response) {
+    static JSONObject readJSONObject(HttpResponse<InputStream> response) {
         Charset charset = charsetFromHeaders(response.headers());
         try (InputStream inputStream = response.body();
              InputStreamReader inputStreamReader = new InputStreamReader(inputStream, charset)) {
