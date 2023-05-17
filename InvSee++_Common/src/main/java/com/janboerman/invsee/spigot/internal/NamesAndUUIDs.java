@@ -71,6 +71,7 @@ public class NamesAndUUIDs {
     });
     private final Map<UUID, String> userNameCacheView = Collections.unmodifiableMap(userNameCache);
 
+    //TODO make order configurable from InvSee++'s config
     /** The list of strategies used to resolve players' unique IDs. Strategies are attempted in order. */
     public final List<UUIDResolveStrategy> uuidResolveStrategies;
     /** The list of strategies used to resolve players' usernames. Strategies are attempted in order. */
