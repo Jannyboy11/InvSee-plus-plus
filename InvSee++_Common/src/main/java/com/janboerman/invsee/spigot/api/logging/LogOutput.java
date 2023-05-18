@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -34,10 +35,11 @@ public interface LogOutput {
 
     public void log(Difference difference);
 
-    //TODO should there be a close method (which closes the Handlers attached to the logger) ?
-    //TODO How do I handle logging to the same output(handler) using different formats?
-    //TODO it this even possible? I guess I will have to pre-process the format myself. Am I not already doing that though?
+    public void close();
 
+    public static void closeGlobal() {
+        LogFileHandlers.closeGlobalHandler();
+    }
 }
 
 class NoOutput implements LogOutput {
@@ -48,6 +50,11 @@ class NoOutput implements LogOutput {
 
     @Override
     public void log(Difference difference) {
+        // no-op
+    }
+
+    @Override
+    public void close() {
         // no-op
     }
 }
@@ -89,9 +96,7 @@ class LogOutputImpl implements LogOutput {
                     break;
                 case PLUGIN_LOG_FILE:
                     try {
-                        File file = new File(logFileFolder, "_global.log");
-                        if (!file.exists()) file.createNewFile();
-                        FileHandler fileHandler = new FileHandler(file.getAbsolutePath(), true);
+                        FileHandler fileHandler = LogFileHandlers.getGlobalHandler(logFileFolder);
                         fileHandler.setLevel(Level.ALL);
                         fileHandler.setFormatter(new DifferenceFormatter(logFormats.get(LogTarget.PLUGIN_LOG_FILE)));
                         logger.addHandler(fileHandler);
@@ -101,9 +106,7 @@ class LogOutputImpl implements LogOutput {
                     break;
                 case SPECTATOR_LOG_FILE:
                     try {
-                        File file = new File(logFileFolder, spectatorId + ".log");
-                        if (!file.exists()) file.createNewFile();
-                        FileHandler fileHandler = new FileHandler(file.getAbsolutePath(), true);
+                        FileHandler fileHandler = LogFileHandlers.getSpectatorHandler(logFileFolder, spectatorId);
                         fileHandler.setLevel(Level.ALL);
                         fileHandler.setFormatter(new DifferenceFormatter(logFormats.get(LogTarget.SPECTATOR_LOG_FILE)));
                         logger.addHandler(fileHandler);
@@ -140,6 +143,11 @@ class LogOutputImpl implements LogOutput {
 
         String message = LogOutputImpl.format(format, Level.INFO, now, spectatorId, spectatorName, taken, given, targetPlayer);
         logger.log(Level.INFO, message, new Object[] { spectatorId, spectatorName, taken, given, targetPlayer });
+    }
+
+    @Override
+    public void close() {
+        LogFileHandlers.closeSpectatorHandler(spectatorId);
     }
 
     private static class DifferenceFormatter extends SimpleFormatter {
@@ -263,6 +271,62 @@ class LogOutputImpl implements LogOutput {
                 }
             }
             return new Taken(items);
+        }
+    }
+
+}
+
+class LogFileHandlers {
+
+    private static FileHandler global;
+    private static WeakHashMap<UUID, FileHandler> spectators = new WeakHashMap<>();
+
+    private static final Object globalLock = new Object();
+    private static final Object spectatorLock = new Object();
+
+    private LogFileHandlers() {}
+
+    static FileHandler getGlobalHandler(File logFileFolder) throws IOException {
+        synchronized (globalLock) {
+            if (global == null) {
+                File logFile = new File(logFileFolder, "_global.log");
+                if (!logFile.exists()) logFile.createNewFile();
+                global = new FileHandler(logFile.getAbsolutePath(), true);
+            }
+
+            return global;
+        }
+    }
+
+    static void closeGlobalHandler() {
+        synchronized (globalLock) {
+            if (global != null) {
+                global.close();
+                global = null;
+            }
+        }
+    }
+
+    static FileHandler getSpectatorHandler(File logFileFolder, UUID spectator) throws IOException {
+        synchronized (spectatorLock) {
+            FileHandler handler = spectators.get(spectator);
+            if (handler == null) {
+                File logFile = new File(logFileFolder, spectator + ".log");
+                if (!logFile.exists()) logFile.createNewFile();
+                handler = new FileHandler(logFile.getAbsolutePath(), true);
+                spectators.put(spectator, handler);
+            }
+
+            return handler;
+        }
+    }
+
+    static void closeSpectatorHandler(UUID spectator) {
+        synchronized (spectatorLock) {
+            FileHandler handler = spectators.remove(spectator);
+            if (handler != null) {
+                handler.close();
+            }
         }
     }
 

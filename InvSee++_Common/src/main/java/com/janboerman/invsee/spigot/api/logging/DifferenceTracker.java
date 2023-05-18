@@ -33,6 +33,7 @@ public class DifferenceTracker {
         if (granularity == LogGranularity.LOG_ON_CLOSE && !difference.isEmpty()) {
             output.log(difference);
         }
+        output.close();
     }
 
     public Difference getDifference() {

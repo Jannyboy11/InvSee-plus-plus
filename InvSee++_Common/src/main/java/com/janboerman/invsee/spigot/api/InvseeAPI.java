@@ -6,6 +6,7 @@ import java.util.function.*;
 import java.util.logging.Level;
 
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
+import com.janboerman.invsee.spigot.api.logging.LogOutput;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.InventoryNotCreated;
 import com.janboerman.invsee.spigot.api.response.InventoryOpenEventCancelled;
@@ -117,10 +118,14 @@ public class InvseeAPI {
 
     /** Called when InvSee++ disables. DO NOT CALL! */
     public void shutDown() {
+        //complete futures. needed to ensure changes are saved.
         for (var future : pendingInventoriesByUuid.values())
             try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
         for (var future : pendingEnderChestsByUuid.values())
             try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
+
+        //clean up logger resources
+        LogOutput.closeGlobal();
     }
 
     /** Get the known mappings from players' usernames to unique IDs. */
