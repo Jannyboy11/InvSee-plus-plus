@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.logging.Difference;
 import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftInventoryView;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -45,6 +46,7 @@ class MainBukkitInventoryView extends MainSpectatorInventoryView {
 
     @Override
     public void setTitle(String title) {
+        CraftInventoryView.sendInventoryTitleChange(this, title);
         nms.title = title;
     }
 
