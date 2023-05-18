@@ -41,19 +41,26 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 ## Addons
 
 #### InvSee++_Give
-###### Commands:
+##### Commands:
 - `/invgive <player> <item type> <amount>? <nbt tag>?`
 - `/endergive <player> <item type> <amount>? <nbt tag>?`
-###### Permissions:
+###### Examples:
+- `/invgive Notch diamond 1 {"foo":"bar"}`
+- `/endergive Jannyboy11 wool:14`
+##### Permissions:
 - `invseeplusplus.give.*` provides `invseeplusplus.give.inventory` and `invseeplusplus.give.enderchest`.
 - `invseeplusplus.give.inventory` allows access to `/invgive`.
 - `invseeplusplus.give.enderchest` allows access to `/endergive`.
 
+
 #### InvSee++_Clear
-###### Commands:
+##### Commands:
 - `/invclear <player> <item type>? <amount>?`
 - `/enderclear <player> <item type>? <amount>?`
-###### Permissions:
+###### Examples:
+- `/invclear Notch diamond 1`
+- `/enderclear Jannyboy11 wool:14`
+##### Permissions:
 - `invseeplusplus.clear.*` provides `invseeplusplus.clear.inventory` and `invseeplusplus.clear.enderchest`.
 - `invseeplusplus.clear.inventory` allows access to `/invclear`.
 - `invseeplusplus.clear.enderchest` allows access to `/enderclear`.
