@@ -3,6 +3,8 @@ package com.janboerman.invsee.spigot.addon.clear;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 
+import java.util.Objects;
+
 interface ItemType {
 
     public static ItemType plain(Material material) {
@@ -25,7 +27,7 @@ interface ItemType {
         private final Material material;
 
         Plain(Material material) {
-            this.material = material;
+            this.material = Objects.requireNonNull(material);
         }
 
         @Override
@@ -37,6 +39,25 @@ interface ItemType {
         public int removeAtMostFrom(Inventory inventory, int atMost) {
             return RemoveUtil.removeAtMost(inventory, material, atMost);
         }
+
+        @Override
+        public String toString() {
+            return material.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof Plain)) return false;
+
+            Plain that = (Plain) o;
+            return this.material == that.material;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(material);
+        }
     }
 
     static class WithData implements ItemType {
@@ -44,7 +65,7 @@ interface ItemType {
         private final byte data;
 
         WithData(Material material, byte data) {
-            this.material = material;
+            this.material = Objects.requireNonNull(material);
             this.data = data;
         }
 
@@ -56,6 +77,25 @@ interface ItemType {
         @Override
         public int removeAtMostFrom(Inventory inventory, int atMost) {
             return RemoveUtil.removeIfAtMost(inventory, stack-> stack.getType() == material && stack.getDurability() == (short) data, atMost);
+        }
+
+        @Override
+        public String toString() {
+            return material.toString() + ":" + data;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof WithData)) return false;
+
+            WithData that = (WithData) o;
+            return this.material == that.material && this.data == that.data;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(material, data);
         }
     }
 
