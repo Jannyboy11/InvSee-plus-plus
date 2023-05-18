@@ -7,7 +7,6 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.*;
 import org.bukkit.inventory.ItemStack;
 
@@ -56,8 +55,7 @@ class InvGiveExecutor implements CommandExecutor {
         var eitherMaterial = Convert.convertItemType(inputItemType);
         if (eitherMaterial.isLeft()) { sender.sendMessage(ChatColor.RED + eitherMaterial.getLeft()); return true; }
         assert eitherMaterial.isRight();
-        Material material = eitherMaterial.getRight();
-        //TODO data value? (because that's a thing in pre-1.13)
+        ItemType itemType = eitherMaterial.getRight();
 
         int amount;
         if (args.length > 2) {
@@ -70,7 +68,7 @@ class InvGiveExecutor implements CommandExecutor {
             amount = 1;
         }
 
-        ItemStack items = new ItemStack(material, amount);
+        ItemStack items = itemType.toItemStack(amount);
 
         if (args.length > 3) {
             StringJoiner inputTag = new StringJoiner(" ");

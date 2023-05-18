@@ -43,8 +43,9 @@ class InvClearExecutor implements CommandExecutor {
             uuidFuture = api.fetchUniqueId(userName);
         }
 
-        Material itemType = null;
-        //TODO data value? (because that's a thing in pre-1.13)
+        ItemType itemType = null;
+        //TODO nbt tag?
+
         int maxCount = -1;
 
         if (args.length >= 2) {
@@ -71,7 +72,7 @@ class InvClearExecutor implements CommandExecutor {
             }
         }
 
-        final Material finalItemType = itemType;
+        final ItemType finalItemType = itemType;
         final int finalMaxCount = maxCount;
         final CreationOptions<PlayerInventorySlot> creationOptions = api.mainInventoryCreationOptions()
                 .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
@@ -93,10 +94,10 @@ class InvClearExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.GREEN + "Cleared " + userName + "'s inventory.");
                         } else {
                             if (finalMaxCount == -1) {
-                                inventory.remove(finalItemType);
+                                finalItemType.removeAllFrom(inventory);
                                 sender.sendMessage(ChatColor.GREEN + "Removed all " + finalItemType + " from " + userName + "'s inventory.");
                             } else {
-                                int removed = RemoveUtil.removeAtMost(inventory, finalItemType, finalMaxCount);
+                                int removed = finalItemType.removeAtMostFrom(inventory, finalMaxCount);
                                 sender.sendMessage( ChatColor.GREEN + "Removed " + removed + " " + finalItemType + " from " + userName + "'s inventory.");
                             }
                         }

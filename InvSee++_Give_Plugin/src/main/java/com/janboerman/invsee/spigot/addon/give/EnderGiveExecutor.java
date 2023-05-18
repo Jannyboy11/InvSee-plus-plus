@@ -11,9 +11,7 @@ import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
 import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
 import com.janboerman.invsee.spigot.api.response.UnknownTarget;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
-import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -64,8 +62,7 @@ class EnderGiveExecutor implements CommandExecutor {
         var eitherMaterial = Convert.convertItemType(inputItemType);
         if (eitherMaterial.isLeft()) { sender.sendMessage(ChatColor.RED + eitherMaterial.getLeft()); return true; }
         assert eitherMaterial.isRight();
-        Material material = eitherMaterial.getRight();
-        //TODO data value? (because that's a thing in pre-1.13)
+        ItemType itemType = eitherMaterial.getRight();
 
         int amount;
         if (args.length > 2) {
@@ -77,7 +74,8 @@ class EnderGiveExecutor implements CommandExecutor {
         } else {
             amount = 1;
         }
-        ItemStack items = new ItemStack(material, amount);
+
+        ItemStack items = itemType.toItemStack(amount);
 
         if (args.length > 3) {
             StringJoiner inputTag = new StringJoiner(" ");

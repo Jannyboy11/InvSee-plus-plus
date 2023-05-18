@@ -19,12 +19,32 @@ class Convert {
         return Either.right(input);
     }
 
-    static Either<String, Material> convertItemType(String input) {
+    static Either<String, ItemType> convertItemType(String input) {
         assert input != null;
 
-        Material material = Material.matchMaterial(input);
+        String materialName;
+        Byte dataValue;
+
+        final int colonIndex = input.indexOf(':');
+        if (colonIndex != -1) {
+            materialName = input.substring(0, colonIndex);
+            try {
+                dataValue = Byte.parseByte(input.substring(colonIndex + 1));
+            } catch (NumberFormatException e) {
+                return Either.left(e.getMessage());
+            }
+        } else {
+            materialName = input;
+            dataValue = null;
+        }
+
+        Material material = Material.matchMaterial(materialName);
         if (material != null) {
-            return Either.right(material);
+            if (dataValue != null) {
+                return Either.right(ItemType.withData(material, dataValue));
+            } else {
+                return Either.right(ItemType.plain(material));
+            }
         } else {
             return Either.left("Material " + input + " does not exist.");
         }
