@@ -2,7 +2,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>invsee-plus-plus</artifactId>
-        <version>0.21.9-SNAPSHOT</version>
+        <version>0.21.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
