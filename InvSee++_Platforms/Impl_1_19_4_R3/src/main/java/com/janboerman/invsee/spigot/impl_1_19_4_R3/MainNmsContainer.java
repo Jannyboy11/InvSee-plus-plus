@@ -25,7 +25,8 @@ class MainNmsContainer extends AbstractContainerMenu {
 	final Player player;
 	final MainNmsInventory top;
 	final Inventory bottom;
-	final String title;
+	final String originalTitle;
+	String title;
 
 	final CreationOptions<PlayerInventorySlot> creationOptions;
 	private final boolean spectatingOwnInventory;
@@ -108,7 +109,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 
 		this.creationOptions = creationOptions;
 		Target target = Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName);
-		this.title = creationOptions.getTitle().titleFor(target);
+		this.originalTitle = creationOptions.getTitle().titleFor(target);
 		Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
 		LogOptions logOptions = creationOptions.getLogOptions();
 		Plugin plugin = creationOptions.getPlugin();
@@ -207,4 +208,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 		return itemStack;
 	}
 
+	public String title() {
+		return title != null ? title : originalTitle;
+	}
 }

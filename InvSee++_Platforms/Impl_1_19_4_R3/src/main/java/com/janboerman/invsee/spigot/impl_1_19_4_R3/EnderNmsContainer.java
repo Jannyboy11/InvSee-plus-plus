@@ -25,7 +25,8 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	final Player player;
 	final EnderNmsInventory top;
 	final Inventory bottom;
-	final String title;
+	final String originalTitle;
+	String title;
 
 	final CreationOptions<EnderChestSlot> creationOptions;
 	private final int topRows;	//in Purpur, this is not always 3.
@@ -96,7 +97,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 
 		this.creationOptions = creationOptions;
 		Target target = Target.byGameProfile(nmsInventory.targetPlayerUuid, nmsInventory.targetPlayerName);
-		this.title = creationOptions.getTitle().titleFor(target);
+		this.originalTitle = creationOptions.getTitle().titleFor(target);
 		Mirror<EnderChestSlot> mirror = creationOptions.getMirror();
 		LogOptions logOptions = creationOptions.getLogOptions();
 		Plugin plugin = creationOptions.getPlugin();
@@ -189,5 +190,9 @@ class EnderNmsContainer extends AbstractContainerMenu {
 		}
 		
 		return itemStack;
+	}
+
+	public String title() {
+		return title != null ? title : originalTitle;
 	}
 }

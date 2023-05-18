@@ -35,7 +35,17 @@ class MainBukkitInventoryView extends MainSpectatorInventoryView {
 
     @Override
     public String getTitle() {
-        return nms.title;
+        return nms.title();
+    }
+
+    @Override
+    public String getOriginalTitle() {
+        return nms.originalTitle;
+    }
+
+    @Override
+    public void setTitle(String title) {
+        nms.title = title;
     }
 
     @Override
