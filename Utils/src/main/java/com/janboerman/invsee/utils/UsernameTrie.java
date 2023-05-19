@@ -108,7 +108,7 @@ public class UsernameTrie<V> {
 
         /*not-null, except for the root node*/
         private final char[] segment;
-        /*nullable*/
+        /*not null*/
         private Maybe<V> value;
 
         /*nullable*/
