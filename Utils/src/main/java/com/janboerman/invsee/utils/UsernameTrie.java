@@ -136,7 +136,7 @@ public class UsernameTrie<V> {
                 return false;
             // are all our children empty?
             if (children == null)
-                return false;
+                return true;
             for (Node<V> child : children.values())
                 if (child != null && !child.isEmpty())
                     return false;
