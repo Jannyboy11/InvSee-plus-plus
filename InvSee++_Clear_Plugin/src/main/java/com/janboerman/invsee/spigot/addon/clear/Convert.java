@@ -50,7 +50,12 @@ class Convert {
             }
         } else {
             try {
-                Tag<Material> tag = Bukkit.getTag("items", NamespacedKey.fromString(materialName, null), Material.class);
+                NamespacedKey tagKey = NamespacedKey.fromString(materialName, null);
+                Tag<Material> tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, tagKey, Material.class);
+                if (tag != null) {
+                    return Either.right(ItemType.fromTag(tag));
+                }
+                tag = Bukkit.getTag(Tag.REGISTRY_BLOCKS, tagKey, Material.class);
                 if (tag != null) {
                     return Either.right(ItemType.fromTag(tag));
                 }
