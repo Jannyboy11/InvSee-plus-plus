@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.addon.clear;
 
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.inventory.Inventory;
 
 import java.util.Objects;
@@ -13,6 +14,10 @@ interface ItemType {
 
     public static ItemType withData(Material material, byte data) {
         return new WithData(material, data);
+    }
+
+    public static ItemType fromTag(Tag<Material> tag) {
+        return new FromTag(tag);
     }
 
     //
@@ -76,7 +81,7 @@ interface ItemType {
 
         @Override
         public int removeAtMostFrom(Inventory inventory, int atMost) {
-            return RemoveUtil.removeIfAtMost(inventory, stack-> stack.getType() == material && stack.getDurability() == (short) data, atMost);
+            return RemoveUtil.removeIfAtMost(inventory, stack -> stack.getType() == material && stack.getDurability() == (short) data, atMost);
         }
 
         @Override
@@ -96,6 +101,44 @@ interface ItemType {
         @Override
         public int hashCode() {
             return Objects.hash(material, data);
+        }
+    }
+
+    static class FromTag implements ItemType {
+        private final Tag<Material> tag;
+
+        FromTag(Tag<Material> tag) {
+            this.tag = tag;
+        }
+
+
+        @Override
+        public void removeAllFrom(Inventory inventory) {
+            RemoveUtil.removeIf(inventory, stack -> tag.isTagged(stack.getType()));
+        }
+
+        @Override
+        public int removeAtMostFrom(Inventory inventory, int atMost) {
+            return RemoveUtil.removeIfAtMost(inventory, stack -> tag.isTagged(stack.getType()), atMost);
+        }
+
+        @Override
+        public String toString() {
+            return tag.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if (!(o instanceof FromTag)) return false;
+
+            FromTag that = (FromTag) o;
+            return Objects.equals(this.tag, that.tag);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(tag);
         }
     }
 

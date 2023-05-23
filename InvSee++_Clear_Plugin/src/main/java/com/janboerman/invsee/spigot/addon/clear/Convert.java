@@ -1,7 +1,10 @@
 package com.janboerman.invsee.spigot.addon.clear;
 
 import com.janboerman.invsee.utils.Either;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Tag;
 
 import java.util.UUID;
 
@@ -30,8 +33,8 @@ class Convert {
             materialName = input.substring(0, colonIndex);
             try {
                 dataValue = Byte.parseByte(input.substring(colonIndex + 1));
-            } catch (NumberFormatException e) {
-                return Either.left(e.getMessage());
+            } catch (NumberFormatException ignored) {
+                dataValue = null;
             }
         } else {
             materialName = input;
@@ -46,6 +49,14 @@ class Convert {
                 return Either.right(ItemType.plain(material));
             }
         } else {
+            try {
+                Tag<Material> tag = Bukkit.getTag("items", NamespacedKey.fromString(materialName, null), Material.class);
+                if (tag != null) {
+                    return Either.right(ItemType.fromTag(tag));
+                }
+            } catch (NoClassDefFoundError | NoSuchMethodError legacyServerIgnored) {
+            }
+
             return Either.left("Material " + input + " does not exist.");
         }
     }
