@@ -124,7 +124,8 @@ interface ItemType {
 
         @Override
         public String toString() {
-            return tag.toString();
+            //call tag.getKey() first (instead of tag.toString() directly), because CraftTag does not override toString(), NamespacedKey does.
+            return tag.getKey().toString();
         }
 
         @Override
