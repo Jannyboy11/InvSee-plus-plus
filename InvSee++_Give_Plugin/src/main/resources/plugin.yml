@@ -24,11 +24,11 @@ permissions:
 commands:
   invgive:
     description: "Give an item to a(n) (offline) player's inventory"
-    usage: /<command> <target player> <item type> <amount>? <tag>?
+    usage: /<command> <target player> <item type> [amount] [tag]
     permission: invseeplusplus.give.inventory
     aliases: [inventorygive, igive]
   endergive:
     description: "Give an item to a(n) (offline) player's enderchest"
-    usage: /<command> <target player> <item type> <amount>? <tag>?
+    usage: /<command> <target player> <item type> [amount] [tag]
     permission: invseeplusplus.give.enderchest
     aliases: [enderchestgive, egive]
