@@ -29,6 +29,6 @@ commands:
     aliases: [inventoryclear, iclear]
   enderclear:
     description: "Clear a(n) (offline) player's enderchest"
-    usage: /<command> <target player> <item type>? <max count>?
+    usage: /<command> <target player> [item type] [max count]
     permission: invseeplusplus.clear.enderchest
     aliases: [enderchestclear, eclear]
