@@ -24,7 +24,7 @@ permissions:
 commands:
   invclear:
     description: "Clear a(n) (offline) player's inventory"
-    usage: /<command> <target player> <item type>? <max count>?
+    usage: /<command> <target player> [item type] [max count]
     permission: invseeplusplus.clear.inventory
     aliases: [inventoryclear, iclear]
   enderclear:
