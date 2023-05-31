@@ -84,6 +84,9 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI implements InvseePlat
         }
     }
 
+
+
+
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> spectateInventory(UUID playerId, String playerName, String title, ProfileId profileId) {
 
         //TODO
@@ -91,6 +94,14 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI implements InvseePlat
         //TODO take into account that not all groups necessarily share inventories across worlds.
         //TODO take into account that multiverse-inventories manages storage contents, armour contents and offhand contents independently.
         //TODO THIS NEEDS TO BE TAKEN INTO ACCOUNT *ESPECIALLY* WHEN SAVING PLAYER DATA!
+
+        Player onlinePlayer = plugin.getServer().getPlayer(playerId);
+        if (onlinePlayer != null) {
+            //TODO Set<ProfileKey> activeProfileKeys = mviHook.getActiveProfileKeys(HumanEntity player);
+
+
+            //TODO more..
+        }
 
         /*  IF the player is online THEN
          *      IF the player's current profile (world, gamemode) matches the profileId THEN

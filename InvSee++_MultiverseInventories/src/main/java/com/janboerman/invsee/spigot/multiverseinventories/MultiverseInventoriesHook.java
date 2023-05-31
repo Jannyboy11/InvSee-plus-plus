@@ -6,11 +6,14 @@ import com.onarandombox.multiverseinventories.InventoriesConfig;
 import com.onarandombox.multiverseinventories.WorldGroup;
 import com.onarandombox.multiverseinventories.profile.GlobalProfile;
 import com.onarandombox.multiverseinventories.profile.ProfileDataSource;
+import com.onarandombox.multiverseinventories.profile.ProfileKey;
 import com.onarandombox.multiverseinventories.profile.WorldGroupManager;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 public class MultiverseInventoriesHook {
@@ -94,7 +97,7 @@ public class MultiverseInventoriesHook {
         return success;
     }
 
-    public boolean mviChecksByPassPermissions() {
+    public boolean mviChecksBypassPermissions() {
         //DO I even need this at all?
 
         //bypass permissions:
@@ -131,6 +134,19 @@ public class MultiverseInventoriesHook {
 
     public boolean saveAndLoadOnLoginAndLogout() {
         return mviConfig.usingLoggingSaveLoad();
+    }
+
+    public Set<ProfileKey> getActiveProfileKeys(HumanEntity player) {
+        //TODO both WORLD and GROUP profile keys
+
+        return null;
+    }
+
+    public ProfileKey getActiveWorldProfile(HumanEntity player) {
+        //TODO should I care about the dataName?
+        //TODO should I return multiple ProfileKeys here as well?
+
+        return null;
     }
 
 }

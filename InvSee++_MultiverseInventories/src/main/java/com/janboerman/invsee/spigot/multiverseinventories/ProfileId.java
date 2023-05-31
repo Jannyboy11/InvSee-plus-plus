@@ -12,8 +12,8 @@ public class ProfileId {
 
     private final UUID playerId;
     private final String playerName;
-    private final ContainerType containerType;
-    private final String containerName;
+    private final ContainerType containerType;  //World or Group.
+    private final String containerName; //corresponds to 'dataName' in MVI. Allowed values are same as save folder names: "worlds", "groups" and "players".
     private final ProfileType profileType; //null for gamemode-unspecific profiles
 
     ProfileId(MultiverseInventoriesHook hook, ProfileKey profileKey) {
