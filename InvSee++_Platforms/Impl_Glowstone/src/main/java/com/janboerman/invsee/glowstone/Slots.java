@@ -27,6 +27,7 @@ final class InaccessibleSlot extends GlowInventorySlot {
 
 }
 
+//TODO redundant?
 final class PersonalSlot extends GlowInventorySlot {
 
     GlowInventorySlot delegate = new GlowInventorySlot();

@@ -49,7 +49,7 @@ public abstract class SpectatorInventoryView<Slot> extends InventoryView {
      * @see <a href="https://github.com/Jannyboy11/InvSee-plus-plus/wiki/Customising-spectator-inventories#mirror">Mirror explanation in the InvSee++ wiki</a>
      */
     public Mirror<Slot> getMirror() {
-        return getCreationOptions().getMirror();
+        return creationOptions.getMirror();
     }
 
     /**

@@ -234,4 +234,26 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
         }
     }
 
+    // Glowstone faulty implementations overrides
+
+    @Override
+    public boolean containsAtLeast(ItemStack stack, int amount) {
+        if (amount <= 0)
+            return true;
+        if (stack == null)
+            return false; //this is a bit weird, but this is what CraftInventory does.
+
+        int encountered = 0;
+        for (int slot = 0; slot < getSize(); slot++) {
+            ItemStack item = getItem(slot);
+            if (item != null && item.isSimilar(stack)) {
+                encountered += item.getAmount();
+                if (encountered >= amount)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
 }
