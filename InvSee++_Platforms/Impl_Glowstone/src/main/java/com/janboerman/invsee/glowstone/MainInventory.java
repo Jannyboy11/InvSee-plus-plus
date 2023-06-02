@@ -7,15 +7,11 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.ConstantList;
-import com.janboerman.invsee.utils.ListHelper;
-import com.janboerman.invsee.utils.Ref;
-import com.janboerman.invsee.utils.SingletonList;
 import net.glowstone.entity.GlowHumanEntity;
 import net.glowstone.inventory.GlowCraftingInventory;
 import net.glowstone.inventory.GlowInventory;
 import net.glowstone.inventory.GlowInventorySlot;
 import net.glowstone.inventory.GlowPlayerInventory;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -44,6 +40,7 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
         this.targetPlayerUuid = targetPlayer.getUniqueId();
         this.targetPlayerName = targetPlayer.getName();
         this.creationOptions = creationOptions;
+        setMaxStackSize(defaultMaxStack());
 
         GlowPlayerInventory targetInventory = targetPlayer.getInventory();
         List<GlowInventorySlot> targetSlots = GlowstoneHacks.getSlots(targetInventory);
@@ -66,15 +63,38 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
         this.personalSlots = GlowstoneHacks.getSlots(craftingInventory).subList(1, craftingInventory.getSize());
 
         //the ultimate hack! :D
-        List<GlowInventorySlot> hack = new ConcatList<>(containerSlots, armourSlots);
-        hack = new ConcatList<>(hack, Collections.singletonList(offhandSlot));
-        hack = new ConcatList<>(hack, Collections.singletonList(cursorSlot));
-        hack = new ConcatList<>(hack, new ConstantList<>(4, InaccessibleSlot.INSTANCE));
-        hack = new ConcatList<>(hack, personalSlots);
+        updateContents();
+    }
+
+    void updateContents() {
+        List<GlowInventorySlot> list = new ConcatList<>(containerSlots, armourSlots);
+        list = new ConcatList<>(list, Collections.singletonList(offhandSlot));
+        list = new ConcatList<>(list, Collections.singletonList(cursorSlot));
+        list = new ConcatList<>(list, new ConstantList<>(3, InaccessibleSlot.INSTANCE));
+        list = new ConcatList<>(list, personalSlots);
         if (personalSlots.size() < 9) {
-            hack = new ConcatList<>(hack, new ConstantList<>(9 - personalSlots.size(), InaccessibleSlot.INSTANCE));
+            list = new ConcatList<>(list, new ConstantList<>(9 - personalSlots.size(), InaccessibleSlot.INSTANCE));
         }
-        GlowstoneHacks.setSlots(this, hack);
+        GlowstoneHacks.setSlots(this, list);
+    }
+
+    @Override
+    public ItemStack[] getStorageContents() {
+        return containerSlots.stream().map(GlowInventorySlot::getItem).toArray(ItemStack[]::new);
+    }
+
+    @Override
+    public void setStorageContents(ItemStack[] storageContents) {
+        Objects.requireNonNull(storageContents, "storageContents cannot be null");
+        int storageContentsSize = containerSlots.size();
+        if (storageContentsSize != storageContents.length)
+            throw new IllegalArgumentException("storage contents must be of length " + storageContentsSize);
+
+        for (int i = 0; i < storageContentsSize; i++) {
+            containerSlots.get(i).setItem(storageContents[i]);
+        }
+
+        updateContents();
     }
 
     @Override
@@ -92,6 +112,8 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
         for (int i = 0; i < armourContentsSize; i++) {
             armourSlots.get(i).setItem(armourContents[i]);
         }
+
+        updateContents();
     }
 
     @Override
@@ -107,11 +129,15 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
     public void setOffHandContents(ItemStack[] offHand) {
         if (offHand == null || offHand.length == 0) return;
         offhandSlot.setItem(offHand[0]);
+
+        updateContents();
     }
 
     @Override
     public void setCursorContents(ItemStack cursor) {
         cursorSlot.setItem(cursor);
+
+        updateContents();
     }
 
     @Override
@@ -128,6 +154,8 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
         for (int i = 0; i < craftingContents.length; i++) {
             personalSlots.get(i).setItem(craftingContents[i]);
         }
+
+        updateContents();
     }
 
     @Override
@@ -140,8 +168,33 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
         return personalSlots.size();
     }
 
-    //TODO also override getContents (include padding :))
-    //TODO also override setContents (hell yes, fun!)
+    @Override
+    public ItemStack[] getContents() {
+        ItemStack[] result = new ItemStack[getSize()];
+        System.arraycopy(getStorageContents(), 0, result, 0, 36);
+        System.arraycopy(getArmourContents(), 0, result, 36, 4);
+        result[40] = offhandSlot.getItem();
+        result[41] = cursorSlot.getItem();
+        System.arraycopy(getPersonalContents(), 0, result, 45, getPersonalContentsSize());
+        return result;
+    }
+
+    @Override
+    public void setContents(ItemStack[] items) {
+        for (int i = 0; i < 36; i++) {
+            containerSlots.get(i).setItem(items[i]);
+        }
+        for (int i = 0; i < 4; i++){
+            armourSlots.get(i).setItem(items[36 + i]);
+        }
+        offhandSlot.setItem(items[40]);
+        cursorSlot.setItem(items[41]);
+        for (int i = 0; i < 9; i++) {
+            personalSlots.get(i).setItem(items[45 + 1]);
+        }
+
+        updateContents();
+    }
 
     //
 

@@ -138,7 +138,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
 	@Override
 	public List<ItemStack> getContents() {
-		List<ItemStack> paddingOne = NonNullList.withSize(45 - storageContents.size() - armourContents.size() - offHand.size() - 1, ItemStack.EMPTY);
+		List<ItemStack> paddingOne = NonNullList.withSize(45 - storageContents.size() - armourContents.size() - offHand.size() - 1/*cursor*/, ItemStack.EMPTY);
 		List<ItemStack> paddingTwo = NonNullList.withSize(9 - personalContents.size(), ItemStack.EMPTY);
 		
 		return new ConcatList<>(storageContents,
