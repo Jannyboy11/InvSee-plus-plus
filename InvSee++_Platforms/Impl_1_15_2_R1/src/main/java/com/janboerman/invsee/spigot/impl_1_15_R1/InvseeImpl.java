@@ -39,7 +39,7 @@ import java.util.function.BiFunction;
 
 public class InvseeImpl implements InvseePlatform {
 
-    static ItemStack EMPTY_STACK = ItemStack.a;
+    static final ItemStack EMPTY_STACK = ItemStack.a;
 
     private final Plugin plugin;
     private final OpenSpectatorsCache cache;

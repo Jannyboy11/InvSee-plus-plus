@@ -8,13 +8,13 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
  */
 public interface EnderSpectatorInventory extends SpectatorInventory<EnderChestSlot> {
 
-    /** Get the mirror this inventory is viewed through */
+    /** Get the mirror this inventory is viewed through. */
     @Override
     public default Mirror<EnderChestSlot> getMirror() {
-        return Mirror.defaultEnderChest();
+        return getCreationOptions().getMirror();
     }
 
-    /** Set the contents of this inventory based on the contents from the provided inventory */
+    /** Set the contents of this inventory based on the contents from the provided inventory. */
     public default void setContents(EnderSpectatorInventory newContents) {
         setStorageContents(newContents.getStorageContents());
     }

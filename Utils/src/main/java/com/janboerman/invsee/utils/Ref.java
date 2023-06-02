@@ -12,6 +12,13 @@ public interface Ref<T> {
 
     public T get();
 
+    public static <T> Ref<T> empty(T empty) {
+        return new Ref<T>() {
+            @Override public T get() { return empty; }
+            @Override public void set(T item) {}
+        };
+    }
+
     public static <T> Ref<T> of(Supplier<? extends T> get, Consumer<? super T> set) {
         return new Ref<T>() {
             @Override public T get() { return get.get(); }

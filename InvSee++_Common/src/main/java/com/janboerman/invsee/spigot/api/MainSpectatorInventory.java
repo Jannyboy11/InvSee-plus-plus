@@ -50,10 +50,10 @@ public interface MainSpectatorInventory extends SpectatorInventory<PlayerInvento
 
     /** Get the mirror this inventory is viewed through. */
     public default Mirror<PlayerInventorySlot> getMirror() {
-        return Mirror.defaultPlayerInventory();
+        return getCreationOptions().getMirror();
     }
 
-    /** Set the contents of this inventory based on the contents from the provided inventory */
+    /** Set the contents of this inventory based on the contents from the provided inventory. */
     public default void setContents(MainSpectatorInventory newContents) {
         setStorageContents(newContents.getStorageContents());
         setArmourContents(newContents.getArmourContents());

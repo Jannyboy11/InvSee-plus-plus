@@ -187,6 +187,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>impl_glowstone</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.janboerman.invsee</groupId>-->
 <!--            <artifactId>invsee-plus-plus_multiverse-inventories</artifactId>-->

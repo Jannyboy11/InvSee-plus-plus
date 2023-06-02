@@ -56,7 +56,7 @@ public class InvseeImpl implements InvseePlatform {
     private final OpenSpectatorsCache cache;
     private final Scheduler scheduler;
 
-    static ItemStack EMPTY_STACK = null;
+    static final ItemStack EMPTY_STACK = null;
 
     static boolean isEmptyStack(ItemStack stack) {
         return stack == null || stack.count == 0;
