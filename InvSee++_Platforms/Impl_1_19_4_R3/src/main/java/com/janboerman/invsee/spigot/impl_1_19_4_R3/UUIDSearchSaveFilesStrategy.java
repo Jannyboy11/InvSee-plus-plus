@@ -47,7 +47,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 			if (playerFiles != null) {
 				List<LogRecord> errors = new CopyOnWriteArrayList<>();
 
-				//search through the save files, find the save file which has the lastKnownName of the quested player.
+				//search through the save files, find the save file which has the lastKnownName of the requested player.
 				playerFilesLoop:
 				for (File playerFile : playerFiles) {
 					final String fileName = playerFile.getName();
@@ -104,7 +104,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 		}, scheduler::executeAsync);
 	}
 
-	private static final boolean tagHasLastKnownName(CompoundTag compound, String userName) {
+	private static boolean tagHasLastKnownName(CompoundTag compound, String userName) {
 		if (compound.contains("bukkit", TAG_COMPOUND)) {
 			CompoundTag bukkit = compound.getCompound("bukkit");
 			if (bukkit.contains("lastKnownName", TAG_STRING)) {

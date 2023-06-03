@@ -33,12 +33,11 @@ public class InvseeImpl /*TODO implements InvseePlatform*/ {
         this.scheduler = scheduler;
 
         if (lookup.onlineMode(plugin.getServer())) {
-            //TODO add UUIDSearchSaveFilesStrategy
+            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin, scheduler));
         } else {
-            //TODO add UUIDSearchSaveFilesStrategy beforelast
-            //TODO check GlowStone's UUID spoofing method
+            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin, scheduler));
         }
-        //TODO add NameSearchSaveFilesStrategy
+        lookup.nameResolveStrategies.add(new NameSearchSaveFilesStrategy(plugin, scheduler));
 
         //add extra event listener for DifferenceTracker since Glowstone's InventoryView implementation does not get inventory clicks passed.
         server.getPluginManager().registerEvent(InventoryCloseEvent.class, new Listener() {}, EventPriority.MONITOR, (Listener listener, Event ev) -> {
@@ -51,6 +50,5 @@ public class InvseeImpl /*TODO implements InvseePlatform*/ {
             }
         }, plugin);
     }
-
-
+    
 }

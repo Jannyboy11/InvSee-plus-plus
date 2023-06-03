@@ -5,11 +5,17 @@ import com.flowpowered.network.service.HandlerLookupService;
 import net.glowstone.GlowServer;
 import net.glowstone.inventory.GlowInventory;
 import net.glowstone.inventory.GlowInventorySlot;
+import net.glowstone.io.nbt.NbtPlayerDataService;
 import net.glowstone.net.GlowSession;
 import net.glowstone.net.message.play.inv.WindowClickMessage;
 import net.glowstone.net.protocol.GlowProtocol;
 import net.glowstone.net.protocol.PlayProtocol;
+import net.glowstone.util.nbt.CompoundTag;
+import net.glowstone.util.nbt.NbtInputStream;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -64,6 +70,20 @@ final class GlowstoneHacks {
         }
     }
 
+    static File getPlayerDir(NbtPlayerDataService playerDataService) {
+        try {
+            Field field = NbtPlayerDataService.class.getField("playerDir");
+            field.setAccessible(true);
+            return (File) field.get(playerDataService);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to get player data folder reflectively.", e);
+        }
+    }
 
+    static CompoundTag readCompressed(File playerFile) throws IOException {
+        try (NbtInputStream in = new NbtInputStream(new FileInputStream(playerFile))) {
+            return in.readCompound();
+        }
+    }
 
 }

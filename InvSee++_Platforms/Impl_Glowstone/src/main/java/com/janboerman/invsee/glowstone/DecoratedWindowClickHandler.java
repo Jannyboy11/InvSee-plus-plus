@@ -22,7 +22,7 @@ public class DecoratedWindowClickHandler implements MessageHandler<GlowSession, 
         this(new WindowClickHandler());
     }
 
-    public DecoratedWindowClickHandler(MessageHandler<GlowSession, WindowClickMessage> delegate) {
+    DecoratedWindowClickHandler(MessageHandler<GlowSession, WindowClickMessage> delegate) {
         this.delegate = Objects.requireNonNull(delegate);
     }
 

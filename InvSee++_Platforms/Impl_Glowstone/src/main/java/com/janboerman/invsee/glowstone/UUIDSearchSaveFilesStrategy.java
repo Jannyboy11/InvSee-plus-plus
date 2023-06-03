@@ -1,23 +1,28 @@
-package com.janboerman.invsee.spigot.impl_1_12_R1;
+package com.janboerman.invsee.glowstone;
 
+import static com.janboerman.invsee.glowstone.GlowstoneHacks.getPlayerDir;
+import static com.janboerman.invsee.glowstone.GlowstoneHacks.readCompressed;
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
-import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.LogRecord;
-import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
-
-import com.janboerman.invsee.spigot.api.Scheduler;
-import net.minecraft.server.v1_12_R1.NBTCompressedStreamTools;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.WorldNBTStorage;
-import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
+import net.glowstone.GlowServer;
+import net.glowstone.io.nbt.NbtPlayerDataService;
+import net.glowstone.util.nbt.CompoundTag;
+import net.glowstone.util.nbt.NbtInputStream;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 
 public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
@@ -32,35 +37,35 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 
     @Override
     public CompletableFuture<Optional<UUID>> resolveUniqueId(String userName) {
-        CraftServer craftServer = (CraftServer) plugin.getServer();
-        WorldNBTStorage worldNBTStorage = (WorldNBTStorage) craftServer.getHandle().playerFileData;
+        GlowServer server = (GlowServer) plugin.getServer();
+        NbtPlayerDataService playerDataService = (NbtPlayerDataService) server.getPlayerDataService();
 
-        File playerDirectory = getPlayerDir(worldNBTStorage);
+        File playerDirectory = getPlayerDir(playerDataService);
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return CompletedEmpty.the();
 
         return CompletableFuture.supplyAsync(() -> {
-            File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+            File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
             if (playerFiles != null) {
                 List<LogRecord> errors = new CopyOnWriteArrayList<>();
 
-                //search through the save files, find the save file which has the lastKnownName of the quested player.
+                //search through the save files, find the save file which has the lastKnownName of the requested player.
                 playerFilesLoop:
                 for (File playerFile : playerFiles) {
                     final String fileName = playerFile.getName();
                     final UUID playerId = uuidFromFileName(fileName);
                     final Executor syncExecutor = playerId == null ? scheduler::executeSyncGlobal : runnable -> scheduler.executeSyncPlayer(playerId, runnable, null);
 
-                    //I now finally understand the appeal of libraries like Cats Effect / ZIO.
                     try {
-                        CompletableFuture<NBTTagCompound> compoundFuture = CompletableFuture.completedFuture(NBTCompressedStreamTools.a(new FileInputStream(playerFile)));
+
+                        CompletableFuture<CompoundTag> compoundFuture = CompletableFuture.completedFuture(readCompressed(playerFile));
                         // if reading the player file asynchronously fails, we retry on the main thread.
                         compoundFuture = compoundFuture.handleAsync((tag, asyncEx) -> {
                             if (asyncEx == null) {
                                 return tag;
                             } else {
                                 try {
-                                    return NBTCompressedStreamTools.a(new FileInputStream(playerFile));
+                                    return readCompressed(playerFile);
                                 } catch (IOException syncEx) {
                                     //too bad, could not read this player save file synchronously.
                                     syncEx.addSuppressed(asyncEx);
@@ -70,20 +75,18 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
                         }, syncExecutor);
 
                         try {
-                            NBTTagCompound compound = compoundFuture.get(); // we join the (possibly synchronous!) future back into our async future!
+                            CompoundTag compound = compoundFuture.get(); // we join the (possibly synchronous!) future back into our async future!
                             if (tagHasLastKnownName(compound, userName)) {
-                                String uuid = fileName.substring(0, fileName.length() - 4);
-                                if (uuid.startsWith("-")) uuid = uuid.substring(1);
+                                String uuid = fileName.substring(0, 36);
                                 try {
-                                    UUID uniqueId = UUID.fromString(uuid);
-                                    return Optional.of(uniqueId);
+                                    //finally, we got there!
+                                    return Optional.of(UUID.fromString(uuid));
                                 } catch (IllegalArgumentException e) {
                                     //log exception only later in case the *correct* player file couldn't be found.
                                     errors.add(new LogRecord(Level.WARNING, "Encountered player save file name that is not a uuid: " + fileName, e));
                                 }
                             }
                         } catch (ExecutionException e) {
-                            // could not 'join' the future. nothing useful we can do here - we need to let some other strategy resolve the UUID instead.
                             Throwable syncEx = e.getCause();
                             errors.add(new LogRecord(Level.SEVERE, "Encountered player save file containing invalid NBT: " + fileName, syncEx));
                             continue playerFilesLoop;
@@ -105,26 +108,24 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
         }, scheduler::executeAsync);
     }
 
-    private static boolean tagHasLastKnownName(NBTTagCompound compound, String userName) {
-        if (compound.hasKeyOfType("bukkit", TAG_COMPOUND)) {
-            NBTTagCompound bukkit = compound.getCompound("bukkit");
-            if (bukkit.hasKeyOfType("lastKnownName", TAG_STRING)) {
-                String lastKnownName = bukkit.getString("lastKnownName");
-                return lastKnownName.equalsIgnoreCase(userName);
-            }
-        }
-
-        return false;
-    }
-
     private static UUID uuidFromFileName(String fileName) {
-        if (fileName == null || fileName.length() < 36) return null;
         String uuidChars = fileName.substring(0, 36);
         try {
             return UUID.fromString(uuidChars);
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    private static boolean tagHasLastKnownName(CompoundTag tag, String userName) {
+        if (tag.isCompound("bukkit")) {
+            CompoundTag bukkit = tag.getCompound("bukkit");
+            if (bukkit.isString("lastKnownName")) {
+                String lastKnownName = bukkit.getString("lastKnownName");
+                return lastKnownName.equals(userName);
+            }
+        }
+        return false;
     }
 
 }
