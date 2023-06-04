@@ -54,6 +54,8 @@ public interface Setup {
                 case MappingsVersion._1_19_4:
                     return new Impl_1_19_4(plugin, lookup, scheduler, cache);
             }
+        } else if("net.glowstone.GlowServer".equals(serverClassName)) {
+            return new Impl_Glowstone(plugin, lookup, scheduler, cache);
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
@@ -119,6 +121,12 @@ class Impl_1_19_3 extends SetupImpl {
 class Impl_1_19_4 extends SetupImpl {
     Impl_1_19_4(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_19_4_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_19_4_R3.KnownPlayersProvider(plugin, scheduler));
+    }
+}
+
+class Impl_Glowstone extends SetupImpl {
+    Impl_Glowstone(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.glowstone.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.glowstone.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
