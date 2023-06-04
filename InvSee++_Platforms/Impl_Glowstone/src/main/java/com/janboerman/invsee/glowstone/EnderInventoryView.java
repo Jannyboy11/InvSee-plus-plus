@@ -9,6 +9,7 @@ import com.janboerman.invsee.spigot.api.logging.LogOutput;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -23,6 +24,8 @@ public class EnderInventoryView extends EnderSpectatorInventoryView {
     private final PlayerInventory bottom;
 
     private DifferenceTracker diffTracker;
+
+    InventoryOpenEvent openEvent;
 
     EnderInventoryView(HumanEntity spectator, EnderInventory top, CreationOptions<EnderChestSlot> creationOptions) {
         super(creationOptions);

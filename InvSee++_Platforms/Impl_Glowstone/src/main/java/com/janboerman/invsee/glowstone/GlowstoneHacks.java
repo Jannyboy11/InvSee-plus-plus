@@ -7,6 +7,7 @@ import net.glowstone.entity.GlowEntity;
 import net.glowstone.entity.GlowPlayer;
 import net.glowstone.inventory.GlowInventory;
 import net.glowstone.inventory.GlowInventorySlot;
+import net.glowstone.inventory.InventoryMonitor;
 import net.glowstone.io.entity.EntityStore;
 import net.glowstone.io.nbt.NbtPlayerDataService;
 import net.glowstone.net.GlowSession;
@@ -105,7 +106,8 @@ final class GlowstoneHacks {
             method.setAccessible(true);
             return (EntityStore<? extends GlowEntity>) method.invoke(null, clazz, type);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Failed to find GlowPlayer entity store.", e);
+            throw new RuntimeException("Failed to find GlowPlayer entity store reflectively.", e);
         }
     }
+
 }

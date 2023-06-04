@@ -8,6 +8,7 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
@@ -18,7 +19,6 @@ import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.utils.Rethrow;
 import net.glowstone.GlowServer;
-import net.glowstone.entity.GlowEntity;
 import net.glowstone.entity.GlowHumanEntity;
 import net.glowstone.entity.GlowPlayer;
 import net.glowstone.entity.meta.profile.GlowPlayerProfile;
@@ -36,6 +36,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -82,9 +83,17 @@ public class InvseeImpl implements InvseePlatform {
                 ((EnderInventoryView) view).onClose();
             }
         }, plugin);
+        //add extra event listener to capture InventoryOpenEvents
+        server.getPluginManager().registerEvent(InventoryOpenEvent.class, new Listener() {}, EventPriority.MONITOR, (Listener listener, Event ev) -> {
+            InventoryOpenEvent event = (InventoryOpenEvent) ev;
+            InventoryView view = event.getView();
+            if (view instanceof MainInventoryView) {
+                ((MainInventoryView) view).openEvent = event;
+            } else if (view instanceof EnderInventoryView) {
+                ((EnderInventoryView) view).openEvent = event;
+            }
+        }, plugin);
     }
-
-    // TODO! :D
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity target, CreationOptions<PlayerInventorySlot> options) {
@@ -106,9 +115,17 @@ public class InvseeImpl implements InvseePlatform {
     }
 
     @Override
-    public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options) {
-        //TODO
-        return null;
+    public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, CreationOptions<PlayerInventorySlot> options) {
+        MainInventory glowInventory = (MainInventory) inv;
+        MainInventoryView view = new MainInventoryView(spectator, glowInventory, options);
+
+        spectator.openInventory(view);
+
+        if (view.openEvent != null && view.openEvent.isCancelled()) {
+            return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(view.openEvent));
+        } else {
+            return OpenResponse.open(view);
+        }
     }
 
     @Override
@@ -120,7 +137,7 @@ public class InvseeImpl implements InvseePlatform {
 
     @Override
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options) {
-        createOffline(playerId, playerName, options, this::spectateEnderChest);
+        return createOffline(playerId, playerName, options, this::spectateEnderChest);
     }
 
     @Override
@@ -129,9 +146,17 @@ public class InvseeImpl implements InvseePlatform {
     }
 
     @Override
-    public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options) {
-        //TODO
-        return null;
+    public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, CreationOptions<EnderChestSlot> options) {
+        EnderInventory glowInventory = (EnderInventory) inv;
+        EnderInventoryView view = new EnderInventoryView(spectator, glowInventory, options);
+
+        spectator.openInventory(view);
+
+        if (view.openEvent != null && view.openEvent.isCancelled()) {
+            return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(view.openEvent));
+        } else {
+            return OpenResponse.open(view);
+        }
     }
 
     private <Slot, IS extends SpectatorInventory<Slot>> CompletableFuture<SpectateResponse<IS>> createOffline(UUID playerId, String playerName, CreationOptions<Slot> options, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, IS> invCreator) {
@@ -215,5 +240,7 @@ public class InvseeImpl implements InvseePlatform {
             }
         }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
+
+    //no need to call InventoryOpenEvent manually, GlowPlayer already does this for us! :D
 
 }

@@ -39,7 +39,7 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
     final List<GlowInventorySlot> containerSlots;
     final List<GlowInventorySlot> armourSlots;
     final GlowInventorySlot offhandSlot;
-    final GlowInventorySlot cursorSlot;
+    GlowInventorySlot cursorSlot;
     final List<GlowInventorySlot> craftingSlots;
     List<GlowInventorySlot> personalSlots;
 
@@ -263,6 +263,7 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
             List<GlowInventorySlot> merchantInventorySlots = GlowstoneHacks.getSlots((GlowMerchantInventory) top);
             this.personalSlots = merchantInventorySlots.subList(0, merchantInventorySlots.size() - 1);
         }
+        updateContents();
 
         for (HumanEntity viewer : getViewers()) {
             if (viewer instanceof Player) {
@@ -275,6 +276,7 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
     public void unwatch() {
         //reset the personal slots back to the crafting contents
         this.personalSlots = craftingSlots;
+        updateContents();
 
         for (HumanEntity viewer : getViewers()) {
             if (viewer instanceof org.bukkit.entity.Player) {
