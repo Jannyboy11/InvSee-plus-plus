@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 public interface OfflinePlayerProvider {
 
+    /** Gets all usernames of players that are known to the server. Usernames will be passed to the consumer as they are discovered. */
     public void getAll(Consumer<String> consumer);
 
     @Deprecated(forRemoval = true, since = "0.20.0")
@@ -15,6 +16,7 @@ public interface OfflinePlayerProvider {
         return result;
     }
 
+    /** Gets all usernames that starts with the specified prefix of players that are known to the server. Usernames will be passed to the consumer as they are discovered. */
     public void getWithPrefix(String prefix, Consumer<String> consumer);
 
     @Deprecated(forRemoval = true, since = "0.20.0")
