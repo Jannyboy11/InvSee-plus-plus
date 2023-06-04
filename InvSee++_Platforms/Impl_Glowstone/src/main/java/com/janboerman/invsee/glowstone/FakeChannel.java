@@ -13,12 +13,17 @@ import io.netty.channel.EventLoop;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.SocketAddress;
 
-public class FakeChannel implements Channel {
+class FakeChannel implements Channel {
+
+    static final Channel INSTANCE = new FakeChannel();
+
+    private final ChannelFuture future;
+
+    FakeChannel() {
+        this.future = new FakeChannelFuture(this);
+    }
 
     @Override
     public ChannelId id() {
@@ -62,25 +67,17 @@ public class FakeChannel implements Channel {
 
     @Override
     public SocketAddress localAddress() {
-        try {
-            return new ServerSocket(25565, 0, InetAddress.getByName(null)).getLocalSocketAddress();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
     @Override
     public SocketAddress remoteAddress() {
-        try {
-            return new ServerSocket(25565, 0, InetAddress.getByName(null)).getLocalSocketAddress();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
     @Override
     public ChannelFuture closeFuture() {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
@@ -115,62 +112,62 @@ public class FakeChannel implements Channel {
 
     @Override
     public ChannelFuture bind(SocketAddress socketAddress) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture connect(SocketAddress socketAddress) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture connect(SocketAddress socketAddress, SocketAddress socketAddress1) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture disconnect() {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture close() {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture deregister() {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture bind(SocketAddress socketAddress, ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture connect(SocketAddress socketAddress, ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture connect(SocketAddress socketAddress, SocketAddress socketAddress1, ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture disconnect(ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture close(ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture deregister(ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
@@ -180,12 +177,12 @@ public class FakeChannel implements Channel {
 
     @Override
     public ChannelFuture write(Object o) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture write(Object o, ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
@@ -195,12 +192,12 @@ public class FakeChannel implements Channel {
 
     @Override
     public ChannelFuture writeAndFlush(Object o, ChannelPromise channelPromise) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture writeAndFlush(Object o) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
@@ -215,12 +212,12 @@ public class FakeChannel implements Channel {
 
     @Override
     public ChannelFuture newSucceededFuture() {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override
     public ChannelFuture newFailedFuture(Throwable throwable) {
-        throw new UnsupportedOperationException();
+        return future;
     }
 
     @Override

@@ -171,11 +171,12 @@ public class InvseeImpl implements InvseePlatform {
 
         //create the fake player
         GameServer gameServer = server.getNetworkServer();
-        Channel channel = new FakeChannel();
+        Channel channel = FakeChannel.INSTANCE;
         GlowSession session = new GlowSession(server, gameServer.getProtocolProvider(), channel, gameServer);
         GlowPlayerProfile profile = new GlowPlayerProfile(playerName, playerId, true);
         PlayerReader reader = playerDataService.beginReadingData(playerId);
         FakePlayer fakePlayer = new FakePlayer(session, profile, reader);
+        session.setPlayer(profile);
 
         return CompletableFuture.supplyAsync(() -> {
             //if the player's save file does not exist, then fail.
@@ -215,11 +216,12 @@ public class InvseeImpl implements InvseePlatform {
 
         //create the fake player
         GameServer gameServer = server.getNetworkServer();
-        Channel channel = new FakeChannel();
+        Channel channel = FakeChannel.INSTANCE;
         GlowSession session = new GlowSession(server, gameServer.getProtocolProvider(), channel, gameServer);
         GlowPlayerProfile profile = new GlowPlayerProfile(playerName, playerId, true);
         PlayerReader reader = playerDataService.beginReadingData(playerId);
         FakePlayer fakePlayer = new FakePlayer(session, profile, reader);
+        session.setPlayer(profile);
 
         return CompletableFuture.runAsync(() -> {
             //get player file
