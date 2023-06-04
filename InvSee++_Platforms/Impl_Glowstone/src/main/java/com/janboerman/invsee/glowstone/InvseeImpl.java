@@ -84,7 +84,7 @@ public class InvseeImpl implements InvseePlatform {
         }, plugin);
     }
 
-    //TODO implement! :D
+    // TODO! :D
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity target, CreationOptions<PlayerInventorySlot> options) {
@@ -97,14 +97,12 @@ public class InvseeImpl implements InvseePlatform {
 
     @Override
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options) {
-        //TODO
-        return null;
+        return createOffline(playerId, playerName, options, this::spectateInventory);
     }
 
     @Override
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
-        //TODO
-        return null;
+    public CompletableFuture<Void> saveInventory(MainSpectatorInventory newInventory) {
+        return save(newInventory, this::spectateInventory, MainSpectatorInventory::setContents);
     }
 
     @Override
@@ -122,14 +120,12 @@ public class InvseeImpl implements InvseePlatform {
 
     @Override
     public CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options) {
-        //TODO
-        return null;
+        createOffline(playerId, playerName, options, this::spectateEnderChest);
     }
 
     @Override
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
-        //TODO
-        return null;
+    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory newInventory) {
+        return save(newInventory, this::spectateEnderChest, EnderSpectatorInventory::setContents);
     }
 
     @Override
