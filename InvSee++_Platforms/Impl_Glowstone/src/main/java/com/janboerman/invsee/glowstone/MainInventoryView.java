@@ -32,11 +32,6 @@ class MainInventoryView extends MainSpectatorInventoryView {
         this.spectator = spectator;
         this.bottom = spectator.getInventory();
         this.top = top;
-        //TODO do I need this? does Glowstone contain the same shift-click algorithm as CraftBukkit?
-        //if (top.targetPlayerUuid.equals(spectator.getUniqueId())) {
-        //    top.cursorSlot = InaccessibleSlot.INSTANCE;
-        //}
-        //TODO ideally, I the inventoryview disallowed access to the slot, without altering the inventory.
 
         final Target target = Target.byGameProfile(top.getSpectatedPlayerId(), top.getSpectatedPlayerName());
         final LogOptions logOptions = creationOptions.getLogOptions();

@@ -8,6 +8,7 @@ import net.glowstone.entity.GlowPlayer;
 import net.glowstone.inventory.GlowInventory;
 import net.glowstone.inventory.GlowInventorySlot;
 import net.glowstone.inventory.InventoryMonitor;
+import net.glowstone.io.entity.EntityStorage;
 import net.glowstone.io.entity.EntityStore;
 import net.glowstone.io.nbt.NbtPlayerDataService;
 import net.glowstone.net.GlowSession;
@@ -80,7 +81,7 @@ final class GlowstoneHacks {
 
     static File getPlayerDir(NbtPlayerDataService playerDataService) {
         try {
-            Field field = NbtPlayerDataService.class.getField("playerDir");
+            Field field = NbtPlayerDataService.class.getDeclaredField("playerDir");
             field.setAccessible(true);
             return (File) field.get(playerDataService);
         } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -102,7 +103,7 @@ final class GlowstoneHacks {
 
     static EntityStore<? extends GlowEntity> findEntityStore(Class<? extends GlowEntity> clazz, String type) {
         try {
-            Method method = EntityStore.class.getDeclaredMethod("find", Class.class, String.class);
+            Method method = EntityStorage.class.getDeclaredMethod("find", Class.class, String.class);
             method.setAccessible(true);
             return (EntityStore<? extends GlowEntity>) method.invoke(null, clazz, type);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {

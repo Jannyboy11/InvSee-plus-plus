@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class MainInventory extends GlowInventory implements MainSpectatorInventory, ShallowCopy<MainInventory>, Personal {
+class MainInventory extends GlowInventory implements MainSpectatorInventory, ShallowCopy<MainInventory>, Personal {
 
     final UUID targetPlayerUuid;
     final String targetPlayerName;
@@ -43,7 +43,7 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
     final List<GlowInventorySlot> craftingSlots;
     List<GlowInventorySlot> personalSlots;
 
-    public MainInventory(GlowHumanEntity targetPlayer, CreationOptions<PlayerInventorySlot> creationOptions) {
+    MainInventory(GlowHumanEntity targetPlayer, CreationOptions<PlayerInventorySlot> creationOptions) {
         super(null, InventoryType.CHEST, 54, creationOptions.getTitle().titleFor(Target.byPlayer(targetPlayer)));
 
         this.targetPlayerUuid = targetPlayer.getUniqueId();

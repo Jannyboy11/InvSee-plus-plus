@@ -9,11 +9,9 @@ import com.janboerman.invsee.spigot.internal.LogRecord;
 import net.glowstone.GlowServer;
 import net.glowstone.io.nbt.NbtPlayerDataService;
 import net.glowstone.util.nbt.CompoundTag;
-import net.glowstone.util.nbt.NbtInputStream;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;

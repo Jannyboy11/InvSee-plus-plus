@@ -17,7 +17,7 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class EnderInventoryView extends EnderSpectatorInventoryView {
+class EnderInventoryView extends EnderSpectatorInventoryView {
 
     private final HumanEntity spectator;
     private final EnderInventory top;

@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 /**
  * Cache for player usernames and unique IDs.
@@ -108,20 +109,24 @@ public class NamesAndUUIDs {
         if (PAPER) {
             this.uuidResolveStrategies.add(new UUIDPaperCacheStrategy(plugin, scheduler));
 
-            YamlConfiguration paperConfig = plugin.getServer().spigot().getPaperConfig();
-            ConfigurationSection proxiesSection = paperConfig.getConfigurationSection("proxies");
-            if (proxiesSection != null) {
-                //bungee
-                ConfigurationSection bungeeSection = proxiesSection.getConfigurationSection("bungee-cord");
-                if (bungeeSection != null) {
-                    this.bungeeCordOnline = this.bungeeCord && bungeeSection.getBoolean("online-mode", false);
+            try {
+                YamlConfiguration paperConfig = plugin.getServer().spigot().getPaperConfig();
+                ConfigurationSection proxiesSection = paperConfig.getConfigurationSection("proxies");
+                if (proxiesSection != null) {
+                    //bungee
+                    ConfigurationSection bungeeSection = proxiesSection.getConfigurationSection("bungee-cord");
+                    if (bungeeSection != null) {
+                        this.bungeeCordOnline = this.bungeeCord && bungeeSection.getBoolean("online-mode", false);
+                    }
+                    //velocity
+                    ConfigurationSection velocitySection = proxiesSection.getConfigurationSection("velocity");
+                    if (velocitySection != null) {
+                        this.velocity = velocitySection.getBoolean("enabled", false);
+                        this.velocityOnline = this.velocity && velocitySection.getBoolean("online-mode", false);
+                    }
                 }
-                //velocity
-                ConfigurationSection velocitySection = proxiesSection.getConfigurationSection("velocity");
-                if (velocitySection != null) {
-                    this.velocity = velocitySection.getBoolean("enabled", false);
-                    this.velocityOnline = this.velocity && velocitySection.getBoolean("online-mode", false);
-                }
+            } catch (UnsupportedOperationException e/*can happen on Glowstone*/) {
+                plugin.getLogger().log(Level.WARNING, "Server acts as if it includes the paper config api, but it actually doesn't!", e);
             }
         }
 

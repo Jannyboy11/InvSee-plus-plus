@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class EnderInventory extends GlowInventory implements EnderSpectatorInventory, ShallowCopy<EnderInventory> {
+class EnderInventory extends GlowInventory implements EnderSpectatorInventory, ShallowCopy<EnderInventory> {
 
     final UUID targetPlayerUuid;
     final String targetPlayerName;

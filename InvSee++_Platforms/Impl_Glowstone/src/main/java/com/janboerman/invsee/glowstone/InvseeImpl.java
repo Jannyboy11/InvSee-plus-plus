@@ -18,6 +18,7 @@ import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.utils.Rethrow;
+import io.netty.channel.Channel;
 import net.glowstone.GlowServer;
 import net.glowstone.entity.GlowHumanEntity;
 import net.glowstone.entity.GlowPlayer;
@@ -60,7 +61,7 @@ public class InvseeImpl implements InvseePlatform {
 
     public InvseeImpl(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         GlowServer server = (GlowServer) plugin.getServer();
-        GlowstoneHacks.injectWindowClickHandler(server);
+        server.getScheduler().runTask(plugin, () -> GlowstoneHacks.injectWindowClickHandler(server));
 
         this.plugin = plugin;
         this.cache = cache;
@@ -169,9 +170,12 @@ public class InvseeImpl implements InvseePlatform {
         //3. Return the inventory!
 
         //create the fake player
-        Location location = server.getWorlds().get(0).getSpawnLocation();
+        GameServer gameServer = server.getNetworkServer();
+        Channel channel = new FakeChannel();
+        GlowSession session = new GlowSession(server, gameServer.getProtocolProvider(), channel, gameServer);
         GlowPlayerProfile profile = new GlowPlayerProfile(playerName, playerId, true);
-        GlowHumanEntity fakeHumanEntity = new FakeHumanEntity(location, profile);
+        PlayerReader reader = playerDataService.beginReadingData(playerId);
+        FakePlayer fakePlayer = new FakePlayer(session, profile, reader);
 
         return CompletableFuture.supplyAsync(() -> {
             //if the player's save file does not exist, then fail.
@@ -185,11 +189,11 @@ public class InvseeImpl implements InvseePlatform {
             try {
                 //load data onto the fake player
                 CompoundTag tag = playerFileExists ? GlowstoneHacks.readCompressed(playerFile) : new CompoundTag();
-                EntityStore glowhumanentityStore = GlowstoneHacks.findEntityStore(GlowHumanEntity.class, "load");
-                glowhumanentityStore.load(fakeHumanEntity, tag);
+                EntityStore glowhumanentityStore = GlowstoneHacks.findEntityStore(GlowPlayer.class, "load");
+                glowhumanentityStore.load(fakePlayer, tag);
 
                 //return the inventory
-                return SpectateResponse.succeed(invCreator.apply(fakeHumanEntity, options));
+                return SpectateResponse.succeed(invCreator.apply(fakePlayer, options));
             } catch (IOException e) {
                 return Rethrow.unchecked(e);
             }
@@ -211,7 +215,8 @@ public class InvseeImpl implements InvseePlatform {
 
         //create the fake player
         GameServer gameServer = server.getNetworkServer();
-        GlowSession session = new GlowSession(server, gameServer.getProtocolProvider(), null/*netty channel*/, gameServer);
+        Channel channel = new FakeChannel();
+        GlowSession session = new GlowSession(server, gameServer.getProtocolProvider(), channel, gameServer);
         GlowPlayerProfile profile = new GlowPlayerProfile(playerName, playerId, true);
         PlayerReader reader = playerDataService.beginReadingData(playerId);
         FakePlayer fakePlayer = new FakePlayer(session, profile, reader);
