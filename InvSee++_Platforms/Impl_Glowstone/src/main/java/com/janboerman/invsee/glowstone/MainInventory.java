@@ -4,16 +4,24 @@ import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.ConstantList;
 import net.glowstone.entity.GlowHumanEntity;
+import net.glowstone.inventory.GlowAnvilInventory;
 import net.glowstone.inventory.GlowCraftingInventory;
+import net.glowstone.inventory.GlowEnchantingInventory;
 import net.glowstone.inventory.GlowInventory;
 import net.glowstone.inventory.GlowInventorySlot;
+import net.glowstone.inventory.GlowMerchantInventory;
 import net.glowstone.inventory.GlowPlayerInventory;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
@@ -22,7 +30,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class MainInventory extends GlowInventory implements MainSpectatorInventory, ShallowCopy<MainInventory> {
+public class MainInventory extends GlowInventory implements MainSpectatorInventory, ShallowCopy<MainInventory>, Personal {
 
     final UUID targetPlayerUuid;
     final String targetPlayerName;
@@ -32,7 +40,8 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
     final List<GlowInventorySlot> armourSlots;
     final GlowInventorySlot offhandSlot;
     final GlowInventorySlot cursorSlot;
-    final List<GlowInventorySlot> personalSlots;
+    final List<GlowInventorySlot> craftingSlots;
+    List<GlowInventorySlot> personalSlots;
 
     public MainInventory(GlowHumanEntity targetPlayer, CreationOptions<PlayerInventorySlot> creationOptions) {
         super(null, InventoryType.CHEST, 54, creationOptions.getTitle().titleFor(Target.byPlayer(targetPlayer)));
@@ -60,7 +69,7 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
 
         //on Glowstone, the GlowCraftingInventory carries the RESULT at slot 0, and the CRAFTING matrix at slots 1 through (size-1).
         GlowCraftingInventory craftingInventory = targetInventory.getCraftingInventory();
-        this.personalSlots = GlowstoneHacks.getSlots(craftingInventory).subList(1, craftingInventory.getSize());
+        this.personalSlots = this.craftingSlots = GlowstoneHacks.getSlots(craftingInventory).subList(1, craftingInventory.getSize());
 
         //the ultimate hack! :D
         updateContents();
@@ -234,6 +243,46 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
         }
     }
 
+    //
+
+    @Override
+    public void watch(InventoryView targetPlayerView) {
+        //if the target player has an opened inventory, and if the opened inventory is personal,
+        //then set the personalSlots to the be the *same* slots as that opened inventory.
+        Inventory top = targetPlayerView.getTopInventory();
+        if (top instanceof GlowCraftingInventory) {
+            List<GlowInventorySlot> craftingInventorySlots = GlowstoneHacks.getSlots((GlowCraftingInventory) top);
+            this.personalSlots = craftingInventorySlots.subList(1, craftingInventorySlots.size());
+        } else if (top instanceof GlowAnvilInventory) {
+            List<GlowInventorySlot> anvilInventorySlots = GlowstoneHacks.getSlots((GlowAnvilInventory) top);
+            this.personalSlots = anvilInventorySlots.subList(0, anvilInventorySlots.size() - 1);
+        } else if (top instanceof GlowEnchantingInventory) {
+            List<GlowInventorySlot> enchantingInventorySlots = GlowstoneHacks.getSlots((GlowEnchantingInventory) top);
+            this.personalSlots = enchantingInventorySlots;
+        } else if (top instanceof GlowMerchantInventory) {
+            List<GlowInventorySlot> merchantInventorySlots = GlowstoneHacks.getSlots((GlowMerchantInventory) top);
+            this.personalSlots = merchantInventorySlots.subList(0, merchantInventorySlots.size() - 1);
+        }
+
+        for (HumanEntity viewer : getViewers()) {
+            if (viewer instanceof Player) {
+                ((Player) viewer).updateInventory();
+            }
+        }
+    }
+
+    @Override
+    public void unwatch() {
+        //reset the personal slots back to the crafting contents
+        this.personalSlots = craftingSlots;
+
+        for (HumanEntity viewer : getViewers()) {
+            if (viewer instanceof org.bukkit.entity.Player) {
+                ((org.bukkit.entity.Player) viewer).updateInventory();
+            }
+        }
+    }
+
     // Glowstone faulty implementations overrides
 
     @Override
@@ -255,5 +304,6 @@ public class MainInventory extends GlowInventory implements MainSpectatorInvento
 
         return false;
     }
+
 
 }

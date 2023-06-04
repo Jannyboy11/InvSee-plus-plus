@@ -6,6 +6,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
+import net.glowstone.entity.GlowHumanEntity;
 import net.glowstone.inventory.GlowInventory;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
@@ -20,13 +21,15 @@ public class EnderInventory extends GlowInventory implements EnderSpectatorInven
 
     final CreationOptions<EnderChestSlot> creationOptions;
 
-    public EnderInventory(UUID targetPlayerUuid, String targetPlayerName, CreationOptions<EnderChestSlot> creationOptions, int size) {
-        super(null, InventoryType.CHEST, size, creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)));
+    public EnderInventory(GlowHumanEntity target, CreationOptions<EnderChestSlot> creationOptions) {
+        super(null, InventoryType.CHEST, target.getEnderChest().getSize(), creationOptions.getTitle().titleFor(Target.byGameProfile(target.getUniqueId(), target.getName())));
 
-        this.targetPlayerUuid = targetPlayerUuid;
-        this.targetPlayerName = targetPlayerName;
+        this.targetPlayerUuid = target.getUniqueId();
+        this.targetPlayerName = target.getName();
         this.creationOptions = creationOptions;
         setMaxStackSize(defaultMaxStack());
+
+        GlowstoneHacks.setSlots(this, GlowstoneHacks.getSlots(target.getEnderChest()));
     }
 
     @Override
