@@ -184,7 +184,9 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         System.arraycopy(getArmourContents(), 0, result, 36, 4);
         result[40] = offhandSlot.getItem();
         result[41] = cursorSlot.getItem();
+        for (int i = 42; i < 45; i++) result[i] = InvseeImpl.EMPTY_STACK;
         System.arraycopy(getPersonalContents(), 0, result, 45, getPersonalContentsSize());
+        for (int i = 53; i >= (45 + getPersonalContentsSize()); i--) result[i] = InvseeImpl.EMPTY_STACK;
         return result;
     }
 

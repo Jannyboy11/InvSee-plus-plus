@@ -5,6 +5,7 @@ import com.flowpowered.network.service.HandlerLookupService;
 import net.glowstone.GlowServer;
 import net.glowstone.entity.GlowEntity;
 import net.glowstone.entity.GlowPlayer;
+import net.glowstone.entity.meta.profile.GlowPlayerProfile;
 import net.glowstone.inventory.GlowInventory;
 import net.glowstone.inventory.GlowInventorySlot;
 import net.glowstone.inventory.InventoryMonitor;
@@ -66,6 +67,7 @@ final class GlowstoneHacks {
     }
 
     private static PlayProtocol getPlayProtocol(GlowServer server) {
+        //TODO getNetworkServer() returns null?
         return server.getNetworkServer().getProtocolProvider().getPlay();
     }
 
@@ -111,4 +113,14 @@ final class GlowstoneHacks {
         }
     }
 
+    //alternative for GlowSession#setPlayer(GlowPlayerProfile) that doesn't do weird connection stuff.
+    static void setPlayer(GlowSession session, GlowPlayer player) {
+        try {
+            Field field = GlowSession.class.getDeclaredField("player");
+            field.setAccessible(true);
+            field.set(session, player);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to set GlowSession's player profile.", e);
+        }
+    }
 }

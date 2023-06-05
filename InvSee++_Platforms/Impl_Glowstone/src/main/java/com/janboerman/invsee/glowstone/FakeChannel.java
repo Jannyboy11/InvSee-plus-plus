@@ -19,6 +19,7 @@ class FakeChannel implements Channel {
 
     static final Channel INSTANCE = new FakeChannel();
 
+
     private final ChannelFuture future;
 
     FakeChannel() {
@@ -67,12 +68,12 @@ class FakeChannel implements Channel {
 
     @Override
     public SocketAddress localAddress() {
-        return null;
+        return FakeSocketAddress.INSTANCE;
     }
 
     @Override
     public SocketAddress remoteAddress() {
-        return null;
+        return FakeSocketAddress.INSTANCE;
     }
 
     @Override
@@ -102,12 +103,12 @@ class FakeChannel implements Channel {
 
     @Override
     public ChannelPipeline pipeline() {
-        throw new UnsupportedOperationException();
+        return FakePipeline.INSTANCE;
     }
 
     @Override
     public ByteBufAllocator alloc() {
-        throw new UnsupportedOperationException();
+        return FakeByteBufAllocator.INSTANCE;
     }
 
     @Override

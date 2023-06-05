@@ -37,7 +37,7 @@ public class DecoratedWindowClickHandler implements MessageHandler<GlowSession, 
         if (openInventory instanceof SpectatorInventoryView) {
             view = (SpectatorInventoryView) openInventory;
             before = Arrays.stream(view.getTopInventory().getContents())
-                    .map(ItemStack::clone)
+                    .map(DecoratedWindowClickHandler::cloneItemStack)
                     .collect(Collectors.toList());
         }
 
@@ -45,7 +45,7 @@ public class DecoratedWindowClickHandler implements MessageHandler<GlowSession, 
 
         if (openInventory instanceof SpectatorInventoryView) {
             after = Arrays.stream(view.getTopInventory().getContents())
-                    .map(ItemStack::clone)
+                    .map(DecoratedWindowClickHandler::cloneItemStack)
                     .collect(Collectors.toList());
         }
 
@@ -54,5 +54,9 @@ public class DecoratedWindowClickHandler implements MessageHandler<GlowSession, 
         } else if (view instanceof EnderInventoryView) {
             ((EnderInventoryView) view).onClick(before, after);
         }
+    }
+
+    private static ItemStack cloneItemStack(ItemStack stack) {
+        return stack == null ? InvseeImpl.EMPTY_STACK : stack.clone();
     }
 }

@@ -35,11 +35,14 @@ final class CursorSlot extends GlowInventorySlot {
 
     @Override
     public ItemStack getItem() {
-        return target.getItemOnCursor();
+        ItemStack stack = target.getItemOnCursor();
+        if (stack == null) stack = InvseeImpl.EMPTY_STACK;
+        return stack;
     }
 
     @Override
     public void setItem(ItemStack item) {
+        if (item == null) item = InvseeImpl.EMPTY_STACK;
         target.setItemOnCursor(item);
     }
 }

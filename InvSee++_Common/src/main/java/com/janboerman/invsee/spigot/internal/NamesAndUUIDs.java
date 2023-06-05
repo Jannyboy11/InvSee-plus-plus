@@ -126,7 +126,7 @@ public class NamesAndUUIDs {
                     }
                 }
             } catch (UnsupportedOperationException e/*can happen on Glowstone*/) {
-                plugin.getLogger().log(Level.WARNING, "Server acts as if it includes the paper config api, but it actually doesn't!", e);
+                plugin.getLogger().log(Level.WARNING, "Server acts as if it supports the paper config api, but it actually doesn't!", e);
             }
         }
 

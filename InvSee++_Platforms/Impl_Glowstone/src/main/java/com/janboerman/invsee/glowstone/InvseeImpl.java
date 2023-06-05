@@ -30,7 +30,6 @@ import net.glowstone.net.GameServer;
 import net.glowstone.net.GlowSession;
 import net.glowstone.util.InventoryUtil;
 import net.glowstone.util.nbt.CompoundTag;
-import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -41,6 +40,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +61,6 @@ public class InvseeImpl implements InvseePlatform {
 
     public InvseeImpl(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         GlowServer server = (GlowServer) plugin.getServer();
-        server.getScheduler().runTask(plugin, () -> GlowstoneHacks.injectWindowClickHandler(server));
 
         this.plugin = plugin;
         this.cache = cache;
@@ -94,6 +93,16 @@ public class InvseeImpl implements InvseePlatform {
                 ((EnderInventoryView) view).openEvent = event;
             }
         }, plugin);
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (server.getNetworkServer() != null) {
+                    GlowstoneHacks.injectWindowClickHandler(server);
+                    cancel();
+                }
+            }
+        }.runTaskTimer(plugin, 0, 1);
     }
 
     @Override
@@ -176,7 +185,7 @@ public class InvseeImpl implements InvseePlatform {
         GlowPlayerProfile profile = new GlowPlayerProfile(playerName, playerId, true);
         PlayerReader reader = playerDataService.beginReadingData(playerId);
         FakePlayer fakePlayer = new FakePlayer(session, profile, reader);
-        session.setPlayer(profile);
+        GlowstoneHacks.setPlayer(session, fakePlayer);
 
         return CompletableFuture.supplyAsync(() -> {
             //if the player's save file does not exist, then fail.
@@ -221,7 +230,7 @@ public class InvseeImpl implements InvseePlatform {
         GlowPlayerProfile profile = new GlowPlayerProfile(playerName, playerId, true);
         PlayerReader reader = playerDataService.beginReadingData(playerId);
         FakePlayer fakePlayer = new FakePlayer(session, profile, reader);
-        session.setPlayer(profile);
+        GlowstoneHacks.setPlayer(session, fakePlayer);
 
         return CompletableFuture.runAsync(() -> {
             //get player file
