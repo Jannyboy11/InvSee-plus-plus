@@ -45,6 +45,8 @@ interface Setup {
                 case MappingsVersion._1_19_4:
                     return new Impl_1_19_4();
             }
+        } else if ("net.glowstone.GlowServer".equals(serverClassName)) {
+            return new Impl_Glowstone();
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
@@ -120,5 +122,11 @@ class Impl_1_12_2 extends SetupImpl {
 class Impl_1_8_8 extends SetupImpl {
     Impl_1_8_8() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_8_R3.GiveImpl.INSTANCE);
+    }
+}
+
+class Impl_Glowstone extends SetupImpl {
+    Impl_Glowstone() {
+        super(com.janboerman.invsee.spigot.addon.give.glowstone.GiveImpl.INSTANCE);
     }
 }

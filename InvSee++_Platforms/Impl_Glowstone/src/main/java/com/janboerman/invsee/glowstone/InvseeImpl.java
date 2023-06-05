@@ -49,8 +49,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-//TODO: similar implementation for InvSee++_Give
-
 public class InvseeImpl implements InvseePlatform {
 
     static final ItemStack EMPTY_STACK = InventoryUtil.EMPTY_STACK;
