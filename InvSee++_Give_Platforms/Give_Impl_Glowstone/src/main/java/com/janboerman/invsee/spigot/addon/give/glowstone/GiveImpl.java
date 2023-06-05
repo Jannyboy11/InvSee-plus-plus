@@ -1,9 +1,10 @@
 package com.janboerman.invsee.spigot.addon.give.glowstone;
 
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
+
 import org.bukkit.inventory.ItemStack;
 
-public class GiveImpl implements GiveApi {
+public class GiveImpl implements GiveApi /*TODO extends NeditImpl*/ {
 
     public static final GiveImpl INSTANCE = new GiveImpl();
 
