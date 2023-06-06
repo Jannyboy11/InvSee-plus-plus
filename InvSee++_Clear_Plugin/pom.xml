@@ -9,6 +9,10 @@
     <artifactId>invsee-plus-plus_clear_plugin</artifactId>
     <name>InvSee++ Clear Plugin</name>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <build>
         <finalName>InvSee++_Clear</finalName>
 

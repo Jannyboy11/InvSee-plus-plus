@@ -12,6 +12,7 @@
 
     <properties>
         <bukkit.version>1.17.1-R0.1-SNAPSHOT</bukkit.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <build>

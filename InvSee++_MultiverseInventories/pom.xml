@@ -9,6 +9,10 @@
     <artifactId>invsee-plus-plus_multiverse-inventories</artifactId>
     <name>InvSee++ MultiverseInventories integration</name>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <repositories>
         <repository>
             <id>onarandombox</id>

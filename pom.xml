@@ -56,7 +56,6 @@
     </distributionManagement>
 
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.8.2</junit.version>
     </properties>

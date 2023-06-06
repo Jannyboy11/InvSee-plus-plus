@@ -9,6 +9,10 @@
     <artifactId>invsee-plus-plus_common</artifactId>
     <name>InvSee++ Common</name>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>

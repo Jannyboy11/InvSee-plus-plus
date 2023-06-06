@@ -9,6 +9,10 @@
     <artifactId>invsee-plus-plus_give_common</artifactId>
     <name>InvSee++ Give Common</name>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

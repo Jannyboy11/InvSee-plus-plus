@@ -9,6 +9,10 @@
     <artifactId>invsee-plus-plus_give_plugin</artifactId>
     <name>InvSee++ Give Plugin</name>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <build>
         <finalName>InvSee++_Give</finalName>
 
