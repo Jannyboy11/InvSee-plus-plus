@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_19_4_R3;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -21,4 +22,11 @@ class FakeEntityHuman extends Player {
 		return false;
 	}
 
+
+	// === workarounds for Mohist ===
+
+	@Override
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+	}
 }

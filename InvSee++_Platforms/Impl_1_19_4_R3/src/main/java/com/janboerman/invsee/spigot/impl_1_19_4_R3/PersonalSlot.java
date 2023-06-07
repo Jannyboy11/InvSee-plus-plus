@@ -11,7 +11,7 @@ class PersonalSlot extends Slot {
 	}
 	
 	private boolean works() {
-		MainNmsInventory inv = (MainNmsInventory) container;
+		MainNmsInventory inv = (MainNmsInventory) super.container;		// Mohist compat: use super.container instead of this.container
 		int personalSize = inv.personalContents.size();
 		boolean inRange = 45 <= super.getContainerSlot() && super.getContainerSlot() < 45 + personalSize;
 		return inRange;
@@ -66,6 +66,48 @@ class PersonalSlot extends Slot {
 	public ItemStack getItem() {
 		if (!works()) return ItemStack.EMPTY;
 		return super.getItem();
+	}
+
+	public boolean isActive() {
+		return works();
+	}
+
+	// === Mohist workarounds ===
+
+	public boolean m_5857_(ItemStack itemStack) {
+		return mayPlace(itemStack);
+	}
+
+	public boolean m_6657_() {
+		return hasItem();
+	}
+
+	public void m_219996_(ItemStack itemStack) {
+		set(itemStack);
+	}
+
+	public int m_6641_() {
+		return getMaxStackSize();
+	}
+
+	public ItemStack m_6201_(int subtractAmount) {
+		return remove(subtractAmount);
+	}
+
+	public boolean m_150651_(Player player) {
+		return allowModification(player);
+	}
+
+	public boolean m_8010_(Player player) {
+		return mayPickup(player);
+	}
+
+	public ItemStack m_7993_() {
+		return getItem();
+	}
+
+	public boolean m_6659_() {
+		return isActive();
 	}
 
 }

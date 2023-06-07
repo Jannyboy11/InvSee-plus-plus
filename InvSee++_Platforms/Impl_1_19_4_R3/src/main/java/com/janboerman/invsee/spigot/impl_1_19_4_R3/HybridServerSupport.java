@@ -4,7 +4,6 @@ import com.janboerman.invsee.utils.FuzzyReflection;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 

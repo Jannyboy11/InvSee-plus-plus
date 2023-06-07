@@ -117,9 +117,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 				int magicX = 8 + xPos * 18;
 				int magicY = 18 + yPos * 18;
 
-				addSlot(makeSlot(mirror, top, index, magicX, magicY));
-
-				//this.addSlot(new Slot(top, index, magicX, magicY));
+				super.addSlot(makeSlot(mirror, top, index, magicX, magicY));	// Mohist compat: call super.addSlot instead of this.addSlot
 			}
 		}
 		
@@ -132,7 +130,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 				int index = xPos + yPos * 9;
 				int magicX = 8 + xPos * 18;
 				int magicY = 103 + yPos * 18 + magicAddY;
-				this.addSlot(new Slot(bottom, index, magicX, magicY));
+				super.addSlot(new Slot(bottom, index, magicX, magicY));			// Mohist compat: call super.addSlot instead of this.addSlot
 			}
 		}
 		
@@ -141,7 +139,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 			int index = xPos;
 			int magicX = 8 + xPos * 18;
 			int magicY = 161 + magicAddY;
-			this.addSlot(new Slot(bottom, index, magicX, magicY));
+			super.addSlot(new Slot(bottom, index, magicX, magicY));				// Mohist compat: call super.addSlot instead of this.addSlot
 		}
 	}
 
@@ -195,4 +193,29 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	public String title() {
 		return title != null ? title : originalTitle;
 	}
+
+
+	// === workarounds for Mohist ===
+
+	@Override
+	public MenuType<?> getType() {
+		return super.getType();
+	}
+
+	public void m_150399_(int i, int j, ClickType clicktype, Player entityHuman) {
+		clicked(i, j, clicktype, entityHuman);
+	}
+
+	public void m_6877_(Player entityHuman) {
+		removed(entityHuman);
+	}
+
+	public boolean m_6875_(Player entityHuman) {
+		return stillValid(entityHuman);
+	}
+
+	public ItemStack m_7648_(Player entityHuman, int rawIndex) {
+		return quickMoveStack(entityHuman, rawIndex);
+	}
+
 }

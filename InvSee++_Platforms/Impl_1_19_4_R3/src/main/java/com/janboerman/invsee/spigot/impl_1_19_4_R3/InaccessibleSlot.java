@@ -23,7 +23,7 @@ class InaccessibleSlot extends Slot {
 	
 	@Override
 	public void set(ItemStack itemStack) {
-		setChanged();
+		super.setChanged();		//Mohist
 	}
 	
 	@Override
@@ -49,6 +49,50 @@ class InaccessibleSlot extends Slot {
 	@Override
 	public ItemStack getItem() {
 		return ItemStack.EMPTY;
+	}
+
+	@Override
+	public boolean isActive() {
+		return false;
+	}
+
+
+	// === Mohist workarounds ===
+
+	public boolean m_5857_(ItemStack itemStack) {
+		return mayPlace(itemStack);
+	}
+
+	public boolean m_6657_() {
+		return hasItem();
+	}
+
+	public void m_219996_(ItemStack itemStack) {
+		set(itemStack);
+	}
+
+	public int m_6641_() {
+		return getMaxStackSize();
+	}
+
+	public ItemStack m_6201_(int subtractAmount) {
+		return remove(subtractAmount);
+	}
+
+	public boolean m_150651_(Player player) {
+		return allowModification(player);
+	}
+
+	public boolean m_8010_(Player player) {
+		return mayPickup(player);
+	}
+
+	public ItemStack m_7993_() {
+		return getItem();
+	}
+
+	public boolean m_6659_() {
+		return isActive();
 	}
 
 }
