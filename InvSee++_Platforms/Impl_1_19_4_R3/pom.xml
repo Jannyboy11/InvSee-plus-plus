@@ -15,19 +15,12 @@
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache-snapshots</id>
-            <url>https://repository.apache.org/content/repositories/snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven-compiler-plugin.verison}</version>
                 <configuration>
                     <release>17</release>
                 </configuration>
@@ -36,7 +29,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.2-SNAPSHOT</version>
+                <version>${maven-shade-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -62,7 +55,7 @@
             <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.4</version>
+                <version>${specialsource-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

@@ -20,7 +20,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven-compiler-plugin.verison}</version>
                 <configuration>
                     <release>17</release>
                 </configuration>
@@ -29,7 +29,7 @@
             <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.4</version>
+                <version>${specialsource-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

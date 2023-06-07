@@ -58,6 +58,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.8.2</junit.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <specialsource-maven-plugin.version>1.2.5</specialsource-maven-plugin.version>
+        <maven-compiler-plugin.verison>3.11.0</maven-compiler-plugin.verison>
+        <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
     </properties>
     <url>https://github.com/Jannyboy11/InvSee-plus-plus</url>
 
@@ -66,7 +70,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>${maven-compiler-plugin.verison}</version>
                 <configuration>
                     <release>11</release>
                 </configuration>
