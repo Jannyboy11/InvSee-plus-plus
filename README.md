@@ -42,8 +42,8 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 
 #### InvSee++_Give
 ##### Commands:
-- `/invgive <player> <item type> <amount>? <nbt tag>?`
-- `/endergive <player> <item type> <amount>? <nbt tag>?`
+- `/invgive <player> <item type> [<amount>] [<nbt tag>]`
+- `/endergive <player> <item type> [<amount>] [<nbt tag>]`
 ###### Examples:
 - `/invgive Notch diamond 1 {"foo":"bar"}`
 - `/endergive Jannyboy11 wool:14`
