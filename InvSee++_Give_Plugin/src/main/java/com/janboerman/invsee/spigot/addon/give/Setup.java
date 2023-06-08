@@ -30,16 +30,6 @@ interface Setup {
                 case MappingsVersion._1_18_2:
                     return new Impl_1_18_2();
             }
-        } else if ("org.bukkit.craftbukkit.v1_19_R1.CraftServer".equals(serverClassName)) {
-            switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_19_2:
-                    return new Impl_1_19_2();
-            }
-        } else if ("org.bukkit.craftbukkit.v1_19_R2.CraftServer".equals(serverClassName)) {
-            switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_19_3:
-                    return new Impl_1_19_3();
-            }
         } else if ("org.bukkit.craftbukkit.v1_19_R3.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_19_4:
@@ -85,18 +75,6 @@ class Impl_1_20 extends SetupImpl {
 class Impl_1_19_4 extends SetupImpl {
     Impl_1_19_4() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_19_4_R3.GiveImpl.INSTANCE);
-    }
-}
-
-class Impl_1_19_3 extends SetupImpl {
-    Impl_1_19_3() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_1_19_3_R2.GiveImpl.INSTANCE);
-    }
-}
-
-class Impl_1_19_2 extends SetupImpl {
-    Impl_1_19_2() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_1_19_2_R1.GiveImpl.INSTANCE);
     }
 }
 

@@ -82,8 +82,6 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
     - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped`
-    - `java -jar BuildTools.jar --rev 1.19.2 --compile craftbukkit --remapped`
-    - `java -jar BuildTools.jar --rev 1.19.3 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20 --compile craftbukkit --remapped`
 2. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
@@ -131,5 +129,3 @@ Is there any server that implements the Bukkit api that I'm missing? Don't hesit
 | Minecraft version: | 1.8.x       | 1.12.x      | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.x      |
 |--------------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
 | Java version:      | 11 or newer | 11 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer | 17 or newer |
-
-[37]: https://github.com/Jannyboy11/InvSee-plus-plus/issues/37 "37"

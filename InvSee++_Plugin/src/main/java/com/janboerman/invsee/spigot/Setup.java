@@ -39,16 +39,6 @@ public interface Setup {
                 case MappingsVersion._1_18_2:
                     return new Impl_1_18_2(plugin, lookup, scheduler, cache);
             }
-        } else if ("org.bukkit.craftbukkit.v1_19_R1.CraftServer".equals(serverClassName)) {
-            switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_19_2:
-                    return new Impl_1_19_2(plugin, lookup, scheduler, cache);
-            }
-        } else if ("org.bukkit.craftbukkit.v1_19_R2.CraftServer".equals(serverClassName)) {
-            switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_19_3:
-                    return new Impl_1_19_3(plugin, lookup, scheduler, cache);
-            }
         } else if ("org.bukkit.craftbukkit.v1_19_R3.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_19_4:
@@ -108,18 +98,6 @@ class Impl_1_17_1 extends SetupImpl {
 class Impl_1_18_2 extends SetupImpl {
     Impl_1_18_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_18_2_R2.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_18_2_R2.KnownPlayersProvider(plugin, scheduler));
-    }
-}
-
-class Impl_1_19_2 extends SetupImpl {
-    Impl_1_19_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_19_2_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_19_2_R1.KnownPlayersProvider(plugin, scheduler));
-    }
-}
-
-class Impl_1_19_3 extends SetupImpl {
-    Impl_1_19_3(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_19_3_R2.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_19_3_R2.KnownPlayersProvider(plugin, scheduler));
     }
 }
 

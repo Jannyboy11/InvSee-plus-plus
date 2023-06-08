@@ -3,7 +3,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.21.11-SNAPSHOT</version>
+    <version>0.22.0-SNAPSHOT</version>
 
     <modules>
         <module>Utils</module>
@@ -15,8 +15,6 @@
         <module>InvSee++_Platforms/Impl_1_16_5_R3</module>
         <module>InvSee++_Platforms/Impl_1_17_1_R1</module>
         <module>InvSee++_Platforms/Impl_1_18_2_R2</module>
-        <module>InvSee++_Platforms/Impl_1_19_2_R1</module>
-        <module>InvSee++_Platforms/Impl_1_19_3_R2</module>
         <module>InvSee++_Platforms/Impl_1_19_4_R3</module>
         <module>InvSee++_Platforms/Impl_1_20_R1</module>
         <module>InvSee++_Platforms/Impl_Glowstone</module>
@@ -30,8 +28,6 @@
         <module>InvSee++_Give_Platforms/Give_Impl_1_16_5_R3</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_17_1_R1</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_18_2_R2</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_19_2_R1</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_19_3_R2</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_19_4_R3</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_20_R1</module>
         <module>InvSee++_Give_Platforms/Give_Impl_Glowstone</module>
