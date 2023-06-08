@@ -40,7 +40,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 			@Override public void set(ItemStack item) { target.containerMenu.setCarried(item); }
 			@Override public ItemStack get() { return target.containerMenu.getCarried(); }
 		};
-		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
+		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy (in contrast to getItems() which uses List.copyOf(this.items) !!!)
 	}
 
 	@Override
