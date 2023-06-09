@@ -3,7 +3,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.22.1-SNAPSHOT</version>
+    <version>0.22.1</version>
 
     <modules>
         <module>Utils</module>
@@ -41,7 +41,7 @@
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/Jannyboy11/InvSee-plus-plus.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v0.22.1</tag>
     </scm>
 
     <distributionManagement>
@@ -81,7 +81,7 @@
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <preparationGoals>clean verify</preparationGoals>
                     <scmCommentPrefix>Maven Release Plugin:</scmCommentPrefix>
-                    <scmReleaseCommitComment>@{prefix} Release @{releaseLabel}🎉!</scmReleaseCommitComment>
+                    <scmReleaseCommitComment>@{prefix} Release @{releaseLabel}&#x1f389;!</scmReleaseCommitComment>
                     <scmDevelopmentCommitComment>@{prefix} Bump version.</scmDevelopmentCommitComment>
                     <scmRollbackCommitComment>@{prefix} Roll back.</scmRollbackCommitComment>
                 </configuration>
