@@ -59,11 +59,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <junit.version>5.8.2</junit.version>
-        <maven.deploy.skip>releases</maven.deploy.skip>
         <specialsource-maven-plugin.version>1.2.5</specialsource-maven-plugin.version>
         <maven-compiler-plugin.verison>3.11.0</maven-compiler-plugin.verison>
         <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
+
+        <maven.deploy.skip>releases</maven.deploy.skip>
+        <ignoreSnapshots>true</ignoreSnapshots>
+        <ignoreReleases>true</ignoreReleases>
     </properties>
     <url>https://github.com/Jannyboy11/InvSee-plus-plus</url>
 
@@ -74,6 +78,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>3.0.1</version>
                 <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
                     <preparationGoals>clean verify</preparationGoals>
                 </configuration>
             </plugin>
