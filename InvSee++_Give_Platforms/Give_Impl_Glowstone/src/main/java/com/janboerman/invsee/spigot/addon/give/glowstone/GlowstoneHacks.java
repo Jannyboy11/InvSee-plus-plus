@@ -17,7 +17,7 @@ final class GlowstoneHacks {
             method.setAccessible(true);
             method.invoke(tag, key, value);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Cannot put child Tag in CompoundTag.", e);
+            throw new RuntimeException("Failed to put child Tag in CompoundTag.", e);
         }
     }
 
