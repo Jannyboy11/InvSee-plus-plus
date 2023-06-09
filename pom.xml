@@ -42,8 +42,8 @@
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/Jannyboy11/InvSee-plus-plus.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <distributionManagement>
         <repository>
@@ -81,6 +81,10 @@
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                     <preparationGoals>clean verify</preparationGoals>
+                    <scmCommentPrefix>Maven Release Plugin:</scmCommentPrefix>
+                    <scmReleaseCommitComment>@{prefix} Release @{releaseLabel}🎉!</scmReleaseCommitComment>
+                    <scmDevelopmentCommitComment>@{prefix} Bump version.</scmDevelopmentCommitComment>
+                    <scmRollbackCommitComment>@{prefix} Roll back.</scmRollbackCommitComment>
                 </configuration>
             </plugin>
 
