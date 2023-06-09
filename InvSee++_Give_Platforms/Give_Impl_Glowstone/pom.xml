@@ -10,10 +10,6 @@
     <artifactId>give_impl_glowstone</artifactId>
     <name>InvSee++ Give implementation for Glowstone</name>
 
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <repositories>
 <!--        <repository>-->
 <!--            <id>jitpack.io</id>-->

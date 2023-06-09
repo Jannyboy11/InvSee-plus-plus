@@ -9,10 +9,6 @@
     <artifactId>mojang-api</artifactId>
     <name>Mojang API</name>
 
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>

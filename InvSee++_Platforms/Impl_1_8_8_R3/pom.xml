@@ -10,10 +10,6 @@
     <artifactId>impl_1_8_8_r3</artifactId>
     <name>InvSee++ implementation for CraftBukkit 1.8.8</name>
 
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>

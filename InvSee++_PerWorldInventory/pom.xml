@@ -9,10 +9,6 @@
     <artifactId>invsee-plus-plus_per-world-inventory</artifactId>
     <name>InvSee++ PerWorldInventory integration</name>
 
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <repositories>
         <repository>
             <id>spigot-repo</id>

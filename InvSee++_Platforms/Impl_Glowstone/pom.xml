@@ -10,10 +10,6 @@
     <artifactId>impl_glowstone</artifactId>
     <name>InvSee++ implementation for Glowstone</name>
 
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <build>
         <defaultGoal>clean package</defaultGoal>
 
