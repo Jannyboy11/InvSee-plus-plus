@@ -12,6 +12,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.PistonMoveReaction;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.sign.Side;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.entity.*;
@@ -129,6 +130,9 @@ public class FakePlayer implements Player {
     private final WeakHashMap<Plugin, Set<Entity>> hiddenEntities = new WeakHashMap<>();
     private WorldBorder worldBorder;
     private Location lastDeathLocation;
+    private int enchantmentSeed;
+    private boolean visibleByDefault;
+    private int expCooldown;
 
     public FakePlayer(UUID uniqueId, String name, Server server) {
         this.uuid = uniqueId;
@@ -673,6 +677,16 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void setVisibleByDefault(boolean b) {
+        this.visibleByDefault = b;
+    }
+
+    @Override
+    public boolean isVisibleByDefault() {
+        return visibleByDefault;
+    }
+
+    @Override
     public void setGlowing(boolean b) {
         this.glowing = b;
     }
@@ -986,7 +1000,15 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void playSound(@NotNull Entity entity, @NotNull String s, float v, float v1) {
+    }
+
+    @Override
     public void playSound(@NotNull Entity entity, @NotNull Sound sound, @NotNull SoundCategory soundCategory, float v, float v1) {
+    }
+
+    @Override
+    public void playSound(@NotNull Entity entity, @NotNull String s, @NotNull SoundCategory soundCategory, float v, float v1) {
     }
 
     @Override
@@ -1040,7 +1062,19 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void sendBlockDamage(@NotNull Location location, float v, @NotNull Entity entity) {
+    }
+
+    @Override
+    public void sendBlockDamage(@NotNull Location location, float v, int i) {
+    }
+
+    @Override
     public void sendEquipmentChange(@NotNull LivingEntity livingEntity, @NotNull EquipmentSlot equipmentSlot, @NotNull ItemStack itemStack) {
+    }
+
+    @Override
+    public void sendEquipmentChange(@NotNull LivingEntity livingEntity, @NotNull Map<EquipmentSlot, ItemStack> map) {
     }
 
     public boolean sendChunkChange(@NotNull Location location, int i, int i1, int i2, @NotNull byte[] bytes) {
@@ -1061,6 +1095,22 @@ public class FakePlayer implements Player {
 
     @Override
     public void sendMap(@NotNull MapView mapView) {
+    }
+
+    @Override
+    public void sendHurtAnimation(float v) {
+    }
+
+    @Override
+    public void addCustomChatCompletions(@NotNull Collection<String> collection) {
+    }
+
+    @Override
+    public void removeCustomChatCompletions(@NotNull Collection<String> collection) {
+    }
+
+    @Override
+    public void setCustomChatCompletions(@NotNull Collection<String> collection) {
     }
 
     @Override
@@ -1120,13 +1170,23 @@ public class FakePlayer implements Player {
     }
 
     @Override
-    public void giveExp(int i) {
+    public int getExpCooldown() {
+        return expCooldown;
+    }
 
+    @Override
+    public void setExpCooldown(int i) {
+        this.expCooldown = i;
+    }
+
+    @Override
+    public void giveExp(int i) {
+        setExp(getExp() + i);
     }
 
     @Override
     public void giveExpLevels(int i) {
-
+        setLevel(getLevel() + i);
     }
 
     @Override
@@ -1502,6 +1562,10 @@ public class FakePlayer implements Player {
     }
 
     @Override
+    public void openSign(@NotNull Sign sign, @NotNull Side side) {
+    }
+
+    @Override
     public void showDemoScreen() {
     }
 
@@ -1551,10 +1615,22 @@ public class FakePlayer implements Player {
         return false;
     }
 
+    @Override
+    public int getEnchantmentSeed() {
+        return this.enchantmentSeed;
+    }
+
+    @Override
+    public void setEnchantmentSeed(int seed) {
+        this.enchantmentSeed = seed;
+    }
+
     @NotNull
     @Override
     public InventoryView getOpenInventory() {
         return new InventoryView() {
+            private String title = InventoryType.PLAYER.getDefaultTitle();
+
             @NotNull
             @Override
             public Inventory getTopInventory() {
@@ -1582,7 +1658,18 @@ public class FakePlayer implements Player {
             @NotNull
             @Override
             public String getTitle() {
+                return title;
+            }
+
+            @NotNull
+            @Override
+            public String getOriginalTitle() {
                 return InventoryType.PLAYER.getDefaultTitle();
+            }
+
+            @Override
+            public void setTitle(@NotNull String s) {
+                this.title = s;
             }
         };
     }
@@ -1624,7 +1711,6 @@ public class FakePlayer implements Player {
 
     @Override
     public void closeInventory() {
-
     }
 
     @NotNull
