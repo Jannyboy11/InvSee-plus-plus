@@ -7,11 +7,11 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>give_impl_1_20_r1</artifactId>
-    <name>InvSee++ Give implementation for CraftBukkit 1.20</name>
+    <artifactId>impl_1_20_1_r1</artifactId>
+    <name>InvSee++ implementation for CraftBukkit 1.20.1</name>
 
     <properties>
-        <bukkit.version>1.20-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>1.20.1-R0.1-SNAPSHOT</bukkit.version>
     </properties>
 
     <build>
@@ -23,6 +23,32 @@
                 <configuration>
                     <release>17</release>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>org.hamcrest:hamcrest-core</exclude>
+                                    <exclude>com.googlecode.json-simple:json-simple</exclude>
+                                </excludes>
+                            </artifactSet>
+
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -61,32 +87,24 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>invsee-plus-plus_give_common</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.TheNullicorn</groupId>
-            <artifactId>Nedit</artifactId>
-            <version>49615cf47c</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
             <version>${bukkit.version}</version>
             <classifier>remapped-mojang</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>invsee-plus-plus_common</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

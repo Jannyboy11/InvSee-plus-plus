@@ -48,13 +48,15 @@ public interface Setup {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_20:
                     return new Impl_1_20(plugin, lookup, scheduler, cache);
+                case MappingsVersion._1_20_1:
+                    return new Impl_1_20_1(plugin, lookup, scheduler, cache);
             }
         } else if("net.glowstone.GlowServer".equals(serverClassName)) {
             return new Impl_Glowstone(plugin, lookup, scheduler, cache);
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
-            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20]. Are you running the latest InvSee++?");
+            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20, 1.20.1]. Are you running the latest InvSee++?");
         } else {
             throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit or Glowstone.");
         }
@@ -110,6 +112,12 @@ class Impl_1_19_4 extends SetupImpl {
 class Impl_1_20 extends SetupImpl {
     Impl_1_20(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_20_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_R1.KnownPlayersProvider(plugin, scheduler));
+    }
+}
+
+class Impl_1_20_1 extends SetupImpl {
+    Impl_1_20_1(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_20_1_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_1_R1.KnownPlayersProvider(plugin, scheduler));
     }
 }
 

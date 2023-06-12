@@ -39,13 +39,15 @@ interface Setup {
             switch (MappingsVersion.getMappingsVersion(server)) {
                 case MappingsVersion._1_20:
                     return new Impl_1_20();
+                case MappingsVersion._1_20_1:
+                    return new Impl_1_20_1();
             }
         } else if ("net.glowstone.GlowServer".equals(serverClassName)) {
             return new Impl_Glowstone();
         }
 
         if (server.getClass().getSimpleName().equals("CraftServer")) {
-            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20]. Are you running the latest InvSee++_Give?");
+            throw new RuntimeException("Unsupported CraftBukkit version. Please run on one of [1.8.8, 1.12.2, 1.15.2, 1.16.5, 1.17.1, 1.18.2, 1.19.4, 1.20, 1.20.1]. Are you running the latest InvSee++_Give?");
         } else {
             throw new RuntimeException("Unsupported server software. Please run on (a fork of) CraftBukkit or Glowstone.");
         }
@@ -63,6 +65,12 @@ class SetupImpl implements Setup {
     @Override
     public GiveApi getGiveApi() {
         return api;
+    }
+}
+
+class Impl_1_20_1 extends SetupImpl {
+    Impl_1_20_1() {
+        super(com.janboerman.invsee.spigot.addon.give.impl_1_20_1_R1.GiveImpl.INSTANCE);
     }
 }
 
