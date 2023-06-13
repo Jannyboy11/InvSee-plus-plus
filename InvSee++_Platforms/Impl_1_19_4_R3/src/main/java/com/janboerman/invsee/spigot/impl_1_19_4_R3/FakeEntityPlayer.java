@@ -15,6 +15,6 @@ class FakeEntityPlayer extends ServerPlayer {
 
     @Override
     public FakeCraftPlayer getBukkitEntity() {
-        return bukkitEntity == null ? bukkitEntity = new FakeCraftPlayer(super.level.getCraftServer(), this) : bukkitEntity;    // Mohist compat: user super.level instead of this.level
+        return bukkitEntity == null ? bukkitEntity = new FakeCraftPlayer(super.level.getCraftServer(), this) : bukkitEntity;    // Mohist compat: use super.level instead of this.level
     }
 }
