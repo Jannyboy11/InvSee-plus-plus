@@ -37,7 +37,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 
-		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
 		assert playerFiles != null : "playerFiles is not a directory?";
 		for (File playerFile : playerFiles) {
 			try {
@@ -68,7 +68,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 
-		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
 		assert playerFiles != null : "playerFiles is not a directory?";
 		for (File playerFile : playerFiles) {
 			try {
