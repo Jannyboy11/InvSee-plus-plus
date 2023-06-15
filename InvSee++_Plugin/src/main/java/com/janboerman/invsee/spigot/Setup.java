@@ -51,7 +51,7 @@ public interface Setup {
                 case MappingsVersion._1_20_1:
                     return new Impl_1_20_1(plugin, lookup, scheduler, cache);
             }
-        } else if("net.glowstone.GlowServer".equals(serverClassName)) {
+        } else if ("net.glowstone.GlowServer".equals(serverClassName)) {
             return new Impl_Glowstone(plugin, lookup, scheduler, cache);
         }
 

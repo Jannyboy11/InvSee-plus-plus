@@ -62,7 +62,7 @@ public class HybridServerSupport {
             try {
                 //call the forge method: getContents()[Lnet/minecraft/server/v1_8_R3/ItemStack;
                 MethodHandles.Lookup lookup = MethodHandles.lookup();
-                MethodHandle methodHandle = lookup.findVirtual(enderChest.getClass(), "getContents", MethodType.methodType(List.class));
+                MethodHandle methodHandle = lookup.findVirtual(enderChest.getClass(), "getContents", MethodType.methodType(ItemStack[].class));
                 return (ItemStack[]) methodHandle.invoke(enderChest);
             } catch (Throwable forgeMethodNotFound) {
                 RuntimeException ex = new RuntimeException("No method known of getting the enderchest items");
