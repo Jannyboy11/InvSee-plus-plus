@@ -83,7 +83,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped`
-    - `java -jar BuildTools.jar --rev 1.20 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 3798 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.1 --compile craftbukkit --remapped`
 2. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
 and running `mvn clean install -DskipTests=true` in its root directory.

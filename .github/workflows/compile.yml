@@ -29,11 +29,14 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - name: Install CraftBukkit 1.17.1, 1.18.2, 1.19.4, 1.20, 1.20.1
+        # Use build number 3798 to compile CraftBukkit 1.20, see:
+        # https://hub.spigotmc.org/jira/browse/BUILDTOOLS-658
+        # https://hub.spigotmc.org/versions/
         run: |
           java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped
-          java -jar BuildTools.jar --rev 1.20 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 3798 --compile craftbukkit --remapped 
           java -jar BuildTools.jar --rev 1.20.1 --compile craftbukkit --remapped
       - name: Install PerWorldInventory
         run: |
