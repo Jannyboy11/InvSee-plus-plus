@@ -91,6 +91,9 @@ public class InvseeImpl implements InvseePlatform {
                 ((EnderInventoryView) view).openEvent = event;
             }
         }, plugin);
+        //TODO Mirror functionality: check whether overriding #getItem and #setItem was enough. It probably is.
+        //TODO otherwise: transform contents of WindowClickHandler, SetWindowSlotMessage and SetWindowContentsMessage if the open inventory view is a SpectatorInventoryView.
+        //TODO we might have to decorate GlowPlayer itself and override sendItemChange(slot, stack) and somehow make sure GlowStone instantiates our own DecoratedGlowPlayer instead of the built-in GlowPlayer.
 
         new BukkitRunnable() {
             @Override
@@ -127,7 +130,8 @@ public class InvseeImpl implements InvseePlatform {
         MainInventory glowInventory = (MainInventory) inv;
         MainInventoryView view = new MainInventoryView(spectator, glowInventory, options);
 
-        spectator.openInventory(view);
+        spectator.openInventory(view);  //TODO level of indirection in order to implement Mirror functionality.
+        //TODO will I have to modify packets? quite likely.
 
         if (view.openEvent != null && view.openEvent.isCancelled()) {
             return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(view.openEvent));
@@ -158,7 +162,8 @@ public class InvseeImpl implements InvseePlatform {
         EnderInventory glowInventory = (EnderInventory) inv;
         EnderInventoryView view = new EnderInventoryView(spectator, glowInventory, options);
 
-        spectator.openInventory(view);
+        spectator.openInventory(view);  //TODO level of indirection in order to implement Mirror functionality.
+        //TODO will I have to modify packets? quite likely.
 
         if (view.openEvent != null && view.openEvent.isCancelled()) {
             return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(view.openEvent));

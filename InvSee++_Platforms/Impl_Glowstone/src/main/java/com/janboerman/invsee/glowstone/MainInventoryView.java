@@ -59,6 +59,28 @@ class MainInventoryView extends MainSpectatorInventoryView {
         return spectator;
     }
 
+    @Override
+    public ItemStack getItem(int slot) {
+        if (slot == -999) {
+            return null;
+        } else if (slot < top.getSize()) {
+            Integer index = getMirror().getIndex(PlayerInventorySlot.byDefaultIndex(slot));
+            return index == null ? null : super.getItem(index);
+        } else {
+            return super.getItem(slot);
+        }
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack item) {
+        if (slot == -999 || slot >= top.getSize()) {
+            super.setItem(slot, item);
+        } else {
+            Integer index = getMirror().getIndex(PlayerInventorySlot.byDefaultIndex(slot));
+            if (index != null) super.setItem(index, item);
+        }
+    }
+
     @Nullable
     @Override
     public Difference getTrackedDifference() {
