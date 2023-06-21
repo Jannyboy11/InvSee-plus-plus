@@ -17,6 +17,9 @@ public abstract class MainSpectatorInventoryView extends SpectatorInventoryView<
     @Override
     public abstract MainSpectatorInventory getTopInventory();
 
+    /** Sets the item in the desired slot of the InventoryView. If the slot is in the top inventory, then the inventory slot will be computed using
+     * {@code getMirror().getIndex(PlayerInventorySlot.byDefaultIndex(slot))}.
+     * @see com.janboerman.invsee.spigot.api.template.Mirror */
     @Override
     public void setItem(int slot, ItemStack item) {
         if (0 <= slot && slot < getTopInventory().getSize()) {
@@ -27,6 +30,9 @@ public abstract class MainSpectatorInventoryView extends SpectatorInventoryView<
         }
     }
 
+    /** Gets the item in the desired slot of the InventoryView. If the slot is in the top inventory, then the inventory slot will be computed using
+     * {@code getMirror().getIndex(PlayerInventorySlot.byDefaultIndex(slot))}.
+     * @see com.janboerman.invsee.spigot.api.template.Mirror */
     @Override
     public ItemStack getItem(int slot) {
         if (0 <= slot && slot < getTopInventory().getSize()) {
