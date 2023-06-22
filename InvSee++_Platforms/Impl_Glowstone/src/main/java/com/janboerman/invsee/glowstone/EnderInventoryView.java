@@ -61,11 +61,10 @@ class EnderInventoryView extends EnderSpectatorInventoryView {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot == -999) {
-            return null;
-        } else if (slot < top.getSize()) {
-            Integer index = getMirror().getIndex(EnderChestSlot.byDefaultIndex(slot));
-            return index == null ? null : super.getItem(index);
+        EnderInventory top;
+        if (0 <= slot && slot < (top = getTopInventory()).getSize()) {
+            EnderChestSlot ecSlot = getMirror().getSlot(slot);
+            return ecSlot == null ? null : top.getItem(ecSlot.defaultIndex());
         } else {
             return super.getItem(slot);
         }
@@ -73,11 +72,12 @@ class EnderInventoryView extends EnderSpectatorInventoryView {
 
     @Override
     public void setItem(int slot, ItemStack item) {
-        if (slot == -999 || slot >= top.getSize()) {
-            super.setItem(slot, item);
+        EnderInventory top;
+        if (0 <= slot && slot < (top = getTopInventory()).getSize()) {
+            EnderChestSlot ecSlot = getMirror().getSlot(slot);
+            if (ecSlot != null) top.setItem(ecSlot.defaultIndex(), item);
         } else {
-            Integer index = getMirror().getIndex(EnderChestSlot.byDefaultIndex(slot));
-            if (index != null) super.setItem(index, item);
+            super.setItem(slot, item);
         }
     }
 

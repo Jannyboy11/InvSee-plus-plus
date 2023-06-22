@@ -61,11 +61,10 @@ class MainInventoryView extends MainSpectatorInventoryView {
 
     @Override
     public ItemStack getItem(int slot) {
-        if (slot == -999) {
-            return null;
-        } else if (slot < top.getSize()) {
-            Integer index = getMirror().getIndex(PlayerInventorySlot.byDefaultIndex(slot));
-            return index == null ? null : super.getItem(index);
+        MainInventory top;
+        if (0 <= slot && slot < (top = getTopInventory()).getSize()) {
+            PlayerInventorySlot piSlot = getMirror().getSlot(slot);
+            return piSlot == null ? null : top.getItem(piSlot.defaultIndex());
         } else {
             return super.getItem(slot);
         }
@@ -73,11 +72,12 @@ class MainInventoryView extends MainSpectatorInventoryView {
 
     @Override
     public void setItem(int slot, ItemStack item) {
-        if (slot == -999 || slot >= top.getSize()) {
-            super.setItem(slot, item);
+        MainInventory top;
+        if (0 <= slot && slot < (top = getTopInventory()).getSize()) {
+            PlayerInventorySlot piSlot = getMirror().getSlot(slot);
+            if (piSlot != null) top.setItem(piSlot.defaultIndex(), item);
         } else {
-            Integer index = getMirror().getIndex(PlayerInventorySlot.byDefaultIndex(slot));
-            if (index != null) super.setItem(index, item);
+            super.setItem(slot, item);
         }
     }
 

@@ -18,28 +18,28 @@ public abstract class EnderSpectatorInventoryView extends SpectatorInventoryView
     public abstract EnderSpectatorInventory getTopInventory();
 
     /** Sets the item in the desired slot of the InventoryView. If the slot is in the top inventory, then the inventory slot will be computed using
-     * {@code getMirror().getIndex(EnderChestSlot.byDefaultIndex(slot))}.
+     * {@code getMirror().getSlot(slot).defaultIndex()}.
      * @see com.janboerman.invsee.spigot.api.template.Mirror */
     @Override
     public void setItem(int slot, ItemStack item) {
         if (slot == -999 || slot >= getTopInventory().getSize()) {
             super.setItem(slot, item);
         } else {
-            Integer index = getMirror().getIndex(EnderChestSlot.byDefaultIndex(slot));
-            if (index != null) super.setItem(index, item);
+            EnderChestSlot ecSlot = getMirror().getSlot(slot);
+            if (ecSlot != null) super.setItem(ecSlot.defaultIndex(), item);
         }
     }
 
     /** Gets the item in the desired slot of the InventoryView. If the slot is in the top inventory, then the inventory slot will be computed using
-     * {@code getMirror().getIndex(EnderChestSlot.byDefaultIndex(slot))}.
+     * {@code getMirror().getSlot(slot).defaultIndex()}.
      * @see com.janboerman.invsee.spigot.api.template.Mirror */
     @Override
     public ItemStack getItem(int slot) {
         if (slot == -999 || slot >= getTopInventory().getSize()) {
             return super.getItem(slot);
         } else {
-            Integer index = getMirror().getIndex(EnderChestSlot.byDefaultIndex(slot));
-            return index == null ? null : super.getItem(index);
+            EnderChestSlot ecSlot = getMirror().getSlot(slot);
+            return ecSlot == null ? null : super.getItem(ecSlot.defaultIndex());
         }
     }
 
