@@ -6,6 +6,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
+import com.janboerman.invsee.utils.UUIDHelper;
 import net.glowstone.entity.GlowHumanEntity;
 import net.glowstone.inventory.GlowInventory;
 import org.bukkit.event.inventory.InventoryType;
@@ -24,7 +25,7 @@ class EnderInventory extends GlowInventory implements EnderSpectatorInventory, S
     public EnderInventory(GlowHumanEntity target, CreationOptions<EnderChestSlot> creationOptions) {
         super(null, InventoryType.CHEST, target.getEnderChest().getSize(), creationOptions.getTitle().titleFor(Target.byGameProfile(target.getUniqueId(), target.getName())));
 
-        this.targetPlayerUuid = target.getUniqueId();
+        this.targetPlayerUuid = UUIDHelper.copy(target.getUniqueId());
         this.targetPlayerName = target.getName();
         this.creationOptions = creationOptions;
         setMaxStackSize(defaultMaxStack());

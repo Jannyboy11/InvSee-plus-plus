@@ -8,6 +8,7 @@ import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.ConstantList;
+import com.janboerman.invsee.utils.UUIDHelper;
 import net.glowstone.entity.GlowHumanEntity;
 import net.glowstone.inventory.GlowAnvilInventory;
 import net.glowstone.inventory.GlowCraftingInventory;
@@ -46,7 +47,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
     MainInventory(GlowHumanEntity targetPlayer, CreationOptions<PlayerInventorySlot> creationOptions) {
         super(null, InventoryType.CHEST, 54, creationOptions.getTitle().titleFor(Target.byPlayer(targetPlayer)));
 
-        this.targetPlayerUuid = targetPlayer.getUniqueId();
+        this.targetPlayerUuid = UUIDHelper.copy(targetPlayer.getUniqueId());
         this.targetPlayerName = targetPlayer.getName();
         this.creationOptions = creationOptions;
         setMaxStackSize(defaultMaxStack());

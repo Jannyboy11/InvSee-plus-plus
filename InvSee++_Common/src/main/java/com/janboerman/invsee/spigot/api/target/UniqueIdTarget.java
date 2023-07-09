@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.api.target;
 
+import com.janboerman.invsee.utils.UUIDHelper;
+
 import java.util.Objects;
 import java.util.UUID;
 
@@ -9,7 +11,7 @@ public class UniqueIdTarget implements Target {
 
     /** @deprecated Use {@link Target#byUniqueId(UUID)} instead. */
     public UniqueIdTarget(UUID uniqueId) {
-        this.uniqueId = Objects.requireNonNull(uniqueId);
+        this.uniqueId = UUIDHelper.copy(Objects.requireNonNull(uniqueId));
     }
 
     public UUID getUniqueId() {
