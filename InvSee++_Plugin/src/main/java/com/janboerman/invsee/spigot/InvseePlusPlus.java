@@ -453,7 +453,7 @@ public class InvseePlusPlus extends JavaPlugin {
     }
 
     /** @deprecated use your own player database instead. */
-    @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true, since = "0.22.0")
     public OfflinePlayerProvider getOfflinePlayerProvider() {
         return offlinePlayerProvider;
     }
