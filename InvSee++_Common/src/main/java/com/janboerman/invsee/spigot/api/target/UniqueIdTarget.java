@@ -11,7 +11,7 @@ public class UniqueIdTarget implements Target {
 
     /** @deprecated Use {@link Target#byUniqueId(UUID)} instead. */
     public UniqueIdTarget(UUID uniqueId) {
-        this.uniqueId = UUIDHelper.copy(Objects.requireNonNull(uniqueId));
+        this.uniqueId = Objects.requireNonNull(uniqueId);
     }
 
     public UUID getUniqueId() {
