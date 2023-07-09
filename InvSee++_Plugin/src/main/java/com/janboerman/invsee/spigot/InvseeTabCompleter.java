@@ -27,12 +27,18 @@ public class InvseeTabCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         InvseeAPI api = plugin.getApi();
+        Player player = sender instanceof Player ? (Player) sender : null;
+
         if (args.length == 0) {
             Collection<? extends Player> onlinePlayers = sender.getServer().getOnlinePlayers();
             List<String> onlineNames = new ArrayList<>(onlinePlayers.size());
-            for (Player onlinePlayer : onlinePlayers) {
-                onlineNames.add(onlinePlayer.getName());
-            }
+            if (player == null)
+                for (Player onlinePlayer : onlinePlayers)
+                    onlineNames.add(onlinePlayer.getName());
+            else
+                for (Player onlinePlayer : onlinePlayers)
+                    if (player.canSee(onlinePlayer))
+                        onlineNames.add(onlinePlayer.getName());
 
             if (plugin.offlinePlayerSupport() && plugin.offlinePlayerSupport()) {
                 Set<String> offlineNames = api.getUuidCache().keySet();
@@ -50,10 +56,19 @@ public class InvseeTabCompleter implements TabCompleter {
 
             Collection<? extends Player> onlinePlayers = sender.getServer().getOnlinePlayers();
             List<String> onlineNames = new ArrayList<>();
-            for (Player onlinePlayer : onlinePlayers) {
-                String onlineName = onlinePlayer.getName();
-                if (StringHelper.startsWithIgnoreCase(onlineName, prefix)) {
-                    onlineNames.add(onlineName);
+            if (player == null) {
+                for (Player onlinePlayer : onlinePlayers) {
+                    String onlineName = onlinePlayer.getName();
+                    if (StringHelper.startsWithIgnoreCase(onlineName, prefix)) {
+                        onlineNames.add(onlineName);
+                    }
+                }
+            } else {
+                for (Player onlinePlayer : onlinePlayers) {
+                    String onlineName = onlinePlayer.getName();
+                    if (player.canSee(onlinePlayer) && StringHelper.startsWithIgnoreCase(onlineName, prefix)) {
+                        onlineNames.add(onlineName);
+                    }
                 }
             }
 
@@ -81,4 +96,5 @@ public class InvseeTabCompleter implements TabCompleter {
 
         return List.of();
     }
+
 }
