@@ -191,6 +191,7 @@ public class InvseeImpl implements InvseePlatform {
             } else {
                 // player file already exists, load the data from the compound onto the player
                 fakeEntityHuman.readAdditionalSaveData(playerCompound);		//only player-specific stuff
+                //fakeEntityHuman.load(playerCompound);                           //ALL entity data
                 //TODO perhaps we should not read only the player-specific stuff, but just all stuff.
                 //TODO See https://github.com/Jannyboy11/InvSee-plus-plus/issues/72
                 //TODO another approach would be to explicitly read the pdc data, but this puts a burden of proof on us to make sure that
@@ -227,7 +228,7 @@ public class InvseeImpl implements InvseePlatform {
             SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
             transfer.accept(currentInv, newInventory);
 
-            fakeCraftPlayer.saveData();
+            fakeCraftPlayer.saveData(); //TODO NBT tag does not contain
     	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 

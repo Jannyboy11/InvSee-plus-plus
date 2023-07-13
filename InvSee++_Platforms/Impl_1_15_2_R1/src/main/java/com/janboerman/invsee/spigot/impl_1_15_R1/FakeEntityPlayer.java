@@ -1,10 +1,15 @@
 package com.janboerman.invsee.spigot.impl_1_15_R1;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
 import net.minecraft.server.v1_15_R1.PlayerInteractManager;
 import net.minecraft.server.v1_15_R1.WorldServer;
+
+import java.lang.reflect.Field;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FakeEntityPlayer extends EntityPlayer {
 
@@ -16,6 +21,22 @@ public class FakeEntityPlayer extends EntityPlayer {
 
     @Override
     public FakeCraftPlayer getBukkitEntity() {
-        return bukkitEntity == null ? bukkitEntity = new FakeCraftPlayer(world.getServer(), this) : bukkitEntity;
+        if (bukkitEntity == null) {
+            bukkitEntity = new FakeCraftPlayer(super.world.getServer(), this);
+
+            try {
+                //https://github.com/Jannyboy11/InvSee-plus-plus/issues/72
+                //make sure we set bukkitEntity, to ensure that CraftBukkit can get the PersistentData from the CraftEntity when saving the player's NBT tag compound!
+                //See Entity#save
+                Field craftbukkitField = Entity.class.getDeclaredField("bukkitEntity");
+                craftbukkitField.setAccessible(true);
+                craftbukkitField.set(this, bukkitEntity);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                Logger.getLogger("Minecraft").log(Level.SEVERE, "Failed to overwrite CraftBukkit's 'bukkitEntity'.", e);
+            }
+        }
+
+        return bukkitEntity;
     }
+
 }
