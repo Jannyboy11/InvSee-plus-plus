@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot;
 
+import com.janboerman.invsee.folia.FoliaSupport;
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.folia.FoliaScheduler;
 import com.janboerman.invsee.spigot.api.CreationOptions;
@@ -399,15 +400,7 @@ public class InvseePlusPlus extends JavaPlugin {
     }
 
     private static Scheduler makeScheduler(InvseePlusPlus plugin) {
-        boolean folia;
-        try {
-            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
-            folia = true;
-        } catch (ClassNotFoundException e) {
-            folia = false;
-        }
-
-        if (folia) {
+        if (FoliaSupport.isFolia()) {
             return new FoliaScheduler(plugin);
         } else {
             return new DefaultScheduler(plugin);

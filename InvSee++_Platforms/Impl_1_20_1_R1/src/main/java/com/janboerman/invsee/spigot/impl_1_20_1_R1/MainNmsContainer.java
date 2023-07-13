@@ -208,7 +208,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 		return itemStack;
 	}
 
-	public String title() {
+	String title() {
 		return title != null ? title : originalTitle;
 	}
 
