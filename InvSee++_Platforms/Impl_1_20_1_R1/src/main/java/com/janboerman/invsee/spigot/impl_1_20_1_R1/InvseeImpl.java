@@ -191,6 +191,14 @@ public class InvseeImpl implements InvseePlatform {
             } else {
                 // player file already exists, load the data from the compound onto the player
                 fakeEntityHuman.readAdditionalSaveData(playerCompound);		//only player-specific stuff
+                //TODO perhaps we should not read only the player-specific stuff, but just all stuff.
+                //TODO See https://github.com/Jannyboy11/InvSee-plus-plus/issues/72
+                //TODO another approach would be to explicitly read the pdc data, but this puts a burden of proof on us to make sure that
+                //TODO we are not forgetting a property that may be introduced by Spigot or Paper in future versions.
+
+                //TODO still, it is weird that that bug happens in the first place, because when we call fakeCraftPlayer.loadData() in our save(...) method,
+                //TODO the Persistent Data should be included!
+                //TODO So perhaps, the bug is in our FakeEntityPlayer / FakeEntityHuman implementation??
             }
 
     		CraftHumanEntity craftHumanEntity = new FakeCraftHumanEntity(server, fakeEntityHuman);
