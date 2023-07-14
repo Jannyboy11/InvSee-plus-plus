@@ -214,27 +214,27 @@ class MainNmsContainer extends AbstractContainerMenu {
 
 
 	// === workarounds for Mohist ===
-	//TODO are SRG names stable?
+	// For now, use the same SRG names as in 1.19.4, as they seem to be stable.
 
-//	@Override
-//	public MenuType<?> getType() {
-//		return super.getType();
-//	}
-//
-//	public void m_150399_(int i, int j, ClickType clicktype, Player entityHuman) {
-//		clicked(i, j, clicktype, entityHuman);
-//	}
-//
-//	public void m_6877_(Player entityHuman) {
-//		removed(entityHuman);
-//	}
-//
-//	public boolean m_6875_(Player entityHuman) {
-//		return stillValid(entityHuman);
-//	}
-//
-//	public ItemStack m_7648_(Player entityHuman, int rawIndex) {
-//		return quickMoveStack(entityHuman, rawIndex);
-//	}
+	@Override
+	public MenuType<?> getType() {
+		return super.getType();
+	}
+
+	public void m_150399_(int i, int j, ClickType clicktype, Player entityHuman) {
+		clicked(i, j, clicktype, entityHuman);
+	}
+
+	public void m_6877_(Player entityHuman) {
+		removed(entityHuman);
+	}
+
+	public boolean m_6875_(Player entityHuman) {
+		return stillValid(entityHuman);
+	}
+
+	public ItemStack m_7648_(Player entityHuman, int rawIndex) {
+		return quickMoveStack(entityHuman, rawIndex);
+	}
 
 }

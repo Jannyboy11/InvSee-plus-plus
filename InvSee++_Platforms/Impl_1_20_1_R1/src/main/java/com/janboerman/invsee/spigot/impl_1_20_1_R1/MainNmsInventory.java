@@ -243,54 +243,54 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
 
 	// === workarounds for Mohist ===
-	//TODO are SRG names stable?
+	// For now, use the same SRG names as in 1.19.4, as they seem to be stable.
 
-//	public int m_6893_() {
-//		return getMaxStackSize();
-//	}
-//
-//	public void m_6211_() {
-//		clearContent();
-//	}
-//
-//	public AbstractContainerMenu m_7208_(int containerId, Inventory playerInventory, Player viewer) {
-//		return createMenu(containerId, playerInventory, viewer);
-//	}
-//
-//	public Component m_5446_() {
-//		return getDisplayName();
-//	}
-//
-//	public int m_6643_() {
-//		return getContainerSize();
-//	}
-//
-//	public ItemStack m_8020_(int slot) {
-//		return getItem(slot);
-//	}
-//
-//	public boolean m_7983_() {
-//		return isEmpty();
-//	}
-//
-//	public ItemStack m_7407_(int slot, int amount) {
-//		return removeItem(slot, amount);
-//	}
-//
-//	public ItemStack m_8016_(int slot) {
-//		return removeItemNoUpdate(slot);
-//	}
-//
-//	public void m_6596_() {
-//		setChanged();
-//	}
-//
-//	public void m_6836_(int slot, ItemStack itemStack) {
-//		setItem(slot, itemStack);
-//	}
-//
-//	public boolean m_6542_(Player player) {
-//		return stillValid(player);
-//	}
+	public int m_6893_() {
+		return getMaxStackSize();
+	}
+
+	public void m_6211_() {
+		clearContent();
+	}
+
+	public AbstractContainerMenu m_7208_(int containerId, Inventory playerInventory, Player viewer) {
+		return createMenu(containerId, playerInventory, viewer);
+	}
+
+	public Component m_5446_() {
+		return getDisplayName();
+	}
+
+	public int m_6643_() {
+		return getContainerSize();
+	}
+
+	public ItemStack m_8020_(int slot) {
+		return getItem(slot);
+	}
+
+	public boolean m_7983_() {
+		return isEmpty();
+	}
+
+	public ItemStack m_7407_(int slot, int amount) {
+		return removeItem(slot, amount);
+	}
+
+	public ItemStack m_8016_(int slot) {
+		return removeItemNoUpdate(slot);
+	}
+
+	public void m_6596_() {
+		setChanged();
+	}
+
+	public void m_6836_(int slot, ItemStack itemStack) {
+		setItem(slot, itemStack);
+	}
+
+	public boolean m_6542_(Player player) {
+		return stillValid(player);
+	}
 
 }
