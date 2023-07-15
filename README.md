@@ -115,7 +115,7 @@ Server support matrix:
 | Paper                      | Tier 2  | Tier 2  | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
 | Folia                      | n/a     | n/a     | n/a     | n/a     | n/a    | n/a    | Tier 2 | Tier 2 |
 | Other forks of CraftBukkit | Tier 2  | Tier 2  | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
-| Forge/Bukkit hybrids       | Tier 2* | Tier 2* | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
+| (Neo)Forge/Bukkit hybrids  | Tier 2* | Tier 2* | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
 | Fabric/Bukkit hybrids      | Tier 2* | Tier 2* | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2 | Tier 2 |
 | Glowstone                  | Tier 2  | Tier 2  | n/a     | n/a     | n/a    | n/a    | n/a    | n/a    |
 
