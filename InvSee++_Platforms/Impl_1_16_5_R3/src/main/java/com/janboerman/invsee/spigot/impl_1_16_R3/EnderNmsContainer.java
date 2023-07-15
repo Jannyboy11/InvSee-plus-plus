@@ -204,6 +204,11 @@ class EnderNmsContainer extends Container {
     }
 
     //idem
+    public Slot getSlot(int rawIndex) {
+        return super.getSlot(rawIndex);
+    }
+
+    //dito
     public void addSlotListener(ICrafting icrafting) {
         super.addSlotListener(icrafting);
     }

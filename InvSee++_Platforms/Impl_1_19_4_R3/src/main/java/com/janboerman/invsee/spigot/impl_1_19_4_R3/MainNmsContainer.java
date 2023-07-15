@@ -220,6 +220,11 @@ class MainNmsContainer extends AbstractContainerMenu {
 		return super.getType();
 	}
 
+	@Override
+	public Slot getSlot(int rawIndex) {
+		return super.getSlot(rawIndex);
+	}
+
 	public void m_150399_(int i, int j, ClickType clicktype, Player entityHuman) {
 		clicked(i, j, clicktype, entityHuman);
 	}

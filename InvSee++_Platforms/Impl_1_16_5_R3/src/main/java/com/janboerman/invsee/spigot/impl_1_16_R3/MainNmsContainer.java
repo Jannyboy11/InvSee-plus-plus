@@ -211,7 +211,12 @@ class MainNmsContainer extends Container {
         return Containers.GENERIC_9X6;
     }
 
-    //idem.
+    //idem
+    public Slot getSlot(int rawIndex) {
+        return super.getSlot(rawIndex);
+    }
+
+    //dito
     public void addSlotListener(ICrafting icrafting) {
         super.addSlotListener(icrafting);
     }
