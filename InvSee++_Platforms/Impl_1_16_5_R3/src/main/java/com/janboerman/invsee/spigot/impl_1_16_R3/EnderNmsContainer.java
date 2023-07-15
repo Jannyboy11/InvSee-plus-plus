@@ -158,7 +158,7 @@ class EnderNmsContainer extends Container {
         //returns EMPTY_STACK when we are done transferring the itemstack on the rawIndex
         //remember that we are called inside the body of a loop!
 
-        List<Slot> slots = super.slots; //HybridServerSupport.getSlots(this);
+        List<Slot> slots = super.slots;
 
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
         Slot slot = slots.get(rawIndex);

@@ -179,7 +179,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 			return ItemStack.EMPTY;
 		
 		ItemStack itemStack = ItemStack.EMPTY;
-		final Slot slot = getSlot(rawIndex);
+		final Slot slot = super.getSlot(rawIndex);																// Mohist: super
 		final int topRows = 6;
 		
 		if (slot != null && slot.hasItem()) {
@@ -188,12 +188,12 @@ class MainNmsContainer extends AbstractContainerMenu {
 			itemStack = clickedSlotItem.copy();
 			if (rawIndex < topRows * 9) {
 				//clicked in the top inventory
-				if (!moveItemStackTo(clickedSlotItem, topRows * 9, this.slots.size(), true)) {
+				if (!super.moveItemStackTo(clickedSlotItem, topRows * 9, super.slots.size(), true)) {	// Mohist: super (2x)
 					return ItemStack.EMPTY;
 				}
 			} else {
 				//clicked in the bottom inventory
-				if (!moveItemStackTo(clickedSlotItem, 0, topRows * 9, false)) {
+				if (!super.moveItemStackTo(clickedSlotItem, 0, topRows * 9, false)) {				// Mohist: super
 					return ItemStack.EMPTY;
 				}
 			}

@@ -165,7 +165,7 @@ class MainNmsContainer extends Container {
         if (spectatingOwnInventory)
             return InvseeImpl.EMPTY_STACK;
 
-        List<Slot> slots = super.slots; //HybridServerSupport.getSlots(this);
+        List<Slot> slots = super.slots;
 
         ItemStack itemstack = InvseeImpl.EMPTY_STACK;
         Slot slot = slots.get(rawIndex);
