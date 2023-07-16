@@ -38,6 +38,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 		this.maxStack = size;
 	}
 
+	//vanilla
 	@Override
 	public int getMaxStackSize() {
 		return maxStack;
@@ -55,32 +56,38 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 		setChanged();
 	}
 
+	//vanilla
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
 		return new EnderNmsContainer(containerId, this, playerInventory, player, creationOptions);
 	}
 
+	//vanilla
 	@Override
 	public Component getDisplayName() {
 		//return new TextComponent("minecraft:generic_9x" + (storageContents.size() / 9));
 		return CraftChatMessage.fromStringOrNull(creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)));
 	}
 
+	//vanilla
 	@Override
 	public void clearContent() {
 		storageContents.clear();
 	}
 
+	//vanilla
 	@Override
 	public int getContainerSize() {
 		return storageContents.size();
 	}
 
+	//craftbukkit
 	@Override
 	public List<ItemStack> getContents() {
 		return storageContents;
 	}
 
+	//vanilla
 	@Override
 	public ItemStack getItem(int slot) {
 		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
@@ -88,6 +95,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 		return storageContents.get(slot);
 	}
 
+	//vanilla
 	@Override
 	public boolean isEmpty() {
 		for (ItemStack stack : storageContents) {
@@ -96,16 +104,19 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 		return true;
 	}
 
+	//craftbukkit
 	@Override
 	public void onClose(CraftHumanEntity bukkitPlayer) {
 		super.onClose(bukkitPlayer);
 	}
 
+	//craftbukkit
 	@Override
 	public void onOpen(CraftHumanEntity bukkitPlayer) {
 		super.onOpen(bukkitPlayer);
 	}
 
+	//vanilla
 	@Override
 	public ItemStack removeItem(int slot, int amount) {
 		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
@@ -117,6 +128,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 		return stack;
 	}
 
+	//vanilla
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
 		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
@@ -130,11 +142,13 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 		}
 	}
 
+	//vanilla
 	@Override
 	public void setChanged() {
 		//probably don't need to do anything here.
 	}
 
+	//vanilla
 	@Override
 	public void setItem(int slot, ItemStack itemStack) {
 		if (slot < 0 || slot >= getContainerSize()) return;
@@ -147,6 +161,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 		setChanged();
 	}
 
+	//vanilla
 	@Override
 	public boolean stillValid(Player player) {
 		//no chest lock

@@ -34,7 +34,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 	final DifferenceTracker tracker;
 	
 	private static MenuType<?> determineMenuType(EnderNmsInventory inv) {
-		return switch(inv.getContainerSize()) {
+		return switch (inv.getContainerSize()) {
 			case 9 -> MenuType.GENERIC_9x1;
 			case 18 -> MenuType.GENERIC_9x2;
 			case 27 -> MenuType.GENERIC_9x3;

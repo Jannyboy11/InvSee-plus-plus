@@ -53,6 +53,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		this.maxStack = size;
 	}
 
+	//vanilla
 	@Override
 	public int getMaxStackSize() {
 		return maxStack;
@@ -108,6 +109,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		return null;
 	}
 
+	//vanilla
 	@Override
 	public void clearContent() {
 		storageContents.clear();
@@ -120,22 +122,26 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		}
 	}
 
+	//vanilla
 	@Override
 	public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player viewer) {
 		return new MainNmsContainer(containerId, this, playerInventory, viewer, creationOptions);
 	}
 
+	//vanilla
 	@Override
 	public Component getDisplayName() {
 		//return new TextComponent("minecraft:generic_9x6");
 		return CraftChatMessage.fromStringOrNull(creationOptions.getTitle().titleFor(Target.byGameProfile(targetPlayerUuid, targetPlayerName)));
 	}
 
+	//vanilla
 	@Override
 	public int getContainerSize() {
 		return 54;
 	}
 
+	//craftbukkit
 	@Override
 	public List<ItemStack> getContents() {
 		List<ItemStack> paddingOne = NonNullList.withSize(45 - storageContents.size() - armourContents.size() - offHand.size() - 1/*cursor*/, ItemStack.EMPTY);
@@ -150,6 +156,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 													paddingTwo))))));
 	}
 
+	//vanilla
 	@Override
 	public ItemStack getItem(int slot) {
 		var ref = decideWhichItem(slot);
@@ -158,6 +165,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		return ref.get();
 	}
 
+	//vanilla
 	@Override
 	public boolean isEmpty() {
 		for (ItemStack stack : armourContents) {
@@ -177,16 +185,19 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		return true;
 	}
 
+	//craftbukkit
 	@Override
 	public void onClose(CraftHumanEntity bukkitPlayer) {
 		super.onClose(bukkitPlayer);
 	}
 
+	//craftbukkit
 	@Override
 	public void onOpen(CraftHumanEntity bukkitPlayer) {
 		super.onOpen(bukkitPlayer);
 	}
 
+	//vanilla
 	@Override
 	public ItemStack removeItem(int slot, int amount) {
 		var ref = decideWhichItem(slot);
@@ -204,6 +215,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		}
 	}
 
+	//vanilla
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
 		var ref = decideWhichItem(slot);
@@ -218,11 +230,13 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		}
 	}
 
+	//vanilla
 	@Override
 	public void setChanged() {
 		//nothing to do here?
 	}
 
+	//vanilla
 	@Override
 	public void setItem(int slot, ItemStack stack) {
 		var ref = decideWhichItem(slot);
@@ -236,6 +250,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		setChanged();
 	}
 
+	//vanilla
 	@Override
 	public boolean stillValid(Player player) {
 		return true;
