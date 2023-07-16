@@ -1,7 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_16_R3;
 
 import com.janboerman.invsee.utils.FuzzyReflection;
-import net.minecraft.server.v1_16_R3.Container;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.InventoryEnderChest;
 import net.minecraft.server.v1_16_R3.ItemStack;
@@ -13,8 +12,6 @@ import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.invoke.VarHandle;
-import java.lang.invoke.VarHandle.AccessMode;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

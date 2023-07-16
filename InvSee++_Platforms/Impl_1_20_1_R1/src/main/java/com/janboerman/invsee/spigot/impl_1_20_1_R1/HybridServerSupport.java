@@ -14,7 +14,6 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 public class HybridServerSupport {
 
@@ -66,15 +65,14 @@ public class HybridServerSupport {
     public static NonNullList<ItemStack> enderChestItems(PlayerEnderChestContainer enderChest) {
         try {
             return enderChest.items;
-        } catch (NoSuchFieldError | IllegalAccessError craftbukkitFieldIsActuallyPrivate) {
+        } catch (NoSuchFieldError | IllegalAccessError vanillaFieldIsActuallyPrivate) {
             try {
                 //call the forge method: getContents()Ljava/util/List<net/minecraft/world/item/ItemStack>;
-                MethodHandles.Lookup lookup = MethodHandles.lookup();
-                MethodHandle methodHandle = lookup.findVirtual(enderChest.getClass(), "getContents", MethodType.methodType(List.class));
-                return (NonNullList<ItemStack>) methodHandle.invoke(enderChest);
+                //fortunately CraftBukkit contains this method as well, so we can just call it directly without reflection! :D
+                return (NonNullList<ItemStack>) enderChest.getContents();
             } catch (Throwable forgeMethodNotFound) {
                 RuntimeException ex = new RuntimeException("No method known of getting the enderchest items");
-                ex.addSuppressed(craftbukkitFieldIsActuallyPrivate);
+                ex.addSuppressed(vanillaFieldIsActuallyPrivate);
                 ex.addSuppressed(forgeMethodNotFound);
                 throw ex;
             }
