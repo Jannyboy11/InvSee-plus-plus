@@ -6,6 +6,7 @@ import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.LogRecord;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 import com.janboerman.invsee.spigot.api.Scheduler;
+import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
@@ -43,7 +44,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 			return CompletedEmpty.the();
 		
 		return CompletableFuture.supplyAsync(() -> {
-			File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+			File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
 			if (playerFiles != null) {
 				List<LogRecord> errors = new CopyOnWriteArrayList<>();
 

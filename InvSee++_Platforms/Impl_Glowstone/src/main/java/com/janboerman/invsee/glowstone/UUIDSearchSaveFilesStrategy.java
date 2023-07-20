@@ -6,6 +6,7 @@ import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.resolve.UUIDResolveStrategy;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.spigot.internal.LogRecord;
+import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import net.glowstone.GlowServer;
 import net.glowstone.io.nbt.NbtPlayerDataService;
 import net.glowstone.util.nbt.CompoundTag;
@@ -43,7 +44,7 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
             return CompletedEmpty.the();
 
         return CompletableFuture.supplyAsync(() -> {
-            File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
+            File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
             if (playerFiles != null) {
                 List<LogRecord> errors = new CopyOnWriteArrayList<>();
 
