@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_16_R3;
 
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.api.Scheduler;
+import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import com.janboerman.invsee.utils.StringHelper;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 
@@ -40,7 +41,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         for (File playerFile : playerFiles) {
             try {
                 readName(result, playerFile);
@@ -70,7 +71,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         for (File playerFile : playerFiles) {
             try {
                 readName(prefix, result, playerFile);

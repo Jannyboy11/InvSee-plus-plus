@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.impl_1_20_1_R1;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
+import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import com.janboerman.invsee.utils.StringHelper;
 import net.minecraft.ReportedException;
 import net.minecraft.nbt.CompoundTag;
@@ -37,7 +38,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 
-		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
+		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
 		assert playerFiles != null : "playerFiles is not a directory?";
 		for (File playerFile : playerFiles) {
 			try {
@@ -68,7 +69,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		if (!playerDirectory.exists() || !playerDirectory.isDirectory())
 			return;
 
-		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
+		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
 		assert playerFiles != null : "playerFiles is not a directory?";
 		for (File playerFile : playerFiles) {
 			try {

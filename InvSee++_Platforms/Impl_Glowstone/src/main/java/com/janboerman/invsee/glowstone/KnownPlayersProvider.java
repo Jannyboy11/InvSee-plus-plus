@@ -4,6 +4,7 @@ import static com.janboerman.invsee.glowstone.GlowstoneHacks.getPlayerDir;
 import static com.janboerman.invsee.glowstone.GlowstoneHacks.readCompressed;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import com.janboerman.invsee.spigot.api.Scheduler;
+import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import com.janboerman.invsee.utils.StringHelper;
 import net.glowstone.GlowServer;
 import net.glowstone.io.nbt.NbtPlayerDataService;
@@ -36,7 +37,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.exists())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         assert playerFiles != null : "playerFiles is not a directory?";
         for (File playerFile : playerFiles) {
             try {
@@ -67,7 +68,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.exists())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.length() == 40 && fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         assert playerFiles != null : "playerFiles is not a directory?";
         for (File playerFile : playerFiles) {
             try {

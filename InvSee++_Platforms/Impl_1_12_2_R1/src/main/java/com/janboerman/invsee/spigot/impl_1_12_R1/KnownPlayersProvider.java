@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.impl_1_12_R1;
 import com.janboerman.invsee.spigot.api.OfflinePlayerProvider;
 import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.spigot.api.Scheduler;
+import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import com.janboerman.invsee.utils.StringHelper;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 import net.minecraft.server.v1_12_R1.NBTCompressedStreamTools;
@@ -39,7 +40,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         for (File playerFile : playerFiles) {
             try {
                 readName(result, playerFile);
@@ -69,7 +70,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         for (File playerFile : playerFiles) {
             try {
                 readName(prefix, result, playerFile);

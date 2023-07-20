@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 
 import com.janboerman.invsee.spigot.api.Scheduler;
+import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.plugin.Plugin;
 
@@ -39,7 +40,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         assert playerFiles != null : "playerFiles is not a directory?";
         for (File playerFile : playerFiles) {
             try {
@@ -70,7 +71,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
         if (!playerDirectory.exists() || !playerDirectory.isDirectory())
             return;
 
-        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> fileName.endsWith(".dat"));
+        File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
         assert playerFiles != null : "playerFiles is not a directory?";
         for (File playerFile : playerFiles) {
             try {
