@@ -8,6 +8,7 @@ com.janboerman.invsee.spigot.api.target
 com.janboerman.invsee.spigot.api.response
 com.janboerman.invsee.spigot.api.logging
 com.janboerman.invsee.spigot.api.template
+com.janboerman.invsee.spigot.api.placeholder
 com.janboerman.invsee.folia
 com.janboerman.invsee.paper
 com.janboerman.invsee.spigot
