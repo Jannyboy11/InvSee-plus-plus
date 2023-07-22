@@ -53,6 +53,10 @@ public interface InvseePlatform {
 
     public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options);
 
+    public default PlaceholderPalette getPlaceholderPalette(String name) {
+        return PlaceholderPalette.empty();
+    }
+
 
     // default creation options
 

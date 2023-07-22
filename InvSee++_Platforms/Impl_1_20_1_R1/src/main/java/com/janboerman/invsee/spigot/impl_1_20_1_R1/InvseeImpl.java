@@ -38,7 +38,6 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
@@ -313,4 +312,14 @@ public class InvseeImpl implements InvseePlatform {
             return ItemStack.EMPTY;
         }
     }
+
+    @Override
+    public PlaceholderPalette getPlaceholderPalette(String name) {
+        return switch (name) {
+            case "glass" -> Placeholders.PALETTE_GLASS;
+            case "icons" -> Placeholders.PALETTE_ICONS;
+            default -> PlaceholderPalette.empty();
+        };
+    }
+
 }

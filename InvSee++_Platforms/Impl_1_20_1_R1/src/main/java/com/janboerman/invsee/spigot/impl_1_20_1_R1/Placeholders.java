@@ -89,7 +89,7 @@ public class Placeholders {
             GLASS_STONECUTTER,
             GLASS_GENERIC
     );
-    static final PlaceholderPalette PALETTE_REPR = new SimplePlaceholderPalette("icons",
+    static final PlaceholderPalette PALETTE_ICONS = new SimplePlaceholderPalette("icons",
             ICON_INACCESSIBLE,
             ICON_ARMOUR_HELMET,
             ICON_ARMOUR_CHESTPLATE,

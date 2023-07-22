@@ -9,6 +9,7 @@ import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.logging.LogGranularity;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.logging.LogTarget;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.target.Target;
 /*
 import com.janboerman.invsee.spigot.multiverseinventories.MultiverseInventoriesHook;
@@ -117,6 +118,7 @@ public class InvseePlusPlus extends JavaPlugin {
         api.setMainInventoryMirror(getInventoryMirror(config));
         api.setEnderInventoryMirror(getEnderChestMirror(config));
         api.setLogOptions(getLogOptions(config));
+        api.setPlaceholderPalette(getPlaceholderPalette(platform, config));
 
         //commands
         setupCommands();
@@ -388,6 +390,16 @@ public class InvseePlusPlus extends JavaPlugin {
             if (formatConsole != null) formats.put(LogTarget.CONSOLE, formatConsole);
             return LogOptions.of(logGranularity, logTargets, formats);
         }
+    }
+
+    public PlaceholderPalette getPlaceholderPalette() {
+        return platformCreationOptionsMainInventory.getPlaceholderPalette();
+    }
+
+    public PlaceholderPalette getPlaceholderPalette(InvseePlatform platform, FileConfiguration config) {
+        String paletteName = config.getString("placeholder-palette");
+        if (paletteName == null) return PlaceholderPalette.empty();
+        return platform.getPlaceholderPalette(paletteName);
     }
 
     private File getConfigFile() {

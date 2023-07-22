@@ -5,24 +5,11 @@ import java.util.concurrent.*;
 import java.util.function.*;
 import java.util.logging.Level;
 
-import com.janboerman.invsee.spigot.api.logging.LogOptions;
-import com.janboerman.invsee.spigot.api.logging.LogOutput;
+import com.janboerman.invsee.spigot.api.logging.*;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
-import com.janboerman.invsee.spigot.api.response.ImplementationFault;
-import com.janboerman.invsee.spigot.api.response.InventoryNotCreated;
-import com.janboerman.invsee.spigot.api.response.InventoryOpenEventCancelled;
-import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
-import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
-import com.janboerman.invsee.spigot.api.response.OfflineSupportDisabled;
-import com.janboerman.invsee.spigot.api.response.OpenResponse;
-import com.janboerman.invsee.spigot.api.response.SpectateResponse;
-import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
-import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
-import com.janboerman.invsee.spigot.api.response.UnknownTarget;
+import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
-import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
-import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
-import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.*;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
@@ -214,6 +201,12 @@ public class InvseeAPI {
     public final void setLogOptions(LogOptions options) {
         Objects.requireNonNull(options);
         this.logOptions = options.clone();
+    }
+
+    /** Set the {@link PlaceholderPalette} that will be used for placeholders for absent items in non-container slots. */
+    public final void setPlaceholderPalette(PlaceholderPalette palette) {
+        Objects.requireNonNull(palette);
+        this.placeholderPalette = palette;
     }
 
     /**
@@ -586,7 +579,7 @@ public class InvseeAPI {
      * @param enderChest the ender chest contents
      * @return a future which completes once the contents is saved
      */
-    //TODO make this final.
+    //TODO make this final (requires restructure: composition over inheritance)...
     public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
         return platform.saveEnderChest(enderChest);
     }
@@ -1278,6 +1271,5 @@ public class InvseeAPI {
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         return platform.spectateInventory(player, mainInventoryCreationOptions().withTitle(title));
     }
-
 
 }

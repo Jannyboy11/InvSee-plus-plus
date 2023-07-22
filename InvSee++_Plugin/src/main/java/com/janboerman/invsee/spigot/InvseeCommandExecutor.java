@@ -65,7 +65,8 @@ public class InvseeCommandExecutor implements CommandExecutor {
                 .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
                 .withUnknownPlayerSupport(plugin.unknownPlayerSupport())
                 .withBypassExemptedPlayers(player.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY))
-                .withLogOptions(plugin.getLogOptions());
+                .withLogOptions(plugin.getLogOptions())
+                .withPlaceholderPalette(plugin.getPlaceholderPalette());    //TODO Always empty. FIXME
 
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> pwiFuture = null;
 
