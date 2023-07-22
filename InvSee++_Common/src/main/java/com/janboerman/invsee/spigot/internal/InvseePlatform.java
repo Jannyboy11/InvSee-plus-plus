@@ -9,6 +9,7 @@ import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.logging.LogGranularity;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.logging.LogTarget;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
@@ -57,12 +58,12 @@ public interface InvseePlatform {
 
     public default CreationOptions<PlayerInventorySlot> defaultInventoryCreationOptions(Plugin plugin) {
         return CreationOptions.of(plugin, Title.defaultMainInventory(), true, Mirror.defaultPlayerInventory(), true, false, LogOptions
-                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()));
+                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()), PlaceholderPalette.empty());
     }
 
     public default CreationOptions<EnderChestSlot> defaultEnderChestCreationOptions(Plugin plugin) {
         return CreationOptions.of(plugin, Title.defaultEnderInventory(), true, Mirror.defaultEnderChest(), true, false, LogOptions
-                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()));
+                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()), PlaceholderPalette.empty());
     }
 
 }

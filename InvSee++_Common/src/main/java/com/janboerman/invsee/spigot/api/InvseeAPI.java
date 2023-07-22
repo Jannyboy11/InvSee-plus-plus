@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import com.janboerman.invsee.spigot.api.logging.LogOptions;
 import com.janboerman.invsee.spigot.api.logging.LogOutput;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.InventoryNotCreated;
 import com.janboerman.invsee.spigot.api.response.InventoryOpenEventCancelled;
@@ -69,6 +70,7 @@ public class InvseeAPI {
     protected Mirror<EnderChestSlot> enderchestMirror = Mirror.defaultEnderChest();
 
     private LogOptions logOptions = new LogOptions();
+    private PlaceholderPalette placeholderPalette = PlaceholderPalette.empty();
 
     private final Map<String, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByName = Collections.synchronizedMap(new CaseInsensitiveMap<>());
     private final Map<UUID, CompletableFuture<SpectateResponse<MainSpectatorInventory>>> pendingInventoriesByUuid = new ConcurrentHashMap<>();
@@ -221,7 +223,7 @@ public class InvseeAPI {
      */
     public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions(Player spectator) {
         final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_INVENTORY);
-        return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, bypassExempt, logOptions.clone());
+        return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, bypassExempt, logOptions.clone(), placeholderPalette);
     }
 
     /**
@@ -231,7 +233,7 @@ public class InvseeAPI {
      */
     public CreationOptions<EnderChestSlot> enderInventoryCreationOptions(Player spectator) {
         final boolean bypassExempt = spectator.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST);
-        return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, bypassExempt, logOptions.clone());
+        return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, bypassExempt, logOptions.clone(), placeholderPalette);
     }
 
     /**
@@ -240,7 +242,7 @@ public class InvseeAPI {
      * @return the creation options
      */
     public CreationOptions<PlayerInventorySlot> mainInventoryCreationOptions() {
-        return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, false, logOptions.clone());
+        return new CreationOptions<>(plugin, mainInventoryTitle, offlinePlayerSupport, inventoryMirror, unknownPlayerSupport, false, logOptions.clone(), placeholderPalette);
     }
 
     /**
@@ -249,7 +251,7 @@ public class InvseeAPI {
      * @return the creation options
      */
     public CreationOptions<EnderChestSlot> enderInventoryCreationOptions() {
-        return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, false, logOptions.clone());
+        return new CreationOptions<>(plugin, enderInventoryTitle, offlinePlayerSupport, enderchestMirror, unknownPlayerSupport, false, logOptions.clone(), placeholderPalette);
     }
 
     // ========= end of creation options =========
@@ -1162,7 +1164,7 @@ public class InvseeAPI {
 
     /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
     @Deprecated public final CompletableFuture<SpectateResponse<MainSpectatorInventory>> mainSpectatorInventory(UUID playerId, String playerName, String title, boolean offlineSupport, Mirror<PlayerInventorySlot> mirror) {
-        return mainSpectatorInventory(playerId, playerName, new CreationOptions<>(plugin, Title.of(title), offlineSupport, mirror, unknownPlayerSupport, false, LogOptions.empty()));
+        return mainSpectatorInventory(playerId, playerName, CreationOptions.of(plugin, Title.of(title), offlineSupport, mirror, unknownPlayerSupport, false, LogOptions.empty()));
     }
 
     // open ender spectator inventory using parameters

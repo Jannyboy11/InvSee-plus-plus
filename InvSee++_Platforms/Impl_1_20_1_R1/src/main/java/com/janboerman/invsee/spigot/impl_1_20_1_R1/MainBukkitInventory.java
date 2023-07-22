@@ -1,10 +1,16 @@
 package com.janboerman.invsee.spigot.impl_1_20_1_R1;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.MainInventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MerchantContainer;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -28,36 +34,53 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 	@Override
 	public void watch(InventoryView targetPlayerView) {
 		Objects.requireNonNull(targetPlayerView, "targetPlayerView cannot be null");
-		
+
+		PlaceholderGroup placeholderGroup = null;
+
 		MainNmsInventory nms = getInventory();
 		var top = targetPlayerView.getTopInventory();
 		if (top instanceof CraftInventoryCrafting cic) {
 			CraftingContainer targetCrafting = (CraftingContainer) cic.getInventory();
 			nms.personalContents = targetCrafting.getContents(); //luckily, this does not create a copy.
-		} else if (top instanceof CraftResultInventory cri) {
-			//anvil, grindstone, loom, smithing table, cartography table, stone cutter
-			Container repairItems = cri.getInventory();
-			nms.personalContents = repairItems.getContents();
+			placeholderGroup = PlaceholderGroup.CRAFTING;
+		} else if (top instanceof CraftInventoryMerchant cim) {
+			MerchantContainer merchantItems = cim.getInventory();
+			nms.personalContents = merchantItems.getContents().subList(0, 2); //only payment slots
+			placeholderGroup = PlaceholderGroup.MERCHANT;
 		} else if (top instanceof CraftInventoryEnchanting cie) {
 			Container enchantItems = cie.getInventory();
 			nms.personalContents = enchantItems.getContents();
-		} else if (top instanceof CraftInventoryMerchant cim) {
-			MerchantContainer merchantItems = cim.getInventory();
-			nms.personalContents = merchantItems.getContents();
-		}
-		
-		//do this at the nms level so that I can save on packets? (only need to update the last 9 slots :-))
-		for (HumanEntity viewer : getViewers()) {
-			if (viewer instanceof org.bukkit.entity.Player) {
-				((org.bukkit.entity.Player) viewer).updateInventory();
-			}
+			placeholderGroup = PlaceholderGroup.ENCHANTING;
+		} else if (top instanceof CraftResultInventory cri) {
+			Container inputItems = cri.getInventory();
+			nms.personalContents = inputItems.getContents();
+			placeholderGroup = switch (cri.getType()) {
+				case ANVIL -> PlaceholderGroup.ANVIL;
+				case CARTOGRAPHY -> PlaceholderGroup.CARTOGRAPHY;
+				case GRINDSTONE -> PlaceholderGroup.GRINDSTONE;
+				case LOOM -> PlaceholderGroup.LOOM;
+				case SMITHING, SMITHING_NEW -> PlaceholderGroup.SMITHING;
+				case STONECUTTER -> PlaceholderGroup.STONECUTTER;
+				default -> throw new RuntimeException("CraftResultInventory with unexpected InventoryType: " + cri.getType());
+			};
 		}
 
-		//TODO send packets for 'personal slots'
-		//TODO perhaps also a 'shield' for offhand.
-		//TODO as well as a barrier for inacessible slots
-		//TODO structure_void for 'carried' item?
-		//TODO use: serverPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, container.incrementStateId(), -1, itemstack));
+		for (HumanEntity viewer : getViewers()) {
+			if (viewer instanceof CraftPlayer spectator) {
+				MainBukkitInventoryView view = (MainBukkitInventoryView) spectator.getOpenInventory();
+				CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
+				Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+				PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
+
+				for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i <= PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
+					Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+					if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
+						net.minecraft.world.item.ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, placeholderGroup);
+						InvseeImpl.sendItemChange(spectator.getHandle(), rawIndex, stack);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -67,12 +90,21 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		
 		//idem
 		for (HumanEntity viewer : getViewers()) {
-			if (viewer instanceof org.bukkit.entity.Player spectator) {
-				spectator.updateInventory();
+			if (viewer instanceof CraftPlayer spectator) {
+				MainBukkitInventoryView view = (MainBukkitInventoryView) spectator.getOpenInventory();
+				CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
+				Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+				PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
+
+				for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i < PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
+					Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+					if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
+						net.minecraft.world.item.ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, PlaceholderGroup.CRAFTING);
+						InvseeImpl.sendItemChange(spectator.getHandle(), rawIndex, stack);
+					}
+				}
 			}
 		}
-
-		//TODO send packets for personal slots which are now the player's crafting slots
 	}
 
 	@Override

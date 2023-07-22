@@ -10,7 +10,7 @@ class PersonalSlot extends Slot {
 		super(inventory, index, xPos, yPos);
 	}
 	
-	private boolean works() {
+	boolean works() {
 		MainNmsInventory inv = (MainNmsInventory) super.container;		// Mohist compat: use super.container instead of this.container
 		int personalSize = inv.personalContents.size();
 		boolean inRange = 45 <= super.getContainerSlot() && super.getContainerSlot() < 45 + personalSize;

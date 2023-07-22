@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_20_1_R1;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 
@@ -51,5 +52,11 @@ class HelmetSlot extends EquipmentSlot {
 class OffhandSlot extends EquipmentSlot {
     OffhandSlot(MainNmsInventory inventory, int index, int magicX, int magicY) {
         super(inventory, index, magicX, magicY, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD);
+    }
+}
+
+class CursorSlot extends Slot {
+    public CursorSlot(Container inventory, int index, int magicX, int magicY) {
+        super(inventory, index, magicX, magicY);
     }
 }

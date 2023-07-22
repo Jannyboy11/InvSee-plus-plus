@@ -61,7 +61,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 			return new OffhandSlot(top, referringTo, magicX, magicY); //idem?
 		} else if (place.isCursor() && !spectatingOwnInventory) {
 			final int referringTo = 41;
-			return new Slot(top, referringTo, magicX, magicY); //idem?
+			return new CursorSlot(top, referringTo, magicX, magicY); //idem?
 		} else {
 			return new InaccessibleSlot(top, positionIndex, magicX, magicY); //idem?
 		}

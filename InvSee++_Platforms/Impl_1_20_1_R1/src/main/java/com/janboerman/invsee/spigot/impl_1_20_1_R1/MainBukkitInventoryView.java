@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 
 class MainBukkitInventoryView extends MainSpectatorInventoryView {
 
-    private final MainNmsContainer nms;
+    final MainNmsContainer nms;
 
     MainBukkitInventoryView(MainNmsContainer nms) {
         super(nms.creationOptions);
