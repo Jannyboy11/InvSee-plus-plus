@@ -1,6 +1,7 @@
 com.janboerman.invsee.spigot.internal
 com.janboerman.invsee.spigot.internal.template
 com.janboerman.invsee.spigot.internal.inventory
+com.janboerman.invsee.spigot.internal.placeholder
 com.janboerman.invsee.spigot.api
 com.janboerman.invsee.spigot.api.resolve
 com.janboerman.invsee.spigot.api.target

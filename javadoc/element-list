@@ -9,4 +9,5 @@ com.janboerman.invsee.spigot.api.target
 com.janboerman.invsee.spigot.api.template
 com.janboerman.invsee.spigot.internal
 com.janboerman.invsee.spigot.internal.inventory
+com.janboerman.invsee.spigot.internal.placeholder
 com.janboerman.invsee.spigot.internal.template
