@@ -46,8 +46,6 @@ public interface Setup {
             }
         } else if ("org.bukkit.craftbukkit.v1_20_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_20:
-                    return new Impl_1_20(plugin, lookup, scheduler, cache);
                 case MappingsVersion._1_20_1:
                     return new Impl_1_20_1(plugin, lookup, scheduler, cache);
             }
@@ -106,12 +104,6 @@ class Impl_1_18_2 extends SetupImpl {
 class Impl_1_19_4 extends SetupImpl {
     Impl_1_19_4(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_19_4_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_19_4_R3.KnownPlayersProvider(plugin, scheduler));
-    }
-}
-
-class Impl_1_20 extends SetupImpl {
-    Impl_1_20(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_20_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_R1.KnownPlayersProvider(plugin, scheduler));
     }
 }
 

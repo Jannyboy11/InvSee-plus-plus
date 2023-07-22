@@ -37,8 +37,6 @@ interface Setup {
             }
         } else if ("org.bukkit.craftbukkit.v1_20_R1.CraftServer".equals(serverClassName)) {
             switch (MappingsVersion.getMappingsVersion(server)) {
-                case MappingsVersion._1_20:
-                    return new Impl_1_20();
                 case MappingsVersion._1_20_1:
                     return new Impl_1_20_1();
             }
@@ -71,12 +69,6 @@ class SetupImpl implements Setup {
 class Impl_1_20_1 extends SetupImpl {
     Impl_1_20_1() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_20_1_R1.GiveImpl.INSTANCE);
-    }
-}
-
-class Impl_1_20 extends SetupImpl {
-    Impl_1_20() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_1_20_R1.GiveImpl.INSTANCE);
     }
 }
 
