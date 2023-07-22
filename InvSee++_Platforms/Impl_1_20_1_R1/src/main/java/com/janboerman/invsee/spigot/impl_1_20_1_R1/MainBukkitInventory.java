@@ -52,6 +52,12 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 				((org.bukkit.entity.Player) viewer).updateInventory();
 			}
 		}
+
+		//TODO send packets for 'personal slots'
+		//TODO perhaps also a 'shield' for offhand.
+		//TODO as well as a barrier for inacessible slots
+		//TODO structure_void for 'carried' item?
+		//TODO use: serverPlayer.connection.send(new ClientboundContainerSetSlotPacket(-1, container.incrementStateId(), -1, itemstack));
 	}
 
 	@Override
@@ -61,10 +67,12 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		
 		//idem
 		for (HumanEntity viewer : getViewers()) {
-			if (viewer instanceof org.bukkit.entity.Player) {
-				((org.bukkit.entity.Player) viewer).updateInventory();
+			if (viewer instanceof org.bukkit.entity.Player spectator) {
+				spectator.updateInventory();
 			}
 		}
+
+		//TODO send packets for personal slots which are now the player's crafting slots
 	}
 
 	@Override
