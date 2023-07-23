@@ -27,7 +27,8 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
     protected Ref<ItemStack> onCursor;
     protected ItemStack[] playerCraftingContents;
-    protected ItemStack[] personalContents;  //crafting, anvil, merchant, enchanting
+    private ItemStack[] personalContents;  //crafting, anvil, merchant, enchanting
+    private int personalContentsSize;
 
     MainNmsInventory(EntityHuman target, CreationOptions<PlayerInventorySlot> creationOptions) {
         super(target.getUniqueID(), target.getName(), creationOptions);
@@ -49,6 +50,23 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         };
         IInventory /*InventoryCrafting*/ playerCrafting = ((CraftInventory) target.defaultContainer.getBukkitView().getTopInventory()).getInventory();
         this.personalContents = this.playerCraftingContents = playerCrafting.getContents();
+    }
+
+    void setPersonalContents(ItemStack[] personalContents, int size) {
+        this.personalContents = personalContents;
+        this.personalContentsSize = size;
+    }
+
+    void setPersonalContents(ItemStack[] personalContents) {
+        setPersonalContents(personalContents, personalContents.length);
+    }
+
+    ItemStack[] getPersonalContents() {
+        return personalContents;
+    }
+
+    int getPersonalContentsSize() {
+        return personalContentsSize;
     }
 
     @Override
@@ -79,6 +97,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         this.onCursor = from.onCursor;
         this.playerCraftingContents = from.playerCraftingContents;
         this.personalContents = from.personalContents;
+        this.personalContentsSize = from.personalContentsSize;
         update();
     }
 
@@ -103,7 +122,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
         if (45 <= slot && slot < 54) {
             int idx = slot - 45;
-            if (idx < personalContents.length) {
+            if (idx < personalContentsSize) {
                 return Ref.ofArray(idx, personalContents);
             }
         }
@@ -233,7 +252,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         System.arraycopy(storageContents, 0, result, PlayerInventorySlot.CONTAINER_00.defaultIndex(), storageContents.length);
         System.arraycopy(armourContents, 0, result, PlayerInventorySlot.ARMOUR_BOOTS.defaultIndex(), armourContents.length);
         result[PlayerInventorySlot.CURSOR.defaultIndex()] = onCursor.get();
-        System.arraycopy(personalContents, 0, result, PlayerInventorySlot.PERSONAL_00.defaultIndex(), personalContents.length);
+        System.arraycopy(personalContents, 0, result, PlayerInventorySlot.PERSONAL_00.defaultIndex(), personalContentsSize);
         return result;
     }
 
@@ -252,7 +271,10 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         InvseeImpl.clear(storageContents);
         InvseeImpl.clear(armourContents);
         onCursor.set(InvseeImpl.EMPTY_STACK);
-        InvseeImpl.clear(playerCraftingContents);
+        InvseeImpl.clear(personalContents);
+        if (personalContents != playerCraftingContents) {
+            InvseeImpl.clear(playerCraftingContents);
+        }
     }
 
     @Override

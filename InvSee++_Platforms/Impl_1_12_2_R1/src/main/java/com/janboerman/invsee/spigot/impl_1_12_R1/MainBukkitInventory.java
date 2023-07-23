@@ -18,7 +18,6 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryEnchanting;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventoryMerchant;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -60,7 +59,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
             placeholderGroup = PlaceholderGroup.ENCHANTING;
         } else if (top instanceof CraftInventoryMerchant) {
             InventoryMerchant merchantItems = ((CraftInventoryMerchant) top).getInventory();
-            nms.personalContents = merchantItems.getContents();
+            nms.personalContents = merchantItems.getContents().subList(0, 2);
             placeholderGroup = PlaceholderGroup.MERCHANT;
         }
 

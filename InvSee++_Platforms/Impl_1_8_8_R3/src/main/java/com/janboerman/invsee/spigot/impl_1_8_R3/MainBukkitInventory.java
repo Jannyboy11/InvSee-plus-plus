@@ -47,19 +47,20 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
         if (top instanceof CraftInventoryCrafting) {
             //includes a player's own crafting slots
             InventoryCrafting targetCrafting = (InventoryCrafting) ((CraftInventoryCrafting) top).getInventory();
-            nms.personalContents = targetCrafting.getContents(); //luckily this getContents() method does not copy.
+            nms.setPersonalContents(targetCrafting.getContents()); //luckily this getContents() method does not copy.
             placeholderGroup = PlaceholderGroup.CRAFTING;
         } else if (top instanceof CraftInventoryAnvil) {
             IInventory repairItems = ((CraftInventoryAnvil) top).getInventory();
-            nms.personalContents = repairItems.getContents();
+            nms.setPersonalContents(repairItems.getContents());
             placeholderGroup = PlaceholderGroup.ANVIL;
         } else if (top instanceof CraftInventoryEnchanting) {
             IInventory enchantItems = ((CraftInventoryEnchanting) top).getInventory();
-            nms.personalContents = enchantItems.getContents();
+            nms.setPersonalContents(enchantItems.getContents());
             placeholderGroup = PlaceholderGroup.ENCHANTING;
         } else if (top instanceof CraftInventoryMerchant) {
             IInventory merchantItems = ((CraftInventoryMerchant) top).getInventory();
-            nms.personalContents = merchantItems.getContents();
+            net.minecraft.server.v1_8_R3.ItemStack[] merchantContents = merchantItems.getContents();
+            nms.setPersonalContents(merchantContents, merchantContents.length - 1);
             placeholderGroup = PlaceholderGroup.MERCHANT;
         }
 
@@ -89,7 +90,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
     @Override
     public void unwatch() {
         MainNmsInventory nms = getInventory();
-        nms.personalContents = nms.playerCraftingContents;
+        nms.setPersonalContents(nms.playerCraftingContents);
 
         //send personal slots changes
         for (HumanEntity viewer : getViewers()) {
@@ -167,9 +168,9 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
         Objects.requireNonNull(craftingContents, "craftingContents cannot be null");
 
         MainNmsInventory nms = getInventory();
-        var nmsCraftingItems = nms.personalContents;
+        var nmsCraftingItems = nms.getPersonalContents();
         if (nmsCraftingItems != null) {
-            int craftingContentsSize = nmsCraftingItems.length;
+            int craftingContentsSize = nms.getPersonalContentsSize();
             if (craftingContents.length != craftingContentsSize)
                 throw new IllegalArgumentException("craftingContents must be of length " + craftingContentsSize);
 
@@ -181,9 +182,10 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public ItemStack[] getPersonalContents() {
-        var nmsCraftingItems = getInventory().personalContents;
+        MainNmsInventory nms = getInventory();
+        var nmsCraftingItems = nms.getPersonalContents();
         if (nmsCraftingItems != null) {
-            int craftingContentsSize = nmsCraftingItems.length;
+            int craftingContentsSize = nms.getPersonalContentsSize();
             ItemStack[] result = new ItemStack[craftingContentsSize];
             for (int i = 0; i < craftingContentsSize; i++) {
                 result[i] = CraftItemStack.asCraftMirror(nmsCraftingItems[i]);
@@ -196,12 +198,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public int getPersonalContentsSize() {
-        var nmsCraftingItems = getInventory().personalContents;
-        if (nmsCraftingItems != null) {
-            return nmsCraftingItems.length;
-        } else {
-            return 0;
-        }
+        return getInventory().getPersonalContentsSize();
     }
 
     @Override

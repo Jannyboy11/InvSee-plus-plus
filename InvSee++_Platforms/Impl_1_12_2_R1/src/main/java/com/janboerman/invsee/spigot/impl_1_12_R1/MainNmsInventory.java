@@ -276,7 +276,10 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         armourContents.clear();
         offHand.clear();
         onCursor.set(InvseeImpl.EMPTY_STACK);
-        playerCraftingContents.clear();
+        personalContents.clear();
+        if (personalContents != playerCraftingContents) {
+            playerCraftingContents.clear();
+        }
     }
 
     @Override
