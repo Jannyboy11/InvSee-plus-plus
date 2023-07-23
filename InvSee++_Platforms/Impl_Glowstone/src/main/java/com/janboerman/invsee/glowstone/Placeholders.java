@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import static com.janboerman.invsee.spigot.internal.placeholder.Placeholders.*;
 import com.janboerman.invsee.spigot.internal.placeholder.SimplePlaceholderPalette;
+import net.glowstone.inventory.GlowMetaShield;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import static org.bukkit.Material.*;
@@ -74,12 +75,10 @@ public class Placeholders {
     private static final ItemStack ICON_ARMOUR_CHESTPLATE = makeStack(CHAINMAIL_CHESTPLATE, and(name(CHESTPLATE), HIDE_ATTRIBUTES));
     private static final ItemStack ICON_ARMOUR_LEGGINGS = makeStack(CHAINMAIL_LEGGINGS, and(name(LEGGINGS), HIDE_ATTRIBUTES));
     private static final ItemStack ICON_ARMOUR_BOOTS = makeStack(CHAINMAIL_BOOTS, and(name(BOOTS), HIDE_ATTRIBUTES));
-    private static final ItemStack ICON_OFFHAND = makeStack(SHIELD, (BlockStateMeta meta) -> {
+    private static final ItemStack ICON_OFFHAND = makeStack(SHIELD, (GlowMetaShield meta) -> {
         meta.setDisplayName(OFFHAND);
-        Banner banner = (Banner) meta.getBlockState();
-        banner.setBaseColor(DyeColor.WHITE);
-        banner.setPatterns(List.of(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
-        meta.setBlockState(banner);
+        meta.setBaseColor(DyeColor.WHITE);
+        meta.setPatterns(List.of(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
     });
     private static final ItemStack ICON_CURSOR = makeStack(STRUCTURE_VOID, name(CURSOR));
