@@ -35,7 +35,7 @@ public interface PlaceholderPalette {
 
     public ItemStack generic();
 
-
+    //TODO refactor, instead of view and rawIndex, shouldn't it just accept a PlayerInventorySlot?
     public ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup placeholderGroup);
 
 }
@@ -47,6 +47,11 @@ class EmptyPalette implements PlaceholderPalette {
     private static final ItemStack EMPTY_STACK = null;
 
     private EmptyPalette() {
+    }
+
+    @Override
+    public String toString() {
+        return "empty";
     }
 
     @Override

@@ -66,8 +66,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		}
 
 		for (HumanEntity viewer : getViewers()) {
-			if (viewer instanceof CraftPlayer spectator) {
-				MainBukkitInventoryView view = (MainBukkitInventoryView) spectator.getOpenInventory();
+			if (viewer instanceof CraftPlayer spectator && spectator.getOpenInventory() instanceof MainBukkitInventoryView view) {
 				CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
 				Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
 				PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
@@ -90,8 +89,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		
 		//idem
 		for (HumanEntity viewer : getViewers()) {
-			if (viewer instanceof CraftPlayer spectator) {
-				MainBukkitInventoryView view = (MainBukkitInventoryView) spectator.getOpenInventory();
+			if (viewer instanceof CraftPlayer spectator && spectator.getOpenInventory() instanceof MainBukkitInventoryView view) {
 				CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
 				Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
 				PlaceholderPalette palette = creationOptions.getPlaceholderPalette();

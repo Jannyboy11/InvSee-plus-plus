@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.internal.placeholder;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -14,26 +15,26 @@ public class Placeholders {
     private Placeholders() {
     }
 
-    public static final String INACCESSIBLE = "";
-    public static final String HELMET = "Helmet";
-    public static final String CHESTPLATE = "Chestplate";
-    public static final String LEGGINGS = "Leggings";
-    public static final String BOOTS = "Boots";
-    public static final String OFFHAND = "Off-hand";
-    public static final String CURSOR = "Cursor";
-    public static final String CRAFTING = "Crafting ingredient";
-    public static final String ANVIL = "Anvil input";
-    public static final String MERCHANT = "Merchant payment";
-    public static final String CARTOGRAPHY = "Cartography input";
-    public static final String ENCHANTING_ITEM = "Enchanting item";
-    public static final String ENCHANTING_FUEL = "Enchanting lapis lazuli";
-    public static final String GRINDSTONE = "Grindstone input";
-    public static final String LOOM = "Loom input";
-    public static final String SMITHING_BASE = "Smithing item";
-    public static final String SMITHING_TEMPLATE = "Smithing template";
-    public static final String SMITHING_ADDITION = "Smithing addition";
-    public static final String STONECUTTER = "Stonecutter input";
-    public static final String GENERIC = "";
+    public static final String INACCESSIBLE = ChatColor.DARK_RED + "Not accessible";
+    public static final String HELMET = ChatColor.AQUA + "Helmet";
+    public static final String CHESTPLATE = ChatColor.AQUA + "Chestplate";
+    public static final String LEGGINGS = ChatColor.AQUA + "Leggings";
+    public static final String BOOTS = ChatColor.AQUA + "Boots";
+    public static final String OFFHAND = ChatColor.AQUA + "Off-hand";
+    public static final String CURSOR = ChatColor.AQUA + "Cursor";
+    public static final String CRAFTING = ChatColor.AQUA + "Crafting ingredient";
+    public static final String ANVIL = ChatColor.AQUA + "Anvil input";
+    public static final String MERCHANT = ChatColor.AQUA + "Merchant payment";
+    public static final String CARTOGRAPHY = ChatColor.AQUA + "Cartography input";
+    public static final String ENCHANTING_ITEM = ChatColor.AQUA + "Enchanting item";
+    public static final String ENCHANTING_FUEL = ChatColor.AQUA + "Enchanting lapis lazuli";
+    public static final String GRINDSTONE = ChatColor.AQUA + "Grindstone input";
+    public static final String LOOM = ChatColor.AQUA + "Loom input";
+    public static final String SMITHING_BASE = ChatColor.AQUA + "Smithing item";
+    public static final String SMITHING_TEMPLATE = ChatColor.AQUA + "Smithing template";
+    public static final String SMITHING_ADDITION = ChatColor.AQUA + "Smithing addition";
+    public static final String STONECUTTER = ChatColor.AQUA + "Stonecutter input";
+    public static final String GENERIC = ChatColor.AQUA + "Placeholder";
 
     public static final Consumer<? super ItemMeta> HIDE_ATTRIBUTES = meta -> meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 

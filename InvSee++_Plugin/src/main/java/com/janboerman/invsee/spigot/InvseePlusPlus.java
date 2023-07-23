@@ -47,6 +47,7 @@ public class InvseePlusPlus extends JavaPlugin {
     private final boolean asyncTabcompleteEvent;
 
     private InvseeAPI api;
+    private InvseePlatform platform;
     @Deprecated(forRemoval = true) private OfflinePlayerProvider offlinePlayerProvider;
 
     private CreationOptions<PlayerInventorySlot> platformCreationOptionsMainInventory;
@@ -76,7 +77,7 @@ public class InvseePlusPlus extends JavaPlugin {
         final NamesAndUUIDs lookup = new NamesAndUUIDs(this, scheduler);
         final OpenSpectatorsCache cache = new OpenSpectatorsCache();
         Setup setup = Setup.setup(this, scheduler, lookup, cache);
-        final InvseePlatform platform = setup.platform();
+        platform = setup.platform();
         final OfflinePlayerProvider playerDatabase = setup.offlinePlayerProvider();
 
         //set up default creation options
@@ -393,16 +394,16 @@ public class InvseePlusPlus extends JavaPlugin {
     }
 
     public PlaceholderPalette getPlaceholderPalette() {
-        return platformCreationOptionsMainInventory.getPlaceholderPalette();
+        return getPlaceholderPalette(platform, getConfig());
     }
 
     public PlaceholderPalette getPlaceholderPalette(InvseePlatform platform, FileConfiguration config) {
         String paletteName = config.getString("placeholder-palette");
         PlaceholderPalette palette;
         if (paletteName == null) {
-            palette = PlaceholderPalette.empty();
-            config.set("placeholder-palette", "empty");
             dirtyConfig = true;
+            palette = platformCreationOptionsMainInventory.getPlaceholderPalette();
+            config.set("placeholder-palette", palette.toString());
         } else {
             palette = platform.getPlaceholderPalette(paletteName);
         }

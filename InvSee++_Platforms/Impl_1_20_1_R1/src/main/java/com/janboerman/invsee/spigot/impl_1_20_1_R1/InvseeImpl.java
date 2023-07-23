@@ -99,9 +99,10 @@ public class InvseeImpl implements InvseePlatform {
             nmsPlayer.initMenu(nmsWindow);
             MainBukkitInventoryView bukkitWindow = nmsWindow.getBukkitView();
 
-            //send placeholders (inaccessible, armour, offhand, cursor, personal) //TODO does not seem to work?
+            //send placeholders (inaccessible, armour, offhand, cursor, personal)
             Mirror<PlayerInventorySlot> mirror = options.getMirror();
             PlaceholderPalette palette = options.getPlaceholderPalette();
+            System.out.println("DEBUG palette = " + palette);
             ItemStack inaccessible = CraftItemStack.asNMSCopy(palette.inaccessible());
             for (int i = PlayerInventorySlot.CONTAINER_35.defaultIndex() + 1; i < nmsInventory.getContainerSize(); i++) {
                 Integer idx = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
