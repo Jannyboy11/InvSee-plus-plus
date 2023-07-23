@@ -2,7 +2,10 @@ package com.janboerman.invsee.glowstone;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
@@ -10,6 +13,7 @@ import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.ConstantList;
 import com.janboerman.invsee.utils.UUIDHelper;
 import net.glowstone.entity.GlowHumanEntity;
+import net.glowstone.entity.GlowPlayer;
 import net.glowstone.inventory.GlowAnvilInventory;
 import net.glowstone.inventory.GlowCraftingInventory;
 import net.glowstone.inventory.GlowEnchantingInventory;
@@ -30,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 class MainInventory extends GlowInventory implements MainSpectatorInventory, ShallowCopy<MainInventory>, Personal {
 
@@ -40,7 +45,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
     final List<GlowInventorySlot> containerSlots;
     final List<GlowInventorySlot> armourSlots;
     final GlowInventorySlot offhandSlot;
-    GlowInventorySlot cursorSlot;
+    final GlowInventorySlot cursorSlot;
     final List<GlowInventorySlot> craftingSlots;
     List<GlowInventorySlot> personalSlots;
 
@@ -55,12 +60,17 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         GlowPlayerInventory targetInventory = targetPlayer.getInventory();
         List<GlowInventorySlot> targetSlots = GlowstoneHacks.getSlots(targetInventory);
         this.containerSlots = targetSlots.subList(0, 36);
-        this.armourSlots = targetSlots.subList(36, 40);
+        this.armourSlots = List.of(
+                new BootsSlot(targetSlots.get(36)),
+                new LeggingsSlot(targetSlots.get(37)),
+                new ChestplateSlot(targetSlots.get(38)),
+                new HelmetSlot(targetSlots.get(40))
+        );
 
         GlowInventorySlot offHand;
         try {
             EquipmentSlot.valueOf("OFF_HAND");
-            offHand = targetSlots.get(40);
+            offHand = new OffhandSlot(targetSlots.get(40));
         } catch (IllegalArgumentException e) {
             offHand = InaccessibleSlot.INSTANCE;
         }
@@ -70,7 +80,9 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
 
         //on Glowstone, the GlowCraftingInventory carries the RESULT at slot 0, and the CRAFTING matrix at slots 1 through (size-1).
         GlowCraftingInventory craftingInventory = targetInventory.getCraftingInventory();
-        this.personalSlots = this.craftingSlots = GlowstoneHacks.getSlots(craftingInventory).subList(1, craftingInventory.getSize());
+        this.personalSlots = this.craftingSlots = GlowstoneHacks.getSlots(craftingInventory).subList(1, craftingInventory.getSize())
+                .stream().map(PersonalSlot::new).collect(Collectors.toList())
+        ;
 
         //the ultimate hack! :D
         updateContents();
@@ -208,6 +220,16 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         updateContents();
     }
 
+    @Override
+    public void clear() {
+        containerSlots.forEach(slot -> slot.setItem(InvseeImpl.EMPTY_STACK));
+        armourSlots.forEach(slot -> slot.setItem(InvseeImpl.EMPTY_STACK));
+        offhandSlot.setItem(InvseeImpl.EMPTY_STACK);
+        cursorSlot.setItem(InvseeImpl.EMPTY_STACK);
+        craftingSlots.forEach(slot -> slot.setItem(InvseeImpl.EMPTY_STACK));
+        personalSlots.forEach(slot -> slot.setItem(InvseeImpl.EMPTY_STACK));
+    }
+
     //
 
     @Override
@@ -252,26 +274,52 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
     public void watch(InventoryView targetPlayerView) {
         //if the target player has an opened inventory, and if the opened inventory is personal,
         //then set the personalSlots to be the *same* slots as that opened inventory.
+
+        PlaceholderGroup placeholderGroup = null;
+
         Inventory top = targetPlayerView.getTopInventory();
         if (top instanceof GlowCraftingInventory) {
             List<GlowInventorySlot> craftingInventorySlots = GlowstoneHacks.getSlots((GlowCraftingInventory) top);
-            this.personalSlots = craftingInventorySlots.subList(1, craftingInventorySlots.size());
+            this.personalSlots = craftingInventorySlots.subList(1, craftingInventorySlots.size())
+                    .stream().map(PersonalSlot::new).collect(Collectors.toList());
+            placeholderGroup = PlaceholderGroup.CRAFTING;
         } else if (top instanceof GlowAnvilInventory) {
             List<GlowInventorySlot> anvilInventorySlots = GlowstoneHacks.getSlots((GlowAnvilInventory) top);
-            this.personalSlots = anvilInventorySlots.subList(0, anvilInventorySlots.size() - 1);
+            this.personalSlots = anvilInventorySlots.subList(0, anvilInventorySlots.size() - 1)
+                    .stream().map(PersonalSlot::new).collect(Collectors.toList());
+            placeholderGroup = PlaceholderGroup.ANVIL;
         } else if (top instanceof GlowEnchantingInventory) {
             List<GlowInventorySlot> enchantingInventorySlots = GlowstoneHacks.getSlots((GlowEnchantingInventory) top);
-            this.personalSlots = enchantingInventorySlots;
+            this.personalSlots = enchantingInventorySlots
+                    .stream().map(PersonalSlot::new).collect(Collectors.toList());
+            placeholderGroup = PlaceholderGroup.ENCHANTING;
         } else if (top instanceof GlowMerchantInventory) {
             List<GlowInventorySlot> merchantInventorySlots = GlowstoneHacks.getSlots((GlowMerchantInventory) top);
-            this.personalSlots = merchantInventorySlots.subList(0, merchantInventorySlots.size() - 1);
+            this.personalSlots = merchantInventorySlots.subList(0, merchantInventorySlots.size() - 1)
+                    .stream().map(PersonalSlot::new).collect(Collectors.toList());
+            placeholderGroup = PlaceholderGroup.MERCHANT;
         }
         updateContents();
 
-        //TODO placeholders
+        //send personal slot changes
         for (HumanEntity viewer : getViewers()) {
-            if (viewer instanceof Player) {
-                ((Player) viewer).updateInventory();
+            GlowPlayer spectator;
+            MainInventoryView view;
+            if (viewer instanceof GlowPlayer && (spectator = (GlowPlayer) viewer).getOpenInventory() instanceof MainInventoryView) {
+                view = (MainInventoryView) spectator.getOpenInventory();
+                CreationOptions<PlayerInventorySlot> creationOptions = view.getCreationOptions();
+                Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+                PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
+
+                for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i <= PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
+                    Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+                    if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
+                        ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, placeholderGroup);
+                        InvseeImpl.sendItemChange(spectator, rawIndex, stack);
+                    } else {
+                        InvseeImpl.sendItemChange(spectator, i, palette.inaccessible());
+                    }
+                }
             }
         }
     }
@@ -282,10 +330,25 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         this.personalSlots = craftingSlots;
         updateContents();
 
-        //TODO placeholders
+        //send personal slot changes
         for (HumanEntity viewer : getViewers()) {
-            if (viewer instanceof org.bukkit.entity.Player) {
-                ((org.bukkit.entity.Player) viewer).updateInventory();
+            GlowPlayer spectator;
+            MainInventoryView view;
+            if (viewer instanceof GlowPlayer && (spectator = (GlowPlayer) viewer).getOpenInventory() instanceof MainInventoryView) {
+                view = (MainInventoryView) spectator.getOpenInventory();
+                CreationOptions<PlayerInventorySlot> creationOptions = view.getCreationOptions();
+                Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+                PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
+
+                for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i <= PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
+                    Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+                    if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
+                        ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, PlaceholderGroup.CRAFTING);
+                        InvseeImpl.sendItemChange(spectator, rawIndex, stack);
+                    } else {
+                        InvseeImpl.sendItemChange(spectator, i, palette.inaccessible());
+                    }
+                }
             }
         }
     }

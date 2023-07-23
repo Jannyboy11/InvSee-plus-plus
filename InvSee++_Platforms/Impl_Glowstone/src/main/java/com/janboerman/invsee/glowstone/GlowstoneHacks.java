@@ -67,7 +67,7 @@ final class GlowstoneHacks {
     }
 
     private static PlayProtocol getPlayProtocol(GlowServer server) {
-        //TODO getNetworkServer() returns null?
+        // NOTE: server.getNetworkServer() can return null when the server is still initialising.
         return server.getNetworkServer().getProtocolProvider().getPlay();
     }
 
