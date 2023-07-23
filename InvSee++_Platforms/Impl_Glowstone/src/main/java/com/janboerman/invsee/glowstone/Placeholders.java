@@ -11,6 +11,7 @@ import static org.bukkit.Material.*;
 import org.bukkit.block.Banner;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
@@ -75,12 +76,21 @@ public class Placeholders {
     private static final ItemStack ICON_ARMOUR_CHESTPLATE = makeStack(CHAINMAIL_CHESTPLATE, and(name(CHESTPLATE), HIDE_ATTRIBUTES));
     private static final ItemStack ICON_ARMOUR_LEGGINGS = makeStack(CHAINMAIL_LEGGINGS, and(name(LEGGINGS), HIDE_ATTRIBUTES));
     private static final ItemStack ICON_ARMOUR_BOOTS = makeStack(CHAINMAIL_BOOTS, and(name(BOOTS), HIDE_ATTRIBUTES));
-    private static final ItemStack ICON_OFFHAND = makeStack(SHIELD, (GlowMetaShield meta) -> {
-        meta.setDisplayName(OFFHAND);
-        meta.setBaseColor(DyeColor.WHITE);
-        meta.setPatterns(List.of(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-    });
+    private static final ItemStack ICON_OFFHAND; static {
+        ItemStack icon;
+        try {
+            EquipmentSlot.valueOf("OFF_HAND");
+            icon = makeStack(SHIELD, (GlowMetaShield meta) -> {
+                meta.setDisplayName(OFFHAND);
+                meta.setBaseColor(DyeColor.WHITE);
+                meta.setPatterns(List.of(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            });
+        } catch (IllegalArgumentException e) {
+            icon = null;
+        }
+        ICON_OFFHAND = icon;
+    }
     private static final ItemStack ICON_CURSOR = makeStack(STRUCTURE_VOID, name(CURSOR));
     private static final ItemStack ICON_CRAFTING = makeStack(WORKBENCH, name(CRAFTING));
     private static final ItemStack ICON_ANVIL = makeStack(Material.ANVIL, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.ANVIL));
