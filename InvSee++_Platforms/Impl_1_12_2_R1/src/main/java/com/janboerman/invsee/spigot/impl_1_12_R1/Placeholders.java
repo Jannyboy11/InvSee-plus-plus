@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_16_R3;
+package com.janboerman.invsee.spigot.impl_1_12_R1;
 
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
@@ -18,28 +18,56 @@ import java.util.List;
 
 public class Placeholders {
 
+    private static final byte WHITE = 0;
+    private static final byte ORANGE = 1;
+    private static final byte MAGENTA = 2;
+    private static final byte LIGHT_BLUE = 3;
+    private static final byte YELLOW = 4;
+    private static final byte LIME = 5;
+    private static final byte PINK = 6;
+    private static final byte GRAY = 7;
+    private static final byte LIGHT_GRAY = 8;
+    private static final byte CYAN = 9;
+    private static final byte PURPLE = 10;
+    private static final byte BLUE = 11;
+    private static final byte BROWN = 12;
+    private static final byte GREEN = 13;
+    private static final byte RED = 14;
+    private static final byte BLACK = 15;
+
+    // INK_SAC = 0;
+    // ROSE_RED = 1;
+    // CACTUS_GREEN = 2;
+    // COCOA_BEANS = 3;
+    private static final byte LAPIS_LAZULI = 4;
+    // PURPLE_DYE = 5;
+    // CYAN_DYE = 6;
+    // LIGHT_GREY_DYE = 7;
+    // GREY_DYE = 8;
+    // PINK_DYE = 9;
+    // LIME_DYE = 10;
+    // YELLOW_DYE = 11;
+    // LIGHT_BLUE_DYE = 12;
+    // MAGENTDA_DYE = 13;
+    // ORANGE_DYE = 14;
+    // BONE_MEAL = 15;
+
     private Placeholders() {
     }
 
-    private static final ItemStack GLASS_INACCESSIBLE = makeStack(BLACK_STAINED_GLASS_PANE, name(INACCESSIBLE));
-    private static final ItemStack GLASS_ARMOUR_HELMET = makeStack(LIGHT_BLUE_STAINED_GLASS_PANE, name(HELMET));
-    private static final ItemStack GLASS_ARMOUR_CHESTPLATE = makeStack(LIGHT_BLUE_STAINED_GLASS_PANE, name(CHESTPLATE));
-    private static final ItemStack GLASS_ARMOUR_LEGGINGS = makeStack(LIGHT_BLUE_STAINED_GLASS_PANE, name(LEGGINGS));
-    private static final ItemStack GLASS_ARMOUR_BOOTS = makeStack(LIGHT_BLUE_STAINED_GLASS_PANE, name(BOOTS));
-    private static final ItemStack GLASS_OFFHAND = makeStack(YELLOW_STAINED_GLASS_PANE, name(OFFHAND));
-    private static final ItemStack GLASS_CURSOR = makeStack(WHITE_STAINED_GLASS_PANE, name(CURSOR));
-    private static final ItemStack GLASS_CRAFTING = makeStack(ORANGE_STAINED_GLASS_PANE, name(CRAFTING));
-    private static final ItemStack GLASS_ANVIL = makeStack(GRAY_STAINED_GLASS_PANE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.ANVIL));
-    private static final ItemStack GLASS_MERCHANT = makeStack(LIME_STAINED_GLASS_PANE, name(MERCHANT));
-    private static final ItemStack GLASS_CARTOGRAPHY = makeStack(BROWN_STAINED_GLASS_PANE, name(CARTOGRAPHY));
-    private static final ItemStack GLASS_ENCHANTING_ITEM = makeStack(BLUE_STAINED_GLASS_PANE, name(ENCHANTING_ITEM));
-    private static final ItemStack GLASS_ENCHANTING_FUEL = makeStack(BLUE_STAINED_GLASS_PANE, name(ENCHANTING_FUEL));
-    private static final ItemStack GLASS_GRINDSTONE = makeStack(MAGENTA_STAINED_GLASS_PANE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.GRINDSTONE));
-    private static final ItemStack GLASS_LOOM = makeStack(PINK_STAINED_GLASS_PANE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.LOOM));
-    private static final ItemStack GLASS_SMITHING_BASE = makeStack(GRAY_STAINED_GLASS_PANE, name(SMITHING_BASE));
-    private static final ItemStack GLASS_SMITHING_ADDITION = makeStack(GRAY_STAINED_GLASS_PANE, name(SMITHING_ADDITION));
-    private static final ItemStack GLASS_STONECUTTER = makeStack(LIGHT_GRAY_STAINED_GLASS_PANE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.STONECUTTER));
-    private static final ItemStack GLASS_GENERIC = makeStack(CYAN_STAINED_GLASS_PANE, name(GENERIC));
+    private static final ItemStack GLASS_INACCESSIBLE = makeStack(STAINED_GLASS_PANE, BLACK, name(INACCESSIBLE));
+    private static final ItemStack GLASS_ARMOUR_HELMET = makeStack(STAINED_GLASS_PANE, LIGHT_BLUE, name(HELMET));
+    private static final ItemStack GLASS_ARMOUR_CHESTPLATE = makeStack(STAINED_GLASS_PANE, LIGHT_BLUE, name(CHESTPLATE));
+    private static final ItemStack GLASS_ARMOUR_LEGGINGS = makeStack(STAINED_GLASS_PANE, LIGHT_BLUE, name(LEGGINGS));
+    private static final ItemStack GLASS_ARMOUR_BOOTS = makeStack(STAINED_GLASS_PANE, LIGHT_BLUE, name(BOOTS));
+    private static final ItemStack GLASS_OFFHAND = makeStack(STAINED_GLASS_PANE, YELLOW, name(OFFHAND));
+    private static final ItemStack GLASS_CURSOR = makeStack(STAINED_GLASS_PANE, WHITE, name(CURSOR));
+    private static final ItemStack GLASS_CRAFTING = makeStack(STAINED_GLASS_PANE, ORANGE, name(CRAFTING));
+    private static final ItemStack GLASS_ANVIL = makeStack(STAINED_GLASS_PANE, GRAY, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.ANVIL));
+    private static final ItemStack GLASS_MERCHANT = makeStack(STAINED_GLASS_PANE, LIME, name(MERCHANT));
+    private static final ItemStack GLASS_ENCHANTING_ITEM = makeStack(STAINED_GLASS_PANE, BLUE, name(ENCHANTING_ITEM));
+    private static final ItemStack GLASS_ENCHANTING_FUEL = makeStack(STAINED_GLASS_PANE, BLUE, name(ENCHANTING_FUEL));
+    private static final ItemStack GLASS_GENERIC = makeStack(STAINED_GLASS_PANE, CYAN, name(GENERIC));
 
     private static final ItemStack ICON_INACCESSIBLE = makeStack(BARRIER, name(INACCESSIBLE));
     private static final ItemStack ICON_ARMOUR_HELMET = makeStack(CHAINMAIL_HELMET, and(name(HELMET), HIDE_ATTRIBUTES));
@@ -52,20 +80,14 @@ public class Placeholders {
         banner.setBaseColor(DyeColor.WHITE);
         banner.setPatterns(List.of(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
         meta.setBlockState(banner);
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE);
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
     });
     private static final ItemStack ICON_CURSOR = makeStack(STRUCTURE_VOID, name(CURSOR));
-    private static final ItemStack ICON_CRAFTING = makeStack(CRAFTING_TABLE, name(CRAFTING));
+    private static final ItemStack ICON_CRAFTING = makeStack(WORKBENCH, name(CRAFTING));
     private static final ItemStack ICON_ANVIL = makeStack(Material.ANVIL, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.ANVIL));
     private static final ItemStack ICON_MERCHANT = makeStack(EMERALD, name(MERCHANT));
-    private static final ItemStack ICON_CARTOGRAPHY = makeStack(CARTOGRAPHY_TABLE, name(CARTOGRAPHY));
-    private static final ItemStack ICON_ENCHANTING_ITEM = makeStack(ENCHANTING_TABLE, name(ENCHANTING_ITEM));
-    private static final ItemStack ICON_ENCHANTING_FUEL = makeStack(LAPIS_LAZULI, name(ENCHANTING_FUEL));
-    private static final ItemStack ICON_GRINDSTONE = makeStack(Material.GRINDSTONE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.GRINDSTONE));
-    private static final ItemStack ICON_LOOM = makeStack(Material.LOOM, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.LOOM));
-    private static final ItemStack ICON_SMITHING_BASE = makeStack(SMITHING_TABLE, name(SMITHING_BASE));
-    private static final ItemStack ICON_SMITHING_ADDITION = makeStack(NETHERITE_INGOT, name(SMITHING_ADDITION));
-    private static final ItemStack ICON_STONECUTTER = makeStack(Material.STONECUTTER, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.STONECUTTER));
+    private static final ItemStack ICON_ENCHANTING_ITEM = makeStack(ENCHANTMENT_TABLE, name(ENCHANTING_ITEM));
+    private static final ItemStack ICON_ENCHANTING_FUEL = makeStack(INK_SACK, LAPIS_LAZULI, name(ENCHANTING_ITEM));
     private static final ItemStack ICON_GENERIC = makeStack(CHEST, name(GENERIC));
 
     static final PlaceholderPalette PALETTE_GLASS = new PlaceholderPalette("glass panes",
@@ -79,15 +101,15 @@ public class Placeholders {
             GLASS_CRAFTING,
             GLASS_ANVIL,
             GLASS_MERCHANT,
-            GLASS_CARTOGRAPHY,
+            null,
             GLASS_ENCHANTING_ITEM,
             GLASS_ENCHANTING_FUEL,
-            GLASS_GRINDSTONE,
-            GLASS_LOOM,
-            GLASS_SMITHING_BASE,
             null,
-            GLASS_SMITHING_ADDITION,
-            GLASS_STONECUTTER,
+            null,
+            null,
+            null,
+            null,
+            null,
             GLASS_GENERIC
     );
     static final PlaceholderPalette PALETTE_ICONS = new PlaceholderPalette("icons",
@@ -101,15 +123,15 @@ public class Placeholders {
             ICON_CRAFTING,
             ICON_ANVIL,
             ICON_MERCHANT,
-            ICON_CARTOGRAPHY,
+            null,
             ICON_ENCHANTING_ITEM,
             ICON_ENCHANTING_FUEL,
-            ICON_GRINDSTONE,
-            ICON_LOOM,
-            ICON_SMITHING_BASE,
             null,
-            ICON_SMITHING_ADDITION,
-            ICON_STONECUTTER,
+            null,
+            null,
+            null,
+            null,
+            null,
             ICON_GENERIC
     );
 }
@@ -139,20 +161,11 @@ class PlaceholderPalette extends SimplePlaceholderPalette {
             case CRAFTING: return crafting();
             case ANVIL: return anvil();
             case MERCHANT: return merchant();
-            case CARTOGRAPHY: return cartography();
             case ENCHANTING:
                 switch (slot) {
                     case PERSONAL_00: return enchantingItem();
                     case PERSONAL_01: return enchantingFuel();
                 }
-            case GRINDSTONE: return grindstone();
-            case LOOM: return loom();
-            case SMITHING:
-                switch (slot) {
-                    case PERSONAL_00: return smithingBase();
-                    case PERSONAL_01: return smithingAddition();
-                }
-            case STONECUTTER: return stonecutter();
         }
 
         return inaccessible();

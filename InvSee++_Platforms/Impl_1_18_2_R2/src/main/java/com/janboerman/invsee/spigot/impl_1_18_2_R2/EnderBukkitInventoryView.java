@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 class EnderBukkitInventoryView extends EnderSpectatorInventoryView {
 
-    private final EnderNmsContainer nms;
+    final EnderNmsContainer nms;
 
     EnderBukkitInventoryView(EnderNmsContainer nms) {
         super(nms.creationOptions);

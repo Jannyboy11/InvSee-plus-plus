@@ -1,10 +1,15 @@
 package com.janboerman.invsee.spigot.impl_1_8_R3;
 
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.MainInventory;
 import net.minecraft.server.v1_8_R3.IInventory;
 import net.minecraft.server.v1_8_R3.InventoryCrafting;
-import net.minecraft.server.v1_8_R3.InventoryMerchant;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryAnvil;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryCrafting;
@@ -12,7 +17,6 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryEnchanting;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventoryMerchant;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -36,27 +40,48 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
     public void watch(InventoryView targetPlayerView) {
         Objects.requireNonNull(targetPlayerView, "targetPlayerView cannot be null");
 
+        PlaceholderGroup placeholderGroup = null;
+
         MainNmsInventory nms = getInventory();
         Inventory top = targetPlayerView.getTopInventory();
         if (top instanceof CraftInventoryCrafting) {
             //includes a player's own crafting slots
             InventoryCrafting targetCrafting = (InventoryCrafting) ((CraftInventoryCrafting) top).getInventory();
             nms.personalContents = targetCrafting.getContents(); //luckily this getContents() method does not copy.
+            placeholderGroup = PlaceholderGroup.CRAFTING;
         } else if (top instanceof CraftInventoryAnvil) {
             IInventory repairItems = ((CraftInventoryAnvil) top).getInventory();
             nms.personalContents = repairItems.getContents();
+            placeholderGroup = PlaceholderGroup.ANVIL;
         } else if (top instanceof CraftInventoryEnchanting) {
             IInventory enchantItems = ((CraftInventoryEnchanting) top).getInventory();
             nms.personalContents = enchantItems.getContents();
+            placeholderGroup = PlaceholderGroup.ENCHANTING;
         } else if (top instanceof CraftInventoryMerchant) {
-            InventoryMerchant merchantItems = (InventoryMerchant) ((CraftInventoryMerchant) top).getInventory();
+            IInventory merchantItems = ((CraftInventoryMerchant) top).getInventory();
             nms.personalContents = merchantItems.getContents();
+            placeholderGroup = PlaceholderGroup.MERCHANT;
         }
 
-        //do this at the nms level so that I can save on packets? (only need to update the last 9 slots :-))
+        //send personal slots changes
         for (HumanEntity viewer : getViewers()) {
-            if (viewer instanceof Player) {
-                ((Player) viewer).updateInventory();
+            CraftPlayer spectator;
+            MainBukkitInventoryView view;
+            if (viewer instanceof CraftPlayer && (spectator = (CraftPlayer) viewer).getOpenInventory() instanceof MainBukkitInventoryView) {
+                view = (MainBukkitInventoryView) spectator.getOpenInventory();
+                CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
+                Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+                com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
+
+                for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i <= PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
+                    Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+                    if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
+                        net.minecraft.server.v1_8_R3.ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, placeholderGroup);
+                        InvseeImpl.sendItemChange(spectator.getHandle(), rawIndex, stack);
+                    } else {
+                        InvseeImpl.sendItemChange(spectator.getHandle(), i, CraftItemStack.asNMSCopy(palette.inaccessible()));
+                    }
+                }
             }
         }
     }
@@ -66,10 +91,25 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
         MainNmsInventory nms = getInventory();
         nms.personalContents = nms.playerCraftingContents;
 
-        //do this at the nms level so that I can save on packets? (only need to update the last 9 slots :-))
+        //send personal slots changes
         for (HumanEntity viewer : getViewers()) {
-            if (viewer instanceof Player) {
-                ((Player) viewer).updateInventory();
+            CraftPlayer spectator;
+            MainBukkitInventoryView view;
+            if (viewer instanceof CraftPlayer && (spectator = (CraftPlayer) viewer).getOpenInventory() instanceof MainBukkitInventoryView) {
+                view = (MainBukkitInventoryView) spectator.getOpenInventory();
+                CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
+                Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+                PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
+
+                for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i <= PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
+                    Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+                    if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
+                        net.minecraft.server.v1_8_R3.ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, PlaceholderGroup.CRAFTING);
+                        InvseeImpl.sendItemChange(spectator.getHandle(), rawIndex, stack);
+                    } else {
+                        InvseeImpl.sendItemChange(spectator.getHandle(), i, CraftItemStack.asNMSCopy(palette.inaccessible()));
+                    }
+                }
             }
         }
     }

@@ -5,16 +5,16 @@ import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.Slot;
 
-public class PersonalSlot extends Slot {
+class PersonalSlot extends Slot {
 
     //a slot in the MainNmsContainer that sits on the 6th row representing the items in the player's crafting inventory
     //which could be either the 4-slot part in the player's own inventory, or a real workbench inventory.
     //this class could be used for slots other personal-inventories too such as anvils, enchanting tables, etc.
-    public PersonalSlot(MainNmsInventory inventory, int index, int xPos, int yPos) {
+    PersonalSlot(MainNmsInventory inventory, int index, int xPos, int yPos) {
         super(inventory, index, xPos, yPos);
     }
 
-    private boolean works() {
+    boolean works() {
         MainNmsInventory inv = (MainNmsInventory) inventory;
         int personalSize = inv.personalContents.length;
         boolean inRange = 45 <= slot(this) && slot(this) < 45 + personalSize;

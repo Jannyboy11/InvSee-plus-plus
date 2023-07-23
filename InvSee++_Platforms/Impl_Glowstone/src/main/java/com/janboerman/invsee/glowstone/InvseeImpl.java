@@ -257,4 +257,6 @@ public class InvseeImpl implements InvseePlatform {
 
     //no need to call InventoryOpenEvent manually, GlowPlayer already does this for us! :D
 
+    //TODO override getPlaceholderPalette
+
 }

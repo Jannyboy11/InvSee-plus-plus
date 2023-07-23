@@ -5,9 +5,9 @@ import net.minecraft.server.v1_15_R1.IInventory;
 import net.minecraft.server.v1_15_R1.ItemStack;
 import net.minecraft.server.v1_15_R1.Slot;
 
-public class InaccessibleSlot extends Slot {
+class InaccessibleSlot extends Slot {
 
-    public InaccessibleSlot(IInventory inventory, int index, int xPos, int yPos) {
+    InaccessibleSlot(IInventory inventory, int index, int xPos, int yPos) {
         super(inventory, index, xPos, yPos);
     }
 
