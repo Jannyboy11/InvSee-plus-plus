@@ -13,7 +13,7 @@ public class PersonalSlot extends Slot {
         super(inventory, index, xPos, yPos);
     }
 
-    private boolean works() {
+    boolean works() {
         MainNmsInventory inv = (MainNmsInventory) super.inventory;  //because of bug in Magma's remapper, call super.inventory instead of this.inventory.
         int personalSize = inv.personalContents.size();
         boolean inRange = 45 <= HybridServerSupport.slot(this) && HybridServerSupport.slot(this) < 45 + personalSize;

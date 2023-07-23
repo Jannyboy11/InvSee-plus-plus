@@ -6,12 +6,15 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
 import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
@@ -27,6 +30,7 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -85,7 +89,35 @@ public class InvseeImpl implements InvseePlatform {
             nmsPlayer.activeContainer = nmsWindow;
             nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, nmsWindow.getType(), nmsWindow.getTitle()));
             nmsWindow.addSlotListener(nmsPlayer);
-            return OpenResponse.open(nmsWindow.getBukkitView());
+            MainBukkitInventoryView bukkitView = nmsWindow.getBukkitView();
+
+            //send placeholders
+            Mirror<PlayerInventorySlot> mirror = options.getMirror();
+            PlaceholderPalette palette = options.getPlaceholderPalette();
+            ItemStack inaccessible = CraftItemStack.asNMSCopy(palette.inaccessible());
+            for (int i = PlayerInventorySlot.CONTAINER_35.defaultIndex() + 1; i < nmsInventory.getSize(); i++) {
+                Integer idx = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+                if (idx == null) {
+                    sendItemChange(nmsPlayer, i, inaccessible);
+                    continue;
+                }
+                int rawIndex = idx.intValue();
+
+                Slot slot = nmsWindow.getSlot(rawIndex);
+                if (slot.hasItem()) continue;
+
+                //slot has no item, send placeholder.
+                if (slot instanceof InaccessibleSlot) sendItemChange(nmsPlayer, rawIndex, inaccessible);
+                else if (slot instanceof BootsSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.armourBoots()));
+                else if (slot instanceof LeggingsSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.armourLeggings()));
+                else if (slot instanceof ChestplateSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.armourChestplate()));
+                else if (slot instanceof HelmetSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.armourHelmet()));
+                else if (slot instanceof OffhandSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.offHand()));
+                else if (slot instanceof CursorSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.cursor()));
+                else if (slot instanceof PersonalSlot) sendItemChange(nmsPlayer, rawIndex, ((PersonalSlot) slot).works() ? CraftItemStack.asNMSCopy(palette.generic()) : inaccessible);
+            }
+
+            return OpenResponse.open(bukkitView);
         }
     }
 
@@ -243,4 +275,50 @@ public class InvseeImpl implements InvseePlatform {
         }
     }
 
+    @Override
+    public com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette getPlaceholderPalette(String name) {
+        switch (name) {
+            case "glass panes": return Placeholders.PALETTE_GLASS;
+            case "icons": return Placeholders.PALETTE_ICONS;
+            default: return com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette.empty();
+        }
+    }
+
+    static void sendItemChange(EntityPlayer entityPlayer, int rawIndex, ItemStack toSend) {
+        Container container = entityPlayer.activeContainer;
+        entityPlayer.playerConnection.sendPacket(new PacketPlayOutSetSlot(container.windowId, rawIndex, toSend));
+    }
+
+    static ItemStack getItemOrPlaceholder(PlaceholderPalette palette, MainBukkitInventoryView view, int rawIndex, PlaceholderGroup group) {
+        Slot slot = view.nms.getSlot(rawIndex);
+        if (slot.hasItem()) return slot.getItem();
+
+        if (slot instanceof InaccessibleSlot) {
+            return CraftItemStack.asNMSCopy(palette.inaccessible());
+        } else if (slot instanceof BootsSlot) {
+            return CraftItemStack.asNMSCopy(palette.armourBoots());
+        } else if (slot instanceof LeggingsSlot) {
+            return CraftItemStack.asNMSCopy(palette.armourLeggings());
+        } else if (slot instanceof ChestplateSlot) {
+            return CraftItemStack.asNMSCopy(palette.armourChestplate());
+        } else if (slot instanceof HelmetSlot) {
+            return CraftItemStack.asNMSCopy(palette.armourLeggings());
+        } else if (slot instanceof OffhandSlot) {
+            return CraftItemStack.asNMSCopy(palette.offHand());
+        } else if (slot instanceof CursorSlot) {
+            return CraftItemStack.asNMSCopy(palette.cursor());
+        } else if (slot instanceof PersonalSlot) {
+            PersonalSlot personalSlot = (PersonalSlot) slot;
+            if (!personalSlot.works()) return CraftItemStack.asNMSCopy(palette.inaccessible());
+            if (group == null) return EMPTY_STACK; //no group for personal slot -> fall back to empty stack
+
+            Mirror<PlayerInventorySlot> mirror = view.nms.creationOptions.getMirror();
+            PlayerInventorySlot pis = mirror.getSlot(rawIndex);
+            if (pis == null) return CraftItemStack.asNMSCopy(palette.inaccessible());
+
+            return CraftItemStack.asNMSCopy(palette.getPersonalSlotPlaceholder(pis, group));
+        } else {
+            return EMPTY_STACK;
+        }
+    }
 }

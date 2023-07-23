@@ -35,18 +35,27 @@ public class MainNmsContainer extends Container {
         } else if (place.isContainer()) {
             final int referringTo = place.ordinal() - PlayerInventorySlot.CONTAINER_00.ordinal();
             return new Slot(top, referringTo, magicX, magicY); //magicX and magicY correct here? it seems to work though.
-        } else if (place.isArmour()) {
-            final int referringTo = place.ordinal() - PlayerInventorySlot.ARMOUR_BOOTS.ordinal() + 36;
-            return new Slot(top, referringTo, magicX, magicY); //idem?
+        } else if (place == PlayerInventorySlot.ARMOUR_BOOTS) {
+            final int referringTo = 36;
+            return new BootsSlot(top, referringTo, magicX, magicY); //idem?
+        } else if (place == PlayerInventorySlot.ARMOUR_LEGGINGS) {
+            final int referringTo = 37;
+            return new LeggingsSlot(top, referringTo, magicX, magicY); //idem?
+        } else if (place == PlayerInventorySlot.ARMOUR_CHESTPLATE) {
+            final int referringTo = 38;
+            return new ChestplateSlot(top, referringTo, magicX, magicY); //idem?
+        } else if (place == PlayerInventorySlot.ARMOUR_HELMET) {
+            final int referringTo = 39;
+            return new HelmetSlot(top, referringTo, magicX, magicY); //idem?
         } else if (place.isPersonal()) {
             final int referringTo = place.ordinal() - PlayerInventorySlot.PERSONAL_00.ordinal() + 45;
             return new PersonalSlot(top, referringTo, magicX, magicY); //idem?
         } else if (place.isOffHand()) {
             final int referringTo = 40;
-            return new Slot(top, referringTo, magicX, magicY); //idem?
+            return new OffhandSlot(top, referringTo, magicX, magicY); //idem?
         } else if (place.isCursor() && !spectatingOwnInventory) {
             final int referringTo = 41;
-            return new Slot(top, referringTo, magicX, magicY); //idem?
+            return new CursorSlot(top, referringTo, magicX, magicY); //idem?
         } else {
             return new InaccessibleSlot(top, positionIndex, magicX, magicY); //idem?
         }
