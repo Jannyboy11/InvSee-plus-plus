@@ -104,7 +104,10 @@ public class InvseeImpl implements InvseePlatform {
             PlaceholderPalette palette = options.getPlaceholderPalette();
             ItemStack inaccessible = CraftItemStack.asNMSCopy(palette.inaccessible());
             for (int i = PlayerInventorySlot.CONTAINER_35.defaultIndex() + 1; i < nmsInventory.getContainerSize(); i++) {
-                int rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+                Integer idx = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
+                if (idx == null) continue;
+                int rawIndex = idx.intValue();
+
                 Slot slot = nmsWindow.getSlot(rawIndex);
                 if (slot.hasItem()) continue;
 
