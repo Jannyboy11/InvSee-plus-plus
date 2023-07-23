@@ -16,6 +16,8 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 
 import static com.janboerman.invsee.spigot.internal.placeholder.Placeholders.*;
 
+import java.util.List;
+
 public class Placeholders {
 
     private Placeholders() {
@@ -51,8 +53,7 @@ public class Placeholders {
         meta.setDisplayName(OFFHAND);
         Banner banner = (Banner) meta.getBlockState();
         banner.setBaseColor(DyeColor.WHITE);
-        banner.setPattern(0, new Pattern(DyeColor.RED, PatternType.STRIPE_TOP));
-        banner.setPattern(1, new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM));
+        banner.setPatterns(List.of(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
         meta.setBlockState(banner);
     });
     private static final ItemStack ICON_CURSOR = makeStack(STRUCTURE_VOID, name(CURSOR));
