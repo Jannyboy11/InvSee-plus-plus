@@ -314,7 +314,7 @@ public class InvseeImpl implements InvseePlatform {
     @Override
     public PlaceholderPalette getPlaceholderPalette(String name) {
         return switch (name) {
-            case "glass" -> Placeholders.PALETTE_GLASS;
+            case "glass panes" -> Placeholders.PALETTE_GLASS;
             case "icons" -> Placeholders.PALETTE_ICONS;
             default -> PlaceholderPalette.empty();
         };

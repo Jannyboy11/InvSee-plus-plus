@@ -92,5 +92,5 @@ logging:
     Target        : <target>
 
 # Selects the palette of placeholders to be used in slots for armour, crafting, enchanting, anvil, merchant, loom, cartography, smithing, grindstone, stonecutter.
-# Choose one of: 'glass', 'icons' or 'empty'.
-placeholder-palette: glass
+# Choose one of: 'glass panes', 'icons' or 'empty'.
+placeholder-palette: 'glass panes'
