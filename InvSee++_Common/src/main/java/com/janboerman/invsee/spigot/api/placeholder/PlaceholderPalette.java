@@ -1,6 +1,7 @@
 package com.janboerman.invsee.spigot.api.placeholder;
 
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.inventory.ItemStack;
 
 public interface PlaceholderPalette {
@@ -35,8 +36,7 @@ public interface PlaceholderPalette {
 
     public ItemStack generic();
 
-    //TODO refactor, instead of view and rawIndex, shouldn't it just accept a PlayerInventorySlot?
-    public ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup placeholderGroup);
+    public ItemStack getPersonalSlotPlaceholder(PlayerInventorySlot slot, PlaceholderGroup placeholderGroup);
 
 }
 
@@ -155,7 +155,7 @@ class EmptyPalette implements PlaceholderPalette {
     }
 
     @Override
-    public ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup placeholderGroup) {
+    public ItemStack getPersonalSlotPlaceholder(PlayerInventorySlot slot, PlaceholderGroup placeholderGroup) {
         return EMPTY_STACK;
     }
 }

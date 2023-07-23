@@ -126,16 +126,10 @@ class PlaceholderPalette extends SimplePlaceholderPalette {
     }
 
     @Override
-    public ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup group) {
+    public ItemStack getPersonalSlotPlaceholder(PlayerInventorySlot pis, PlaceholderGroup group) {
         assert group != null && group.isPersonal();
-
-        MainBukkitInventoryView bukkitView = (MainBukkitInventoryView) view;
-        Mirror<PlayerInventorySlot> mirror = bukkitView.nms.creationOptions.getMirror();
-        PlayerInventorySlot pis = mirror.getSlot(rawIndex);
-
         assert pis != null && pis.isPersonal();
 
-        int slot = pis.defaultIndex() - PlayerInventorySlot.PERSONAL_00.defaultIndex();
-        return InvseeImpl.getPlaceholder(group, this, slot);
+        return InvseeImpl.getPlaceholder(group, this, pis);
     }
 }

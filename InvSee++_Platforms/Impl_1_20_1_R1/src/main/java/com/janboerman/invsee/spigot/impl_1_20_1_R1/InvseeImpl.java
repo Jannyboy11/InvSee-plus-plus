@@ -305,7 +305,12 @@ public class InvseeImpl implements InvseePlatform {
         } else if (slot instanceof PersonalSlot personalSlot) {
             if (!personalSlot.works()) return CraftItemStack.asNMSCopy(palette.inaccessible());
             if (group == null) return ItemStack.EMPTY; //no group for personal slot -> fall back to empty stack
-            return CraftItemStack.asNMSCopy(palette.getPersonalSlotPlaceholder(view, rawIndex, group));
+
+            Mirror<PlayerInventorySlot> mirror = view.nms.creationOptions.getMirror();
+            PlayerInventorySlot pis = mirror.getSlot(rawIndex);
+            if (pis == null) return CraftItemStack.asNMSCopy(palette.inaccessible());
+
+            return CraftItemStack.asNMSCopy(palette.getPersonalSlotPlaceholder(pis, group));
         } else {
             return ItemStack.EMPTY;
         }
@@ -320,15 +325,15 @@ public class InvseeImpl implements InvseePlatform {
         };
     }
 
-    static org.bukkit.inventory.ItemStack getPlaceholder(PlaceholderGroup group, PlaceholderPalette palette, int slot) {
+    static org.bukkit.inventory.ItemStack getPlaceholder(PlaceholderGroup group, PlaceholderPalette palette, PlayerInventorySlot slot) {
         switch (group) {
             case INACCESSIBLE: return palette.inaccessible();
             case ARMOUR:
                 switch (slot) {
-                    case 0: return palette.armourBoots();
-                    case 1: return palette.armourLeggings();
-                    case 2: return palette.armourChestplate();
-                    case 3: return palette.armourHelmet();
+                    case ARMOUR_BOOTS: return palette.armourBoots();
+                    case ARMOUR_LEGGINGS: return palette.armourLeggings();
+                    case ARMOUR_CHESTPLATE: return palette.armourChestplate();
+                    case ARMOUR_HELMET: return palette.armourHelmet();
                 }
             case OFFHAND: return palette.offHand();
             case CURSOR: return palette.cursor();
@@ -338,16 +343,16 @@ public class InvseeImpl implements InvseePlatform {
             case CARTOGRAPHY: return palette.cartography();
             case ENCHANTING:
                 switch (slot) {
-                    case 0: return palette.enchantingItem();
-                    case 1: return palette.enchantingFuel();
+                    case PERSONAL_00: return palette.enchantingItem();
+                    case PERSONAL_01: return palette.enchantingFuel();
                 }
             case GRINDSTONE: return palette.grindstone();
             case LOOM: return palette.loom();
             case SMITHING:
                 switch (slot) {
-                    case 0: return palette.smithingTemplate();
-                    case 1: return palette.smithingBase();
-                    case 2: return palette.smithingAddition();
+                    case PERSONAL_00: return palette.smithingTemplate();
+                    case PERSONAL_01: return palette.smithingBase();
+                    case PERSONAL_02: return palette.smithingAddition();
                 }
             case STONECUTTER: return palette.stonecutter();
         }

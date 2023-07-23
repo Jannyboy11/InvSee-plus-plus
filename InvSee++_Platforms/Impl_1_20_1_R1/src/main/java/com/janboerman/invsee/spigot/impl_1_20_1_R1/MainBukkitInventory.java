@@ -76,6 +76,8 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 					if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
 						net.minecraft.world.item.ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, placeholderGroup);
 						InvseeImpl.sendItemChange(spectator.getHandle(), rawIndex, stack);
+					} else {
+						InvseeImpl.sendItemChange(spectator.getHandle(), i, CraftItemStack.asNMSCopy(palette.inaccessible()));
 					}
 				}
 			}
@@ -99,6 +101,8 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 					if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
 						net.minecraft.world.item.ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, PlaceholderGroup.CRAFTING);
 						InvseeImpl.sendItemChange(spectator.getHandle(), rawIndex, stack);
+					} else {
+						InvseeImpl.sendItemChange(spectator.getHandle(), i, CraftItemStack.asNMSCopy(palette.inaccessible()));
 					}
 				}
 			}
