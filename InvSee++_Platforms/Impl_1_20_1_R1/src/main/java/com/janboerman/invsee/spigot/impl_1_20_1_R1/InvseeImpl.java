@@ -299,15 +299,7 @@ public class InvseeImpl implements InvseePlatform {
         } else if (slot instanceof PersonalSlot personalSlot) {
             if (!personalSlot.works()) return CraftItemStack.asNMSCopy(palette.inaccessible());
             if (group == null) return ItemStack.EMPTY; //no group for personal slot -> fall back to empty stack
-
-            Mirror<PlayerInventorySlot> mirror = view.nms.creationOptions.getMirror();
-            PlayerInventorySlot pis = mirror.getSlot(rawIndex);
-            assert pis != null && pis.isPersonal();
-
-            int idx = pis.defaultIndex() - PlayerInventorySlot.PERSONAL_00.defaultIndex();
-            org.bukkit.inventory.ItemStack stack = group.getPlaceholder(palette, idx);
-
-            return CraftItemStack.asNMSCopy(stack);
+            return CraftItemStack.asNMSCopy(palette.getPersonalSlotPlaceholder(view, rawIndex, group));
         } else {
             return ItemStack.EMPTY;
         }
@@ -320,6 +312,41 @@ public class InvseeImpl implements InvseePlatform {
             case "icons" -> Placeholders.PALETTE_ICONS;
             default -> PlaceholderPalette.empty();
         };
+    }
+
+    static org.bukkit.inventory.ItemStack getPlaceholder(PlaceholderGroup group, PlaceholderPalette palette, int slot) {
+        switch (group) {
+            case INACCESSIBLE: return palette.inaccessible();
+            case ARMOUR:
+                switch (slot) {
+                    case 0: return palette.armourBoots();
+                    case 1: return palette.armourLeggings();
+                    case 2: return palette.armourChestplate();
+                    case 3: return palette.armourHelmet();
+                }
+            case OFFHAND: return palette.offHand();
+            case CURSOR: return palette.cursor();
+            case CRAFTING: return palette.crafting();
+            case ANVIL: return palette.anvil();
+            case MERCHANT: return palette.merchant();
+            case CARTOGRAPHY: return palette.cartography();
+            case ENCHANTING:
+                switch (slot) {
+                    case 0: return palette.enchantingItem();
+                    case 1: return palette.enchantingFuel();
+                }
+            case GRINDSTONE: return palette.grindstone();
+            case LOOM: return palette.loom();
+            case SMITHING:
+                switch (slot) {
+                    case 0: return palette.smithingTemplate();
+                    case 1: return palette.smithingBase();
+                    case 2: return palette.smithingAddition();
+                }
+            case STONECUTTER: return palette.stonecutter();
+        }
+
+        return palette.inaccessible();
     }
 
 }

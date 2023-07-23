@@ -93,4 +93,4 @@ logging:
 
 # Selects the palette of placeholders to be used in slots for armour, crafting, enchanting, anvil, merchant, loom, cartography, smithing, grindstone, stonecutter.
 # Choose one of: 'glass', 'icons' or 'empty'.
-placeholder-palette: empty
+placeholder-palette: glass

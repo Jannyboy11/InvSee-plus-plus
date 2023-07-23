@@ -1,6 +1,9 @@
 package com.janboerman.invsee.spigot.impl_1_20_1_R1;
 
-import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
+import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.placeholder.SimplePlaceholderPalette;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -67,7 +70,7 @@ public class Placeholders {
     private static final ItemStack ICON_STONECUTTER = makeStack(Material.STONECUTTER, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.STONECUTTER));
     private static final ItemStack ICON_GENERIC = makeStack(CHEST, name(GENERIC));
 
-    static final PlaceholderPalette PALETTE_GLASS = new SimplePlaceholderPalette("glass panes",
+    static final PlaceholderPalette PALETTE_GLASS = new PlaceholderPalette("glass panes",
             GLASS_INACCESSIBLE,
             GLASS_ARMOUR_HELMET,
             GLASS_ARMOUR_CHESTPLATE,
@@ -89,7 +92,7 @@ public class Placeholders {
             GLASS_STONECUTTER,
             GLASS_GENERIC
     );
-    static final PlaceholderPalette PALETTE_ICONS = new SimplePlaceholderPalette("icons",
+    static final PlaceholderPalette PALETTE_ICONS = new PlaceholderPalette("icons",
             ICON_INACCESSIBLE,
             ICON_ARMOUR_HELMET,
             ICON_ARMOUR_CHESTPLATE,
@@ -111,4 +114,25 @@ public class Placeholders {
             ICON_STONECUTTER,
             ICON_GENERIC
     );
+}
+
+class PlaceholderPalette extends SimplePlaceholderPalette {
+
+    public PlaceholderPalette(String name, ItemStack inaccessible, ItemStack armourHelmet, ItemStack armourChestplate, ItemStack armourLeggings, ItemStack armourBoots, ItemStack offHand, ItemStack cursor, ItemStack crafting, ItemStack anvil, ItemStack merchant, ItemStack cartography, ItemStack enchantingItem, ItemStack enchantingFuel, ItemStack grindstone, ItemStack loom, ItemStack smithingBase, ItemStack smithingTemplate, ItemStack smithingAddition, ItemStack stonecutter, ItemStack generic) {
+        super(name, inaccessible, armourHelmet, armourChestplate, armourLeggings, armourBoots, offHand, cursor, crafting, anvil, merchant, cartography, enchantingItem, enchantingFuel, grindstone, loom, smithingBase, smithingTemplate, smithingAddition, stonecutter, generic);
+    }
+
+    @Override
+    public ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup group) {
+        assert group != null && group.isPersonal();
+
+        MainBukkitInventoryView bukkitView = (MainBukkitInventoryView) view;
+        Mirror<PlayerInventorySlot> mirror = bukkitView.nms.creationOptions.getMirror();
+        PlayerInventorySlot pis = mirror.getSlot(rawIndex);
+
+        assert pis != null && pis.isPersonal();
+
+        int slot = pis.defaultIndex() - PlayerInventorySlot.PERSONAL_00.defaultIndex();
+        return InvseeImpl.getPlaceholder(group, this, slot);
+    }
 }

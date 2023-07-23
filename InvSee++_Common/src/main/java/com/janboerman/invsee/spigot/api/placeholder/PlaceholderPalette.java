@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.api.placeholder;
 
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import org.bukkit.inventory.ItemStack;
 
 public interface PlaceholderPalette {
@@ -33,6 +34,9 @@ public interface PlaceholderPalette {
     public ItemStack stonecutter();
 
     public ItemStack generic();
+
+
+    public ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup placeholderGroup);
 
 }
 
@@ -142,6 +146,11 @@ class EmptyPalette implements PlaceholderPalette {
 
     @Override
     public ItemStack generic() {
+        return EMPTY_STACK;
+    }
+
+    @Override
+    public ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup placeholderGroup) {
         return EMPTY_STACK;
     }
 }

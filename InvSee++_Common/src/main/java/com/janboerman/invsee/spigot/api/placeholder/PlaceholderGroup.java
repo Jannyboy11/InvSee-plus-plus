@@ -1,7 +1,5 @@
 package com.janboerman.invsee.spigot.api.placeholder;
 
-import org.bukkit.inventory.ItemStack;
-
 public enum PlaceholderGroup {
 
     INACCESSIBLE,
@@ -18,39 +16,15 @@ public enum PlaceholderGroup {
     SMITHING,
     STONECUTTER;
 
-    public ItemStack getPlaceholder(PlaceholderPalette palette, int slot) {
+    public boolean isPersonal() {
         switch (this) {
-            case INACCESSIBLE: return palette.inaccessible();
+            case INACCESSIBLE:
             case ARMOUR:
-                switch (slot) {
-                    case 0: return palette.armourBoots();
-                    case 1: return palette.armourLeggings();
-                    case 2: return palette.armourChestplate();
-                    case 3: return palette.armourHelmet();
-                }
-            case OFFHAND: return palette.offHand();
-            case CURSOR: return palette.cursor();
-            case CRAFTING: return palette.crafting();
-            case ANVIL: return palette.anvil();
-            case MERCHANT: return palette.merchant();
-            case CARTOGRAPHY: return palette.cartography();
-            case ENCHANTING:
-                switch (slot) {
-                    case 0: return palette.enchantingItem();
-                    case 1: return palette.enchantingFuel();
-                }
-            case GRINDSTONE: return palette.grindstone();
-            case LOOM: return palette.loom();
-            case SMITHING:
-                switch (slot) {
-                    case 0: return palette.smithingBase();
-                    case 1: return palette.smithingTemplate();
-                    case 2: return palette.smithingAddition();
-                }
-            case STONECUTTER: return palette.stonecutter();
+            case OFFHAND:
+            case CURSOR:
+                return false;
+            default:
+                return true;
         }
-
-        return palette.inaccessible();
     }
-
 }

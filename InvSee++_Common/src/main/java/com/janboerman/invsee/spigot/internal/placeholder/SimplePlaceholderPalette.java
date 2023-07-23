@@ -1,9 +1,11 @@
 package com.janboerman.invsee.spigot.internal.placeholder;
 
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import org.bukkit.inventory.ItemStack;
 
-public class SimplePlaceholderPalette implements PlaceholderPalette {
+public abstract class SimplePlaceholderPalette implements PlaceholderPalette {
 
     private final String name;
 
@@ -77,6 +79,9 @@ public class SimplePlaceholderPalette implements PlaceholderPalette {
     @Override public ItemStack smithingAddition() { return clone(smithingAddition); }
     @Override public ItemStack stonecutter() { return clone(stonecutter); }
     @Override public ItemStack generic() { return clone(generic); }
+
+    @Override
+    public abstract ItemStack getPersonalSlotPlaceholder(MainSpectatorInventoryView view, int rawIndex, PlaceholderGroup placeholderGroup);
 
     private static ItemStack clone(ItemStack itemStack) {
         return itemStack == null ? null : itemStack.clone();
