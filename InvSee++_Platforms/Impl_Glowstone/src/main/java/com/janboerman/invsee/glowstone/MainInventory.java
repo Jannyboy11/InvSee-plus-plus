@@ -251,7 +251,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
     @Override
     public void watch(InventoryView targetPlayerView) {
         //if the target player has an opened inventory, and if the opened inventory is personal,
-        //then set the personalSlots to the be the *same* slots as that opened inventory.
+        //then set the personalSlots to be the *same* slots as that opened inventory.
         Inventory top = targetPlayerView.getTopInventory();
         if (top instanceof GlowCraftingInventory) {
             List<GlowInventorySlot> craftingInventorySlots = GlowstoneHacks.getSlots((GlowCraftingInventory) top);
@@ -268,6 +268,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         }
         updateContents();
 
+        //TODO placeholders
         for (HumanEntity viewer : getViewers()) {
             if (viewer instanceof Player) {
                 ((Player) viewer).updateInventory();
@@ -281,6 +282,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         this.personalSlots = craftingSlots;
         updateContents();
 
+        //TODO placeholders
         for (HumanEntity viewer : getViewers()) {
             if (viewer instanceof org.bukkit.entity.Player) {
                 ((org.bukkit.entity.Player) viewer).updateInventory();

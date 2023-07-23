@@ -132,6 +132,9 @@ public class InvseeImpl implements InvseePlatform {
         if (view.openEvent != null && view.openEvent.isCancelled()) {
             return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(view.openEvent));
         } else {
+
+            //TODO placeholders
+
             return OpenResponse.open(view);
         }
     }
