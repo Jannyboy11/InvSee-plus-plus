@@ -15,7 +15,7 @@ public class Placeholders {
     private Placeholders() {
     }
 
-    public static final String INACCESSIBLE = ChatColor.DARK_RED + "Not accessible";
+    public static final String INACCESSIBLE = ChatColor.DARK_RED + "";
     public static final String HELMET = ChatColor.AQUA + "Helmet";
     public static final String CHESTPLATE = ChatColor.AQUA + "Chestplate";
     public static final String LEGGINGS = ChatColor.AQUA + "Leggings";
@@ -34,7 +34,7 @@ public class Placeholders {
     public static final String SMITHING_TEMPLATE = ChatColor.AQUA + "Smithing template";
     public static final String SMITHING_ADDITION = ChatColor.AQUA + "Smithing addition";
     public static final String STONECUTTER = ChatColor.AQUA + "Stonecutter input";
-    public static final String GENERIC = ChatColor.AQUA + "Placeholder";
+    public static final String GENERIC = ChatColor.AQUA + "";
 
     public static final Consumer<? super ItemMeta> HIDE_ATTRIBUTES = meta -> meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 

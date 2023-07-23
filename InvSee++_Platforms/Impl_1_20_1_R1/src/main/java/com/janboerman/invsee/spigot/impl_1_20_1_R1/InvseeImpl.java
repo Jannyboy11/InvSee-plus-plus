@@ -102,11 +102,13 @@ public class InvseeImpl implements InvseePlatform {
             //send placeholders (inaccessible, armour, offhand, cursor, personal)
             Mirror<PlayerInventorySlot> mirror = options.getMirror();
             PlaceholderPalette palette = options.getPlaceholderPalette();
-            System.out.println("DEBUG palette = " + palette);
             ItemStack inaccessible = CraftItemStack.asNMSCopy(palette.inaccessible());
             for (int i = PlayerInventorySlot.CONTAINER_35.defaultIndex() + 1; i < nmsInventory.getContainerSize(); i++) {
                 Integer idx = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
-                if (idx == null) continue;
+                if (idx == null) {
+                    sendItemChange(nmsPlayer, i, inaccessible);
+                    continue;
+                }
                 int rawIndex = idx.intValue();
 
                 Slot slot = nmsWindow.getSlot(rawIndex);

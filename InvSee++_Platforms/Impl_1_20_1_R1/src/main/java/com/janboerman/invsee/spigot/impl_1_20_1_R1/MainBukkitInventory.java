@@ -94,7 +94,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 				Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
 				PlaceholderPalette palette = creationOptions.getPlaceholderPalette();
 
-				for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i < PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
+				for (int i = PlayerInventorySlot.PERSONAL_00.defaultIndex(); i <= PlayerInventorySlot.PERSONAL_08.defaultIndex(); i++) {
 					Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
 					if (rawIndex != null) { // null rawIndex does not happen if the server admin configured the template correctly.
 						net.minecraft.world.item.ItemStack stack = InvseeImpl.getItemOrPlaceholder(palette, view, rawIndex, PlaceholderGroup.CRAFTING);
