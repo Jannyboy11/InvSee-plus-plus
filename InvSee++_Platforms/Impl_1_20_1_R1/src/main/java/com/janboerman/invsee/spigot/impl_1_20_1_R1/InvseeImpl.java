@@ -287,6 +287,7 @@ public class InvseeImpl implements InvseePlatform {
             default -> PlaceholderPalette.empty();
         };
     }
+
     static void sendItemChange(ServerPlayer entityPlayer, int rawIndex, ItemStack toSend) {
         AbstractContainerMenu container = entityPlayer.containerMenu;
         entityPlayer.connection.send(new ClientboundContainerSetSlotPacket(container.containerId, container.incrementStateId(), rawIndex, toSend));
