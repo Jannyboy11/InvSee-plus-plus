@@ -279,6 +279,14 @@ public class InvseeImpl implements InvseePlatform {
         }
     }
 
+    @Override
+    public PlaceholderPalette getPlaceholderPalette(String name) {
+        return switch (name) {
+            case "glass panes" -> Placeholders.PALETTE_GLASS;
+            case "icons" -> Placeholders.PALETTE_ICONS;
+            default -> PlaceholderPalette.empty();
+        };
+    }
     static void sendItemChange(ServerPlayer entityPlayer, int rawIndex, ItemStack toSend) {
         AbstractContainerMenu container = entityPlayer.containerMenu;
         entityPlayer.connection.send(new ClientboundContainerSetSlotPacket(container.containerId, container.incrementStateId(), rawIndex, toSend));
@@ -314,50 +322,6 @@ public class InvseeImpl implements InvseePlatform {
         } else {
             return ItemStack.EMPTY;
         }
-    }
-
-    @Override
-    public PlaceholderPalette getPlaceholderPalette(String name) {
-        return switch (name) {
-            case "glass panes" -> Placeholders.PALETTE_GLASS;
-            case "icons" -> Placeholders.PALETTE_ICONS;
-            default -> PlaceholderPalette.empty();
-        };
-    }
-
-    static org.bukkit.inventory.ItemStack getPlaceholder(PlaceholderGroup group, PlaceholderPalette palette, PlayerInventorySlot slot) {
-        switch (group) {
-            case INACCESSIBLE: return palette.inaccessible();
-            case ARMOUR:
-                switch (slot) {
-                    case ARMOUR_BOOTS: return palette.armourBoots();
-                    case ARMOUR_LEGGINGS: return palette.armourLeggings();
-                    case ARMOUR_CHESTPLATE: return palette.armourChestplate();
-                    case ARMOUR_HELMET: return palette.armourHelmet();
-                }
-            case OFFHAND: return palette.offHand();
-            case CURSOR: return palette.cursor();
-            case CRAFTING: return palette.crafting();
-            case ANVIL: return palette.anvil();
-            case MERCHANT: return palette.merchant();
-            case CARTOGRAPHY: return palette.cartography();
-            case ENCHANTING:
-                switch (slot) {
-                    case PERSONAL_00: return palette.enchantingItem();
-                    case PERSONAL_01: return palette.enchantingFuel();
-                }
-            case GRINDSTONE: return palette.grindstone();
-            case LOOM: return palette.loom();
-            case SMITHING:
-                switch (slot) {
-                    case PERSONAL_00: return palette.smithingTemplate();
-                    case PERSONAL_01: return palette.smithingBase();
-                    case PERSONAL_02: return palette.smithingAddition();
-                }
-            case STONECUTTER: return palette.stonecutter();
-        }
-
-        return palette.inaccessible();
     }
 
 }

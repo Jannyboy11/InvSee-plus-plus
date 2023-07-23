@@ -1,8 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_20_1_R1;
 
-import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
-import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.placeholder.SimplePlaceholderPalette;
 import org.bukkit.DyeColor;
@@ -69,7 +67,7 @@ public class Placeholders {
     private static final ItemStack ICON_LOOM = makeStack(Material.LOOM, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.LOOM));
     private static final ItemStack ICON_SMITHING_BASE = makeStack(SMITHING_TABLE, name(SMITHING_BASE));
     private static final ItemStack ICON_SMITHING_TEMPLATE = makeStack(NETHERITE_UPGRADE_SMITHING_TEMPLATE, name(SMITHING_TEMPLATE));
-    private static final ItemStack ICON_SMITHING_ADDITION = makeStack(QUARTZ, name(SMITHING_ADDITION));
+    private static final ItemStack ICON_SMITHING_ADDITION = makeStack(NETHERITE_INGOT, name(SMITHING_ADDITION));
     private static final ItemStack ICON_STONECUTTER = makeStack(Material.STONECUTTER, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.STONECUTTER));
     private static final ItemStack ICON_GENERIC = makeStack(CHEST, name(GENERIC));
 
@@ -126,10 +124,42 @@ class PlaceholderPalette extends SimplePlaceholderPalette {
     }
 
     @Override
-    public ItemStack getPersonalSlotPlaceholder(PlayerInventorySlot pis, PlaceholderGroup group) {
+    public ItemStack getPersonalSlotPlaceholder(PlayerInventorySlot slot, PlaceholderGroup group) {
         assert group != null && group.isPersonal();
-        assert pis != null && pis.isPersonal();
+        assert slot != null && slot.isPersonal();
 
-        return InvseeImpl.getPlaceholder(group, this, pis);
+        switch (group) {
+            case INACCESSIBLE: return inaccessible();
+            case ARMOUR:
+                switch (slot) {
+                    case ARMOUR_BOOTS: return armourBoots();
+                    case ARMOUR_LEGGINGS: return armourLeggings();
+                    case ARMOUR_CHESTPLATE: return armourChestplate();
+                    case ARMOUR_HELMET: return armourHelmet();
+                }
+            case OFFHAND: return offHand();
+            case CURSOR: return cursor();
+            case CRAFTING: return crafting();
+            case ANVIL: return anvil();
+            case MERCHANT: return merchant();
+            case CARTOGRAPHY: return cartography();
+            case ENCHANTING:
+                switch (slot) {
+                    case PERSONAL_00: return enchantingItem();
+                    case PERSONAL_01: return enchantingFuel();
+                }
+            case GRINDSTONE: return grindstone();
+            case LOOM: return loom();
+            case SMITHING:
+                switch (slot) {
+                    case PERSONAL_00: return smithingTemplate();
+                    case PERSONAL_01: return smithingBase();
+                    case PERSONAL_02: return smithingAddition();
+                }
+            case STONECUTTER: return stonecutter();
+        }
+
+        return inaccessible();
     }
+
 }

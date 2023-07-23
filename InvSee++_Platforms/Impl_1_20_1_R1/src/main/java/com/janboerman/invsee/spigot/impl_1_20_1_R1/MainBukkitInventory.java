@@ -65,6 +65,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 			};
 		}
 
+		//send personal slots changes
 		for (HumanEntity viewer : getViewers()) {
 			if (viewer instanceof CraftPlayer spectator && spectator.getOpenInventory() instanceof MainBukkitInventoryView view) {
 				CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
@@ -88,8 +89,8 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 	public void unwatch() {
 		MainNmsInventory nms = getInventory();
 		nms.personalContents = nms.craftingContents;
-		
-		//idem
+
+		//send personal slots changes
 		for (HumanEntity viewer : getViewers()) {
 			if (viewer instanceof CraftPlayer spectator && spectator.getOpenInventory() instanceof MainBukkitInventoryView view) {
 				CreationOptions<PlayerInventorySlot> creationOptions = view.nms.creationOptions;
