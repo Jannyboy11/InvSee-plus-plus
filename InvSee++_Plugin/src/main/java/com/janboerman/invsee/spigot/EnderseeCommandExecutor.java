@@ -73,7 +73,8 @@ public class EnderseeCommandExecutor implements CommandExecutor {
                 .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
                 .withUnknownPlayerSupport(plugin.unknownPlayerSupport())
                 .withBypassExemptedPlayers(player.hasPermission(Exempt.BYPASS_EXEMPT_ENDERCHEST))
-                .withLogOptions(plugin.getLogOptions());
+                .withLogOptions(plugin.getLogOptions())
+                .withPlaceholderPalette(plugin.getPlaceholderPalette());
 
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> pwiFuture = null;
 
