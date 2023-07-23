@@ -398,8 +398,15 @@ public class InvseePlusPlus extends JavaPlugin {
 
     public PlaceholderPalette getPlaceholderPalette(InvseePlatform platform, FileConfiguration config) {
         String paletteName = config.getString("placeholder-palette");
-        if (paletteName == null) return PlaceholderPalette.empty();
-        return platform.getPlaceholderPalette(paletteName);
+        PlaceholderPalette palette;
+        if (paletteName == null) {
+            palette = PlaceholderPalette.empty();
+            config.set("placeholder-palette", "empty");
+            dirtyConfig = true;
+        } else {
+            palette = platform.getPlaceholderPalette(paletteName);
+        }
+        return palette;
     }
 
     private File getConfigFile() {
@@ -413,7 +420,7 @@ public class InvseePlusPlus extends JavaPlugin {
     private static Scheduler makeScheduler(InvseePlusPlus plugin) {
         boolean folia;
         try {
-            Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
             folia = true;
         } catch (ClassNotFoundException e) {
             folia = false;
