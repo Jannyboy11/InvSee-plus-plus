@@ -154,7 +154,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
     }
 
     @Override
-    public void setOffHandContents(ItemStack[] offHand){
+    public void setOffHandContents(ItemStack[] offHand) {
         Objects.requireNonNull(offHand, "offHand cannot be null");
         int offHandContentsSize = getInventory().offHand.size();
         if (offHand.length != offHandContentsSize)
