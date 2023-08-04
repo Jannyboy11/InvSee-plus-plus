@@ -22,7 +22,6 @@ import net.glowstone.inventory.GlowInventorySlot;
 import net.glowstone.inventory.GlowMerchantInventory;
 import net.glowstone.inventory.GlowPlayerInventory;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;

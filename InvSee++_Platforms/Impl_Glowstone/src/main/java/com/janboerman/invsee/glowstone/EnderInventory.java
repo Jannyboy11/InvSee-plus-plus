@@ -54,11 +54,6 @@ class EnderInventory extends GlowInventory implements EnderSpectatorInventory, S
     }
 
     @Override
-    public void setContents(EnderSpectatorInventory newContents) {
-        EnderSpectatorInventory.super.setContents(newContents);
-    }
-
-    @Override
     public int defaultMaxStack() {
         return 64;
     }
@@ -66,6 +61,21 @@ class EnderInventory extends GlowInventory implements EnderSpectatorInventory, S
     @Override
     public void shallowCopyFrom(EnderInventory from) {
         GlowstoneHacks.setSlots(this, GlowstoneHacks.getSlots(from));
+    }
+
+    @Override
+    public void setContents(EnderSpectatorInventory newContents) {
+        super.setContents(newContents.getContents());
+    }
+
+    //1.8.8 compat
+    public ItemStack[] getStorageContents() {
+        return super.getContents();
+    }
+
+    //1.8.8 compat
+    public void setStorageContents(ItemStack[] contents) {
+        super.setContents(contents);
     }
 
     @Override
