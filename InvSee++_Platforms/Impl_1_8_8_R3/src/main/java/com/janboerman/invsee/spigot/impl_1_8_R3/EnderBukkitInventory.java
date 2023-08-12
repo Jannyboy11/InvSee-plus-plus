@@ -21,12 +21,12 @@ public class EnderBukkitInventory extends CraftInventory implements EnderInvento
         super.setContents(newContents.getContents());
     }
 
-    //@Override
+    @Override
     public ItemStack[] getStorageContents() {
         return super.getContents();
     }
 
-    //@Override
+    @Override
     public void setStorageContents(ItemStack[] storageContents) {
         super.setContents(storageContents);
     }

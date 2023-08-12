@@ -68,12 +68,12 @@ class EnderInventory extends GlowInventory implements EnderSpectatorInventory, S
         super.setContents(newContents.getContents());
     }
 
-    //1.8.8 compat
+    @Override
     public ItemStack[] getStorageContents() {
         return super.getContents();
     }
 
-    //1.8.8 compat
+    @Override
     public void setStorageContents(ItemStack[] contents) {
         super.setContents(contents);
     }
