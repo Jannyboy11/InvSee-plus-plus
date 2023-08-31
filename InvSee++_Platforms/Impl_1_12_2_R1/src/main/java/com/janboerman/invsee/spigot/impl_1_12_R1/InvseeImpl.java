@@ -6,6 +6,7 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.event.SpectatorInventorySaveEvent;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.response.*;
@@ -15,6 +16,8 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.enderChestItems;
 import static com.janboerman.invsee.spigot.impl_1_12_R1.HybridServerSupport.nextContainerCounter;
+
+import com.janboerman.invsee.spigot.internal.EventHelper;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
@@ -225,7 +228,7 @@ public class InvseeImpl implements InvseePlatform {
             }
 
             CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
-            return SpectateResponse.succeed(invCreator.apply(craftHumanEntity, options));
+            return SpectateResponse.succeed(EventHelper.callSpectatorInventoryOfflineCreatedEvent(server, invCreator.apply(craftHumanEntity, options)));
 
         }, runnable -> scheduler.executeSyncPlayer(player, runnable, null));
     }
@@ -233,6 +236,9 @@ public class InvseeImpl implements InvseePlatform {
     private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<SaveResponse> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
 
         CraftServer server = (CraftServer) plugin.getServer();
+        SpectatorInventorySaveEvent event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
+        if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
+
         DedicatedPlayerList playerList = server.getHandle();
         IPlayerFileData worldNBTStorage = playerList.playerFileData;
 

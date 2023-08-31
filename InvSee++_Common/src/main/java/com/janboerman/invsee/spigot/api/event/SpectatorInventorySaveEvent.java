@@ -5,13 +5,13 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class SpectatorInventorySave extends Event implements Cancellable {
+public class SpectatorInventorySaveEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
     private boolean cancel;
     private final SpectatorInventory<?> spectatorInventory;
 
-    public SpectatorInventorySave(SpectatorInventory<?> spectatorInventory) {
+    public SpectatorInventorySaveEvent(SpectatorInventory<?> spectatorInventory) {
         this.spectatorInventory = spectatorInventory;
     }
 

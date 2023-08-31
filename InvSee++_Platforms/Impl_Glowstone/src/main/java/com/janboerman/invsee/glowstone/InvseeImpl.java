@@ -7,7 +7,7 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.event.SpectatorInventorySave;
+import com.janboerman.invsee.spigot.api.event.SpectatorInventorySaveEvent;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
@@ -233,7 +233,7 @@ public class InvseeImpl implements InvseePlatform {
                 glowhumanentityStore.load(fakePlayer, tag);
 
                 //return the inventory
-                return SpectateResponse.succeed(invCreator.apply(fakePlayer, options));
+                return SpectateResponse.succeed(EventHelper.callSpectatorInventoryOfflineCreatedEvent(server, invCreator.apply(fakePlayer, options)));
             } catch (IOException e) {
                 return Rethrow.unchecked(e);
             }
@@ -243,7 +243,7 @@ public class InvseeImpl implements InvseePlatform {
 
     private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<SaveResponse> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
         GlowServer server = (GlowServer) plugin.getServer();
-        SpectatorInventorySave event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
+        SpectatorInventorySaveEvent event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
         if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
 
         NbtPlayerDataService playerDataService = (NbtPlayerDataService) server.getPlayerDataService();

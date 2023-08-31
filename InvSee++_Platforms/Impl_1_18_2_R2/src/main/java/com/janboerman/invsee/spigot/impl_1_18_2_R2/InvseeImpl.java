@@ -6,7 +6,7 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.event.SpectatorInventorySave;
+import com.janboerman.invsee.spigot.api.event.SpectatorInventorySaveEvent;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.response.*;
@@ -232,14 +232,14 @@ public class InvseeImpl implements InvseePlatform {
             }
 
             CraftHumanEntity craftHumanEntity = new CraftHumanEntity(server, fakeEntityHuman);
-            return SpectateResponse.succeed(invCreator.apply(craftHumanEntity, options));
+            return SpectateResponse.succeed(EventHelper.callSpectatorInventoryOfflineCreatedEvent(server, invCreator.apply(craftHumanEntity, options)));
     	}, runnable -> scheduler.executeSyncPlayer(player, runnable, null));
     }
 
     private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<SaveResponse> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
 
         CraftServer server = (CraftServer) plugin.getServer();
-        SpectatorInventorySave event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
+        SpectatorInventorySaveEvent event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
         if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
 
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);

@@ -4,8 +4,6 @@ import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-//TODO call this event, also implement SpectatorInventoryOfflineCreateEvent which is cancellable.
-//TODO its fields will be: Player (spectator, nullable), CreationOptions, Target.
 public class SpectatorInventoryOfflineCreatedEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
