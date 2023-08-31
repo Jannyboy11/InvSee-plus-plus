@@ -7,16 +7,15 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.event.SpectatorInventorySave;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
-import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
-import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
-import com.janboerman.invsee.spigot.api.response.OpenResponse;
-import com.janboerman.invsee.spigot.api.response.SpectateResponse;
+import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
+import com.janboerman.invsee.spigot.internal.EventHelper;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
@@ -27,7 +26,6 @@ import net.glowstone.entity.GlowHumanEntity;
 import net.glowstone.entity.GlowPlayer;
 import net.glowstone.entity.meta.profile.GlowPlayerProfile;
 import net.glowstone.inventory.GlowInventorySlot;
-import net.glowstone.inventory.GlowInventoryView;
 import net.glowstone.io.PlayerDataService.PlayerReader;
 import net.glowstone.io.entity.EntityStore;
 import net.glowstone.io.nbt.NbtPlayerDataService;
@@ -124,7 +122,7 @@ public class InvseeImpl implements InvseePlatform {
     }
 
     @Override
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory newInventory) {
+    public CompletableFuture<SaveResponse> saveInventory(MainSpectatorInventory newInventory) {
         return save(newInventory, this::spectateInventory, MainSpectatorInventory::setContents);
     }
 
@@ -183,7 +181,7 @@ public class InvseeImpl implements InvseePlatform {
     }
 
     @Override
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory newInventory) {
+    public CompletableFuture<SaveResponse> saveEnderChest(EnderSpectatorInventory newInventory) {
         return save(newInventory, this::spectateEnderChest, EnderSpectatorInventory::setContents);
     }
 
@@ -243,8 +241,11 @@ public class InvseeImpl implements InvseePlatform {
         }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
-    private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
+    private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<SaveResponse> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
         GlowServer server = (GlowServer) plugin.getServer();
+        SpectatorInventorySave event = EventHelper.callInventorySaveEvent(server, newInventory);
+        if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
+
         NbtPlayerDataService playerDataService = (NbtPlayerDataService) server.getPlayerDataService();
         UUID playerId = newInventory.getSpectatedPlayerId();
         String playerName = newInventory.getName();
@@ -264,7 +265,7 @@ public class InvseeImpl implements InvseePlatform {
         FakePlayer fakePlayer = new FakePlayer(session, profile, reader);
         GlowstoneHacks.setPlayer(session, fakePlayer);
 
-        return CompletableFuture.runAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             //get player file
             File playerDataFolder = GlowstoneHacks.getPlayerDir(playerDataService);
             File playerFile = new File(playerDataFolder, playerId.toString() + ".dat");
@@ -283,8 +284,11 @@ public class InvseeImpl implements InvseePlatform {
                 glowplayerStore = GlowstoneHacks.findEntityStore(GlowPlayer.class, "save");
                 glowplayerStore.save(fakePlayer, tag);              //save player data to tag.
                 GlowstoneHacks.writeCompressed(playerFile, tag);    //save tag to file.
+
+                //return
+                return SaveResponse.saved(currentInventory);
             } catch (IOException e) {
-                Rethrow.unchecked(e);
+                return Rethrow.unchecked(e);
             }
         }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }

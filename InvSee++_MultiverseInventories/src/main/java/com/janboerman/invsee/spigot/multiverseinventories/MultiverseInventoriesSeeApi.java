@@ -16,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
+import com.janboerman.invsee.spigot.api.response.SaveResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
@@ -143,7 +144,7 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI implements InvseePlat
     }
 
     @Override
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
+    public CompletableFuture<SaveResponse> saveInventory(MainSpectatorInventory inventory) {
         //TODO decide whether to save to MVI save file or not
         return wrapped.saveInventory(inventory);
     }
@@ -167,7 +168,7 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI implements InvseePlat
     }
 
     @Override
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
+    public CompletableFuture<SaveResponse> saveEnderChest(EnderSpectatorInventory enderChest) {
         //TODO decide whether to save to MVI save file or not
         return wrapped.saveEnderChest(enderChest);
     }

@@ -12,6 +12,7 @@ import com.janboerman.invsee.spigot.api.logging.LogTarget;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
+import com.janboerman.invsee.spigot.api.response.SaveResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
@@ -40,7 +41,7 @@ public interface InvseePlatform {
 
     public abstract CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options);
 
-    public abstract CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory);
+    public abstract CompletableFuture<SaveResponse> saveInventory(MainSpectatorInventory inventory);
 
     public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory spectatorInventory, CreationOptions<PlayerInventorySlot> options);
 
@@ -50,7 +51,7 @@ public interface InvseePlatform {
 
     public abstract CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, CreationOptions<EnderChestSlot> options);
 
-    public abstract CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest);
+    public abstract CompletableFuture<SaveResponse> saveEnderChest(EnderSpectatorInventory enderChest);
 
     public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory spectatorInventory, CreationOptions<EnderChestSlot> options);
 

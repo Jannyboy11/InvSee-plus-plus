@@ -327,7 +327,7 @@ public class InvseeAPI {
      * @return a future which completes once the contents is saved
      */
     //TODO make this final.
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
+    public CompletableFuture<SaveResponse> saveInventory(MainSpectatorInventory inventory) {
         return platform.saveInventory(inventory);
     }
 
@@ -580,7 +580,7 @@ public class InvseeAPI {
      * @return a future which completes once the contents is saved
      */
     //TODO make this final (requires restructure: composition over inheritance)...
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
+    public CompletableFuture<SaveResponse> saveEnderChest(EnderSpectatorInventory enderChest) {
         return platform.saveEnderChest(enderChest);
     }
 

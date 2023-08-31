@@ -6,18 +6,18 @@ import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
+import com.janboerman.invsee.spigot.api.event.SpectatorInventorySave;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
-import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
-import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
-import com.janboerman.invsee.spigot.api.response.OpenResponse;
-import com.janboerman.invsee.spigot.api.response.SpectateResponse;
+import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import static com.janboerman.invsee.spigot.impl_1_8_R3.HybridServerSupport.enderChestItems;
 import static com.janboerman.invsee.spigot.impl_1_8_R3.HybridServerSupport.nextContainerCounter;
+
+import com.janboerman.invsee.spigot.internal.EventHelper;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
@@ -202,12 +202,12 @@ public class InvseeImpl implements InvseePlatform {
     }
 
     @Override
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory newInventory) {
+    public CompletableFuture<SaveResponse> saveInventory(MainSpectatorInventory newInventory) {
         return save(newInventory, this::spectateInventory, MainSpectatorInventory::setContents);
     }
 
     @Override
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory newInventory) {
+    public CompletableFuture<SaveResponse> saveEnderChest(EnderSpectatorInventory newInventory) {
         return save(newInventory, this::spectateEnderChest, EnderSpectatorInventory::setContents);
     }
 
@@ -243,9 +243,12 @@ public class InvseeImpl implements InvseePlatform {
         }, runnable -> scheduler.executeSyncPlayer(player, runnable, null) /*TODO is this the correct scheduler? I think so.*/);
     }
 
-    private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<Void> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
+    private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<SaveResponse> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
 
         CraftServer server = (CraftServer) plugin.getServer();
+        SpectatorInventorySave event = EventHelper.callInventorySaveEvent(server, newInventory);
+        if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
+
         DedicatedPlayerList playerList = server.getHandle();
         IPlayerFileData worldNBTStorage = playerList.playerFileData;
 
@@ -259,7 +262,7 @@ public class InvseeImpl implements InvseePlatform {
                 gameProfile,
                 new PlayerInteractManager(world.getHandle()));
 
-        return CompletableFuture.runAsync(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             NBTTagCompound playerCompound = worldNBTStorage.load(fakeEntityPlayer);
             if (playerCompound != null) {
                 fakeEntityPlayer.f(playerCompound);   //all entity stuff + player stuff
@@ -272,7 +275,9 @@ public class InvseeImpl implements InvseePlatform {
             transfer.accept(currentInv, newInventory);
 
             worldNBTStorage.save(fakeEntityPlayer);
-        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null) /*TODO correct? I think so.*/);
+
+            return SaveResponse.saved(currentInv);
+        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(EntityPlayer player, Container container) {

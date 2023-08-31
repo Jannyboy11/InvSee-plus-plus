@@ -9,6 +9,7 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;
+import com.janboerman.invsee.spigot.api.response.SaveResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
@@ -379,7 +380,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
     }
 
     @Override
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory) {
+    public CompletableFuture<SaveResponse> saveInventory(MainSpectatorInventory inventory) {
         ProfileKey profileKey = inventoryKeys.get(inventory);
         boolean saveVanilla = false;
 
@@ -439,7 +440,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
     }
 
     @Override
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest) {
+    public CompletableFuture<SaveResponse> saveEnderChest(EnderSpectatorInventory enderChest) {
         ProfileKey profileKey = inventoryKeys.get(enderChest);
 
         boolean saveVanilla = false;
@@ -520,7 +521,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
         }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
-    public CompletableFuture<Void> saveInventory(MainSpectatorInventory inventory, ProfileKey profileKey, boolean saveVanilla) {
+    public CompletableFuture<SaveResponse> saveInventory(MainSpectatorInventory inventory, ProfileKey profileKey, boolean saveVanilla) {
         //if the spectated player is managed by PWI (because its world is managed by PWI)
         //then also save the inventory to PWI's storage
         //that can be done by loading the profile, applying the contents from the MainSpectatorInventory and saving it again
@@ -570,9 +571,15 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                     profile.getBalance());
             pwiHook.getProfileCache().put(profileKey, updatedProfile);
 
+            final CompletableFuture<SaveResponse> vanillaTask;
             CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), scheduler::executeAsync);
-            if (saveVanilla) saveTask = CompletableFuture.allOf(saveTask, wrapped.saveInventory(inventory));
-            return saveTask;
+            if (saveVanilla) {
+                vanillaTask = wrapped.saveInventory(inventory);
+                saveTask = CompletableFuture.allOf(saveTask, vanillaTask);
+            } else {
+                vanillaTask = null;
+            }
+            return saveTask.thenApply(_void -> vanillaTask == null ? SaveResponse.saved(inventory) : vanillaTask.join());
         }
     }
 
@@ -627,7 +634,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
         }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
-    public CompletableFuture<Void> saveEnderChest(EnderSpectatorInventory enderChest, ProfileKey profileKey, boolean saveVanilla) {
+    public CompletableFuture<SaveResponse> saveEnderChest(EnderSpectatorInventory enderChest, ProfileKey profileKey, boolean saveVanilla) {
         //if the spectated player is managed by PWI (because its world is managed by PWI)
         //then also save the inventory to PWI's storage
         //that can be done by loading the profile, applying the contents from the EnderSpectatorInventory and saving it again
@@ -669,9 +676,15 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                     profile.getBalance());
             pwiHook.getProfileCache().put(profileKey, updatedProfile);
 
+            final CompletableFuture<SaveResponse> vanillaTask;
             CompletableFuture<Void> saveTask = CompletableFuture.runAsync(() -> pwiHook.getDataSource().savePlayer(profileKey, updatedProfile), scheduler::executeAsync);
-            if (saveVanilla) saveTask = CompletableFuture.allOf(saveTask, wrapped.saveEnderChest(enderChest));
-            return saveTask;
+            if (saveVanilla) {
+                vanillaTask = wrapped.saveEnderChest(enderChest);
+                saveTask = CompletableFuture.allOf(saveTask, vanillaTask);
+            } else {
+                vanillaTask = null;
+            }
+            return saveTask.thenApply(_void -> vanillaTask == null ? SaveResponse.saved(enderChest) : vanillaTask.join());
         }
     }
 
