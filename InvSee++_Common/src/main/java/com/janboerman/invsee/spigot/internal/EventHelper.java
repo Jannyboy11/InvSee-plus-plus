@@ -1,7 +1,7 @@
 package com.janboerman.invsee.spigot.internal;
 
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
-import com.janboerman.invsee.spigot.api.event.SpectatorInventoryOfflineCreateEvent;
+import com.janboerman.invsee.spigot.api.event.SpectatorInventoryOfflineCreatedEvent;
 import com.janboerman.invsee.spigot.api.event.SpectatorInventorySave;
 import org.bukkit.Server;
 
@@ -17,23 +17,23 @@ public final class EventHelper {
      * @param spectatorInventory the inventory to be saved
      * @return the event
      */
-    public static SpectatorInventorySave callInventorySaveEvent(Server server, SpectatorInventory<?> spectatorInventory) {
+    public static SpectatorInventorySave callSpectatorInventorySaveEvent(Server server, SpectatorInventory<?> spectatorInventory) {
         SpectatorInventorySave event = new SpectatorInventorySave(spectatorInventory);
         server.getPluginManager().callEvent(event);
         return event;
     }
 
-    //TODO instead of SpectatorInventory, have CreationOptions, Player (spectator) and Target ?
     /**
-     * Calls {@link SpectatorInventoryOfflineCreateEvent}.
+     * Calls {@link SpectatorInventoryOfflineCreatedEvent}.
      *
      * @param server the server
      * @param spectatorInventory the inventory to b
      * @return the event
      */
-    public static SpectatorInventoryOfflineCreateEvent callInventoryCreateEvent(Server server, SpectatorInventory<?> spectatorInventory) {
-        SpectatorInventoryOfflineCreateEvent event = new SpectatorInventoryOfflineCreateEvent(spectatorInventory);
+    public static void callSpectatorInventoryOfflineCreatedEvent(Server server, SpectatorInventory<?> spectatorInventory) {
+        SpectatorInventoryOfflineCreatedEvent event = new SpectatorInventoryOfflineCreatedEvent(spectatorInventory);
         server.getPluginManager().callEvent(event);
-        return event;
     }
+
+    //TODO implement callSpectatorInventoryOfflineCreateEvent with CreationOptions, Player (spectator) and Target.
 }

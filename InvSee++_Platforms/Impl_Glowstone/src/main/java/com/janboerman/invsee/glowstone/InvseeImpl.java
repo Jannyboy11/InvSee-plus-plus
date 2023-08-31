@@ -243,7 +243,7 @@ public class InvseeImpl implements InvseePlatform {
 
     private <Slot, SI extends SpectatorInventory<Slot>> CompletableFuture<SaveResponse> save(SI newInventory, BiFunction<? super HumanEntity, ? super CreationOptions<Slot>, SI> currentInvProvider, BiConsumer<SI, SI> transfer) {
         GlowServer server = (GlowServer) plugin.getServer();
-        SpectatorInventorySave event = EventHelper.callInventorySaveEvent(server, newInventory);
+        SpectatorInventorySave event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
         if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
 
         NbtPlayerDataService playerDataService = (NbtPlayerDataService) server.getPlayerDataService();
