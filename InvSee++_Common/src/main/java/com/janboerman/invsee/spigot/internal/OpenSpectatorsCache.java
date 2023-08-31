@@ -9,10 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-/*
- * TODO use this class, share it to both implementations and the InvseeAPI.
- * TODO use constructor dependency-injection.
- */
 public class OpenSpectatorsCache /*TODO implement some kind of Cache interface that is api-public?*/ {
 
     private Map<UUID, WeakReference<MainSpectatorInventory>> openInventories = Collections.synchronizedMap(new WeakHashMap<>());

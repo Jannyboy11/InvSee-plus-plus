@@ -44,7 +44,7 @@ public class InvseeAPI {
     protected final Plugin plugin;
     protected final InvseePlatform platform;
     protected final NamesAndUUIDs lookup;
-    protected final OpenSpectatorsCache cachedInventories;
+    protected final OpenSpectatorsCache openSpectatorsCache;
     protected final Exempt exempt;
 
     private Title mainInventoryTitle = target -> target.toString() + "'s inventory";
@@ -80,13 +80,13 @@ public class InvseeAPI {
     protected final InventoryListener inventoryListener = new InventoryListener();
 
     /** @deprecated internal api */
-    public InvseeAPI(Plugin plugin, InvseePlatform platform, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cachedInventories) {
+    public InvseeAPI(Plugin plugin, InvseePlatform platform, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache openSpectatorsCache) {
         this.plugin = Objects.requireNonNull(plugin);
 
         this.lookup = Objects.requireNonNull(lookup);
         this.platform = Objects.requireNonNull(platform == null ? getPlatform() : platform);
         this.scheduler = Objects.requireNonNull(scheduler);
-        this.cachedInventories = Objects.requireNonNull(cachedInventories);
+        this.openSpectatorsCache = Objects.requireNonNull(openSpectatorsCache);
         this.exempt = new Exempt(plugin.getServer());
 
         registerListeners();
@@ -270,14 +270,14 @@ public class InvseeAPI {
      * @deprecated internal api */
     @Deprecated
     public Optional<MainSpectatorInventory> getOpenMainSpectatorInventory(UUID player) {
-        return Optional.ofNullable(cachedInventories.getMainSpectatorInventory(player));
+        return Optional.ofNullable(openSpectatorsCache.getMainSpectatorInventory(player));
     }
 
     /** Get a cached {@link EnderSpectatorInventory} for the target player.
      * @deprecated internal api */
     @Deprecated
     public Optional<EnderSpectatorInventory> getOpenEnderSpectatorInventory(UUID player) {
-        return Optional.ofNullable(cachedInventories.getEnderSpectatorInventory(player));
+        return Optional.ofNullable(openSpectatorsCache.getEnderSpectatorInventory(player));
     }
 
     /** Fetches the unique ID of the player with the provided username.
@@ -295,25 +295,25 @@ public class InvseeAPI {
     /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(MainSpectatorInventory spectatorInventory) {
-        cachedInventories.cache(spectatorInventory, false);
+        openSpectatorsCache.cache(spectatorInventory, false);
     }
 
     /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(MainSpectatorInventory spectatorInventory, boolean force) {
-        cachedInventories.cache(spectatorInventory, force);
+        openSpectatorsCache.cache(spectatorInventory, force);
     }
 
     /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(EnderSpectatorInventory spectatorInventory) {
-        cachedInventories.cache(spectatorInventory);
+        openSpectatorsCache.cache(spectatorInventory);
     }
 
     /** @deprecated internal api */
     @Deprecated(forRemoval = true)
     protected void cache(EnderSpectatorInventory spectatorInventory, boolean force) {
-        cachedInventories.cache(spectatorInventory, force);
+        openSpectatorsCache.cache(spectatorInventory, force);
     }
 
     // =========== end of internal apis ===========
@@ -370,7 +370,7 @@ public class InvseeAPI {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
             MainSpectatorInventory inv = platform.spectateInventory(target, options);
-            cachedInventories.cache(inv);
+            openSpectatorsCache.cache(inv);
             return SpectateResponse.succeed(inv);
         }
     }
@@ -418,7 +418,7 @@ public class InvseeAPI {
             MainSpectatorInventory spectatorInventory = platform.spectateInventory(targetPlayer, options);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
-            cachedInventories.cache(spectatorInventory);
+            openSpectatorsCache.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -520,7 +520,7 @@ public class InvseeAPI {
 
             MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title, mirror);
             lookup.cacheNameAndUniqueId(playerId, playerName);
-            cachedInventories.cache(spectatorInventory);
+            openSpectatorsCache.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!offlineSupport) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -549,7 +549,7 @@ public class InvseeAPI {
                 return CompletableFuture.completedFuture(SpectateResponse.fail(maybeReason.get()));
             } else {
                 //try cache
-                MainSpectatorInventory alreadyOpen = cachedInventories.getMainSpectatorInventory(playerId);
+                MainSpectatorInventory alreadyOpen = openSpectatorsCache.getMainSpectatorInventory(playerId);
                 if (alreadyOpen != null) {
                     return CompletableFuture.completedFuture(SpectateResponse.succeed(alreadyOpen));
                 }
@@ -561,7 +561,7 @@ public class InvseeAPI {
 
         //map to SpectateResponse and cache if success
         CompletableFuture<SpectateResponse<MainSpectatorInventory>> future = combinedFuture.<SpectateResponse<MainSpectatorInventory>>thenApply(eitherReasonOrInventory -> {
-            eitherReasonOrInventory.ifSuccess(cachedInventories::cache);
+            eitherReasonOrInventory.ifSuccess(openSpectatorsCache::cache);
             return eitherReasonOrInventory;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
@@ -623,7 +623,7 @@ public class InvseeAPI {
             return SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(theTarget));
         } else {
             EnderSpectatorInventory inv = platform.spectateEnderChest(target, options);
-            cachedInventories.cache(inv);
+            openSpectatorsCache.cache(inv);
             return SpectateResponse.succeed(inv);
         }
     }
@@ -671,7 +671,7 @@ public class InvseeAPI {
             EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
             UUID uuid = targetPlayer.getUniqueId();
             lookup.cacheNameAndUniqueId(uuid, targetName);
-            cachedInventories.cache(spectatorInventory);
+            openSpectatorsCache.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -768,7 +768,7 @@ public class InvseeAPI {
 
             EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
             lookup.cacheNameAndUniqueId(playerId, playerName);
-            cachedInventories.cache(spectatorInventory);
+            openSpectatorsCache.cache(spectatorInventory);
             return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
@@ -798,7 +798,7 @@ public class InvseeAPI {
                 return CompletableFuture.completedFuture(SpectateResponse.fail(maybeReason.get()));
             } else {
                 //try cache
-                EnderSpectatorInventory alreadyOpen = cachedInventories.getEnderSpectatorInventory(playerId);
+                EnderSpectatorInventory alreadyOpen = openSpectatorsCache.getEnderSpectatorInventory(playerId);
                 if (alreadyOpen != null) {
                     return CompletableFuture.completedFuture(SpectateResponse.succeed(alreadyOpen));
                 }
@@ -810,7 +810,7 @@ public class InvseeAPI {
 
         //map to SpectateResult and cache if success
         CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future = combinedFuture.<SpectateResponse<EnderSpectatorInventory>>thenApply(eitherReasonOrInventory -> {
-            eitherReasonOrInventory.ifSuccess(cachedInventories::cache);
+            eitherReasonOrInventory.ifSuccess(openSpectatorsCache::cache);
             return eitherReasonOrInventory;
         }).handleAsync((success, error) -> {
             if (error == null) return success;
@@ -892,8 +892,8 @@ public class InvseeAPI {
             //check if somebody was looking in the offline inventory and update player's inventory.
             //idem for ender.
 
-            final MainSpectatorInventory oldMainSpectator = cachedInventories.getMainSpectatorInventory(uuid);
-            final EnderSpectatorInventory oldEnderSpectator = cachedInventories.getEnderSpectatorInventory(uuid);
+            final MainSpectatorInventory oldMainSpectator = openSpectatorsCache.getMainSpectatorInventory(uuid);
+            final EnderSpectatorInventory oldEnderSpectator = openSpectatorsCache.getEnderSpectatorInventory(uuid);
 
             if (oldMainSpectator != null && transferInvToLivePlayer.test(oldMainSpectator, player)) {
                 if (newInventorySpectator == null) {
@@ -911,7 +911,7 @@ public class InvseeAPI {
                         viewer.closeInventory();
                         viewer.openInventory(newInventorySpectator);
                     }
-                    cachedInventories.cache(newInventorySpectator, true);
+                    openSpectatorsCache.cache(newInventorySpectator, true);
                 }
             }
 
@@ -931,7 +931,7 @@ public class InvseeAPI {
                         viewer.closeInventory();
                         viewer.openInventory(newEnderSpectator);
                     }
-                    cachedInventories.cache(newEnderSpectator, true);
+                    openSpectatorsCache.cache(newEnderSpectator, true);
                 }
             }
         }
@@ -981,7 +981,7 @@ public class InvseeAPI {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onTargetOpen(InventoryOpenEvent event) {
             HumanEntity target = event.getPlayer();
-            MainSpectatorInventory spectatorInventory = cachedInventories.getMainSpectatorInventory(target.getUniqueId());
+            MainSpectatorInventory spectatorInventory = openSpectatorsCache.getMainSpectatorInventory(target.getUniqueId());
             if (spectatorInventory instanceof Personal) {
                 //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
                 //set the cursor reference and crafting inventory
@@ -992,7 +992,7 @@ public class InvseeAPI {
         @EventHandler(priority = EventPriority.MONITOR)
         public void onTargetClose(InventoryCloseEvent event) {
             HumanEntity target = event.getPlayer();
-            MainSpectatorInventory spectatorInventory = cachedInventories.getMainSpectatorInventory(target.getUniqueId());
+            MainSpectatorInventory spectatorInventory = openSpectatorsCache.getMainSpectatorInventory(target.getUniqueId());
             if (spectatorInventory instanceof Personal) {
                 //instanceof evaluates to 'false' for null values, so we can be sure that spectatorInventory is not null.
                 //reset personal contents to the player's own crafting contents
