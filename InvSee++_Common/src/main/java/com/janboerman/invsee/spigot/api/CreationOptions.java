@@ -235,7 +235,11 @@ public class CreationOptions<Slot> implements Cloneable {
     /** Get the configured plugin. */
     public Plugin getPlugin() {
         if (plugin == null) {
-            plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
+            try {
+                plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("Woops, I screwed up severely. Please report this issue (including stack trace) at https://github.com/Jannyboy11/InvSee-plus-plus", e);
+            }
         }
         return plugin;
     }
