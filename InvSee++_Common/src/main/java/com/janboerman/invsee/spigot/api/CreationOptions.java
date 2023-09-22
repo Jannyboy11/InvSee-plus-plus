@@ -28,7 +28,7 @@ public class CreationOptions<Slot> implements Cloneable {
     private PlaceholderPalette placeholderPalette = PlaceholderPalette.empty();
 
     CreationOptions(Plugin plugin, Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt, LogOptions logOptions, PlaceholderPalette palette) {
-        this.plugin = Objects.requireNonNull(plugin);
+        this.plugin = plugin;
         this.title = Objects.requireNonNull(title);
         this.offlinePlayerSupport = offlinePlayerSupport;
         this.mirror = Objects.requireNonNull(mirror);
@@ -234,6 +234,9 @@ public class CreationOptions<Slot> implements Cloneable {
 
     /** Get the configured plugin. */
     public Plugin getPlugin() {
+        if (plugin == null) {
+            plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
+        }
         return plugin;
     }
 
