@@ -432,15 +432,15 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		return itemStack; //leftover (couldn't be added)
 	}
 
-	private static void addItem(final ItemStack[] contents, final ItemStack add, final int maxStackSize) {
+	private static void addItem(final ItemStack[] contents, final ItemStack add, final int inventoryMaxStackSize) {
 		assert contents != null && add != null;
 
 		//merge with existing similar item stacks
 		for (int i = 0; i < contents.length && add.getAmount() > 0; i++) {
 			final ItemStack existingStack = contents[i];
-			if (existingStack != null) {
-				final int maxStackSizeForThisItem = Math.min(maxStackSize, existingStack.getMaxStackSize());
-				if (existingStack.isSimilar(add) && existingStack.getAmount() < maxStackSizeForThisItem) {
+			if (existingStack != null && existingStack.isSimilar(add)) {
+				final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, Math.max(existingStack.getMaxStackSize(), add.getAmount()));
+				if (existingStack.getAmount() < maxStackSizeForThisItem) {
 					//how many can we merge (at most)?
 					final int maxMergeAmount = Math.min(maxStackSizeForThisItem - existingStack.getAmount(), add.getAmount());
 					if (maxMergeAmount > 0) {
@@ -449,7 +449,8 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 							existingStack.setAmount(existingStack.getAmount() + add.getAmount());
 							add.setAmount(0);
 						} else {
-							//partial merge
+							//partial merge (item stack to be added couldn't merge completely into the existing stack)
+							assert maxStackSizeForThisItem == existingStack.getAmount() + maxMergeAmount;
 							existingStack.setAmount(maxStackSizeForThisItem);
 							add.setAmount(add.getAmount() - maxMergeAmount);
 						}
@@ -459,7 +460,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		}
 
 		//merge with empty slots
-		final int maxStackSizeForThisItem = Math.min(maxStackSize, add.getMaxStackSize());
+		final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, Math.max(add.getMaxStackSize(), add.getAmount()));
 		for (int i = 0; i < contents.length && add.getAmount() > 0; i++) {
 			if (contents[i] == null || contents[i].getAmount() == 0 || contents[i].getType() == Material.AIR) {
 				if (add.getAmount() <= maxStackSizeForThisItem) {
@@ -467,10 +468,10 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 					contents[i] = add.clone();
 					add.setAmount(0);
 				} else {
-					//partial merge
-					ItemStack clone = add.clone(); clone.setAmount(maxStackSize);
+					//partial merge (item stack exceeded max stack size)
+					ItemStack clone = add.clone(); clone.setAmount(maxStackSizeForThisItem);
 					contents[i] = clone;
-					add.setAmount(add.getAmount() - maxStackSize);
+					add.setAmount(add.getAmount() - maxStackSizeForThisItem);
 				}
 			}
 		}
