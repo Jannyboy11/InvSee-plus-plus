@@ -49,6 +49,11 @@ public interface Setup {
                 case MappingsVersion._1_20_1:
                     return new Impl_1_20_1(plugin, lookup, scheduler, cache);
             }
+        } else if ("org.bukkit.craftbukkit.v1_20_R2.CraftServer".equals(serverClassName)) {
+            switch (MappingsVersion.getMappingsVersion(server)) {
+                case MappingsVersion._1_20_2:
+                    return new Impl_1_20_2(plugin, lookup, scheduler,cache);
+            }
         } else if ("net.glowstone.GlowServer".equals(serverClassName)) {
             return new Impl_Glowstone(plugin, lookup, scheduler, cache);
         }
@@ -110,6 +115,12 @@ class Impl_1_19_4 extends SetupImpl {
 class Impl_1_20_1 extends SetupImpl {
     Impl_1_20_1(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_20_1_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_1_R1.KnownPlayersProvider(plugin, scheduler));
+    }
+}
+
+class Impl_1_20_2 extends SetupImpl {
+    Impl_1_20_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_20_2_R2.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_2_R2.KnownPlayersProvider(plugin, scheduler));
     }
 }
 

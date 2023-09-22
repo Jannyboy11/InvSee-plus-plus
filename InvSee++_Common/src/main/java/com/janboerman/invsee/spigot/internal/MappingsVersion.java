@@ -24,6 +24,7 @@ public class MappingsVersion {
     public static final String _1_19_4 = "3009edc0fff87fa34680686663bd59df";
     public static final String _1_20   = "34f399b4f2033891290b7f0700e9e47b";
     public static final String _1_20_1 = "bcf3dcb22ad42792794079f9443df2c0";
+    public static final String _1_20_2 = "3478a65bfd04b15b431fe107b3617dfc";
 
     /**
      * Get the version of the mappings used by CraftBukkit. Note that this method only works on (forks of) CraftBukkit.
