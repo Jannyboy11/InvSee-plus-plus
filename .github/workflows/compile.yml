@@ -35,11 +35,6 @@ jobs:
           java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.20.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.20.2 --compile craftbukkit --remapped
-      - name: Install PerWorldInventory
-        run: |
-          git clone https://github.com/Jannyboy11/perworldinventory-kt.git
-          cd perworldinventory-kt
-          mvn --batch-mode --update-snapshots clean package install -DskipTests=true
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release

@@ -85,10 +85,8 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
     - `java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.2 --compile craftbukkit --remapped`
-2. Install PerWorldInventory into your local repository by downloading [PerWorldInventory's code](https://github.com/Jannyboy11/perworldinventory-kt)
-and running `mvn clean install -DskipTests=true` in its root directory.
-3. In the root directory of this project run `mvn clean package`.
-You can find the plugin jar at Spigot_Plugin/target/InvSee++.jar.
+2. In the root directory of this project run `mvn clean package`.
+You can find the plugin jar at InvSee++_plugin/target/InvSee++.jar.
 
 ### Developers API
 Documentation available on the [wiki](https://github.com/Jannyboy11/InvSee-plus-plus/wiki)!
@@ -117,7 +115,7 @@ Server support matrix:
 | Other forks of CraftBukkit | Tier 2  | Tier 2  | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2  |
 | (Neo)Forge/Bukkit hybrids  | Tier 2* | Tier 2* | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2  |
 | Fabric/Bukkit hybrids      | Tier 2* | Tier 2* | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2  |
-| Glowstone                  | Tier 2  | Tier 2  | n/a     | n/a     | n/a    | n/a    | n/a     | n/a    | Tier 2  |
+| Glowstone                  | Tier 2  | Tier 2  | n/a     | n/a     | n/a    | n/a    | n/a     | n/a    | n/a     |
 
 *The modding frameworks that these servers are based on were released at a time when Minecraft's minimum supported version was Java 8 (or lower),
 and there is a good chance they won't be able to load mods and plugins compiled for newer Java versions.
