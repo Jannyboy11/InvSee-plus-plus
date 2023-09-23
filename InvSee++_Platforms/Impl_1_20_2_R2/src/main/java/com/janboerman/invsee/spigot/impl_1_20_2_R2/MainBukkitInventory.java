@@ -523,14 +523,12 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 
 		for (int slot = 0; slot < getSize() && remove.getAmount() > 0; slot++) {
 			final ItemStack existingStack = getItem(slot);
-			if (existingStack != null) {
-				if (existingStack.isSimilar(remove)) {
-					//how many can we remove (at most)?
-					final int maxRemoveAmount = Math.min(existingStack.getAmount(), remove.getAmount());
-					//subtract the amount from both item stacks
-					existingStack.setAmount(existingStack.getAmount() - maxRemoveAmount);
-					remove.setAmount(remove.getAmount() - maxRemoveAmount);
-				}
+			if (existingStack != null && existingStack.isSimilar(remove)) {
+				//how many can we remove (at most)?
+				final int maxRemoveAmount = Math.min(existingStack.getAmount(), remove.getAmount());
+				//subtract the amount from both item stacks
+				existingStack.setAmount(existingStack.getAmount() - maxRemoveAmount);
+				remove.setAmount(remove.getAmount() - maxRemoveAmount);
 			}
 		}
 

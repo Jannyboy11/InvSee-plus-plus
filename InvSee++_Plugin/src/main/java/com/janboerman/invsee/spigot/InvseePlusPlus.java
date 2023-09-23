@@ -27,6 +27,9 @@ import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -478,4 +481,11 @@ public class InvseePlusPlus extends JavaPlugin {
         return offlinePlayerProvider;
     }
 
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
+        sender.sendMessage(ChatColor.YELLOW + "Oh now! It looks like InvSee++ didn't start correctly!");
+        sender.sendMessage(ChatColor.YELLOW + "Most likely this is a Minecraft<->InvSee++ version mismatch.");
+        sender.sendMessage(ChatColor.YELLOW + "Check your logs for more information.");
+        return true;
+    }
 }
