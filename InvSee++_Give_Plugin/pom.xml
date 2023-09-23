@@ -2,7 +2,7 @@
     <parent>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.24.3</version>
+        <version>0.24.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -124,7 +124,7 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>give_impl_1_8_8_r3</artifactId>
-            <version>0.24.3</version>
+            <version>0.24.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
