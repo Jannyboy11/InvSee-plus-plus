@@ -3,7 +3,8 @@ package com.janboerman.invsee.spigot.internal.version;
 public enum MinecraftPlatform {
 
     CRAFTBUKKIT("CraftBukkit"),
-    GLOWSTONE("Glowstone");
+    GLOWSTONE("Glowstone"),
+    PAPER("Paper");
     //TODO Folia
 
     private final String name;

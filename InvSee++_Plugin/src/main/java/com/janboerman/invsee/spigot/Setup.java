@@ -119,7 +119,7 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_18_2, (p, l, s, c) -> new Impl_1_18_2(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_19_4, (p, l, s, c) -> new Impl_1_19_4(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_20_1, (p, l, s, c) -> new Impl_1_20_1(p, l, s, c));
-        SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_20_2, (p, l, s, c) -> new Impl_1_20_2(p, l, s, c));
+        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_20_2(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_20_2, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_2));
         final SetupProvider glowstoneProver = (p, l, s, c) -> new Impl_Glowstone(p, l, s, c);
         final MinecraftVersion[] minecraftVersions = MinecraftVersion.values();
         for (int idx = MinecraftVersion._1_8.ordinal(); idx < MinecraftVersion._1_12_2.ordinal(); idx ++) {

@@ -946,6 +946,10 @@ public class InvseeAPI {
             //As soon as no player is spectating that inventory anymore and the JVM garbage collects the SpectatorInventory, the entry will be evicted from the openInventories cache automatically.
             //This *REQUIRES* that the UUIDs used by SpectatorInventories are copies of the UUIDs of the Players. See UUIDHelper#copy(UUID).
         }
+
+        //TODO as Paper may introduce creating multiple nms ServerPlayer objects for the same CraftPlayer,
+        //TODO we need to track this properly and *reset* the nms inventory contents to that of th new (live) player,
+        //TODO whenever the player changes worlds.
     }
 
     private final class InventoryListener implements Listener {

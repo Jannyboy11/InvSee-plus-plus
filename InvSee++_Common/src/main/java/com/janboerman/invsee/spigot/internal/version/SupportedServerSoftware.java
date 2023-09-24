@@ -15,6 +15,12 @@ public class SupportedServerSoftware<ImplementationProvider> {
         this.supportedVersions.put(software, implementationSupplier);
     }
 
+    public void registerSupportedVersion(ImplementationProvider implementationSupplier, ServerSoftware... softwares) {
+        for (ServerSoftware software : softwares) {
+            registerSupportedVersion(software, implementationSupplier);
+        }
+    }
+
     public ImplementationProvider getImplementationProvider(ServerSoftware software) {
         return supportedVersions.get(software);
     }

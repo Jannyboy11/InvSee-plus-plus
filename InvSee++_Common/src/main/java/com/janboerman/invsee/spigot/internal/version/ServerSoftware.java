@@ -81,6 +81,11 @@ public class ServerSoftware {
                     case CraftbukkitMappingsVersion._1_20_2: return CRAFTBUKKIT_1_20_2;
                 }
 
+            case "org.bukkit.craftbukkit.CraftServer":
+                // Paper unversioned server class name
+                // Call Server#getMinecraftVersion() to find out the version (this method was added by Paper).
+                return new ServerSoftware(PAPER, MinecraftVersion.fromString(server.getMinecraftVersion()));
+
             case "net.glowstone.GlowServer":
                 final String glowstoneGameVersion = GlowstoneGameVersion.getGameVersion();
                 switch (glowstoneGameVersion) {
