@@ -3,7 +3,7 @@
         <relativePath>../../pom.xml</relativePath>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.24.4-SNAPSHOT</version>
+        <version>0.24.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
