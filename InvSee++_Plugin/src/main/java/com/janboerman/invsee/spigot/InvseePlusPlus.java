@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public class InvseePlusPlus extends JavaPlugin {
+public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.spigot.api.InvseePlusPlus {
 
     private final boolean asyncTabcompleteEvent;
 

@@ -7,7 +7,6 @@ import org.bukkit.event.HandlerList;
 public class SpectatorInventoryOfflineCreatedEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
-    private boolean cancel;
 
     private final SpectatorInventory<?> spectatorInventory;
 
