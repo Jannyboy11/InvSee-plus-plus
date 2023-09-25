@@ -3,12 +3,12 @@
         <relativePath>../../pom.xml</relativePath>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.24.5</version>
+        <version>0.24.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>give_impl_1_8_8_r3</artifactId>
-  <version>0.24.5</version>
+  <version>0.24.6-SNAPSHOT</version>
     <name>InvSee++ Give implementation for CraftBukkit 1.8.8</name>
 
     <properties>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>invsee-plus-plus_give_common</artifactId>
-            <version>0.24.5</version>
+            <version>0.24.6-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
