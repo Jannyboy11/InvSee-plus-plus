@@ -5,8 +5,6 @@ import java.util.Map;
 
 public class LegacyVersions {
 
-    private static final LegacyVersions INSTANCE = new LegacyVersions();
-
     private static final LegacyVersion
             LATEST_THAT_SUPPORTS_1_20 = new LegacyVersion(MinecraftVersion._1_20, "0.22.6",
             "https://www.spigotmc.org/resources/invsee.82342/download?version=505200", "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.22.6"),
@@ -24,18 +22,22 @@ public class LegacyVersions {
             LATEST_THAT_SUPPORTS_1_17 = new LegacyVersion(MinecraftVersion._1_17, "0.11.4", "https://www.spigotmc.org/resources/invsee.82342/download?version=435036", null),
             LATEST_THAT_SUPPORTS_1_16_3 = new LegacyVersion(MinecraftVersion._1_16_3, "0.7", "https://www.spigotmc.org/resources/invsee.82342/download?version=365265", null);
 
+    private static final LegacyVersions INSTANCE = new LegacyVersions();
+    static {
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_20);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_19_3);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_19_2);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_19_1);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_19);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_18_1);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_18);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_17);
+        INSTANCE.register(LATEST_THAT_SUPPORTS_1_16_3);
+    }
+
     private final Map<MinecraftVersion, LegacyVersion> legacyInvSeePlusPlusVersions = new HashMap<>();
 
     private LegacyVersions() {
-        register(LATEST_THAT_SUPPORTS_1_20);
-        register(LATEST_THAT_SUPPORTS_1_19_3);
-        register(LATEST_THAT_SUPPORTS_1_19_2);
-        register(LATEST_THAT_SUPPORTS_1_19_1);
-        register(LATEST_THAT_SUPPORTS_1_19);
-        register(LATEST_THAT_SUPPORTS_1_18_1);
-        register(LATEST_THAT_SUPPORTS_1_18);
-        register(LATEST_THAT_SUPPORTS_1_17);
-        register(LATEST_THAT_SUPPORTS_1_16_3);
     }
 
     private void register(LegacyVersion legacyVersion) {
