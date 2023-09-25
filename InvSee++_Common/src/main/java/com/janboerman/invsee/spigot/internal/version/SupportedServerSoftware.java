@@ -3,13 +3,13 @@ package com.janboerman.invsee.spigot.internal.version;
 import org.bukkit.Server;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class SupportedServerSoftware<ImplementationProvider> {
 
-    private final Map<ServerSoftware, ImplementationProvider> supportedVersions = new HashMap<>();
+    private final Map<ServerSoftware, ImplementationProvider> supportedVersions = new LinkedHashMap<>();
 
     public void registerSupportedVersion(ServerSoftware software, ImplementationProvider implementationSupplier) {
         this.supportedVersions.put(software, implementationSupplier);
