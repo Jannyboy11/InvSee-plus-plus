@@ -66,7 +66,9 @@ class CursorSlot extends Slot {
 
 class PersonalSlot extends Slot {
 
-    PersonalSlot(MainNmsInventory inventory, int index, int xPos, int yPos) {
+    private final ItemStack placeholder;
+
+    PersonalSlot(ItemStack placeholder, MainNmsInventory inventory, int index, int xPos, int yPos) {
         super(inventory, index, xPos, yPos);
     }
 
@@ -124,7 +126,7 @@ class PersonalSlot extends Slot {
 
     @Override
     public ItemStack getItem() {
-        if (!works()) return ItemStack.EMPTY;
+        if (!works()) return placeholder;
         return super.getItem();
     }
 
@@ -137,8 +139,11 @@ class PersonalSlot extends Slot {
 
 class InaccessibleSlot extends Slot {
 
-    InaccessibleSlot(Container inventory, int index, int xPos, int yPos) {
+    private final ItemStack placeholder;
+
+    InaccessibleSlot(ItemStack placeholder, Container inventory, int index, int xPos, int yPos) {
         super(inventory, index, xPos, yPos);
+        this.placeholder = placeholder;
     }
 
     @Override
@@ -178,29 +183,12 @@ class InaccessibleSlot extends Slot {
 
     @Override
     public ItemStack getItem() {
-        return ItemStack.EMPTY;
+        return placeholder;
     }
 
     @Override
     public boolean isActive() {
         return false;
-    }
-
-}
-
-class InaccessiblePlaceholderSlot extends InaccessibleSlot {
-
-    private final ItemStack placeholder;
-
-    InaccessiblePlaceholderSlot(ItemStack placeholder, Container inventory, int index, int xPos, int yPos) {
-        super(inventory, index, xPos, yPos);
-
-        this.placeholder = placeholder;
-    }
-
-    @Override
-    public ItemStack getItem() {
-        return placeholder;
     }
 
 }

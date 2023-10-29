@@ -49,7 +49,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 		final EnderChestSlot place = mirror.getSlot(positionIndex);
 
 		if (place == null) {
-			return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
+			return new InaccessibleSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
 		} else {
 			final int referringTo = place.ordinal();
 			return new Slot(top, referringTo, magicX, magicY);

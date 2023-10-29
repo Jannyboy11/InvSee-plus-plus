@@ -38,7 +38,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 		final PlayerInventorySlot place = mirror.getSlot(positionIndex);
 
 		if (place == null) {
-			return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
+			return new InaccessibleSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
 		} else if (place.isContainer()) {
 			final int referringTo = place.ordinal() - PlayerInventorySlot.CONTAINER_00.ordinal();
 			return new Slot(top, referringTo, magicX, magicY); //magicX and magicY correct here? it seems to work though.
@@ -56,7 +56,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 			return new HelmetSlot(top, referringTo, magicX, magicY); //idem?
 		} else if (place.isPersonal()) {
 			final int referringTo = place.ordinal() - PlayerInventorySlot.PERSONAL_00.ordinal() + 45;
-			return new PersonalSlot(top, referringTo, magicX, magicY); //idem?
+			return new PersonalSlot(inaccessiblePlaceholder, top, referringTo, magicX, magicY); //idem?
 		} else if (place.isOffHand()) {
 			final int referringTo = 40;
 			return new OffhandSlot(top, referringTo, magicX, magicY); //idem?
@@ -64,7 +64,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 			final int referringTo = 41;
 			return new CursorSlot(top, referringTo, magicX, magicY); //idem?
 		} else {
-			return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY); //idem?
+			return new InaccessibleSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY); //idem?
 		}
 	}
 
