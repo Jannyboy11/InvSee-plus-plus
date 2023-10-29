@@ -3,7 +3,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.24.7</version>
+    <version>0.24.8-SNAPSHOT</version>
 
     <modules>
         <module>Utils</module>
