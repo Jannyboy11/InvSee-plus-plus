@@ -52,7 +52,17 @@ class EnderBukkitInventoryView extends EnderSpectatorInventoryView {
 
     @Override
     public ItemStack getItem(int slot) {
-        return slot < 0 ? null : CraftItemStack.asCraftMirror(nms.getSlot(slot).getItem());
+        if (slot < 0) {
+            return null;
+        } else {
+            net.minecraft.world.item.ItemStack nmsStack;
+            if (slot < nms.top.getContainerSize()) {
+                nmsStack = nms.top.getContents().get(slot);
+            } else {
+                nmsStack = nms.getSlot(slot).getItem();
+            }
+            return CraftItemStack.asCraftMirror(nmsStack);
+        }
     }
 
     @Override

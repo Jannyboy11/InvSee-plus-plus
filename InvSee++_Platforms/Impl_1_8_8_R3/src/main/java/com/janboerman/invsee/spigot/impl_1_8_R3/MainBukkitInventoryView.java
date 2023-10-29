@@ -47,7 +47,17 @@ class MainBukkitInventoryView extends MainSpectatorInventoryView {
 
     @Override
     public ItemStack getItem(int slot) {
-        return slot < 0 ? null : CraftItemStack.asCraftMirror(nms.getSlot(slot).getItem());
+        if (slot < 0) {
+            return null;
+        } else {
+            net.minecraft.server.v1_8_R3.ItemStack nmsStack;
+            if (slot < nms.top.getSize()) {
+                nmsStack = nms.top.getContents()[slot];
+            } else {
+                nmsStack = nms.getSlot(slot).getItem();
+            }
+            return CraftItemStack.asCraftMirror(nmsStack);
+        }
     }
 
     @Override
