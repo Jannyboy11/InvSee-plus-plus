@@ -35,11 +35,11 @@ class MainNmsContainer extends AbstractContainerMenu {
     private MainBukkitInventoryView bukkitView;
     final DifferenceTracker tracker;
 
-    private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
+    private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY, ItemStack inaccessiblePlaceholder) {
         final PlayerInventorySlot place = mirror.getSlot(positionIndex);
 
         if (place == null) {
-            return new InaccessibleSlot(top, positionIndex, magicX, magicY);
+            return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
         } else if (place.isContainer()) {
             final int referringTo = place.ordinal() - PlayerInventorySlot.CONTAINER_00.ordinal();
             return new Slot(top, referringTo, magicX, magicY); //magicX and magicY correct here? it seems to work though.
@@ -65,7 +65,7 @@ class MainNmsContainer extends AbstractContainerMenu {
             final int referringTo = 41;
             return new CursorSlot(top, referringTo, magicX, magicY); //idem?
         } else {
-            return new InaccessibleSlot(top, positionIndex, magicX, magicY); //idem?
+            return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY); //idem?
         }
     }
 
@@ -122,7 +122,7 @@ class MainNmsContainer extends AbstractContainerMenu {
                 int magicX = 8 + xPos * 18;
                 int magicY = 18 + yPos * 18;
 
-                addSlot(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY));
+                addSlot(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY, CraftItemStack.asNMSCopy(creationOptions.getPlaceholderPalette().inaccessible())));
             }
         }
 

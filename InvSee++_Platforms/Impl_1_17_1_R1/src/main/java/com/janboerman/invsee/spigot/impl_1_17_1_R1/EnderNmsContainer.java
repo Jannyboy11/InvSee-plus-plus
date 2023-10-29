@@ -45,11 +45,11 @@ class EnderNmsContainer extends AbstractContainerMenu {
         };
     }
 
-    private static Slot makeSlot(Mirror<EnderChestSlot> mirror, EnderNmsInventory top, int positionIndex, int magicX, int magicY) {
+    private static Slot makeSlot(Mirror<EnderChestSlot> mirror, EnderNmsInventory top, int positionIndex, int magicX, int magicY, ItemStack inaccessiblePlaceholder) {
         final EnderChestSlot place = mirror.getSlot(positionIndex);
 
         if (place == null) {
-            return new InaccessibleSlot(top, positionIndex, magicX, magicY);
+            return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
         } else {
             final int referringTo = place.ordinal();
             return new Slot(top, referringTo, magicX, magicY);
@@ -113,7 +113,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
                 int magicX = 8 + xPos * 18;
                 int magicY = 18 + yPos * 18;
 
-                addSlot(makeSlot(mirror, top, index, magicX, magicY));
+                addSlot(makeSlot(mirror, top, index, magicX, magicY, CraftItemStack.asNMSCopy(creationOptions.getPlaceholderPalette().inaccessible())));
             }
         }
 

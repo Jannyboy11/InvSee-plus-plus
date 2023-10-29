@@ -23,6 +23,8 @@ class EnderInventoryView extends EnderSpectatorInventoryView {
     private final EnderInventory top;
     private final PlayerInventory bottom;
 
+    private final ItemStack inaccessibleSlotPlaceholder;
+
     private DifferenceTracker diffTracker;
 
     InventoryOpenEvent openEvent;
@@ -42,6 +44,8 @@ class EnderInventoryView extends EnderSpectatorInventoryView {
                     logOptions.getGranularity());
             diffTracker.onOpen();
         }
+
+        this.inaccessibleSlotPlaceholder = creationOptions.getPlaceholderPalette().inaccessible();
     }
 
     @Override
@@ -64,7 +68,7 @@ class EnderInventoryView extends EnderSpectatorInventoryView {
         EnderInventory top;
         if (0 <= slot && slot < (top = getTopInventory()).getSize()) {
             EnderChestSlot ecSlot = getMirror().getSlot(slot);
-            return ecSlot == null ? null : top.getItem(ecSlot.defaultIndex());
+            return ecSlot == null ? inaccessibleSlotPlaceholder : top.getItem(ecSlot.defaultIndex());
         } else {
             return super.getItem(slot);
         }

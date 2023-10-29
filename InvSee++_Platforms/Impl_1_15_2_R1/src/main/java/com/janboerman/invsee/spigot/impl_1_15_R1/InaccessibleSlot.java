@@ -48,3 +48,20 @@ class InaccessibleSlot extends Slot {
         return false;
     }
 }
+
+class InaccessiblePlaceholderSlot extends InaccessibleSlot {
+
+    private final ItemStack placeholder;
+
+    InaccessiblePlaceholderSlot(ItemStack placeholder, IInventory inventory, int index, int xPos, int yPos) {
+        super(inventory, index, xPos, yPos);
+
+        this.placeholder = placeholder;
+    }
+
+    @Override
+    public ItemStack getItem() {
+        return placeholder;
+    }
+
+}

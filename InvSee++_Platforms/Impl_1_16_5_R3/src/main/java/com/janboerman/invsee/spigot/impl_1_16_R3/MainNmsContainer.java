@@ -28,11 +28,11 @@ class MainNmsContainer extends Container {
     private MainBukkitInventoryView bukkitView;
     final DifferenceTracker tracker;
 
-    private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY) {
+    private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY, ItemStack inaccessiblePlaceholder) {
         final PlayerInventorySlot place = mirror.getSlot(positionIndex);
 
         if (place == null) {
-            return new InaccessibleSlot(top, positionIndex, magicX, magicY);
+            return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
         } else if (place.isContainer()) {
             final int referringTo = place.ordinal() - PlayerInventorySlot.CONTAINER_00.ordinal();
             return new Slot(top, referringTo, magicX, magicY); //magicX and magicY correct here? it seems to work though.
@@ -58,7 +58,7 @@ class MainNmsContainer extends Container {
             final int referringTo = 41;
             return new CursorSlot(top, referringTo, magicX, magicY); //idem?
         } else {
-            return new InaccessibleSlot(top, positionIndex, magicX, magicY); //idem?
+            return new InaccessiblePlaceholderSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY); //idem?
         }
     }
 

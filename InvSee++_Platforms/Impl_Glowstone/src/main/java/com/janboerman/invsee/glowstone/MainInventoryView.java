@@ -23,6 +23,8 @@ class MainInventoryView extends MainSpectatorInventoryView {
     private final MainInventory top;
     private final PlayerInventory bottom;
 
+    private final ItemStack inaccessiblePlaceholder;
+
     private DifferenceTracker diffTracker;
 
     InventoryOpenEvent openEvent;
@@ -42,6 +44,8 @@ class MainInventoryView extends MainSpectatorInventoryView {
                     logOptions.getGranularity());
             diffTracker.onOpen();
         }
+
+        this.inaccessiblePlaceholder = creationOptions.getPlaceholderPalette().inaccessible();
     }
 
     @Override
@@ -64,7 +68,7 @@ class MainInventoryView extends MainSpectatorInventoryView {
         MainInventory top;
         if (0 <= slot && slot < (top = getTopInventory()).getSize()) {
             PlayerInventorySlot piSlot = getMirror().getSlot(slot);
-            return piSlot == null ? null : top.getItem(piSlot.defaultIndex());
+            return piSlot == null ? inaccessiblePlaceholder : top.getItem(piSlot.defaultIndex());
         } else {
             return super.getItem(slot);
         }
