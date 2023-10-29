@@ -3,7 +3,7 @@
         <relativePath>../../pom.xml</relativePath>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.24.8-SNAPSHOT</version>
+        <version>0.24.7-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -11,10 +11,10 @@
     <name>InvSee++ Give implementation for Glowstone</name>
 
     <repositories>
-<!--        <repository>-->
-<!--            <id>jitpack.io</id>-->
-<!--            <url>https://jitpack.io</url>-->
-<!--        </repository>-->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
         <repository>
             <id>glowstone-repo</id>
             <url>https://repo.glowstone.net/content/repositories/snapshots/</url>
@@ -28,12 +28,12 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.TheNullicorn</groupId>-->
-<!--            <artifactId>Nedit</artifactId>-->
-<!--            <version>49615cf47c</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.TheNullicorn</groupId>
+            <artifactId>Nedit</artifactId>
+            <version>49615cf47c</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>net.glowstone</groupId>
