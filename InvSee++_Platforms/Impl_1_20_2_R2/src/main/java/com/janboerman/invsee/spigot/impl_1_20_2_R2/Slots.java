@@ -153,7 +153,7 @@ class InaccessibleSlot extends Slot {
 
     @Override
     public void set(ItemStack itemStack) {
-        super.setChanged();		// Mohist: call super.setChanged() instead of this.setChanged().
+        setChanged();
     }
 
     @Override
