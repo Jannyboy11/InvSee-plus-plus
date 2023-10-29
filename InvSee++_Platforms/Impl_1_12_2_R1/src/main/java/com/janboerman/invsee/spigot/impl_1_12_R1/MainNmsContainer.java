@@ -128,7 +128,7 @@ class MainNmsContainer extends Container {
                 int index = xPos + yPos * 9;
                 int magicX = 8 + xPos * 18;
                 int magicY = 18 + yPos * 18;
-                a(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY));
+                a(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY, CraftItemStack.asNMSCopy(creationOptions.getPlaceholderPalette().inaccessible())));
             }
         }
 
