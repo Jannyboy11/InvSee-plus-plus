@@ -70,6 +70,7 @@ class PersonalSlot extends Slot {
 
     PersonalSlot(ItemStack placeholder, MainNmsInventory inventory, int index, int xPos, int yPos) {
         super(inventory, index, xPos, yPos);
+        this.placeholder = placeholder;
     }
 
     final boolean works() {
