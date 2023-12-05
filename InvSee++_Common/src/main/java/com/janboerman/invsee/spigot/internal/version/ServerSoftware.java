@@ -20,6 +20,7 @@ public class ServerSoftware {
             CRAFTBUKKIT_1_19_4 = new ServerSoftware(CRAFTBUKKIT, _1_19_4),
             CRAFTBUKKIT_1_20_1 = new ServerSoftware(CRAFTBUKKIT, _1_20_1),
             CRAFTBUKKIT_1_20_2 = new ServerSoftware(CRAFTBUKKIT, _1_20_2),
+            CRAFTBUKKIT_1_20_3 = new ServerSoftware(CRAFTBUKKIT, _1_20_3),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
