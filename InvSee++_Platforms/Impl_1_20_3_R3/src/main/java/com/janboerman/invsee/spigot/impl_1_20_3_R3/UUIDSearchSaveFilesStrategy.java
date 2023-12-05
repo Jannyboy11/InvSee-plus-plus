@@ -8,13 +8,14 @@ import com.janboerman.invsee.spigot.internal.LogRecord;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 import com.janboerman.invsee.spigot.internal.PlayerFileHelper;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NBTReadLimiter;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,16 +54,17 @@ public class UUIDSearchSaveFilesStrategy implements UUIDResolveStrategy {
 				playerFilesLoop:
 				for (File playerFile : playerFiles) {
 					final String fileName = playerFile.getName();
+					final Path filePath = playerFile.toPath();
 					final UUID playerId = uuidFromFileName(fileName);
 					final Executor syncExecutor = playerId == null ? scheduler::executeSyncGlobal : runnable -> scheduler.executeSyncPlayer(playerId, runnable, null);
 
 					//I now finally understand the appeal of libraries like Cats Effect / ZIO.
 					try {
-						CompletableFuture<CompoundTag> compoundFuture = CompletableFuture.completedFuture(net.minecraft.nbt.NbtIo.readCompressed(playerFile, NBTReadLimiter.unlimitedHeap()));
+						CompletableFuture<CompoundTag> compoundFuture = CompletableFuture.completedFuture(net.minecraft.nbt.NbtIo.readCompressed(filePath, NbtAccounter.unlimitedHeap()));
 						// if reading the player file asynchronously fails, we retry on the main thread.
 						compoundFuture = compoundFuture.exceptionallyAsync(asyncEx -> {
 							try {
-								return net.minecraft.nbt.NbtIo.readCompressed(playerFile, NBTReadLimiter.unlimitedHeap());
+								return net.minecraft.nbt.NbtIo.readCompressed(filePath, NbtAccounter.unlimitedHeap());
 							} catch (IOException syncEx) {
 								//too bad, could not read this player save file synchronously.
 								syncEx.addSuppressed(asyncEx);

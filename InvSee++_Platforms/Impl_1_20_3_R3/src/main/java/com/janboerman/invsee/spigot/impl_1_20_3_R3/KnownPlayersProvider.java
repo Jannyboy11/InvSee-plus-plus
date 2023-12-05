@@ -8,13 +8,14 @@ import com.janboerman.invsee.utils.StringHelper;
 import net.minecraft.ReportedException;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NBTReadLimiter;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -42,8 +43,9 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
 		assert playerFiles != null : "playerFiles is not a directory?";
 		for (File playerFile : playerFiles) {
+			final Path filePath = playerFile.toPath();
 			try {
-				readName(result, playerFile);
+				readName(result, filePath);
 			} catch (IOException | ReportedException e1) {
 				//did not work, try again on main thread:
 				UUID playerId = uuidFromFileName(playerFile.getName());
@@ -51,7 +53,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 
 				executor.execute(() -> {
 					try {
-						readName(result, playerFile);
+						readName(result, filePath);
 					} catch (IOException | ReportedException e2) {
 						e2.addSuppressed(e1);
 						plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e2);
@@ -73,8 +75,9 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		File[] playerFiles = playerDirectory.listFiles((directory, fileName) -> PlayerFileHelper.isPlayerSaveFile(fileName));
 		assert playerFiles != null : "playerFiles is not a directory?";
 		for (File playerFile : playerFiles) {
+			final Path filePath = playerFile.toPath();
 			try {
-				readName(prefix, result, playerFile);
+				readName(prefix, result, filePath);
 			} catch (IOException | ReportedException e1) {
 				//did not work, try again on main thread:
 				UUID playerId = uuidFromFileName(playerFile.getName());
@@ -82,7 +85,7 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 
 				executor.execute(() -> {
 					try {
-						readName(prefix, result, playerFile);
+						readName(prefix, result, filePath);
 					} catch (IOException | ReportedException e2) {
 						e2.addSuppressed(e1);
 						plugin.getLogger().log(Level.WARNING, "Error reading player's save file " + playerFile.getAbsolutePath(), e2);
@@ -101,22 +104,22 @@ public class KnownPlayersProvider implements OfflinePlayerProvider {
 		}
 	}
 
-	private static void readName(Consumer<String> reader, File playerFile) throws IOException, ReportedException {
+	private static void readName(Consumer<String> reader, Path playerFile) throws IOException, ReportedException {
 		String name = readName(playerFile);
 		if (name != null) {
 			reader.accept(name);
 		}
 	}
 
-	private static void readName(String prefix, Consumer<String> reader, File playerFile) throws IOException, ReportedException {
+	private static void readName(String prefix, Consumer<String> reader, Path playerFile) throws IOException, ReportedException {
 		String name = readName(playerFile);
 		if (name != null && StringHelper.startsWithIgnoreCase(name, prefix)) {
 			reader.accept(name);
 		}
 	}
 
-	private static String readName(File playerFile) throws IOException, ReportedException {
-		CompoundTag compound = NbtIo.readCompressed(playerFile, NBTReadLimiter.unlimitedHeap());
+	private static String readName(Path playerFile) throws IOException, ReportedException {
+		CompoundTag compound = NbtIo.readCompressed(playerFile, NbtAccounter.unlimitedHeap());
 		if (compound.contains("bukkit", TAG_COMPOUND)) {
 			CompoundTag bukkit = compound.getCompound("bukkit");
 			if (bukkit.contains("lastKnownName", TAG_STRING)) {
