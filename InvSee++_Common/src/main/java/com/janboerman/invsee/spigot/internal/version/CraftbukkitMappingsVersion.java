@@ -25,6 +25,8 @@ public class CraftbukkitMappingsVersion {
     static final String _1_20   = "34f399b4f2033891290b7f0700e9e47b";
     static final String _1_20_1 = "bcf3dcb22ad42792794079f9443df2c0";
     static final String _1_20_2 = "3478a65bfd04b15b431fe107b3617dfc";
+    static final String _1_20_3 = "60a2bb6bf2684dc61c56b90d7c41bddc";
+    static final String _1_20_4 = "60a2bb6bf2684dc61c56b90d7c41bddc"; //Not updated from 1.20.3 to 1.20.4? why md_5?
 
     /**
      * Get the version of the mappings used by CraftBukkit. Note that this method only works on (forks of) CraftBukkit.

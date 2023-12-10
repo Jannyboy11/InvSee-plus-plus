@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class ServerSoftware {
 
-    //only list supported craftbukkit versions here:
+    //only list supported server versions here:
     public static final ServerSoftware
             CRAFTBUKKIT_1_8_8 = new ServerSoftware(CRAFTBUKKIT, _1_8_8),
             CRAFTBUKKIT_1_12_2 = new ServerSoftware(CRAFTBUKKIT, _1_12_2),
@@ -20,7 +20,7 @@ public class ServerSoftware {
             CRAFTBUKKIT_1_19_4 = new ServerSoftware(CRAFTBUKKIT, _1_19_4),
             CRAFTBUKKIT_1_20_1 = new ServerSoftware(CRAFTBUKKIT, _1_20_1),
             CRAFTBUKKIT_1_20_2 = new ServerSoftware(CRAFTBUKKIT, _1_20_2),
-            CRAFTBUKKIT_1_20_3 = new ServerSoftware(CRAFTBUKKIT, _1_20_3),
+            CRAFTBUKKIT_1_20_4 = new ServerSoftware(CRAFTBUKKIT, _1_20_4),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
@@ -80,6 +80,17 @@ public class ServerSoftware {
             case "org.bukkit.craftbukkit.v1_20_R2.CraftServer":
                 switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
                     case CraftbukkitMappingsVersion._1_20_2: return CRAFTBUKKIT_1_20_2;
+                }
+            case "org.bukkit.craftbukkit.v1_20_R3.CraftServer":
+                switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
+                    case CraftbukkitMappingsVersion._1_20_4:
+                        //unfortunately we have to do this since CraftBukkit 1.20.3 and 1.20.4 share the same mappings version.
+                        switch (server.getBukkitVersion()) {
+                            case "1.20.3-R0.1-SNAPSHOT": return new ServerSoftware(CRAFTBUKKIT, _1_20_3);
+                            case "1.20.4-R0.1-SNAPSHOT": return CRAFTBUKKIT_1_20_4;
+                        }
+                        //best-effort
+                        return CRAFTBUKKIT_1_20_4;
                 }
 
             case "org.bukkit.craftbukkit.CraftServer":
