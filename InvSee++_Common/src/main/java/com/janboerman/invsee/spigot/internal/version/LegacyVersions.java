@@ -8,6 +8,10 @@ public class LegacyVersions {
     private static final LegacyVersions INSTANCE = new LegacyVersions();
 
     private static final LegacyVersion
+            LATEST_THAT_SUPPORTS_1_20_1 = INSTANCE.register(new MinecraftVersion[] { MinecraftVersion._1_20_1, MinecraftVersion._1_20_3 }, "0.24.9",
+            "https://www.spigotmc.org/resources/invsee.82342/download?version=522407",
+            "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.24.9"),
+            LATEST_THAT_SUPPORTS_1_20_3 = LATEST_THAT_SUPPORTS_1_20_1,
             LATEST_THAT_SUPPORTS_1_20 = INSTANCE.register(MinecraftVersion._1_20, "0.22.6",
             "https://www.spigotmc.org/resources/invsee.82342/download?version=505200", "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.22.6"),
             LATEST_THAT_SUPPORTS_1_19_3 = INSTANCE.register(MinecraftVersion._1_19_3, "0.21.11",
@@ -27,6 +31,14 @@ public class LegacyVersions {
     private final Map<MinecraftVersion, LegacyVersion> legacyInvSeePlusPlusVersions = new HashMap<>();
 
     private LegacyVersions() {
+    }
+
+    private LegacyVersion register(MinecraftVersion[] minecraft, String invseePlusPlus, String spigot, String github) {
+        LegacyVersion legacyVersion = register(minecraft[0], invseePlusPlus, spigot, github);
+        for (int i = 1; i < minecraft.length; i += 1) {
+            legacyInvSeePlusPlusVersions.put(minecraft[i], legacyVersion);
+        }
+        return legacyVersion;
     }
 
     private LegacyVersion register(MinecraftVersion minecraft, String invseePlusPlus, String spigot, String github) {

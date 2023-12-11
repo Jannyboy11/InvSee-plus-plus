@@ -16,9 +16,7 @@
         <module>InvSee++_Platforms/Impl_1_17_1_R1</module>
         <module>InvSee++_Platforms/Impl_1_18_2_R2</module>
         <module>InvSee++_Platforms/Impl_1_19_4_R3</module>
-        <module>InvSee++_Platforms/Impl_1_20_1_R1</module>
         <module>InvSee++_Platforms/Impl_1_20_2_R2</module>
-        <module>InvSee++_Platforms/Impl_1_20_3_R3</module>
         <module>InvSee++_Platforms/Impl_1_20_4_R3</module>
         <module>InvSee++_Platforms/Impl_Glowstone</module>
         <module>InvSee++_MultiverseInventories</module> <!-- TODO finish this module -->
@@ -32,9 +30,7 @@
         <module>InvSee++_Give_Platforms/Give_Impl_1_17_1_R1</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_18_2_R2</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_19_4_R3</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_20_1_R1</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_20_2_R2</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_20_3_R3</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_20_4_R3</module>
         <module>InvSee++_Give_Platforms/Give_Impl_Glowstone</module>
         <module>InvSee++_Give_Plugin</module>

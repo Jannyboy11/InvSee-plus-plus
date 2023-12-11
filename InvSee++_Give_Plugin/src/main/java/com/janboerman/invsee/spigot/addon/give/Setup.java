@@ -39,9 +39,7 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_17_1, () -> new Impl_1_17_1());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_18_2, () -> new Impl_1_18_2());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_19_4, () -> new Impl_1_19_4());
-        SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_20_1, () -> new Impl_1_20_1());
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_20_2(), ServerSoftware.CRAFTBUKKIT_1_20_2, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_2));
-        SUPPORTED.registerSupportedVersion(() -> new Impl_1_20_3(), new ServerSoftware(MinecraftPlatform.CRAFTBUKKIT, MinecraftVersion._1_20_3), new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_3));
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_20_4(), ServerSoftware.CRAFTBUKKIT_1_20_4, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_4));
         final SetupProvider glowstoneProver = () -> new Impl_Glowstone();
         final MinecraftVersion[] minecraftVersions = MinecraftVersion.values();
@@ -68,21 +66,9 @@ class Impl_1_20_4 extends SetupImpl {
     }
 }
 
-class Impl_1_20_3 extends SetupImpl {
-    Impl_1_20_3() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_1_20_3_R3.GiveImpl.INSTANCE);
-    }
-}
-
 class Impl_1_20_2 extends SetupImpl {
     Impl_1_20_2() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_20_2_R2.GiveImpl.INSTANCE);
-    }
-}
-
-class Impl_1_20_1 extends SetupImpl {
-    Impl_1_20_1() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_1_20_1_R1.GiveImpl.INSTANCE);
     }
 }
 
