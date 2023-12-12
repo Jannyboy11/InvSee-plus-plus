@@ -11,7 +11,7 @@
     <name>InvSee++ implementation for CraftBukkit 1.20.4</name>
 
     <properties>
-        <bukkit.version>1.20.3-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>1.20.4-R0.1-SNAPSHOT</bukkit.version>
     </properties>
 
     <build>
