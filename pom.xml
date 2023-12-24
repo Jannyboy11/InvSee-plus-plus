@@ -3,7 +3,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.24.8-Mohist-Arclight-1.20.1</version>
+    <version>0.24.9-Mohist-Arclight-1.20.1-SNAPSHOT</version>
 
     <modules>
         <module>Utils</module>
