@@ -3,38 +3,17 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.24.8</version>
+    <version>0.24.8-Mohist-Arclight-1.20.1-SNAPSHOT</version>
 
     <modules>
         <module>Utils</module>
         <module>Mojang_API</module>
         <module>InvSee++_Common</module>
-        <module>InvSee++_Platforms/Impl_1_8_8_R3</module>
-        <module>InvSee++_Platforms/Impl_1_12_2_R1</module>
-        <module>InvSee++_Platforms/Impl_1_15_2_R1</module>
-        <module>InvSee++_Platforms/Impl_1_16_5_R3</module>
-        <module>InvSee++_Platforms/Impl_1_17_1_R1</module>
-        <module>InvSee++_Platforms/Impl_1_18_2_R2</module>
-        <module>InvSee++_Platforms/Impl_1_19_4_R3</module>
         <module>InvSee++_Platforms/Impl_1_20_1_R1</module>
-        <module>InvSee++_Platforms/Impl_1_20_2_R2</module>
-        <module>InvSee++_Platforms/Impl_1_20_3_R3</module>
-        <module>InvSee++_Platforms/Impl_Glowstone</module>
-        <module>InvSee++_MultiverseInventories</module> <!-- TODO finish this module -->
         <module>InvSee++_PerWorldInventory</module>
         <module>InvSee++_Plugin</module>
         <module>InvSee++_Give_Common</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_8_8_R3</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_12_2_R1</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_15_2_R1</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_16_5_R3</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_17_1_R1</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_18_2_R2</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_19_4_R3</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_20_1_R1</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_20_2_R2</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_20_3_R3</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_Glowstone</module>
         <module>InvSee++_Give_Plugin</module>
         <module>InvSee++_Clear_Plugin</module>
     </modules>
@@ -45,7 +24,7 @@
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/Jannyboy11/InvSee-plus-plus.git</developerConnection>
-        <tag>v0.24.8</tag>
+        <tag>v0.24.8-Mohist-Arclight-1.20.1</tag>
     </scm>
 
     <distributionManagement>

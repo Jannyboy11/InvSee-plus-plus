@@ -2,7 +2,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>invsee-plus-plus</artifactId>
-        <version>0.24.8</version>
+        <version>0.24.8-Mohist-Arclight-1.20.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -128,76 +128,10 @@
         <!-- implementations -->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_8_8_r3</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_12_2_r1</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_15_2_r1</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_16_5_r3</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_17_1_r1</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_18_2_r2</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_19_4_r3</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_20_1_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_20_2_r2</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_20_3_r3</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_glowstone</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.janboerman.invsee</groupId>-->
-<!--            <artifactId>invsee-plus-plus_multiverse-inventories</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>invsee-plus-plus_per-world-inventory</artifactId>

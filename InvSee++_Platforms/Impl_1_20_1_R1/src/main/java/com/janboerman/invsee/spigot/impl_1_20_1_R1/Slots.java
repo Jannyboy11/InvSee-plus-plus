@@ -132,45 +132,6 @@ class PersonalSlot extends Slot {
         return works();
     }
 
-    // === Mohist workarounds ===
-    // For now, use the same SRG names as in 1.19.4, as they seem to be stable.
-
-    public boolean m_5857_(ItemStack itemStack) {
-        return mayPlace(itemStack);
-    }
-
-    public boolean m_6657_() {
-        return hasItem();
-    }
-
-    public void m_219996_(ItemStack itemStack) {
-        set(itemStack);
-    }
-
-    public int m_6641_() {
-        return getMaxStackSize();
-    }
-
-    public ItemStack m_6201_(int subtractAmount) {
-        return remove(subtractAmount);
-    }
-
-    public boolean m_150651_(Player player) {
-        return allowModification(player);
-    }
-
-    public boolean m_8010_(Player player) {
-        return mayPickup(player);
-    }
-
-    public ItemStack m_7993_() {
-        return getItem();
-    }
-
-    public boolean m_6659_() {
-        return isActive();
-    }
-
 }
 
 
@@ -223,46 +184,6 @@ class InaccessibleSlot extends Slot {
     @Override
     public boolean isActive() {
         return false;
-    }
-
-
-    // === Mohist workarounds ===
-    // For now, use the same SRG names as in 1.19.4, as they seem to be stable.
-
-    public boolean m_5857_(ItemStack itemStack) {
-        return mayPlace(itemStack);
-    }
-
-    public boolean m_6657_() {
-        return hasItem();
-    }
-
-    public void m_219996_(ItemStack itemStack) {
-        set(itemStack);
-    }
-
-    public int m_6641_() {
-        return getMaxStackSize();
-    }
-
-    public ItemStack m_6201_(int subtractAmount) {
-        return remove(subtractAmount);
-    }
-
-    public boolean m_150651_(Player player) {
-        return allowModification(player);
-    }
-
-    public boolean m_8010_(Player player) {
-        return mayPickup(player);
-    }
-
-    public ItemStack m_7993_() {
-        return getItem();
-    }
-
-    public boolean m_6659_() {
-        return isActive();
     }
 
 }
