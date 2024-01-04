@@ -3,7 +3,7 @@
         <relativePath>../../pom.xml</relativePath>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.25.1-Mohist-Catserver-1.16.5</version>
+        <version>0.25.2-Mohist-Catserver-1.16.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
