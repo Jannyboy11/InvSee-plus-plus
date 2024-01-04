@@ -48,39 +48,6 @@ class InaccessibleSlot extends Slot {
         return InvseeImpl.EMPTY_STACK;
     }
 
-
-    // ===== Magma compatibility =====
-    // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
-
-    public boolean func_75214_a(ItemStack stack) {
-        return isAllowed(stack);
-    }
-
-    public boolean func_82869_a(EntityHuman playerEntity) {
-        return isAllowed(playerEntity);
-    }
-
-    public ItemStack func_75211_c() {
-        return getItem();
-    }
-
-    public boolean func_75216_d() {
-        return hasItem();
-    }
-
-    public void func_75215_d(ItemStack stack) {
-        set(stack);
-    }
-
-    public int func_75219_a() {
-        return getMaxStackSize();
-    }
-
-    public ItemStack func_75209_a(int subtractAmount) {
-        //receiveSplit
-        return a(subtractAmount);
-    }
-
 }
 
 class InaccessiblePlaceholderSlot extends InaccessibleSlot {

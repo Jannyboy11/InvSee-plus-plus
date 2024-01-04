@@ -194,42 +194,5 @@ class EnderNmsContainer extends Container {
         return super.a(clickedSlotItem, targetMinIndex, targetMaxIndex, topClicked);
     }
 
-
-    // ===== Magma Compatibility =====
-    // https://github.com/Jannyboy11/InvSee-plus-plus/issues/43#issuecomment-1493377971
-
-    //*ContainerType getType() override because we are calling it from InvSee++*/
-    public Containers<?> getType() {
-        return super.getType();
-    }
-
-    //idem
-    public Slot getSlot(int rawIndex) {
-        return super.getSlot(rawIndex);
-    }
-
-    //dito
-    public void addSlotListener(ICrafting icrafting) {
-        super.addSlotListener(icrafting);
-    }
-
-    public boolean func_75145_c(EntityHuman playerEntity) {
-        return canUse(playerEntity);
-    }
-
-    public ItemStack func_184996_a(int a, int b, InventoryClickType clickType, EntityHuman playerEntity) {
-        //clicked
-        return a(a, b, clickType, playerEntity);
-    }
-
-    public void func_75134_a(EntityHuman playerEntity) {
-        //removed
-        b(playerEntity);
-    }
-
-    public ItemStack func_82846_b(EntityHuman playerEntity, int rawIndex) {
-        return shiftClick(playerEntity, rawIndex);
-    }
-
 }
 
