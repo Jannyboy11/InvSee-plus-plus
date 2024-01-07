@@ -7,10 +7,13 @@ import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
 import com.janboerman.invsee.spigot.api.response.OfflineSupportDisabled;
+import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.response.TargetDoesNotExist;
 import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
 import com.janboerman.invsee.spigot.api.response.UnknownTarget;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
+import com.janboerman.invsee.utils.Either;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -45,7 +48,7 @@ class EnderGiveExecutor implements CommandExecutor {
         String inputPlayer = args[0];
         String inputItemType = args[1];
 
-        var eitherPlayer = Convert.convertPlayer(inputPlayer);
+        Either<UUID, String> eitherPlayer = Convert.convertPlayer(inputPlayer);
         CompletableFuture<Optional<UUID>> uuidFuture;
         CompletableFuture<Optional<String>> userNameFuture;
         if (eitherPlayer.isLeft()) {
@@ -59,7 +62,7 @@ class EnderGiveExecutor implements CommandExecutor {
             uuidFuture = api.fetchUniqueId(userName);
         }
 
-        var eitherMaterial = Convert.convertItemType(inputItemType);
+        Either<String, ItemType> eitherMaterial = Convert.convertItemType(inputItemType);
         if (eitherMaterial.isLeft()) { sender.sendMessage(ChatColor.RED + eitherMaterial.getLeft()); return true; }
         assert eitherMaterial.isRight();
         ItemType itemType = eitherMaterial.getRight();
@@ -67,7 +70,7 @@ class EnderGiveExecutor implements CommandExecutor {
         int amount;
         if (args.length > 2) {
             String inputAmount = args[2];
-            var eitherItems = Convert.convertAmount(inputAmount);
+            Either<String, Integer> eitherItems = Convert.convertAmount(inputAmount);
             if (eitherItems.isLeft()) { sender.sendMessage(ChatColor.RED + eitherItems.getLeft()); return true; }
             assert eitherItems.isRight();
             amount = eitherItems.getRight();
@@ -95,13 +98,14 @@ class EnderGiveExecutor implements CommandExecutor {
                 .withBypassExemptedPlayers(plugin.bypassExemptEndersee(sender));
 
         uuidFuture.<Optional<String>, Void>thenCombineAsync(userNameFuture, (optUuid, optName) -> {
-            if (optName.isEmpty() || optUuid.isEmpty()) {
+            if (!optName.isPresent() || !optUuid.isPresent()) {
                 sender.sendMessage(ChatColor.RED + "Unknown player: " + inputPlayer);
             } else {
                 String userName = optName.get();
                 UUID uuid = optUuid.get();
 
-                var responseFuture = api.enderSpectatorInventory(uuid, userName, creationOptions);
+                CompletableFuture<SpectateResponse<EnderSpectatorInventory>> responseFuture =
+                        api.enderSpectatorInventory(uuid, userName, creationOptions);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();
@@ -135,16 +139,16 @@ class EnderGiveExecutor implements CommandExecutor {
                     } else {
                         NotCreatedReason reason = response.getReason();
                         if (reason instanceof TargetDoesNotExist) {
-                            var targetDoesNotExist = (TargetDoesNotExist) reason;
+                            TargetDoesNotExist targetDoesNotExist = (TargetDoesNotExist) reason;
                             sender.sendMessage(ChatColor.RED + "Player " + targetDoesNotExist.getTarget() + " does not exist.");
                         } else if (reason instanceof UnknownTarget) {
-                            var unknownTarget = (UnknownTarget) reason;
+                            UnknownTarget unknownTarget = (UnknownTarget) reason;
                             sender.sendMessage(ChatColor.RED + "Player " + unknownTarget.getTarget() + " has not logged onto the server yet.");
                         } else if (reason instanceof TargetHasExemptPermission) {
-                            var targetHasExemptPermission = (TargetHasExemptPermission) reason;
+                            TargetHasExemptPermission targetHasExemptPermission = (TargetHasExemptPermission) reason;
                             sender.sendMessage(ChatColor.RED + "Player " + targetHasExemptPermission.getTarget() + " is exempted from being spectated.");
                         } else if (reason instanceof ImplementationFault) {
-                            var implementationFault = (ImplementationFault) reason;
+                            ImplementationFault implementationFault = (ImplementationFault) reason;
                             sender.sendMessage(ChatColor.RED + "An internal fault occurred when trying to load " + implementationFault.getTarget() + "'s enderchest.");
                         } else if (reason instanceof OfflineSupportDisabled) {
                             sender.sendMessage(ChatColor.RED + "Spectating offline players' enderchest is disabled.");

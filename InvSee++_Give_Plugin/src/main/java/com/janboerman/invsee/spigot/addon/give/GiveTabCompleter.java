@@ -1,5 +1,8 @@
 package com.janboerman.invsee.spigot.addon.give;
 
+import static com.janboerman.invsee.utils.Compat.emptyList;
+import static com.janboerman.invsee.utils.Compat.singletonList;
+
 import com.janboerman.invsee.utils.StringHelper;
 import org.bukkit.Material;
 import org.bukkit.command.*;
@@ -54,11 +57,11 @@ class GiveTabCompleter implements TabCompleter {
             final StringJoiner sj = new StringJoiner(" ");
             for (int i = 0; i < args.length; i++) sj.add(args[i]);
             final String inputTag = sj.toString();
-            if (inputTag.length() == 0) return List.of("{");
+            if (inputTag.length() == 0) return singletonList("{");
             //else: how to tabcomplete an nbt tag?
         }
 
-        return List.of();
+        return emptyList();
     }
 
 }

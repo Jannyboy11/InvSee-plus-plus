@@ -71,6 +71,12 @@ public class Compat {
         //TODO multi-release this shit: List.of();
     }
 
+    public static <T> List<T> singletonList(T item) {
+        return Collections.singletonList(item);
+
+        //TODO multi-release this shit: List.of(item);
+    }
+
     public static <T> void ifPresentOrElse(Optional<T> optional, Consumer<? super T> action, Runnable emptyAction) {
         if (optional.isPresent()) {
             action.accept(optional.get());

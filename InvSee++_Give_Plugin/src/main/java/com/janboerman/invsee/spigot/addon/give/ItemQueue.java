@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class ItemQueue implements ConfigurationSerializable {
 
     @Override
     public Map<String, Object> serialize() {
-        return Map.of("queue", new ArrayList<>(queue));
+        return Collections.singletonMap("queue", new ArrayList<>(queue));
     }
 
     public static ItemQueue deserialize(Map<String, Object> map) {
