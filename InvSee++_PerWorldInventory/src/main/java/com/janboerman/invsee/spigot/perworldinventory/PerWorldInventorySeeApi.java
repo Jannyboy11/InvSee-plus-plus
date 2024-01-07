@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.perworldinventory;
 
+import static com.janboerman.invsee.utils.Compat.ifPresentOrElse;
+
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
@@ -200,7 +202,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 ((Personal) mainSpectator).watch(event.getView());
             }
 
-            var spectator = cache.getMainSpectatorInventory(player.getUniqueId());
+            MainSpectatorInventory spectator = cache.getMainSpectatorInventory(player.getUniqueId());
             if (spectator instanceof Personal) {
                 ((Personal) spectator).watch(event.getView());
             }
@@ -216,7 +218,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 ((Personal) mainSpectator).unwatch();
             }
 
-            var spectator = cache.getMainSpectatorInventory(player.getUniqueId());
+            MainSpectatorInventory spectator = cache.getMainSpectatorInventory(player.getUniqueId());
             if (spectator instanceof Personal) {
                 ((Personal) spectator).unwatch();
             }
@@ -264,7 +266,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 viewers.forEach(HumanEntity::closeInventory);
 
                 CompletableFuture<Optional<MainSpectatorInventory>> snapshotFuture = asSnapShotInventory(mainSpectator);
-                snapshotFuture.thenAccept(optional -> optional.ifPresentOrElse(newSpectatorInventory -> {
+                snapshotFuture.thenAccept(optional -> ifPresentOrElse(optional, newSpectatorInventory -> {
                     inventories.put(oldProfileKey, newSpectatorInventory);
                     inventoryKeys.put(newSpectatorInventory, oldProfileKey);
                     newSpectatorInventory.setContents(contents);
@@ -277,7 +279,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 ItemStack[] contents = enderSpectator.getContents();                        //already is a copy
 
                 CompletableFuture<Optional<EnderSpectatorInventory>> snapshotFuture = asSnapShotInventory(enderSpectator);
-                snapshotFuture.thenAccept(optional -> optional.ifPresentOrElse(newSpectatorInventory -> {
+                snapshotFuture.thenAccept(optional -> ifPresentOrElse(optional, newSpectatorInventory -> {
                     enderchests.put(oldProfileKey, newSpectatorInventory);
                     enderchestKeys.put(newSpectatorInventory, oldProfileKey);
                     newSpectatorInventory.setContents(contents);
@@ -313,7 +315,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 executor.execute(() -> {
                     //run in the next tick to ensure that the player has changed worlds and the live inventory is actually really live
                     Optional<MainSpectatorInventory> liveFuture = asLiveInventory(mainSpectator, false);
-                    liveFuture.ifPresentOrElse(liveSpectator -> {
+                    ifPresentOrElse(liveFuture, liveSpectator -> {
                         inventories.put(newProfileKey, liveSpectator);
                         inventoryKeys.put(liveSpectator, newProfileKey);
                         liveSpectator.setContents(contents);    //updates the player's inventory!
@@ -331,7 +333,7 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
                 executor.execute(() -> {
                     //run in the next tick to ensure that the player has changed worlds and the live inventory is actually really live
                     Optional<EnderSpectatorInventory> liveFuture = asLiveInventory(enderSpectator, false);
-                    liveFuture.ifPresentOrElse(liveSpectator -> {
+                    ifPresentOrElse(liveFuture, liveSpectator -> {
                         enderchests.put(newProfileKey, liveSpectator);
                         enderchestKeys.put(liveSpectator, newProfileKey);
                         liveSpectator.setContents(contents);

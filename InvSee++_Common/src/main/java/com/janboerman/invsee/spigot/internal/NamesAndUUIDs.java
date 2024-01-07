@@ -7,13 +7,13 @@ import com.janboerman.invsee.spigot.api.resolve.*;
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import com.janboerman.invsee.utils.Maybe;
 import com.janboerman.invsee.utils.SynchronizedIterator;
+
 import org.bukkit.Server;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -57,14 +57,14 @@ public class NamesAndUUIDs {
         PAPER = paperParticleBuilder;
     }
 
-    private final Map<String, UUID> uuidCache = Collections.synchronizedMap(new CaseInsensitiveMap<>() {
+    private final Map<String, UUID> uuidCache = Collections.synchronizedMap(new CaseInsensitiveMap<UUID>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, UUID> eldest) {
             return size() > 200;
         }
     });
     private final Map<String, UUID> uuidCacheView = Collections.unmodifiableMap(uuidCache);
-    private final Map<UUID, String> userNameCache = Collections.synchronizedMap(new LinkedHashMap<>() {
+    private final Map<UUID, String> userNameCache = Collections.synchronizedMap(new LinkedHashMap<UUID, String>() {
         @Override
         protected boolean removeEldestEntry(Entry<UUID, String> eldest) {
             return size() > 200;
@@ -85,9 +85,7 @@ public class NamesAndUUIDs {
     @Deprecated
     public NamesAndUUIDs(Plugin plugin, Scheduler scheduler) {
 
-        MojangAPI mojangApi = new MojangAPI(HttpClient.newBuilder()
-                .executor(scheduler::executeAsync)
-                .build());
+        MojangAPI mojangApi = new MojangAPI(scheduler::executeAsync);
 
         this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
         this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
@@ -134,7 +132,7 @@ public class NamesAndUUIDs {
         this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin, scheduler));
 
         if (bungeeCord || velocity) {
-            this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin));
+            this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin, scheduler));
             //there is no BungeeCord plugin message subchannel which can get a player name given a uuid.
             //the only way to do that currently is to 'get' a list of all players, and for every player in that list
             //request the uuid. If one matches the argument uuid, then that is the one.
@@ -175,14 +173,14 @@ public class NamesAndUUIDs {
 
     /** Resolve a player's unique ID, given their username. */
     public CompletableFuture<Optional<UUID>> resolveUUID(String username) {
-        var result = resolveUUID(username, new SynchronizedIterator<>(uuidResolveStrategies.iterator()));
+        CompletableFuture<Optional<UUID>> result = resolveUUID(username, new SynchronizedIterator<>(uuidResolveStrategies.iterator()));
         result.thenAccept(optUuid -> optUuid.ifPresent(uuid -> cacheNameAndUniqueId(uuid, username)));
         return result;
     }
 
     /** Resolve a player's username, given their unique ID. */
     public CompletableFuture<Optional<String>> resolveUserName(UUID uniqueId) {
-        var result = resolveUserName(uniqueId, new SynchronizedIterator<>(nameResolveStrategies.iterator()));
+        CompletableFuture<Optional<String>> result = resolveUserName(uniqueId, new SynchronizedIterator<>(nameResolveStrategies.iterator()));
         result.thenAccept(optName -> optName.ifPresent(name -> cacheNameAndUniqueId(uniqueId, name)));
         return result;
     }

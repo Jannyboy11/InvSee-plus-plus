@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.perworldinventory;
 
+import static com.janboerman.invsee.utils.Compat.listOf;
+
 import com.janboerman.invsee.utils.Either;
 import com.janboerman.invsee.utils.Out;
 import com.janboerman.invsee.utils.StringHelper;
@@ -74,13 +76,13 @@ public class PwiCommandArgs {
         //TODO I don't think this is threadsafe.
         //TODO if we are called async, then the should wait for the primary thread, execute the logic on there, and then join.
 
-        if (argument.length() < 4) return List.of("PWI{");
+        if (argument.length() < 4) return listOf("PWI{");
         if (!StringHelper.startsWithIgnoreCase(argument, "PWI{")) {
-            return List.of("PWI{group=", "PWI{world=", "PWI{gamemode=");
+            return listOf("PWI{group=", "PWI{world=", "PWI{gamemode=");
         }
 
         String propertyList = argument.substring(4);
-        if (propertyList.endsWith("}")) return List.of(argument);
+        if (propertyList.endsWith("}")) return listOf(argument);
 
         final Collection<String> groupNames = hook.getGroupManager().getGroups().keySet();
         final Collection<String> worldNames = hook.plugin.getServer().getWorlds().stream().map(World::getName).collect(Collectors.toList());
@@ -120,7 +122,7 @@ public class PwiCommandArgs {
             } else if (result.gameMode == null) {
                 gameModes.stream().map(gm -> argument + "gamemode=" + gm).forEach(everything::add);
             } else {
-                return List.of(argument.substring(argument.length() - 1) + "}");
+                return listOf(argument.substring(argument.length() - 1) + "}");
             }
             return everything;
         }
@@ -145,20 +147,20 @@ public class PwiCommandArgs {
                         .collect(Collectors.toList());
             } else {
                 //all properties are specified - we are done!
-                return List.of(argument + "}");
+                return listOf(argument + "}");
             }
         }
 
         String key = propKeyValue[0];
         if (propKeyValue.length == 1) {
             if (StringHelper.startsWithIgnoreCase("group", key)) {
-                return List.of(bufferBeforeLastProperty + "group=");
+                return listOf(bufferBeforeLastProperty + "group=");
             } else if (StringHelper.startsWithIgnoreCase("world", key)) {
-                return List.of(bufferBeforeLastProperty + "world=");
+                return listOf(bufferBeforeLastProperty + "world=");
             } else if (StringHelper.startsWithIgnoreCase("gamemode", key)) {
-                return List.of(bufferBeforeLastProperty + "gamemode=");
+                return listOf(bufferBeforeLastProperty + "gamemode=");
             } else {
-                return List.of(bufferBeforeLastProperty + "group=", bufferBeforeLastProperty + "world=", bufferBeforeLastProperty + "gamemode=");
+                return listOf(bufferBeforeLastProperty + "group=", bufferBeforeLastProperty + "world=", bufferBeforeLastProperty + "gamemode=");
             }
         }
 

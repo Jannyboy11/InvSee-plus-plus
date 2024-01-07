@@ -43,7 +43,7 @@ public class Difference {
      * @param other the other difference
      */
     public void merge(Difference other) {
-        for (var entry : other.diffs.entrySet()) {
+        for (Map.Entry<ItemType, Integer> entry : other.diffs.entrySet()) {
             accumulate(entry.getKey(), entry.getValue());
         }
     }

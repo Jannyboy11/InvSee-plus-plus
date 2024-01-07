@@ -9,7 +9,7 @@ import java.util.Objects;
  */
 public class InventoryOpenEventCancelled implements NotOpenedReason {
 
-    @Deprecated(forRemoval = true, since = "0.19.0")
+    @Deprecated//(forRemoval = true, since = "0.19.0") //TODO remove in 1.0
     static final InventoryOpenEventCancelled INSTANCE = new InventoryOpenEventCancelled(null);
 
     private final InventoryOpenEvent event;

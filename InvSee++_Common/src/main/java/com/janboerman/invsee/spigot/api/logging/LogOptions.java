@@ -1,6 +1,8 @@
 package com.janboerman.invsee.spigot.api.logging;
 
 import static com.janboerman.invsee.spigot.api.logging.LogTarget.*;
+import static com.janboerman.invsee.utils.Compat.mapEntry;
+import static com.janboerman.invsee.utils.Compat.mapOfEntries;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -50,7 +52,7 @@ public class LogOptions implements Cloneable {
     public LogOptions() {
     }
 
-    @Deprecated(since = "0.19.1")
+    @Deprecated//(since = "0.19.1") //TODO should we deprecate this forRemoval?
     public static LogOptions of(LogGranularity granularity, Set<LogTarget> logTargets) {
         return new LogOptions(granularity, logTargets, null);
     }
@@ -132,11 +134,11 @@ public class LogOptions implements Cloneable {
 
     /** Get the log formats. */
     public Map<LogTarget, String> getFormats() {
-        if (formats == null) return Map.of(
-                SERVER_LOG_FILE, FORMAT_SERVER_LOG_FILE,
-                PLUGIN_LOG_FILE, FORMAT_PLUGIN_LOG_FILE,
-                SPECTATOR_LOG_FILE, FORMAT_SPECTATOR_LOG_FILE,
-                CONSOLE, FORMAT_CONSOLE
+        if (formats == null) return mapOfEntries(
+                mapEntry(SERVER_LOG_FILE, FORMAT_SERVER_LOG_FILE),
+                mapEntry(PLUGIN_LOG_FILE, FORMAT_PLUGIN_LOG_FILE),
+                mapEntry(SPECTATOR_LOG_FILE, FORMAT_SPECTATOR_LOG_FILE),
+                mapEntry(CONSOLE, FORMAT_CONSOLE)
         );
 
         return Collections.unmodifiableMap(formats);

@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_8_R3;
 
+import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
@@ -168,7 +169,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
         Objects.requireNonNull(craftingContents, "craftingContents cannot be null");
 
         MainNmsInventory nms = getInventory();
-        var nmsCraftingItems = nms.getPersonalContents();
+        net.minecraft.server.v1_8_R3.ItemStack[] nmsCraftingItems = nms.getPersonalContents();
         if (nmsCraftingItems != null) {
             int craftingContentsSize = nms.getPersonalContentsSize();
             if (craftingContents.length != craftingContentsSize)
@@ -183,7 +184,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
     @Override
     public ItemStack[] getPersonalContents() {
         MainNmsInventory nms = getInventory();
-        var nmsCraftingItems = nms.getPersonalContents();
+        net.minecraft.server.v1_8_R3.ItemStack[] nmsCraftingItems = nms.getPersonalContents();
         if (nmsCraftingItems != null) {
             int craftingContentsSize = nms.getPersonalContentsSize();
             ItemStack[] result = new ItemStack[craftingContentsSize];
@@ -203,7 +204,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public void setCursorContents(ItemStack cursor) {
-        var onCursor = getInventory().onCursor;
+        Ref<net.minecraft.server.v1_8_R3.ItemStack> onCursor = getInventory().onCursor;
         if (onCursor != null) {
             onCursor.set(CraftItemStack.asNMSCopy(cursor));
         }
@@ -211,7 +212,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public ItemStack getCursorContents() {
-        var onCursor = getInventory().onCursor;
+        Ref<net.minecraft.server.v1_8_R3.ItemStack> onCursor = getInventory().onCursor;
         if (onCursor != null) {
             return CraftItemStack.asCraftMirror(onCursor.get());
         } else {

@@ -18,7 +18,7 @@ public class FuzzyReflection {
                 result.add(field);
             }
         }
-        return result.toArray(Field[]::new);
+        return result.toArray(new Field[result.size()]);
     }
 
     public static Method[] getMethodOfType(Class<?> owningClass, Class<?> returnType, Class<?>... parameterTypes) {
@@ -30,7 +30,7 @@ public class FuzzyReflection {
                 result.add(method);
             }
         }
-        return result.toArray(Method[]::new);
+        return result.toArray(new Method[result.size()]);
     }
 
 }

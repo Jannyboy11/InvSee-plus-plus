@@ -2,6 +2,7 @@ package com.janboerman.invsee.spigot.internal.template;
 
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
+import com.janboerman.invsee.utils.Compat;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,12 +28,12 @@ public class PlayerInventoryMirror implements Mirror<PlayerInventorySlot> {
     /** @deprecated Use {@link #ofTemplate(String)} instead. */
     @Deprecated
     public PlayerInventoryMirror(String template) {
-        slots = template.lines()
+        slots = Compat.lines(template)
                 .flatMap(line -> IntStream.range(0, 9).mapToObj(i -> convert(line.substring(i*5, i*5 + 4))))
                 .toArray(PlayerInventorySlot[]::new);
         indices = new HashMap<>();
         for (int i = 0; i < slots.length; i++) {
-            var slot = slots[i];
+            PlayerInventorySlot slot = slots[i];
             if (slot != null) indices.put(slots[i], i);
         }
     }
@@ -84,7 +85,7 @@ public class PlayerInventoryMirror implements Mirror<PlayerInventorySlot> {
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(" ", "PlayerInventoryTemplate(", ")");
-        for (var slot : slots) sj.add(slot.toString());
+        for (PlayerInventorySlot slot : slots) sj.add(slot.toString());
         return sj.toString();
     }
 

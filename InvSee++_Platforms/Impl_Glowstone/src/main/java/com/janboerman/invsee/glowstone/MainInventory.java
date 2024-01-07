@@ -1,5 +1,6 @@
 package com.janboerman.invsee.glowstone;
 
+import com.janboerman.invsee.utils.Compat;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
@@ -59,7 +60,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         GlowPlayerInventory targetInventory = targetPlayer.getInventory();
         List<GlowInventorySlot> targetSlots = GlowstoneHacks.getSlots(targetInventory);
         this.containerSlots = targetSlots.subList(0, 36);
-        this.armourSlots = List.of(
+        this.armourSlots = Compat.listOf(
                 new BootsSlot(targetSlots.get(36)),
                 new LeggingsSlot(targetSlots.get(37)),
                 new ChestplateSlot(targetSlots.get(38)),
@@ -91,10 +92,10 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         List<GlowInventorySlot> list = new ConcatList<>(containerSlots, armourSlots);
         list = new ConcatList<>(list, Collections.singletonList(offhandSlot));
         list = new ConcatList<>(list, Collections.singletonList(cursorSlot));
-        list = new ConcatList<>(list, new ConstantList<>(3, InaccessibleSlot.INSTANCE));
+        list = new ConcatList<>(list, Collections.nCopies(3, InaccessibleSlot.INSTANCE));
         list = new ConcatList<>(list, personalSlots);
         if (personalSlots.size() < 9) {
-            list = new ConcatList<>(list, new ConstantList<>(9 - personalSlots.size(), InaccessibleSlot.INSTANCE));
+            list = new ConcatList<>(list, Collections.nCopies(9 - personalSlots.size(), InaccessibleSlot.INSTANCE));
         }
         GlowstoneHacks.setSlots(this, list);
     }

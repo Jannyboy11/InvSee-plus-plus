@@ -329,7 +329,7 @@ public class FakeInventory implements Inventory {
     @NotNull
     @Override
     public ListIterator<ItemStack> iterator(int i) {
-        return new ListIterator<>() {
+        return new ListIterator<ItemStack>() {
             int cursor = i;
 
             @Override

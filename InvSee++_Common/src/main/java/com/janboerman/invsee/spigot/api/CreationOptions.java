@@ -16,6 +16,7 @@ import java.util.Objects;
  * Options used to customise how {@link SpectatorInventory}s are opened.
  * @param <Slot> the spectator inventory slot type. Usually {@link PlayerInventorySlot} or {@link EnderChestSlot}.
  */
+//TODO Multi-Release this file such that Deprecated(forRemoval = true) can be used.
 public class CreationOptions<Slot> implements Cloneable {
 
     private Plugin plugin;
@@ -55,24 +56,24 @@ public class CreationOptions<Slot> implements Cloneable {
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, logOptions, placeholderPalette);
     }
 
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport) throws Exception {
         Plugin plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, false, new LogOptions().withGranularity(LogGranularity.LOG_NEVER), PlaceholderPalette.empty());
     }
 
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public static <Slot> CreationOptions<Slot> of(Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt) throws Exception {
         Plugin plugin = JavaPlugin.getPlugin((Class<JavaPlugin>) Class.forName("com.janboerman.invsee.spigot.InvseePlusPlus"));
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, new LogOptions().withGranularity(LogGranularity.LOG_NEVER), PlaceholderPalette.empty());
     }
 
-    @Deprecated(forRemoval = true, since = "0.22.11")
+    @Deprecated//(forRemoval = true, since = "0.22.11")
     public static <Slot> CreationOptions<Slot> of(Plugin plugin, Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt, LogOptions logOptions) {
         return new CreationOptions<>(plugin, title, offlinePlayerSupport, mirror, unknownPlayerSupport, bypassExempt, logOptions, PlaceholderPalette.empty());
     }
 
-    @Deprecated(forRemoval = true, since = "0.20.0")
+    @Deprecated//(forRemoval = true, since = "0.20.0")
     public static CreationOptions<PlayerInventorySlot> defaultMainInventory() {
         return defaultMainInventory(Bukkit.getPluginManager().getPlugin("InvseePlusPlus"));
     }
@@ -86,10 +87,11 @@ public class CreationOptions<Slot> implements Cloneable {
         return new CreationOptions<>(plugin, Title.defaultMainInventory(), true, Mirror.defaultPlayerInventory(), true, false, new LogOptions(), PlaceholderPalette.empty());
     }
 
-    @Deprecated(forRemoval = true, since = "0.20.0")
+    @Deprecated//(forRemoval = true, since = "0.20.0")
     public static CreationOptions<EnderChestSlot> defaultEnderInventory() {
         return defaultEnderInventory(Bukkit.getPluginManager().getPlugin("InvseePlusPlus"));
     }
+
     /**
      * Get default creation options
      * @param plugin the plugin which wants to create {@linkplain EnderSpectatorInventory}s.

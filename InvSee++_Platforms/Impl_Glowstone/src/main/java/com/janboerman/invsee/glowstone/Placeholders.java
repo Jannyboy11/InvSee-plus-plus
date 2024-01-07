@@ -1,5 +1,6 @@
 package com.janboerman.invsee.glowstone;
 
+import com.janboerman.invsee.utils.Compat;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import static com.janboerman.invsee.spigot.internal.placeholder.Placeholders.*;
@@ -83,7 +84,7 @@ public class Placeholders {
             icon = makeStack(SHIELD, (GlowMetaShield meta) -> {
                 meta.setDisplayName(OFFHAND);
                 meta.setBaseColor(DyeColor.WHITE);
-                meta.setPatterns(List.of(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
+                meta.setPatterns(Compat.listOf(new Pattern(DyeColor.RED, PatternType.STRIPE_TOP), new Pattern(DyeColor.BLUE, PatternType.STRIPE_BOTTOM)));
                 meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             });
         } catch (IllegalArgumentException e) {

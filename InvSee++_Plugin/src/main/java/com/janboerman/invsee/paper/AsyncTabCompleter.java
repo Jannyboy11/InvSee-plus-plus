@@ -1,5 +1,7 @@
 package com.janboerman.invsee.paper;
 
+import static com.janboerman.invsee.utils.Compat.listOf;
+
 import com.destroystokyo.paper.event.server.AsyncTabCompleteEvent;
 
 import com.janboerman.invsee.spigot.InvseePlusPlus;
@@ -31,7 +33,7 @@ public class AsyncTabCompleter implements Listener {
         this.api = plugin.getApi();
 
         this.knownLabels = new ConcurrentSkipListSet<>(String.CASE_INSENSITIVE_ORDER);
-        this.knownLabels.addAll(List.of("invsee", "inventorysee", "isee", "endersee", "enderchestsee", "esee"));
+        this.knownLabels.addAll(listOf("invsee", "inventorysee", "isee", "endersee", "enderchestsee", "esee"));
 
         String pluginNameLower = "invseeplusplus";
         List<String> withPrefix = this.knownLabels.stream().map(s -> pluginNameLower + ":" + s).collect(Collectors.toList());
