@@ -2,7 +2,7 @@ package com.janboerman.invsee.spigot.internal.template;
 
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
-import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.utils.Compat;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,12 +29,12 @@ public class EnderChestMirror implements Mirror<EnderChestSlot> {
     @Deprecated
     public EnderChestMirror(String template) {
 
-        slots = template.lines()
+        slots = Compat.lines(template)
                 .flatMap(line -> IntStream.range(0, 9).mapToObj(i -> convert(line.substring(i*5, i*5 + 4))))
                 .toArray(EnderChestSlot[]::new);
         indices = new HashMap<>();
         for (int i = 0; i < slots.length; i++) {
-            var slot = slots[i];
+            EnderChestSlot slot = slots[i];
             if (slot != null) indices.put(slots[i], i);
         }
     }
@@ -72,7 +72,7 @@ public class EnderChestMirror implements Mirror<EnderChestSlot> {
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(" ", "EnderChestTemplate(", ")");
-        for (var slot : slots) sj.add(slot.toString());
+        for (EnderChestSlot slot : slots) sj.add(slot.toString());
         return sj.toString();
     }
 

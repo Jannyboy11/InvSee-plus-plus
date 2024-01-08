@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -163,8 +164,8 @@ public class UsernameTrie<V> {
                     if (children == null || children.isEmpty()) return; //we don't in fact have any children
                     if (children.size() > 1) return; //we have more than one child.
 
-                    final var entry = children.firstEntry(); //do we want to poll?
-                    final var theNode = entry.getValue();
+                    final Entry<Character, Node<V>> entry = children.firstEntry(); //do we want to poll?
+                    final Node<V> theNode = entry.getValue();
 
                     final char[] newSegment = ArrayHelper.concat(segment, theNode.segment);
                     final Node<V> longNode = new Node<>(newSegment, theNode.value, theNode.children, parent);

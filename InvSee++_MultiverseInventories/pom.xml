@@ -9,6 +9,19 @@
     <artifactId>invsee-plus-plus_multiverse-inventories</artifactId>
     <name>InvSee++ MultiverseInventories integration</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.verison}</version>
+                <configuration>
+                    <release>8</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <repositories>
         <repository>
             <id>onarandombox</id>

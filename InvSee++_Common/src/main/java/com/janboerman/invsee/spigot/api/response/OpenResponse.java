@@ -59,7 +59,7 @@ public interface OpenResponse<SIV extends SpectatorInventoryView<?>> {
         return new Closed<>(reason);
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated//(forRemoval = true, since = "0.25.2") //TODO remove in 1.0
     public static <SIV extends SpectatorInventoryView<?>> OpenResponse<SIV> ofNullable(SIV nullableView, NotOpenedReason ifNull) {
         if (nullableView == null) {
             return closed(ifNull);

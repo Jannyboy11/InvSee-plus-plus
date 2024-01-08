@@ -17,7 +17,7 @@ public class GiveImpl extends NeditImpl {
 
     @Override
     protected org.bukkit.inventory.ItemStack applyTag(org.bukkit.inventory.ItemStack stack, NBTCompound tag) {
-        var nmsStack = CraftItemStack.asNMSCopy(stack);
+        net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
         NBTTagCompound nmsTag = convert(tag);
         nmsStack.setTag(nmsTag);
         return CraftItemStack.asCraftMirror(nmsStack);

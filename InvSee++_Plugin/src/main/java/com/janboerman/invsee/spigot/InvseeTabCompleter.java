@@ -1,5 +1,8 @@
 package com.janboerman.invsee.spigot;
 
+import static com.janboerman.invsee.utils.Compat.emptyList;
+import static com.janboerman.invsee.utils.Compat.listCopy;
+
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
@@ -46,7 +49,7 @@ public class InvseeTabCompleter implements TabCompleter {
                 SortedSet<String> allNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
                 allNames.addAll(onlineNames);
                 allNames.addAll(offlineNames);
-                return List.copyOf(allNames);
+                return listCopy(allNames);
             } else {
                 onlineNames.sort(String.CASE_INSENSITIVE_ORDER);
                 return onlineNames;
@@ -80,7 +83,7 @@ public class InvseeTabCompleter implements TabCompleter {
                         allNames.add(offlineName);
                     }
                 }
-                return List.copyOf(allNames);
+                return listCopy(allNames);
             } else {
                 onlineNames.sort(String.CASE_INSENSITIVE_ORDER);
                 return onlineNames;
@@ -94,7 +97,7 @@ public class InvseeTabCompleter implements TabCompleter {
 
         //TODO MultiVerse-Inventories
 
-        return List.of();
+        return emptyList();
     }
 
 }

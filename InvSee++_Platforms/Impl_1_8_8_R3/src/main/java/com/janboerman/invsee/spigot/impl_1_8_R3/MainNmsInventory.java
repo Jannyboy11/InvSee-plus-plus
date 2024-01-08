@@ -37,7 +37,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         this.storageContents = inv.items;
         this.armourContents = inv.armor;
         //this.offHand = inv.extraSlots; //off-hand did not yet exist in 1.8.8! :O
-        this.onCursor = new Ref<>() {
+        this.onCursor = new Ref<ItemStack>() {
             @Override
             public void set(ItemStack item) {
                 inv.setCarried(item);

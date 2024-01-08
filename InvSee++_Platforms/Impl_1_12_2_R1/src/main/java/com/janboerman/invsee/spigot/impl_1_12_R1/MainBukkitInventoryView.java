@@ -37,7 +37,7 @@ class MainBukkitInventoryView extends MainSpectatorInventoryView {
 
     @Override
     public void setItem(int slot, ItemStack item) {
-        var stack = CraftItemStack.asNMSCopy(item);
+        net.minecraft.server.v1_12_R1.ItemStack stack = CraftItemStack.asNMSCopy(item);
         if (slot >= 0) {
             nms.getSlot(slot).set(stack);
         } else {

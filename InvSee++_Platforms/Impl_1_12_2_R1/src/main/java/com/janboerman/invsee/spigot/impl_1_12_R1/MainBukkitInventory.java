@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_12_R1;
 
+import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
@@ -23,6 +24,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class MainBukkitInventory extends CraftInventory implements MainInventory<MainNmsInventory, MainBukkitInventory> {
@@ -170,7 +172,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
         Objects.requireNonNull(craftingContents, "craftingContents cannot be null");
 
         MainNmsInventory nms = getInventory();
-        var nmsCraftingItems = nms.personalContents;
+        List<net.minecraft.server.v1_12_R1.ItemStack> nmsCraftingItems = nms.personalContents;
         if (nmsCraftingItems != null) {
             int craftingContentsSize = nmsCraftingItems.size();
             if (craftingContents.length != craftingContentsSize)
@@ -184,7 +186,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public ItemStack[] getPersonalContents() {
-        var nmsCraftingItems = getInventory().personalContents;
+        List<net.minecraft.server.v1_12_R1.ItemStack> nmsCraftingItems = getInventory().personalContents;
         if (nmsCraftingItems != null) {
             int craftingContentsSize = nmsCraftingItems.size();
             ItemStack[] result = new ItemStack[craftingContentsSize];
@@ -199,7 +201,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public int getPersonalContentsSize() {
-        var nmsCraftingItems = getInventory().personalContents;
+        List<net.minecraft.server.v1_12_R1.ItemStack> nmsCraftingItems = getInventory().personalContents;
         if (nmsCraftingItems != null) {
             return nmsCraftingItems.size();
         } else {
@@ -209,7 +211,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public void setCursorContents(ItemStack cursor) {
-        var onCursor = getInventory().onCursor;
+        Ref<net.minecraft.server.v1_12_R1.ItemStack> onCursor = getInventory().onCursor;
         if (onCursor != null) {
             onCursor.set(CraftItemStack.asNMSCopy(cursor));
         }
@@ -217,7 +219,7 @@ public class MainBukkitInventory extends CraftInventory implements MainInventory
 
     @Override
     public ItemStack getCursorContents() {
-        var onCursor = getInventory().onCursor;
+        Ref<net.minecraft.server.v1_12_R1.ItemStack> onCursor = getInventory().onCursor;
         if (onCursor != null) {
             return CraftItemStack.asCraftMirror(onCursor.get());
         } else {

@@ -69,7 +69,7 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI implements InvseePlat
 
     private void unTie(ProfileId profileId, MainSpectatorInventory spectatorInventory) {
         inventories.remove(profileId, spectatorInventory);
-        var set = inventoryKeys.get(spectatorInventory);
+        Set<ProfileId> set = inventoryKeys.get(spectatorInventory);
         if (set != null) {
             set.remove(profileId);
             if (set.isEmpty()) inventoryKeys.remove(spectatorInventory);
@@ -78,7 +78,7 @@ public class MultiverseInventoriesSeeApi extends InvseeAPI implements InvseePlat
 
     private void unTie(ProfileId profileId, EnderSpectatorInventory spectatorInventory) {
         enderchests.remove(profileId, spectatorInventory);
-        var set = enderchestKeys.get(spectatorInventory);
+        Set<ProfileId> set = enderchestKeys.get(spectatorInventory);
         if (set != null) {
             set.remove(profileId);
             if (set.isEmpty()) enderchestKeys.remove(spectatorInventory);

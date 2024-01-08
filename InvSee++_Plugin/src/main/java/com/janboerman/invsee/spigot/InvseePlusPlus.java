@@ -51,7 +51,7 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
 
     private InvseeAPI api;
     private InvseePlatform platform;
-    @Deprecated(forRemoval = true) private OfflinePlayerProvider offlinePlayerProvider;
+    @Deprecated/*(forRemoval = true)*/ private OfflinePlayerProvider offlinePlayerProvider; //TODO remove in 1.0.0
 
     private CreationOptions<PlayerInventorySlot> platformCreationOptionsMainInventory;
     private CreationOptions<EnderChestSlot> platformCreationOptionsEnderInventory;
@@ -438,21 +438,21 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
     }
 
     /** @deprecated use {@link #getTitleForInventory()} instead. */
-    @Deprecated(forRemoval = true, since = "0.21.0")
+    @Deprecated//(forRemoval = true, since = "0.21.0") //TODO remove in 1.0
     public String getTitleForInventory(Target target) {
         return getConfig().getString("titles.inventory", "<player>'s inventory")
                 .replace("<player>", target.toString());
     }
 
     /** @deprecated use {@link #getTitleForEnderChest()} instead.*/
-    @Deprecated(forRemoval = true, since = "0.21.0")
+    @Deprecated//(forRemoval = true, since = "0.21.0") //TODO remove in 1.0
     public String getTitleForEnderChest(Target target) {
         return getConfig().getString("titles.enderchest", "<player>'s enderchest")
                 .replace("<player>", target.toString());
     }
 
     /** @deprecated use {@link #getInventoryMirror()} instead. */
-    @Deprecated(forRemoval = true, since = "0.21.0")
+    @Deprecated//(forRemoval = true, since = "0.21.0") //TODO remove in 1.0
     public String getInventoryTemplate() {
         return getConfig().getString("templates.inventory",
                 "i_00 i_01 i_02 i_03 i_04 i_05 i_06 i_07 i_08\n" +
@@ -464,7 +464,7 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
     }
 
     /** @deprecated use {@link #getEnderChestMirror()} instead. */
-    @Deprecated(forRemoval = true, since = "0.21.0")
+    @Deprecated//(forRemoval = true, since = "0.21.0") //TODO remove in 1.0
     public String getEnderChestTemplate() {
         return getConfig().getString("templates.enderchest",
                 "e_00 e_01 e_02 e_03 e_04 e_05 e_06 e_07 e_08\n" +
@@ -476,7 +476,7 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
     }
 
     /** @deprecated use your own player database instead. */
-    @Deprecated(forRemoval = true, since = "0.22.0")
+    @Deprecated//(forRemoval = true, since = "0.22.0") //TODO remove in 1.0
     public OfflinePlayerProvider getOfflinePlayerProvider() {
         return offlinePlayerProvider;
     }

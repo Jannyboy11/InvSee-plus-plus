@@ -8,6 +8,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Scheduler implementation based on {@link io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler},
@@ -21,6 +22,7 @@ public class FoliaScheduler implements Scheduler {
         this.plugin = plugin;
     }
 
+    @Override
     public void executeSyncPlayer(UUID playerId, Runnable task, Runnable retired) {
         Server server = plugin.getServer();
         Player player = server.getPlayer(playerId);
@@ -49,5 +51,10 @@ public class FoliaScheduler implements Scheduler {
     @Override
     public void executeLaterGlobal(Runnable task, long delayTicks) {
         plugin.getServer().getGlobalRegionScheduler().runDelayed(plugin, scheduledTask -> task.run(), delayTicks);
+    }
+
+    @Override
+    public void executeLaterAsync(Runnable task, long delayTicks) {
+        plugin.getServer().getAsyncScheduler().runDelayed(plugin, scheduledTask -> task.run(), delayTicks * 50, TimeUnit.MILLISECONDS);
     }
 }

@@ -66,7 +66,7 @@ class DefaultMirrors {
 
     private DefaultMirrors() {}
 
-    static final Mirror<PlayerInventorySlot> DEFAULT_PLAYERINVENTORY_MIRROR = new Mirror<>() {
+    static final Mirror<PlayerInventorySlot> DEFAULT_PLAYERINVENTORY_MIRROR = new Mirror<PlayerInventorySlot>() {
         @Override public Integer getIndex(PlayerInventorySlot playerInventorySlot) {
             if (playerInventorySlot == null) return null;
             return playerInventorySlot.defaultIndex();
@@ -77,7 +77,7 @@ class DefaultMirrors {
         }
     };
 
-    static final Mirror<EnderChestSlot> DEFAULT_ENDERCHEST_MIRROR = new Mirror<>() {
+    static final Mirror<EnderChestSlot> DEFAULT_ENDERCHEST_MIRROR = new Mirror<EnderChestSlot>() {
         @Override public Integer getIndex(EnderChestSlot enderChestSlot) {
             if (enderChestSlot == null) return null;
             return enderChestSlot.defaultIndex();

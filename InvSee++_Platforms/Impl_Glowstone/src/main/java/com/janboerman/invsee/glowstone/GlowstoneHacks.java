@@ -57,7 +57,7 @@ final class GlowstoneHacks {
 
         MessageHandler<GlowSession, WindowClickMessage> oldHandler = (MessageHandler) playHandlers.find(WindowClickMessage.class);
         if (oldHandler != null && !(oldHandler instanceof DecoratedWindowClickHandler)) { //idempotency!
-            var newHandler = new DecoratedWindowClickHandler(oldHandler);
+            DecoratedWindowClickHandler newHandler = new DecoratedWindowClickHandler(oldHandler);
             try {
                 playHandlers.bind(WindowClickMessage.class, newHandler);
             } catch (InstantiationException | IllegalAccessException neverThrown) {

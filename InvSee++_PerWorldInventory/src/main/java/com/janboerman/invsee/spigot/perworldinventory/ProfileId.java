@@ -4,6 +4,7 @@ import me.ebonjaeger.perworldinventory.Group;
 import me.ebonjaeger.perworldinventory.data.ProfileKey;
 import org.bukkit.GameMode;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class ProfileId {
             group = hook.getGroupForWorld(commandArgs.world);
         } else {
             //unmanaged group!
-            group = new Group("", Set.of(), gameMode, null);
+            group = new Group("", Collections.emptySet(), gameMode, null);
         }
 
         this.profileKey = new ProfileKey(playerId, group, gameMode);

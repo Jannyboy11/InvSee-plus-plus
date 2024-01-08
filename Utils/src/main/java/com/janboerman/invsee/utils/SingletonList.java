@@ -88,13 +88,13 @@ public class SingletonList<T> implements List<T>, RandomAccess {
 
     @Override
     public T get(int index) {
-        if (index != 0) throw new IllegalArgumentException(new IndexOutOfBoundsException(index));
+        if (index != 0) throw new IllegalArgumentException(new IndexOutOfBoundsException("Index out of range: " + index));
         return ref.get();
     }
 
     @Override
     public T set(int index, T element) {
-        if (index != 0) throw new IllegalArgumentException(new IndexOutOfBoundsException(index));
+        if (index != 0) throw new IllegalArgumentException(new IndexOutOfBoundsException("Index out of range: " + index));
         T old = ref.get();
         ref.set(element);
         return old;
@@ -196,12 +196,12 @@ public class SingletonList<T> implements List<T>, RandomAccess {
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
         if (!(fromIndex == 0 || fromIndex == 1))
-            throw new IllegalArgumentException("fromIndex must be 0 or 1", new IndexOutOfBoundsException(fromIndex));
+            throw new IllegalArgumentException("fromIndex must be 0 or 1", new IndexOutOfBoundsException("Index out of range: " + fromIndex));
         if (!(toIndex == 0 || toIndex == 1))
-            throw new IllegalArgumentException("toIndex must be 0 or 1", new IndexOutOfBoundsException(toIndex));
+            throw new IllegalArgumentException("toIndex must be 0 or 1", new IndexOutOfBoundsException("Index out of range: " + toIndex));
 
         if (toIndex == 0 || fromIndex == toIndex)
-            return List.of();
+            return Collections.emptyList();
         else
             return this;
     }
