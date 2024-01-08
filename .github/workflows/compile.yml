@@ -55,6 +55,7 @@ jobs:
 #        run: mvn deploy
       - name: Deploy Javadoc
         uses: MathieuSoysal/Javadoc-publisher.yml@v2.4.0
+        if: github.ref == 'refs/heads/master'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           javadoc-branch: javadoc
