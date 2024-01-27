@@ -949,8 +949,10 @@ public class InvseeAPI {
         }
 
         //TODO as Paper may introduce creating multiple nms ServerPlayer objects for the same CraftPlayer,
-        //TODO we need to track this properly and *reset* the nms inventory contents to that of th new (live) player,
+        //TODO we need to track this properly and *reset* the nms inventory contents to that of the new (live) player,
         //TODO whenever the player changes worlds.
+        //TODO see: https://github.com/orgs/PaperMC/projects/6/views/1?pane=issue&itemId=16746355
+        //TODO another option could be that we keep the CraftPlayer in our SpectatorInventory? Perhaps this could be a paper-specific module.
     }
 
     private final class InventoryListener implements Listener {
