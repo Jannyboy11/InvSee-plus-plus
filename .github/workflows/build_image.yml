@@ -15,10 +15,6 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Build and push Docker image
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin ghcr.io
-          docker buildx create --use
-          docker buildx build -t ghcr.io/${{ github.repository_owner }}/${{ github.repository_name }}-build-environment:latest --push .
+          docker image build -f .github/craftbukkit.Dockerfile -t ghcr.io/Jannyboy11/InvSee++-build-env:latest .
+          docker image push ghcr.io/Jannyboy11/InvSee++-build-env:latest
