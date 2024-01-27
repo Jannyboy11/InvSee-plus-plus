@@ -953,6 +953,8 @@ public class InvseeAPI {
         //TODO whenever the player changes worlds.
         //TODO see: https://github.com/orgs/PaperMC/projects/6/views/1?pane=issue&itemId=16746355
         //TODO another option could be that we keep the CraftPlayer in our SpectatorInventory? Perhaps this could be a paper-specific module.
+        //TODO this module can then also account for planned Material changes: https://github.com/orgs/PaperMC/projects/6/views/1?pane=issue&itemId=12583571
+        //TODO as well as ItemStack and ItemMeta changes: https://github.com/orgs/PaperMC/projects/6/views/1?pane=issue&itemId=12585731
     }
 
     private final class InventoryListener implements Listener {
