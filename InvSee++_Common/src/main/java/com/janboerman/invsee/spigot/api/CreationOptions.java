@@ -24,9 +24,11 @@ public class CreationOptions<Slot> implements Cloneable {
     private boolean offlinePlayerSupport = true;
     private Mirror<Slot> mirror;
     private boolean unknownPlayerSupport = true;
-    private boolean bypassExempt = false;
+    private boolean bypassExempt = false;               //should this be a Predicate<Target>? maybe.
     private LogOptions logOptions = new LogOptions();
     private PlaceholderPalette placeholderPalette = PlaceholderPalette.empty();
+
+    //TODO should have a builder api, because api consumers can't keep on using legacy constructors.
 
     CreationOptions(Plugin plugin, Title title, boolean offlinePlayerSupport, Mirror<Slot> mirror, boolean unknownPlayerSupport, boolean bypassExempt, LogOptions logOptions, PlaceholderPalette palette) {
         this.plugin = plugin;
