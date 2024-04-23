@@ -28,13 +28,21 @@ jobs:
           distribution: 'microsoft'
           java-version: '17'
           cache: 'maven'
-      - name: Install CraftBukkit 1.17.1, 1.18.2, 1.19.4, 1.20.1, 1.20.2, 1.20.3
+      - name: Install CraftBukkit 1.17.1, 1.18.2, 1.19.4, 1.20.1, 1.20.4
         run: |
           java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped
-          java -jar BuildTools.jar --rev 1.20.2 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.20.4 --compile craftbukkit --remapped
+      - name: Install JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'microsoft'
+          java-version: '21'
+          cache: 'maven'
+      - name: Install CraftBukkit 1.20.5
+        run: |
+          java -jar BuildTools.jar --rev 1.20.5 --compile craftbukkit --remapped
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release
@@ -53,6 +61,7 @@ jobs:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #        if: startsWith(github.ref, 'refs/tags/')
 #        run: mvn deploy
+      # TODO only do this step on default branch (master):
       - name: Deploy Javadoc
         uses: MathieuSoysal/Javadoc-publisher.yml@v2.4.0
         with:

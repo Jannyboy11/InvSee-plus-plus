@@ -8,6 +8,8 @@ public class LegacyVersions {
     private static final LegacyVersions INSTANCE = new LegacyVersions();
 
     private static final LegacyVersion
+            LATEST_THAT_SUPPORTS_1_20_2 = INSTANCE.register(MinecraftVersion._1_20_2, "0.26.0",
+            "https://www.spigotmc.org/resources/invsee.82342/download?version=525827", "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.26.0"),
             LATEST_THAT_SUPPORTS_1_20_1 = INSTANCE.register(new MinecraftVersion[] { MinecraftVersion._1_20_1, MinecraftVersion._1_20_3 }, "0.24.9",
             "https://www.spigotmc.org/resources/invsee.82342/download?version=522407",
             "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.24.9"),
