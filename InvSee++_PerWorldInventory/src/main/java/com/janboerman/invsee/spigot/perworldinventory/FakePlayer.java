@@ -1,6 +1,8 @@
 package com.janboerman.invsee.spigot.perworldinventory;
 
 import com.janboerman.invsee.spigot.internal.FakePersistentDataContainer;
+import com.janboerman.invsee.utils.Compat;
+
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
@@ -416,7 +418,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public List<Entity> getNearbyEntities(double v, double v1, double v2) {
-        return List.copyOf(getWorld().getNearbyEntities(getLocation(), v, v1, v2));
+        return Compat.listCopy(getWorld().getNearbyEntities(getLocation(), v, v1, v2));
     }
 
     @Override
@@ -739,7 +741,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public Set<String> getScoreboardTags() {
-        return Set.of();
+        return Collections.emptySet();
     }
 
     @Override
@@ -1583,7 +1585,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public Map<String, Object> serialize() {
-        return Map.of(); //can't be bothered to implement this properly. ¯\_(ツ)_/¯
+        return Collections.emptyMap(); //can't be bothered to implement this properly. ¯\_(ツ)_/¯
     }
 
     @NotNull
@@ -1823,7 +1825,7 @@ public class FakePlayer implements Player {
     @Override
     public int discoverRecipes(@NotNull Collection<NamespacedKey> collection) {
         int result = 0;
-        for (var key : collection) {
+        for (NamespacedKey key : collection) {
             if (discoverRecipe(key)) {
                 result += 1;
             }
@@ -1839,7 +1841,7 @@ public class FakePlayer implements Player {
     @Override
     public int undiscoverRecipes(@NotNull Collection<NamespacedKey> collection) {
         int result = 0;
-        for (var key : collection) {
+        for (NamespacedKey key : collection) {
             if (undiscoverRecipe(key)) {
                 result += 1;
             }
@@ -1914,7 +1916,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public List<Block> getLineOfSight(@Nullable Set<Material> set, int i) {
-        return List.of();
+        return Collections.emptyList();
     }
 
     @NotNull
@@ -1926,7 +1928,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public List<Block> getLastTwoTargetBlocks(@Nullable Set<Material> set, int i) {
-        return List.of();
+        return Collections.emptyList();
     }
 
     @Nullable
@@ -2198,7 +2200,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public Set<UUID> getCollidableExemptions() {
-        return Set.of();
+        return Collections.emptySet();
     }
 
     @Nullable
@@ -2346,7 +2348,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public List<MetadataValue> getMetadata(@NotNull String s) {
-        return List.copyOf(metadata.getOrDefault(s, Map.of()).values());
+        return Compat.listCopy(metadata.getOrDefault(s, Collections.emptyMap()).values());
     }
 
     @Override
@@ -2449,7 +2451,7 @@ public class FakePlayer implements Player {
     @NotNull
     @Override
     public Set<String> getListeningPluginChannels() {
-        return Set.of();
+        return Collections.emptySet();
     }
 
     @NotNull

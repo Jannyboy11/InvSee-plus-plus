@@ -82,7 +82,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
     public ItemStack splitWithoutUpdate(int slot) {
         if (slot < 0 || slot >= getSize()) return InvseeImpl.EMPTY_STACK;
 
-        var stack = storageContents.get(slot);
+        net.minecraft.server.v1_12_R1.ItemStack stack = storageContents.get(slot);
         if (stack.isEmpty()) {
             return InvseeImpl.EMPTY_STACK;
         } else {

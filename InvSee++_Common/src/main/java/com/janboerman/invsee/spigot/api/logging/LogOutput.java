@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -243,9 +244,9 @@ class LogOutputImpl implements LogOutput {
         }
 
         static Given from(Difference difference) {
-            var diff = difference.getDifference();
+            Map<ItemType, Integer> diff = difference.getDifference();
             List<Pair<ItemType, Integer>> items = new ArrayList<>(diff.size());
-            for (var entry : diff.entrySet()) {
+            for (Entry<ItemType, Integer> entry : diff.entrySet()) {
                 Integer added = entry.getValue();
                 if (added != null && added > 0) {
                     items.add(new Pair<>(entry.getKey(), added));
@@ -262,9 +263,9 @@ class LogOutputImpl implements LogOutput {
         }
 
         static Taken from(Difference difference) {
-            var diff = difference.getDifference();
+            Map<ItemType, Integer> diff = difference.getDifference();
             List<Pair<ItemType, Integer>> items = new ArrayList<>(diff.size());
-            for (var entry : diff.entrySet()) {
+            for (Entry<ItemType, Integer> entry : diff.entrySet()) {
                 Integer added = entry.getValue();
                 if (added != null && added < 0) {
                     items.add(new Pair<>(entry.getKey(), -1 * added));

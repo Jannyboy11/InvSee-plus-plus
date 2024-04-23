@@ -87,15 +87,15 @@ class Impl_1_19_4 extends SetupImpl {
     }
 }
 
-class Impl_1_20_2 extends SetupImpl {
-    Impl_1_20_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_20_2_R2.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_2_R2.KnownPlayersProvider(plugin, scheduler));
-    }
-}
-
 class Impl_1_20_4 extends SetupImpl {
     Impl_1_20_4(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_20_4_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_4_R3.KnownPlayersProvider(plugin, scheduler));
+    }
+}
+
+class Impl_1_20_5 extends SetupImpl {
+    Impl_1_20_5(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_20_5_R4.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_20_5_R4.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
@@ -118,8 +118,9 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_17_1, (p, l, s, c) -> new Impl_1_17_1(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_18_2, (p, l, s, c) -> new Impl_1_18_2(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_19_4, (p, l, s, c) -> new Impl_1_19_4(p, l, s, c));
-        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_20_2(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_20_2, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_2));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_20_4(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_20_4, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_4));
+        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_20_5(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_20_5, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_5));
+
         final SetupProvider glowstoneProver = (p, l, s, c) -> new Impl_Glowstone(p, l, s, c);
         final MinecraftVersion[] minecraftVersions = MinecraftVersion.values();
         for (int idx = MinecraftVersion._1_8.ordinal(); idx < MinecraftVersion._1_12_2.ordinal(); idx ++) {

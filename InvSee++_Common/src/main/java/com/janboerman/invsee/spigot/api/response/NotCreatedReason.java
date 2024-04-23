@@ -21,7 +21,7 @@ public interface NotCreatedReason {
         return new TargetHasExemptPermission(target);
     }
 
-    @Deprecated(forRemoval = true, since = "0.21.6")
+    @Deprecated//(forRemoval = true, since = "0.21.6") TODO remove 1.0.0
     public static ImplementationFault implementationFault(Target target) {
         return new ImplementationFault(target);
     }

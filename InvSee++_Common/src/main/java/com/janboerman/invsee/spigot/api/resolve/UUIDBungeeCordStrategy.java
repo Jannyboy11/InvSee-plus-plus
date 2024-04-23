@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.api.resolve;
 
+import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import com.janboerman.invsee.utils.UUIDHelper;
@@ -28,11 +29,13 @@ public class UUIDBungeeCordStrategy implements UUIDResolveStrategy, PluginMessag
     private static final String UUIDOther_SUBCHANNEL = "UUIDOther";
 
     private final Plugin plugin;
+    private final Scheduler scheduler;
 
     private final Map<String, CompletableFuture<Optional<UUID>>> futureMap = Collections.synchronizedMap(new CaseInsensitiveMap<>());
 
-    public UUIDBungeeCordStrategy(Plugin plugin) {
+    public UUIDBungeeCordStrategy(Plugin plugin, Scheduler scheduler) {
         this.plugin = Objects.requireNonNull(plugin);
+        this.scheduler = Objects.requireNonNull(scheduler);
 
         Server server = plugin.getServer();
         Messenger messenger = server.getMessenger();
@@ -61,9 +64,10 @@ public class UUIDBungeeCordStrategy implements UUIDResolveStrategy, PluginMessag
             byte[] pluginMessage = byteArrayOutputStream.toByteArray();
 
             player.sendPluginMessage(plugin, BUNGEECORD_CHANNEL, pluginMessage);
-            CompletableFuture<Optional<UUID>> future = new CompletableFuture<>();
-            future.orTimeout(5, TimeUnit.SECONDS);
-            future = future.exceptionally(throwable -> {
+            CompletableFuture<Optional<UUID>> _future = new CompletableFuture<>();
+            //future.orTimeout(5, TimeUnit.SECONDS); //TODO can we multi-release this? we need access to a Scheduler though.
+            scheduler.executeLaterAsync(() -> _future.cancel(true), 20 * 5);
+            CompletableFuture<Optional<UUID>> future = _future.exceptionally(throwable -> {
                 if (!(throwable instanceof CancellationException || throwable instanceof TimeoutException)) {
                     plugin.getLogger().log(Level.WARNING, "Could not request " + userName + "'s UUID from BungeeCord", throwable);
                 }

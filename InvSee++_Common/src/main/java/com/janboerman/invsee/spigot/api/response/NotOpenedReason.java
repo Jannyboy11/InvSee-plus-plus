@@ -12,7 +12,7 @@ public interface NotOpenedReason {
         return new InventoryNotCreated(notCreatedReason);
     }
 
-    @Deprecated(forRemoval = true, since = "0.19.0")
+    @Deprecated//(forRemoval = true, since = "0.19.0") TODO remove in 1.0
     public static InventoryOpenEventCancelled inventoryOpenEventCancelled() {
         return InventoryOpenEventCancelled.INSTANCE;
     }

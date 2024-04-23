@@ -1,80 +1,81 @@
 package com.janboerman.invsee.mojangapi;
 
-import org.json.simple.JSONObject;
+import static com.janboerman.invsee.mojangapi.ResponseUtils.readJSONObject;
 
-import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
-import static com.janboerman.invsee.mojangapi.ResponseUtils.*;
+import com.janboerman.invsee.utils.Rethrow;
 
-/**
- * API to resolve players' usernames and unique IDs via <a href="https://github.com/Electroid/mojang-api">Electroid/mojang-api</a>.
- */
+import org.json.simple.JSONObject;
+
 public class ElectroidAPI {
-    //https://github.com/Electroid/mojang-api
 
-    private final HttpClient httpClient;
+    private final Executor asyncExecutor;
 
-    public ElectroidAPI(HttpClient httpClient) {
-        this.httpClient = httpClient;
-    }
-
-    public ElectroidAPI() {
-        this(HttpClient.newHttpClient());
+    public ElectroidAPI(Executor asyncExecutor) {
+        this.asyncExecutor = asyncExecutor;
     }
 
     public CompletableFuture<Optional<UUID>> lookupUniqueId(String userName) {
-        CompletableFuture<HttpResponse<InputStream>> future = httpClient.sendAsync(HttpRequest
-                .newBuilder(URI.create("https://api.ashcon.app/mojang/v2/user/" + userName))
-                .header("Accept", "application/json")
-                .header("User-Agent", "InvSee++/ElectroidAPI")
-                .timeout(Duration.ofSeconds(5))
-                .build(), HttpResponse.BodyHandlers.ofInputStream());
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                URL url = new URL("https://api.ashcon.app/mojang/v2/user/" + userName);
+                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 
-        return future.thenApply(response -> {
-            if (response.statusCode() == 200) {
-                //ok!
-                JSONObject json = readJSONObject(response);
-                String uuid = (String) json.get("uuid");        // already contains dashes.
-                return Optional.of(UUID.fromString(uuid));
-            } else if (response.statusCode() == 204) {
-                //no content
-                return Optional.empty();
-            } else {
-                //unexpected
-                throw new RuntimeException("Unexpected response from Electroid mojang api, status code=" + response.statusCode() + ".");
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(5 * 1000); //5 seconds
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("User-Agent", "InvSee++/MojangAPI");
+
+                int statusCode = connection.getResponseCode();
+                switch (statusCode) {
+                    case HttpURLConnection.HTTP_OK:
+                        JSONObject json = readJSONObject(connection);
+                        String uuid = (String) json.get("uuid");
+                        return Optional.of(UUID.fromString(uuid));
+                    case HttpURLConnection.HTTP_NO_CONTENT:
+                        return Optional.empty();
+                    default:
+                        throw new RuntimeException("Unexpected response from Electroid mojang api, status code=" + statusCode + ".");
+                }
+            } catch (IOException e) {
+                return Rethrow.unchecked(e);
             }
-        });
+        }, asyncExecutor);
     }
 
     public CompletableFuture<Optional<String>> lookupUserName(UUID uniqueId) {
-        CompletableFuture<HttpResponse<InputStream>> future = httpClient.sendAsync(HttpRequest
-                .newBuilder(URI.create("https://api.ashcon.app/mojang/v2/user/" + uniqueId.toString()))     // uuid with dashes allowed
-                .header("Accept", "application/json")
-                .header("User-Agent", "InvSee++/ElectroidAPI")
-                .timeout(Duration.ofSeconds(5))
-                .build(), HttpResponse.BodyHandlers.ofInputStream());
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                URL url = new URL("https://api.ashcon.app/mojang/v2/user/" + uniqueId.toString());
+                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 
-        return future.thenApply(response -> {
-            if (response.statusCode() == 200) {
-                //ok!
-                JSONObject json = readJSONObject(response);
-                String userName = (String) json.get("username");
-                return Optional.of(userName);
-            } else if (response.statusCode() == 204) {
-                //no content
-                return Optional.empty();
-            } else {
-                //unexpected
-                throw new RuntimeException("Unexpected response from Electroid mojang api, status code=" + response.statusCode() + ".");
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(5 * 1000); //5 seconds
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestProperty("User-Agent", "InvSee++/MojangAPI");
+
+                int statusCode = connection.getResponseCode();
+                switch (statusCode) {
+                    case HttpURLConnection.HTTP_OK:
+                        JSONObject json = readJSONObject(connection);
+                        String userName = (String) json.get("username");
+                        return Optional.of(userName);
+                    case HttpURLConnection.HTTP_NO_CONTENT:
+                        return Optional.empty();
+                    default:
+                        throw new RuntimeException("Unexpected response from Electroid mojang api, status code=" + statusCode + ".");
+                }
+            } catch (IOException e) {
+                return Rethrow.unchecked(e);
             }
-        });
+        }, asyncExecutor);
     }
+
 }

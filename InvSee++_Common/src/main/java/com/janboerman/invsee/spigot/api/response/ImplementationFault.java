@@ -4,7 +4,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 
 import java.util.Objects;
 
-@Deprecated(forRemoval = true, since = "0.19.0")
+@Deprecated//(forRemoval = true, since = "0.19.0") //TODO remove in 1.0.0
 public class ImplementationFault extends AbstractNotCreatedReason {
 
     ImplementationFault(Target target) {

@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.multiverseinventories;
 
+import static com.janboerman.invsee.utils.Compat.listOf;
 import com.janboerman.invsee.utils.Either;
 import com.janboerman.invsee.utils.Out;
 import com.janboerman.invsee.utils.StringHelper;
@@ -28,7 +29,7 @@ public class MviCommandArgs {
 
     private static final String formError = "Expected the following from: MVI{<property>=<value>,...} where <property> is one of [group, world, gamemode].";
 
-    private static final List<ProfileType> BUILTIN_PROFILE_TYPES = List.of(SURVIVAL, CREATIVE, ADVENTURE);
+    private static final List<ProfileType> BUILTIN_PROFILE_TYPES = listOf(SURVIVAL, CREATIVE, ADVENTURE);
 
     String world;
     WorldGroup group;
@@ -104,13 +105,13 @@ public class MviCommandArgs {
     public static List<String> complete(final String argument, MultiverseInventoriesHook hook) {
         //TODO theadsafe-ify this!
 
-        if (argument.length() < 4) return List.of("MVI{");
+        if (argument.length() < 4) return listOf("MVI{");
         if (!StringHelper.startsWithIgnoreCase(argument, "MVI{")) {
-            return List.of("MVI{group=", "MVI{world=", "MVI{profile_type=");
+            return listOf("MVI{group=", "MVI{world=", "MVI{profile_type=");
         }
 
         String propertyList = argument.substring(4);
-        if (propertyList.endsWith("}")) return List.of(argument);
+        if (propertyList.endsWith("}")) return listOf(argument);
 
         final Collection<String> groupNames = hook.getWorldGroups().stream().map(WorldGroup::getName).collect(Collectors.toList());
         final Collection<String> worldNames = hook.plugin.getServer().getWorlds().stream().map(World::getName).collect(Collectors.toList());
@@ -144,7 +145,7 @@ public class MviCommandArgs {
             } else if (result.profileType == null) {
                 profileTypeNames.stream().map(pt -> argument + "profile_type" + pt).forEach(everything::add);
             } else {
-                return List.of(argument.substring(argument.length() - 1) + "}");
+                return listOf(argument.substring(argument.length() - 1) + "}");
             }
             return everything;
         }
@@ -169,20 +170,20 @@ public class MviCommandArgs {
                         .collect(Collectors.toList());
             } else {
                 //everything specified!
-                return List.of(argument + "}");
+                return listOf(argument + "}");
             }
         }
 
         String key = propKeyValue[0];
         if (propKeyValue.length == 1) {
             if (StringHelper.startsWithIgnoreCase("group", key)) {
-                return List.of(bufferBeforeLastProperty + "group=");
+                return listOf(bufferBeforeLastProperty + "group=");
             } else if (StringHelper.startsWithIgnoreCase("world", key)) {
-                return List.of(bufferBeforeLastProperty + "world=");
+                return listOf(bufferBeforeLastProperty + "world=");
             } else if (StringHelper.startsWithIgnoreCase("profile_type", key)) {
-                return List.of(bufferBeforeLastProperty + "profile_typ");
+                return listOf(bufferBeforeLastProperty + "profile_typ");
             } else {
-                return List.of(bufferBeforeLastProperty + "group=", bufferBeforeLastProperty + "world=", bufferBeforeLastProperty + "profile_type=");
+                return listOf(bufferBeforeLastProperty + "group=", bufferBeforeLastProperty + "world=", bufferBeforeLastProperty + "profile_type=");
             }
         }
 

@@ -80,8 +80,8 @@ public class InvseeImpl implements InvseePlatform {
 
     @Override
     public OpenResponse<MainSpectatorInventoryView> openMainSpectatorInventory(Player spectator, MainSpectatorInventory inv, CreationOptions<PlayerInventorySlot> options) {
-        var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
-        var title = options.getTitle().titleFor(target);
+        Target target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
+        String title = options.getTitle().titleFor(target);
 
         CraftPlayer bukkitPlayer = (CraftPlayer) spectator;
         EntityPlayer nmsPlayer = bukkitPlayer.getHandle();
@@ -94,7 +94,7 @@ public class InvseeImpl implements InvseePlatform {
         PlayerInventory bottom = nmsPlayer.inventory;
         MainNmsContainer nmsWindow = new MainNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         IChatBaseComponent titleComponent = title != null ? CraftChatMessage.fromString(title)[0] : nmsInventory.getScoreboardDisplayName();
-        var eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
+        Optional<InventoryOpenEvent> eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
         if (eventCancelled.isPresent()) {
             return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(eventCancelled.get()));
         } else {
@@ -134,8 +134,8 @@ public class InvseeImpl implements InvseePlatform {
 
     @Override
     public OpenResponse<EnderSpectatorInventoryView> openEnderSpectatorInventory(Player spectator, EnderSpectatorInventory inv, CreationOptions<EnderChestSlot> options) {
-        var target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
-        var title = options.getTitle().titleFor(target);
+        Target target = Target.byGameProfile(inv.getSpectatedPlayerId(), inv.getSpectatedPlayerName());
+        String title = options.getTitle().titleFor(target);
 
         CraftPlayer bukkitPlayer = (CraftPlayer) spectator;
         EntityPlayer nmsPlayer = bukkitPlayer.getHandle();
@@ -148,7 +148,7 @@ public class InvseeImpl implements InvseePlatform {
         PlayerInventory bottom = nmsPlayer.inventory;
         EnderNmsContainer nmsWindow = new EnderNmsContainer(windowId, nmsInventory, bottom, nmsPlayer, options);
         IChatBaseComponent titleComponent = title != null ? CraftChatMessage.fromString(title)[0] : nmsInventory.getScoreboardDisplayName();
-        var eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
+        Optional<InventoryOpenEvent> eventCancelled = callInventoryOpenEvent(nmsPlayer, nmsWindow); //closes current open inventory if one is already open
         if (eventCancelled.isPresent()) {
             return OpenResponse.closed(NotOpenedReason.inventoryOpenEventCancelled(eventCancelled.get()));
         } else {

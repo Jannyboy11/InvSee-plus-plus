@@ -2,7 +2,7 @@
     <parent>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.25.2-SNAPSHOT</version>
+        <version>0.26.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,6 +13,15 @@
         <finalName>InvSee++_Give</finalName>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.verison}</version>
+                <configuration>
+                    <release>8</release>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -51,7 +60,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.4-R0.1-SNAPSHOT</version>
+            <version>1.20.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -75,13 +84,13 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>give_impl_1_20_4_r3</artifactId>
+            <artifactId>give_impl_1_20_5_r4</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>give_impl_1_20_2_r2</artifactId>
+            <artifactId>give_impl_1_20_4_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

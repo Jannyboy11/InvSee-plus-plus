@@ -1,5 +1,7 @@
 package com.janboerman.invsee.spigot.addon.clear;
 
+import static com.janboerman.invsee.utils.Compat.emptyList;
+
 import com.janboerman.invsee.utils.StringHelper;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -53,6 +55,6 @@ class ClearTabCompleter implements TabCompleter {
             return amounts.collect(Collectors.toList());
         }
 
-        return List.of();
+        return emptyList();
     }
 }

@@ -15,6 +15,9 @@ interface ItemType {
         return new WithData(material, data);
     }
 
+    // TODO third case: withComponents?? yes! will need this!
+    // TODO look at what vanilla's CommandGive does! :)
+
     //
 
     ItemStack toItemStack(int amount);

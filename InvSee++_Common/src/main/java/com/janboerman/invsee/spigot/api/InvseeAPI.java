@@ -67,14 +67,15 @@ public class InvseeAPI {
 
     //TODO I don't like the design of this. This looks like a hack purely introduced for PerWorldInventory integration
     //TODO maybe we can create a proper abstraction and use that for Multiverse-Inventories / MyWorlds?
+    //TODO See https://github.com/Jannyboy11/InvSee-plus-plus/issues/71
     private BiPredicate<MainSpectatorInventory, Player> transferInvToLivePlayer = (spectatorInv, player) -> true;
     private BiPredicate<EnderSpectatorInventory, Player> transferEnderToLivePlayer = (spectatorInv, player) -> true;
 
     private final Scheduler scheduler;
     /** @deprecated use {@link #getScheduler()} instead */
-    @Deprecated(forRemoval = true, since = "0.20.0") public final Executor serverThreadExecutor;
+    @Deprecated/*(forRemoval = true, since = "0.20.0")*/ public final Executor serverThreadExecutor;
     /** @deprecated use {@link #getScheduler()} instead */
-    @Deprecated(forRemoval = true, since = "0.20.0") public final Executor asyncExecutor;
+    @Deprecated/*(forRemoval = true, since = "0.20.0")*/ public final Executor asyncExecutor;
 
     protected final PlayerListener playerListener = new PlayerListener();
     protected final InventoryListener inventoryListener = new InventoryListener();
@@ -108,9 +109,9 @@ public class InvseeAPI {
     /** Called when InvSee++ disables. DO NOT CALL! */
     public void shutDown() {
         //complete futures. needed to ensure changes are saved.
-        for (var future : pendingInventoriesByUuid.values())
+        for (CompletableFuture<SpectateResponse<MainSpectatorInventory>> future : pendingInventoriesByUuid.values())
             try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
-        for (var future : pendingEnderChestsByUuid.values())
+        for (CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future : pendingEnderChestsByUuid.values())
             try { future.join(); } catch (Throwable e) { e.printStackTrace(); }
 
         //clean up logger resources
@@ -293,25 +294,25 @@ public class InvseeAPI {
     }
 
     /** @deprecated internal api */
-    @Deprecated(forRemoval = true)
+    @Deprecated//(forRemoval = true, since = "0.25.2")
     protected void cache(MainSpectatorInventory spectatorInventory) {
         openSpectatorsCache.cache(spectatorInventory, false);
     }
 
     /** @deprecated internal api */
-    @Deprecated(forRemoval = true)
+    @Deprecated//(forRemoval = true, since = "0.25.2")
     protected void cache(MainSpectatorInventory spectatorInventory, boolean force) {
         openSpectatorsCache.cache(spectatorInventory, force);
     }
 
     /** @deprecated internal api */
-    @Deprecated(forRemoval = true)
+    @Deprecated//(forRemoval = true, since = "0.25.2")
     protected void cache(EnderSpectatorInventory spectatorInventory) {
         openSpectatorsCache.cache(spectatorInventory);
     }
 
     /** @deprecated internal api */
-    @Deprecated(forRemoval = true)
+    @Deprecated//(forRemoval = true, since = "0.25.2")
     protected void cache(EnderSpectatorInventory spectatorInventory, boolean force) {
         openSpectatorsCache.cache(spectatorInventory, force);
     }
@@ -907,7 +908,7 @@ public class InvseeAPI {
                     //no need to update the cache because oldMainSpectator already came from the cache!
                 } else {
                     //does not support shallow copying, just close and re-open, and update the cache!
-                    for (HumanEntity viewer : List.copyOf(oldMainSpectator.getViewers())) {
+                    for (HumanEntity viewer : Compat.listCopy(oldMainSpectator.getViewers())) {
                         viewer.closeInventory();
                         viewer.openInventory(newInventorySpectator);
                     }
@@ -927,7 +928,7 @@ public class InvseeAPI {
                     //no need to update the cache because oldEnderSpectator already came from the cache!
                 } else {
                     //does not support shallow copying, just close and re-open, and update the cache!
-                    for (HumanEntity viewer : List.copyOf(oldEnderSpectator.getViewers())) {
+                    for (HumanEntity viewer : Compat.listCopy(oldEnderSpectator.getViewers())) {
                         viewer.closeInventory();
                         viewer.openInventory(newEnderSpectator);
                     }
@@ -948,8 +949,10 @@ public class InvseeAPI {
         }
 
         //TODO as Paper may introduce creating multiple nms ServerPlayer objects for the same CraftPlayer,
-        //TODO we need to track this properly and *reset* the nms inventory contents to that of th new (live) player,
+        //TODO we need to track this properly and *reset* the nms inventory contents to that of the new (live) player,
         //TODO whenever the player changes worlds.
+        //TODO see: https://github.com/orgs/PaperMC/projects/6/views/1?pane=issue&itemId=16746355
+        //TODO another option could be that we keep the CraftPlayer in our SpectatorInventory? Perhaps this could be a paper-specific module.
     }
 
     private final class InventoryListener implements Listener {
@@ -1229,49 +1232,49 @@ public class InvseeAPI {
     // implementation methods:
 
     /** @deprecated use {@link #enderSpectatorInventory(UUID, String, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title, Mirror<EnderChestSlot> mirror) {
         return platform.createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title).withMirror(mirror))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
     /** @deprecated use {@link #enderSpectatorInventory(UUID, String, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<EnderSpectatorInventory>> createOfflineEnderChest(UUID playerId, String playerName, String title) {
         return platform.createOfflineEnderChest(playerId, playerName, enderInventoryCreationOptions().withTitle(title))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
 
     /** @deprecated use {@link #enderSpectatorInventory(HumanEntity, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title, Mirror<EnderChestSlot> mirror) {
         return platform.spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
     /** @deprecated use {@link #enderSpectatorInventory(HumanEntity, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final EnderSpectatorInventory spectateEnderChest(HumanEntity player, String title) {
         return platform.spectateEnderChest(player, enderInventoryCreationOptions().withTitle(title));
     }
 
     /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title, Mirror<PlayerInventorySlot> mirror) {
         return platform.createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title).withMirror(mirror))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
     /** @deprecated use {@link #mainSpectatorInventory(UUID, String, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final CompletableFuture<Optional<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, String title) {
         return platform.createOfflineInventory(playerId, playerName, mainInventoryCreationOptions().withTitle(title))
                 .thenApply(response -> response.isSuccess() ? Optional.of(response.getInventory()) : Optional.empty());
     }
 
     /** @deprecated use {@link #mainSpectatorInventory(HumanEntity, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title, Mirror<PlayerInventorySlot> mirror) {
         return platform.spectateInventory(player, mainInventoryCreationOptions().withTitle(title).withMirror(mirror));
     }
     /** @deprecated use {@link #mainSpectatorInventory(HumanEntity, CreationOptions)} */
-    @Deprecated(forRemoval = true, since = "0.19.6")
+    @Deprecated//(forRemoval = true, since = "0.19.6")
     public final MainSpectatorInventory spectateInventory(HumanEntity player, String title) {
         return platform.spectateInventory(player, mainInventoryCreationOptions().withTitle(title));
     }

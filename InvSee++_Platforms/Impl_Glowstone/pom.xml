@@ -3,7 +3,7 @@
         <relativePath>../../pom.xml</relativePath>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>invsee-plus-plus</artifactId>
-        <version>0.25.2-SNAPSHOT</version>
+        <version>0.26.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,6 +14,15 @@
         <defaultGoal>clean package</defaultGoal>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.verison}</version>
+                <configuration>
+                    <release>8</release>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

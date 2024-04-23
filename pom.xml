@@ -3,7 +3,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.25.2-SNAPSHOT</version>
+    <version>0.26.1-SNAPSHOT</version>
 
     <modules>
         <module>Utils</module>
@@ -16,8 +16,8 @@
         <module>InvSee++_Platforms/Impl_1_17_1_R1</module>
         <module>InvSee++_Platforms/Impl_1_18_2_R2</module>
         <module>InvSee++_Platforms/Impl_1_19_4_R3</module>
-        <module>InvSee++_Platforms/Impl_1_20_2_R2</module>
         <module>InvSee++_Platforms/Impl_1_20_4_R3</module>
+        <module>InvSee++_Platforms/Impl_1_20_5_R4</module>
         <module>InvSee++_Platforms/Impl_Glowstone</module>
         <module>InvSee++_MultiverseInventories</module> <!-- TODO finish this module -->
         <module>InvSee++_PerWorldInventory</module>
@@ -30,8 +30,8 @@
         <module>InvSee++_Give_Platforms/Give_Impl_1_17_1_R1</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_18_2_R2</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_19_4_R3</module>
-        <module>InvSee++_Give_Platforms/Give_Impl_1_20_2_R2</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_20_4_R3</module>
+        <module>InvSee++_Give_Platforms/Give_Impl_1_20_5_R4</module>
         <module>InvSee++_Give_Platforms/Give_Impl_Glowstone</module>
         <module>InvSee++_Give_Plugin</module>
         <module>InvSee++_Clear_Plugin</module>
@@ -62,10 +62,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <junit.version>5.8.2</junit.version>
-        <specialsource-maven-plugin.version>1.2.5</specialsource-maven-plugin.version>
-        <maven-compiler-plugin.verison>3.11.0</maven-compiler-plugin.verison>
-        <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
+        <junit.version>5.10.2</junit.version>
+        <specialsource-maven-plugin.version>2.0.2</specialsource-maven-plugin.version>
+        <maven-compiler-plugin.verison>3.13.0</maven-compiler-plugin.verison>
+        <maven-shade-plugin.version>3.5.3</maven-shade-plugin.version>
 
         <maven.deploy.skip>releases</maven.deploy.skip>
         <ignoreSnapshots>true</ignoreSnapshots>
@@ -86,15 +86,6 @@
                     <scmReleaseCommitComment>@{prefix} Release @{releaseLabel}&#x1f389;!</scmReleaseCommitComment>
                     <scmDevelopmentCommitComment>@{prefix} Bump version.</scmDevelopmentCommitComment>
                     <scmRollbackCommitComment>@{prefix} Roll back.</scmRollbackCommitComment>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.verison}</version>
-                <configuration>
-                    <release>11</release>
                 </configuration>
             </plugin>
 

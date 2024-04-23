@@ -2,7 +2,7 @@
     <parent>
         <artifactId>invsee-plus-plus</artifactId>
         <groupId>com.janboerman.invsee</groupId>
-        <version>0.25.2-SNAPSHOT</version>
+        <version>0.26.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,7 +17,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.verison}</version>
                 <configuration>
-                    <release>11</release>
+                    <release>8</release>
                     <testRelease>17</testRelease>
                     <parameters>true</parameters> <!-- because the api contains methods with lots of overloads, emitting the parameter names is good for IDE support -->
                 </configuration>

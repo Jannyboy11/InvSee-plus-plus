@@ -1,5 +1,8 @@
 package com.janboerman.invsee.spigot.perworldinventory;
 
+import static com.janboerman.invsee.utils.Compat.mapEntry;
+import static com.janboerman.invsee.utils.Compat.mapOfEntries;
+
 import org.bukkit.profile.PlayerProfile;
 import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.NotNull;
@@ -61,10 +64,10 @@ public class FakePlayerProfile implements PlayerProfile {
     @NotNull
     @Override
     public Map<String, Object> serialize() {
-        return Map.of(
-                "uuid", getUniqueId().toString(),
-                "name", getName(),
-                "textures", getTextures()
+        return mapOfEntries(
+                mapEntry("uuid", getUniqueId().toString()),
+                mapEntry("name", getName()),
+                mapEntry("textures", getTextures())
         );
     }
 }

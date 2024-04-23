@@ -52,4 +52,8 @@ public class DefaultScheduler implements Scheduler {
         plugin.getServer().getScheduler().runTaskLater(plugin, task, delayTicks);
     }
 
+    @Override
+    public void executeLaterAsync(Runnable task, long delayTicks) {
+        plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, task, delayTicks);
+    }
 }

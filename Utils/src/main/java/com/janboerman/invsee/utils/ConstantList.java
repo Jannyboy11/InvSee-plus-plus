@@ -16,6 +16,8 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+/** @deprecated Use {@link java.util.Collections#nCopies(int, Object)} instead. */
+@Deprecated //forRemoval = true
 public final class ConstantList<T> implements java.util.List<T> {
 
     private final int size;
@@ -72,7 +74,7 @@ public final class ConstantList<T> implements java.util.List<T> {
         return array;
     }
 
-    @Override
+    //@Override
     public <U> U[] toArray(IntFunction<U[]> generator) {
         U[] arr = generator.apply(size);
         Arrays.fill(arr, constant);
@@ -136,7 +138,7 @@ public final class ConstantList<T> implements java.util.List<T> {
 
     @Override
     public T get(int index) {
-        Objects.checkIndex(index, size);
+        Compat.checkIndex(index, size);
         return constant;
     }
 
@@ -230,7 +232,7 @@ public final class ConstantList<T> implements java.util.List<T> {
 
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        Objects.checkFromToIndex(fromIndex, toIndex, size);
+        Compat.checkFromToIndex(fromIndex, toIndex, size);
 
         if (fromIndex == 0 && toIndex == size)
             return this;

@@ -20,6 +20,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -63,12 +64,12 @@ public interface InvseePlatform {
 
     public default CreationOptions<PlayerInventorySlot> defaultInventoryCreationOptions(Plugin plugin) {
         return CreationOptions.of(plugin, Title.defaultMainInventory(), true, Mirror.defaultPlayerInventory(), true, false, LogOptions
-                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()), PlaceholderPalette.empty());
+                .of(LogGranularity.LOG_ON_CLOSE, Collections.singleton(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()), PlaceholderPalette.empty());
     }
 
     public default CreationOptions<EnderChestSlot> defaultEnderChestCreationOptions(Plugin plugin) {
         return CreationOptions.of(plugin, Title.defaultEnderInventory(), true, Mirror.defaultEnderChest(), true, false, LogOptions
-                .of(LogGranularity.LOG_ON_CLOSE, Set.of(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()), PlaceholderPalette.empty());
+                .of(LogGranularity.LOG_ON_CLOSE, Collections.singleton(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()), PlaceholderPalette.empty());
     }
 
 

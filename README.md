@@ -45,8 +45,12 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `/invgive <target player> <item type> [<amount>] [<nbt tag>]`
 - `/endergive <target player> <item type> [<amount>] [<nbt tag>]`
 ###### Examples:
+On 1.20.4 an earlier:
 - `/invgive Notch diamond 1 {"foo":"bar"}`
 - `/endergive Jannyboy11 wool:14`
+
+On 1.20.5 and later (WIP):
+- `/invgive Jannyboy11 minecraft:emerald[minecraft:max_stack_size=99] 65`
 ##### Permissions:
 - `invseeplusplus.give.*` provides `invseeplusplus.give.inventory` and `invseeplusplus.give.enderchest`.
 - `invseeplusplus.give.inventory` allows access to `/invgive`.
@@ -123,6 +127,6 @@ and there is a good chance they won't be able to load mods and plugins compiled 
 Is there any server that implements the Bukkit api that I'm missing? Don't hesitate to create [an issue](https://github.com/Jannyboy11/InvSee-plus-plus/issues/new) and request support! 
 
 ### Supported Java versions
-| Minecraft version: | 1.8.x      | 1.12.x     | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.x      |
-|--------------------|------------|------------|-------------|-------------|-------------|-------------|-------------|-------------|
-| Java version:      | 8 or newer | 8 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer | 17 or newer |
+| Minecraft version: | 1.8.x      | 1.12.x     | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.[0-4]  | 1.20.5      |
+|--------------------|------------|------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
+| Java version:      | 8 or newer | 8 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer | 17 or newer | 21 or newer |
