@@ -78,6 +78,18 @@ public class FakePersistentDataContainer implements PersistentDataContainer {
     }
 
     @Override
+    public void copyTo(@NotNull PersistentDataContainer persistentDataContainer, boolean replace) {
+        FakePersistentDataContainer other = (FakePersistentDataContainer) persistentDataContainer;
+        if (replace) {
+            other.map.putAll(this.map);
+        } else {
+            for (Entry<NamespacedKey, Map<PersistentDataType, Object>> entry : this.map.entrySet()) {
+                other.map.putIfAbsent(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    @Override
     public PersistentDataAdapterContext getAdapterContext() {
         return context;
     }
@@ -129,6 +141,11 @@ public class FakePersistentDataContainer implements PersistentDataContainer {
     @Override
     public void readFromBytes(byte @NotNull [] bytes, boolean b) throws IOException {
         throw new UnknownServiceException("Can't deserialize fake data");
+    }
+
+    @Override
+    public void readFromBytes(byte @NotNull [] bytes) throws IOException {
+        PersistentDataContainer.super.readFromBytes(bytes);
     }
 
 }

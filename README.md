@@ -89,6 +89,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
     - `java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.4 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 4137 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 1.20.6 --compile craftbukkit --remapped`
 2. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at InvSee++_plugin/target/InvSee++.jar.
 
@@ -127,6 +128,6 @@ and there is a good chance they won't be able to load mods and plugins compiled 
 Is there any server that implements the Bukkit api that I'm missing? Don't hesitate to create [an issue](https://github.com/Jannyboy11/InvSee-plus-plus/issues/new) and request support! 
 
 ### Supported Java versions
-| Minecraft version: | 1.8.x      | 1.12.x     | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.[0-4]  | 1.20.5      |
+| Minecraft version: | 1.8.x      | 1.12.x     | 1.15.x      | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.[0-4]  | 1.20.5+     |
 |--------------------|------------|------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
 | Java version:      | 8 or newer | 8 or newer | 11 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer | 17 or newer | 21 or newer |

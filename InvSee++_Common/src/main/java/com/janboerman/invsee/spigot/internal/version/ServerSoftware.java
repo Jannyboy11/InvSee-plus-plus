@@ -99,9 +99,16 @@ public class ServerSoftware {
                 }
 
             case "org.bukkit.craftbukkit.CraftServer":
-                // Paper unversioned server class name
-                // Call Server#getMinecraftVersion() to find out the version (this method was added by Paper).
-                return new ServerSoftware(PAPER, MinecraftVersion.fromString(server.getMinecraftVersion()));
+                // CraftBukkit 1.20.6 and up or Paper 1.20.4 and up:
+                try {
+                    // Call Server#getMinecraftVersion() to find out the version (this method was added by Paper).
+                    return new ServerSoftware(PAPER, MinecraftVersion.fromString(server.getMinecraftVersion()));
+                } catch (NoSuchMethodError nsme) {
+                    // Apparently we are not running on Paper (thanks CraftBukkit...)
+                    switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
+                        case CraftbukkitMappingsVersion._1_20_6: return CRAFTBUKKIT_1_20_6;
+                    }
+                }
 
             case "net.glowstone.GlowServer":
                 final String glowstoneGameVersion = GlowstoneGameVersion.getGameVersion();

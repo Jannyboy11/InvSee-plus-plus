@@ -46,6 +46,7 @@ jobs:
         # https://hub.spigotmc.org/versions/
         run: |
           java -jar BuildTools.jar --rev 4137 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 1.20.6 --compile craftbukkit --remapped
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release
