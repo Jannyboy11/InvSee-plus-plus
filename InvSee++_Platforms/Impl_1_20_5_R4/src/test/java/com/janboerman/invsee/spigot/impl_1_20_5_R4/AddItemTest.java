@@ -1,32 +1,23 @@
 package com.janboerman.invsee.spigot.impl_1_20_5_R4;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.logging.Logger;
 
 import net.minecraft.world.Container;
 
 public class AddItemTest {
 
-    private static final Logger LOGGER = Logger.getLogger(AddItemTest.class.getName());
     private static final int INVENTORY_MAX_STACK = Container.MAX_STACK;
 
     private ItemStack[] contents;
 
     @BeforeAll
     public static void setUpClass() {
-        Server server = mock(Server.class);
-        when(server.getItemFactory()).thenReturn(new FakeItemFactory());
-        when(server.getLogger()).thenReturn(LOGGER);
-        Bukkit.setServer(server);
-
+        FakeServer server = new FakeServer();
+        FakeServer.register(server);
     }
 
     @BeforeEach
