@@ -10,7 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import com.janboerman.invsee.utils.Compat;
 
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
@@ -31,6 +34,7 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.WorldCreator;
 import org.bukkit.advancement.Advancement;
+import org.bukkit.block.BlockType;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -75,6 +79,7 @@ public class FakeServer implements Server {
     private static final Logger LOGGER = Logger.getLogger(FakeServer.class.getName());
 
     private final ItemFactory itemFactory = new FakeItemFactory();
+    private final Supplier<Registry<BlockType>> emptyRegistrySupplier = () -> new FakeRegistry<>(Compat.emptyMap());
 
     FakeServer() {
     }
@@ -863,7 +868,7 @@ public class FakeServer implements Server {
 
     @Override
     public <T extends Keyed> Registry<T> getRegistry(Class<T> aClass) {
-        return null;
+        return (Registry<T>) emptyRegistrySupplier.get();
     }
 
     @Override

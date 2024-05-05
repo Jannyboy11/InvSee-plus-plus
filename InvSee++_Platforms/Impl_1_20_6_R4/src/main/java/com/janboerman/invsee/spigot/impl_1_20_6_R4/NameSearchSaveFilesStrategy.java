@@ -2,7 +2,7 @@ package com.janboerman.invsee.spigot.impl_1_20_6_R4;
 
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.resolve.NameResolveStrategy;
-import static com.janboerman.invsee.spigot.impl_1_20_5_R4.HybridServerSupport.getPlayerDir;
+import static com.janboerman.invsee.spigot.impl_1_20_6_R4.HybridServerSupport.getPlayerDir;
 import com.janboerman.invsee.spigot.internal.CompletedEmpty;
 import static com.janboerman.invsee.spigot.internal.NBTConstants.*;
 import net.minecraft.nbt.CompoundTag;

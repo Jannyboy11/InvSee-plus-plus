@@ -62,6 +62,10 @@ public class Compat {
         optional.ifPresentOrElse(action, emptyAction);
     }
 
+    public static <K, V> Map<K, V> emptyMap() {
+        return Map.of();
+    }
+
     public static byte[] readAllBytes(InputStream inputStream) throws IOException {
         if (inputStream == null) return null;
         return inputStream.readAllBytes();

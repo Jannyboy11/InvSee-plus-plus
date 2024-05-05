@@ -70,6 +70,10 @@ public class Compat {
         }
     }
 
+    public static <K, V> Map<K, V> emptyMap() {
+        return Collections.emptyMap();
+    }
+
     public static byte[] readAllBytes(InputStream inputStream) throws IOException {
         if (inputStream == null) return null;
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
