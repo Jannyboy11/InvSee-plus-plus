@@ -58,7 +58,7 @@ public class GiveImpl extends NeditImpl {
 
     @Override
     public int maxStackSize() {
-        // TODO can we get this from some method or constant in the Glowstone API?
+        // There does not seem to be any field or method in Glowstone to ge tthis value.
         return 64;
     }
 

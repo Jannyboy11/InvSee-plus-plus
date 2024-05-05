@@ -9,6 +9,8 @@ import com.janboerman.invsee.utils.Either;
 
 public interface ItemType {
 
+    // TODO convert from Spigot's 'native' https://hub.spigotmc.org/javadocs/spigot/org/bukkit/inventory/ItemType.html
+
     public static ItemType plain(Material material) {
         return new Plain(material);
     }

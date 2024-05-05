@@ -2,7 +2,6 @@ package com.janboerman.invsee.spigot.impl_1_20_5_R4;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 

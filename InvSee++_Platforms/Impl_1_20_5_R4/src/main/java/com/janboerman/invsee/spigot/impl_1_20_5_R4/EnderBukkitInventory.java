@@ -1,7 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_20_5_R4;
 
 import com.janboerman.invsee.spigot.internal.inventory.EnderInventory;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftInventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,8 +52,8 @@ class EnderBukkitInventory extends CraftInventory implements EnderInventory<Ende
 		//merge with existing similar item stacks
 		for (int i = 0; i < contents.length && add.getAmount() > 0; i++) {
 			final ItemStack existingStack = contents[i];
-			if (existingStack != null && existingStack.isSimilar(add)) {
-				final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, Math.max(existingStack.getMaxStackSize(), add.getAmount()));
+			if (add.isSimilar(existingStack)) {
+				final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, Math.min(ItemUtils.getMaxStackSize(existingStack), add.getAmount()));
 				if (existingStack.getAmount() < maxStackSizeForThisItem) {
 					//how many can we merge (at most)?
 					final int maxMergeAmount = Math.min(maxStackSizeForThisItem - existingStack.getAmount(), add.getAmount());
@@ -69,15 +68,15 @@ class EnderBukkitInventory extends CraftInventory implements EnderInventory<Ende
 							existingStack.setAmount(maxStackSizeForThisItem);
 							add.setAmount(add.getAmount() - maxMergeAmount);
 						}
-					}
+					} // else: we cannot merge anything
 				}
 			}
 		}
 
 		//merge with empty slots
-		final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, Math.max(add.getMaxStackSize(), add.getAmount()));
+		final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, Math.min(ItemUtils.getMaxStackSize(add), add.getAmount()));
 		for (int i = 0; i < contents.length && add.getAmount() > 0; i++) {
-			if (contents[i] == null || contents[i].getAmount() == 0 || contents[i].getType() == Material.AIR) {
+			if (ItemUtils.isEmpty(contents[i])) {
 				if (add.getAmount() <= maxStackSizeForThisItem) {
 					//full merge
 					contents[i] = add.clone();
