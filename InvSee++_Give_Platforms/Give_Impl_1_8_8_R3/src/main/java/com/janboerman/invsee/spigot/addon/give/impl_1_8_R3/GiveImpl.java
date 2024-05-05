@@ -15,6 +15,7 @@ import net.minecraft.server.v1_8_R3.NBTTagList;
 import net.minecraft.server.v1_8_R3.NBTTagLong;
 import net.minecraft.server.v1_8_R3.NBTTagShort;
 import net.minecraft.server.v1_8_R3.NBTTagString;
+import net.minecraft.server.v1_8_R3.IInventory;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 
 import java.util.Map.Entry;
@@ -67,4 +68,8 @@ public class GiveImpl extends NeditImpl {
         return listTag;
     }
 
+    @Override
+    public int maxStackSize() {
+        return IInventory.MAX_STACK;
+    }
 }

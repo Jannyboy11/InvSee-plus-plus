@@ -56,4 +56,10 @@ public class GiveImpl extends NeditImpl {
                     .collect(Collectors.toList()));
     }
 
+    @Override
+    public int maxStackSize() {
+        // TODO can we get this from some method or constant in the Glowstone API?
+        return 64;
+    }
+
 }

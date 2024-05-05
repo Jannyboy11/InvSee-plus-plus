@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import org.bukkit.inventory.ItemStack;
 
+import net.minecraft.world.Container;
 
 public class GiveImpl implements GiveApi {
 
@@ -37,5 +38,10 @@ public class GiveImpl implements GiveApi {
         } catch (CommandSyntaxException e) {
             return Either.left(e.getMessage());
         }
+    }
+
+    @Override
+    public int maxStackSize() {
+        return Container.MAX_STACK;
     }
 }

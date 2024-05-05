@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.addon.give;
 import static com.janboerman.invsee.utils.Compat.emptyList;
 import static com.janboerman.invsee.utils.Compat.singletonList;
 
+import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
 import com.janboerman.invsee.utils.StringHelper;
 import org.bukkit.Material;
 import org.bukkit.command.*;
@@ -13,9 +14,15 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.*;
 
+// TODO can we use Brigadier for ItemStack completions?
+// TODO possibly, but we need to keep this around for 1.12.2 and 1.8.8 servers.
 class GiveTabCompleter implements TabCompleter {
 
-    GiveTabCompleter() {}
+    private final GiveApi giveApi;
+
+    GiveTabCompleter(GiveApi giveApi) {
+        this.giveApi = giveApi;
+    }
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -45,7 +52,7 @@ class GiveTabCompleter implements TabCompleter {
         else if (args.length == 3) {
             final String inputAmount = args[2];
             Material material = Material.matchMaterial(args[1]);
-            Stream<String> amounts = IntStream.rangeClosed(1, material != null ? material.getMaxStackSize() : 64)
+            Stream<String> amounts = IntStream.rangeClosed(1, material != null ? material.getMaxStackSize() : giveApi.maxStackSize())
                     .mapToObj(Integer::toString);
             if (!inputAmount.isEmpty()) {
                 amounts = amounts.filter(amount -> amount.startsWith(inputAmount));

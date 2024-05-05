@@ -14,4 +14,6 @@ public interface GiveApi {
     
     public Either<String, ItemType> parseItemType(String itemType);
 
+    public int maxStackSize();
+
 }

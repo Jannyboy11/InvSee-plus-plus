@@ -57,4 +57,9 @@ public class GiveImpl extends NeditImpl {
         return listTag;
     }
 
+    @Override
+    public int maxStackSize() {
+        return IInventory.MAX_STACK;
+    }
+
 }

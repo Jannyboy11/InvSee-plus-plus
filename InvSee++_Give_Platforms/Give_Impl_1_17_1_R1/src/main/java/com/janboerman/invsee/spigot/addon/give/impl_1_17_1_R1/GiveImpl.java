@@ -3,6 +3,7 @@ package com.janboerman.invsee.spigot.addon.give.impl_1_17_1_R1;
 import com.janboerman.invsee.spigot.addon.give.common.NeditImpl;
 import me.nullicorn.nedit.type.*;
 import net.minecraft.nbt.*;
+import net.minecraft.world.Container;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 
 import java.util.Map.Entry;
@@ -54,6 +55,11 @@ public class GiveImpl extends NeditImpl {
             listTag.add(convert(o));
         }
         return listTag;
+    }
+
+    @Override
+    public int maxStackSize() {
+        return Container.LARGE_MAX_STACK_SIZE;
     }
 
 }

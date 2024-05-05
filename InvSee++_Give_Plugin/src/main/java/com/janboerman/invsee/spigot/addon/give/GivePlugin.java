@@ -37,7 +37,7 @@ public class GivePlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new JoinListener(this, queueManager), this);
 
         //commands
-        GiveTabCompleter tabCompleter = new GiveTabCompleter();
+        GiveTabCompleter tabCompleter = new GiveTabCompleter(giveApi);
 
         PluginCommand invGiveCommand = getServer().getPluginCommand("invgive");
         invGiveCommand.setExecutor(new InvGiveExecutor(this, invseeApi, giveApi, queueManager));
