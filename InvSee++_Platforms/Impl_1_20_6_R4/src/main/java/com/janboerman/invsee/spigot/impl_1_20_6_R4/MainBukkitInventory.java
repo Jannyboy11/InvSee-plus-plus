@@ -399,6 +399,8 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 	public HashMap<Integer, ItemStack> addItem(ItemStack[] items) {
 		HashMap<Integer, ItemStack> leftOvers = new HashMap<>();
 
+		// TODO can optimise this by keeping track of empty slots.
+
 		if (items != null) {
 			for (int i = 0; i < items.length; i++) {
 				ItemStack leftOver = addItem(items[i]);
