@@ -75,6 +75,15 @@ public class AddItemTest {
                 itemStack(Material.ENDER_PEARL, 15, 17));
     }
 
+    @Test
+    public void testMergeBelowMaxStackSize() {
+        contents[0] = itemStack(Material.ENDER_PEARL, 15);
+
+        addItem(itemStack(Material.ENDER_PEARL, 15));
+
+        assertContents(itemStack(Material.ENDER_PEARL, 16), itemStack(Material.ENDER_PEARL, 14));
+    }
+
     private void assertContents(ItemStack... expectedPrefix) {
         ItemStack[] actual = contents;
         for (int i = 0; i < expectedPrefix.length; i += 1) {

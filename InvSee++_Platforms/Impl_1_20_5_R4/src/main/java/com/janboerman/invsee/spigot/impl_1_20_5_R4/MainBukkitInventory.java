@@ -440,9 +440,9 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		for (int i = 0; i < contents.length && add.getAmount() > 0; i++) {
 			final ItemStack existingStack = contents[i];
 			if (add.isSimilar(existingStack)) {
-				final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, Math.min(ItemUtils.getMaxStackSize(existingStack), add.getAmount()));
+				final int maxStackSizeForThisItem = Math.min(inventoryMaxStackSize, ItemUtils.getMaxStackSize(existingStack));
 				if (existingStack.getAmount() < maxStackSizeForThisItem) {
-					//how many can we merge (at most)?
+					//how many can we merge (at most)? it's the minimum of what fits and what we have
 					final int maxMergeAmount = Math.min(maxStackSizeForThisItem - existingStack.getAmount(), add.getAmount());
 					assert maxMergeAmount > 0 : "Trying to merge a non-positive number of items: " + maxMergeAmount;
 
