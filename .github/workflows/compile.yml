@@ -53,8 +53,7 @@ jobs:
         with:
           files: |
             InvSee++_Plugin/target/InvSee++.jar
-# TODO re-enable InvSee++_Give again once we figure out a good solution for replacing the NBT tag argument.
-#            InvSee++_Give_Plugin/target/InvSee++_Give.jar
+            InvSee++_Give_Plugin/target/InvSee++_Give.jar
             InvSee++_Clear_Plugin/target/InvSee++_Clear.jar
 #      No longer needed since the maven-release-plugin already does this.
 #      - name: Deploy to GitHub Packages

@@ -49,7 +49,7 @@ On 1.20.4 an earlier:
 - `/invgive Notch diamond 1 {"foo":"bar"}`
 - `/endergive Jannyboy11 wool:14`
 
-On 1.20.5 and later (WIP):
+On 1.20.5 and later:
 - `/invgive Jannyboy11 minecraft:emerald[minecraft:max_stack_size=99] 65`
 ##### Permissions:
 - `invseeplusplus.give.*` provides `invseeplusplus.give.inventory` and `invseeplusplus.give.enderchest`.

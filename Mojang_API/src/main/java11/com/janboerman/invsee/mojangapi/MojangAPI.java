@@ -2,11 +2,13 @@ package com.janboerman.invsee.mojangapi;
 
 import com.janboerman.invsee.utils.UUIDHelper;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
@@ -102,14 +104,19 @@ public class MojangAPI {
     private static <T> Optional<T> handleNotOk(HttpResponse<InputStream> response) {
         int statusCode = response.statusCode();
 
-        if (statusCode == 204) {
+        if (statusCode == HTTP_NO_CONTENT) {
             //no content - a player with that username does not exist.
             return handleNoContent(response);
         }
 
-        else if (statusCode == 400) {
+        else if (statusCode == HTTP_BAD_REQUEST) {
             //bad request
             return handleBadRequest(response);
+        }
+
+        else if (statusCode == HTTP_TOO_MANY_REQUESTS) {
+            //rate limited
+            return handleTooManyRequests(response);
         }
 
         else {
@@ -129,6 +136,17 @@ public class MojangAPI {
         String errorMessage = (String) jsonObject.get("errorMessage");
 
         throw new RuntimeException("We sent a bad request to Mojang. We got a(n) " + error + " with the following message: " + errorMessage);
+    }
+
+    private static <T> Optional<T> handleTooManyRequests(HttpResponse<InputStream> response) {
+        try (InputStream inputStream = response.body()) {
+            byte[] bytes = inputStream.readAllBytes();
+            Charset charset = charsetFromHeaders(response.headers());
+            String errorMessage = new String(bytes, charset);
+            throw new RuntimeException("We were rate limited by Mojang. Error message: " + errorMessage);
+        } catch (IOException e) {
+            throw new RuntimeException("Exception occurred when processing 429 (rate limited) response.", e);
+        }
     }
 
     private static <T> Optional<T> handleUnknownStatusCode(HttpResponse<InputStream> response) {

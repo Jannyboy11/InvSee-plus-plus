@@ -1,6 +1,9 @@
 package com.janboerman.invsee.utils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -64,6 +67,19 @@ public class Compat {
             action.accept(optional.get());
         } else {
             emptyAction.run();
+        }
+    }
+
+    public static byte[] readAllBytes(InputStream inputStream) throws IOException {
+        if (inputStream == null) return null;
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            byte[] data = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+                outputStream.write(data, 0, bytesRead);
+            }
+            outputStream.flush();
+            return outputStream.toByteArray();
         }
     }
 }

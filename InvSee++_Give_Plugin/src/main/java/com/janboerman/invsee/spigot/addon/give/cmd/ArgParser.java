@@ -1,6 +1,5 @@
 package com.janboerman.invsee.spigot.addon.give.cmd;
 
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +11,8 @@ import com.janboerman.invsee.spigot.addon.give.common.Convert;
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
 import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
+import com.janboerman.invsee.utils.Compat;
 import com.janboerman.invsee.utils.Either;
-import com.janboerman.invsee.utils.ListHelper;
 import com.janboerman.invsee.utils.Pair;
 
 import org.bukkit.inventory.ItemStack;
@@ -21,9 +20,9 @@ import org.bukkit.inventory.ItemStack;
 public final class ArgParser {
 
     private static final List<ArgType>
-            FORMAT_ITEMTYPE_AMOUNT = ListHelper.of(ArgType.TARGET, ArgType.ITEM_TYPE, ArgType.AMOUNT),
-            FORMAT_ITEMTYPE_AMOUNT_NBTTAG = ListHelper.of(ArgType.TARGET, ArgType.ITEM_TYPE, ArgType.AMOUNT, ArgType.NBT_TAG),
-            FORMAT_ITEMTYPE = ListHelper.of(ArgType.TARGET, ArgType.ITEM_TYPE);
+            FORMAT_ITEMTYPE_AMOUNT = Compat.listOf(ArgType.TARGET, ArgType.ITEM_TYPE, ArgType.AMOUNT),
+            FORMAT_ITEMTYPE_AMOUNT_NBTTAG = Compat.listOf(ArgType.TARGET, ArgType.ITEM_TYPE, ArgType.AMOUNT, ArgType.NBT_TAG),
+            FORMAT_ITEMTYPE = Compat.listOf(ArgType.TARGET, ArgType.ITEM_TYPE);
 
     // item type strategy:
     //  If the args length is at least 3 and last argument is a number:
@@ -71,14 +70,14 @@ public final class ArgParser {
         if (FORMAT_ITEMTYPE.equals(format)) {
             result.put(ArgType.ITEM_TYPE, args[1]);
         } else if (FORMAT_ITEMTYPE_AMOUNT.equals(format)) {
-            String last = args[args.length - 1];
-            List<String> init = ListHelper.of(args).subList(0, args.length - 1);
-            result.put(ArgType.AMOUNT, last);
-            result.put(ArgType.ITEM_TYPE, String.join(" ", init));
+            String countString = args[args.length - 1];
+            List<String> itemTypeString = Compat.listOf(args).subList(1, args.length - 1);
+            result.put(ArgType.AMOUNT, countString);
+            result.put(ArgType.ITEM_TYPE, String.join(" ", itemTypeString));
         } else if (FORMAT_ITEMTYPE_AMOUNT_NBTTAG.equals(format)) {
             result.put(ArgType.ITEM_TYPE, args[1]);
             result.put(ArgType.AMOUNT, args[2]);
-            result.put(ArgType.NBT_TAG, String.join(" ", Arrays.asList(args).subList(3, args.length)));
+            result.put(ArgType.NBT_TAG, String.join(" ", Compat.listOf(args).subList(3, args.length)));
         } else {
             throw new IllegalArgumentException("Unexpected format: " + format);
         }

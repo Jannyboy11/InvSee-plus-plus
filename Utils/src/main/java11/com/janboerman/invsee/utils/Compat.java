@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import java.io.InputStream;
+import java.io.IOException;
 
 public class Compat {
 
@@ -58,5 +60,10 @@ public class Compat {
 
     public static <T> void ifPresentOrElse(Optional<T> optional, Consumer<? super T> action, Runnable emptyAction) {
         optional.ifPresentOrElse(action, emptyAction);
+    }
+
+    public static byte[] readAllBytes(InputStream inputStream) throws IOException {
+        if (inputStream == null) return null;
+        return inputStream.readAllBytes();
     }
 }

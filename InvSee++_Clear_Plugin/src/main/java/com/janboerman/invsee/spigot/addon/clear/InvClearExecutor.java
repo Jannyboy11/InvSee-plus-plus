@@ -47,6 +47,7 @@ class InvClearExecutor implements CommandExecutor {
 
         ItemType itemType = null;
         //TODO nbt tag?
+        //TODO components? This is actually possible now!
 
         int maxCount = -1;
 

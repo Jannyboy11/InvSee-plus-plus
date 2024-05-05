@@ -1,15 +1,19 @@
 package com.janboerman.invsee.mojangapi;
 
 import static com.janboerman.invsee.mojangapi.ResponseUtils.readJSONObject;
+import static com.janboerman.invsee.mojangapi.ResponseUtils.charsetFromHeader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import com.janboerman.invsee.utils.Compat;
 import com.janboerman.invsee.utils.Rethrow;
 import com.janboerman.invsee.utils.UUIDHelper;
 
@@ -86,8 +90,9 @@ public class MojangAPI {
         assert statusCode == connection.getResponseCode();
 
         switch (statusCode) {
-            case HttpURLConnection.HTTP_NO_CONTENT: return handleNoContent(connection);
-            case HttpURLConnection.HTTP_BAD_REQUEST: return handleBadRequest(connection);
+            case ResponseUtils.HTTP_NO_CONTENT: return handleNoContent(connection);
+            case ResponseUtils.HTTP_BAD_REQUEST: return handleBadRequest(connection);
+            case ResponseUtils.HTTP_TOO_MANY_REQUESTS: return handleTooManyRequests(connection);
             default: return handleUnknownStatusCode(statusCode);
         }
     }
@@ -103,6 +108,17 @@ public class MojangAPI {
         String errorMessage = (String) jsonObject.get("errorMessage");
 
         throw new RuntimeException("We sent a bad request to Mojang. We got a(n) " + error + " with the following message: " + errorMessage);
+    }
+
+    private static <T> Optional<T> handleTooManyRequests(HttpURLConnection connection) {
+        try (InputStream inputStream = connection.getInputStream()) {
+            byte[] bytes = Compat.readAllBytes(inputStream);
+            Charset charset = charsetFromHeader(connection.getHeaderField("Content-Type"));
+            String errorMessage = new String(bytes, charset);
+            throw new RuntimeException("We were rate limited by Mojang. Error message: " + errorMessage);
+        } catch (IOException e) {
+            throw new RuntimeException("Exception occurred when processing 429 (rate limited) response.", e);
+        }
     }
 
     private static <T> Optional<T> handleUnknownStatusCode(int statusCode) {

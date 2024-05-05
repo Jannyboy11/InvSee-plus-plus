@@ -13,6 +13,10 @@ import org.json.simple.parser.ParseException;
 
 class ResponseUtils {
 
+    static final int HTTP_NO_CONTENT = HttpURLConnection.HTTP_NO_CONTENT;
+    static final int HTTP_BAD_REQUEST = HttpURLConnection.HTTP_BAD_REQUEST;
+    static final int HTTP_TOO_MANY_REQUESTS = 429;
+
     private ResponseUtils() {}
 
     static JSONObject readJSONObject(HttpURLConnection connection) {
@@ -34,7 +38,7 @@ class ResponseUtils {
     }
 
 
-    private static Charset charsetFromHeader(String contentType) {
+    static Charset charsetFromHeader(String contentType) {
         if (contentType != null) {
             int indexOfSemi = contentType.indexOf(';');
             if (indexOfSemi != -1) {

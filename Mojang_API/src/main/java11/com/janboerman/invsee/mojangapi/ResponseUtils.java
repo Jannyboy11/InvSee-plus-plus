@@ -15,6 +15,10 @@ import java.util.Optional;
 
 final class ResponseUtils {
 
+    static final int HTTP_NO_CONTENT = 204;
+    static final int HTTP_BAD_REQUEST = 400;
+    static final int HTTP_TOO_MANY_REQUESTS = 429;
+
     private ResponseUtils() {}
 
     static JSONObject readJSONObject(HttpResponse<InputStream> response) {
@@ -55,7 +59,7 @@ final class ResponseUtils {
     }
     */
 
-    private static Charset charsetFromHeaders(HttpHeaders headers) {
+    static Charset charsetFromHeaders(HttpHeaders headers) {
         Optional<String> optionalContentType = headers.firstValue("Content-Type");
         if (optionalContentType.isPresent()) {
             String contentType = optionalContentType.get();
