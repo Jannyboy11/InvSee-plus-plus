@@ -2,9 +2,7 @@ package com.janboerman.invsee.spigot.addon.give;
 
 import com.janboerman.invsee.spigot.addon.give.cmd.ArgParser;
 import com.janboerman.invsee.spigot.addon.give.cmd.ArgType;
-import com.janboerman.invsee.spigot.addon.give.common.Convert;
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
-import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
@@ -20,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;

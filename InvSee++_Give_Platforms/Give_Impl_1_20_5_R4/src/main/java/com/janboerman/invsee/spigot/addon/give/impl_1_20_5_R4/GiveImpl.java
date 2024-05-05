@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.addon.give.impl_1_20_5_R4;
 
+import com.janboerman.invsee.spigot.addon.give.common.Convert;
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
 import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.utils.Either;
@@ -26,6 +27,11 @@ public class GiveImpl implements GiveApi {
 
     @Override
     public Either<String, ItemType> parseItemType(String itemType) {
+        Either<String, ItemType> stackFromLegacySyntax = Convert.convertItemType(itemType);
+        if (stackFromLegacySyntax.isRight()) {
+            return stackFromLegacySyntax;
+        }
+
         try {
             return Either.right(new WithComponents(ItemParser.parseItemType(itemType)));
         } catch (CommandSyntaxException e) {

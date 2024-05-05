@@ -1,8 +1,8 @@
 package com.janboerman.invsee.spigot.addon.give;
 
-import com.janboerman.invsee.spigot.addon.give.common.Convert;
+import com.janboerman.invsee.spigot.addon.give.cmd.ArgParser;
+import com.janboerman.invsee.spigot.addon.give.cmd.ArgType;
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
-import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
@@ -15,6 +15,7 @@ import com.janboerman.invsee.spigot.api.response.TargetHasExemptPermission;
 import com.janboerman.invsee.spigot.api.response.UnknownTarget;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.utils.Either;
+import com.janboerman.invsee.utils.Pair;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -22,9 +23,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -32,13 +33,13 @@ import java.util.logging.Level;
 class EnderGiveExecutor implements CommandExecutor {
 
     private final GivePlugin plugin;
-    private final InvseeAPI api;
+    private final InvseeAPI invseeApi;
     private final GiveApi giveApi;
     private final ItemQueueManager queueManager;
 
-    EnderGiveExecutor(GivePlugin plugin, InvseeAPI api, GiveApi giveApi, ItemQueueManager queueManager) {
+    EnderGiveExecutor(GivePlugin plugin, InvseeAPI invseeApi, GiveApi giveApi, ItemQueueManager queueManager) {
         this.plugin = plugin;
-        this.api = api;
+        this.invseeApi = invseeApi;
         this.giveApi = giveApi;
         this.queueManager = queueManager;
     }
@@ -47,54 +48,26 @@ class EnderGiveExecutor implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length < 2) return false;
 
-        String inputPlayer = args[0];
-        String inputItemType = args[1];
-
-        Either<UUID, String> eitherPlayer = Convert.convertPlayer(inputPlayer);
-        CompletableFuture<Optional<UUID>> uuidFuture;
-        CompletableFuture<Optional<String>> userNameFuture;
-        if (eitherPlayer.isLeft()) {
-            UUID uuid = eitherPlayer.getLeft();
-            uuidFuture = CompletableFuture.completedFuture(Optional.of(uuid));
-            userNameFuture = api.fetchUserName(uuid);
-        } else {
-            assert eitherPlayer.isRight();
-            String userName = eitherPlayer.getRight();
-            userNameFuture = CompletableFuture.completedFuture(Optional.of(userName));
-            uuidFuture = api.fetchUniqueId(userName);
+        Optional<List<ArgType>> maybeFormat = ArgParser.determineFormat(args);
+        if (!maybeFormat.isPresent()) {
+            // Could not recognise the format. Exit early and let bukkit print the usage string.
+            return false;
         }
 
-        Either<String, ItemType> eitherMaterial = Convert.convertItemType(inputItemType);
-        if (eitherMaterial.isLeft()) { sender.sendMessage(ChatColor.RED + eitherMaterial.getLeft()); return true; }
-        assert eitherMaterial.isRight();
-        ItemType itemType = eitherMaterial.getRight();
+        List<ArgType> format = maybeFormat.get();
+        Map<ArgType, String> groupedArguments = ArgParser.splitArguments(format, args);
 
-        int amount;
-        if (args.length > 2) {
-            String inputAmount = args[2];
-            Either<String, Integer> eitherItems = Convert.convertAmount(inputAmount);
-            if (eitherItems.isLeft()) { sender.sendMessage(ChatColor.RED + eitherItems.getLeft()); return true; }
-            assert eitherItems.isRight();
-            amount = eitherItems.getRight();
-        } else {
-            amount = 1;
-        }
+        String inputPlayer = groupedArguments.get(ArgType.TARGET);
+        Pair<CompletableFuture<Optional<UUID>>, CompletableFuture<Optional<String>>> futures = ArgParser.parseTarget(invseeApi, inputPlayer);
+        CompletableFuture<Optional<UUID>> uuidFuture = futures.getFirst();
+        CompletableFuture<Optional<String>> userNameFuture = futures.getSecond();
 
-        ItemStack items = itemType.toItemStack(amount);
+        Either<String, ItemStack> eitherStack = ArgParser.parseItem(giveApi, groupedArguments);
+        if (eitherStack.isLeft()) { sender.sendMessage(ChatColor.RED + eitherStack.getLeft()); return true; }
+        assert eitherStack.isRight();
 
-        if (args.length > 3) {
-            StringJoiner inputTag = new StringJoiner(" ");
-            for (int i = 3; i < args.length; i++) inputTag.add(args[i]);
-            try {
-                items = giveApi.applyTag(items, inputTag.toString());
-            } catch (IllegalArgumentException e) {
-                sender.sendMessage(ChatColor.RED + e.getMessage());
-                return true;
-            }
-        }
-
-        final ItemStack finalItems = items;
-        final CreationOptions<EnderChestSlot> creationOptions = api.enderInventoryCreationOptions()
+        final ItemStack finalItems = eitherStack.getRight();
+        final CreationOptions<EnderChestSlot> creationOptions = invseeApi.enderInventoryCreationOptions()
                 .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
                 .withUnknownPlayerSupport(plugin.unknownPlayerSupport())
                 .withBypassExemptedPlayers(plugin.bypassExemptEndersee(sender));
@@ -107,7 +80,7 @@ class EnderGiveExecutor implements CommandExecutor {
                 UUID uuid = optUuid.get();
 
                 CompletableFuture<SpectateResponse<EnderSpectatorInventory>> responseFuture =
-                        api.enderSpectatorInventory(uuid, userName, creationOptions);
+                        invseeApi.enderSpectatorInventory(uuid, userName, creationOptions);
                 responseFuture.thenAcceptAsync(response -> {
                     if (response.isSuccess()) {
                         EnderSpectatorInventory inventory = response.getInventory();
@@ -117,7 +90,7 @@ class EnderGiveExecutor implements CommandExecutor {
                             //success!!
                             if (plugin.getServer().getPlayer(uuid) == null)
                                 //if the player is offline, save the inventory.
-                                api.saveEnderChest(inventory).whenComplete((v, e) -> {
+                                invseeApi.saveEnderChest(inventory).whenComplete((v, e) -> {
                                     if (e != null) plugin.getLogger().log(Level.SEVERE, "Could not save inventory", e);
                                 });
                             sender.sendMessage(ChatColor.GREEN + "Added " + originalItems + " to " + userName + "'s enderchest!");
@@ -134,7 +107,7 @@ class EnderGiveExecutor implements CommandExecutor {
                             }
 
                             if (plugin.getServer().getPlayer(uuid) == null && plugin.savePartialInventories())
-                                api.saveEnderChest(inventory).whenComplete((v, e) -> {
+                                invseeApi.saveEnderChest(inventory).whenComplete((v, e) -> {
                                     if (e != null) plugin.getLogger().log(Level.SEVERE, "Could not save enderchest", e);
                                 });
                         }
@@ -158,11 +131,11 @@ class EnderGiveExecutor implements CommandExecutor {
                             sender.sendMessage(ChatColor.RED + "Cannot give to " + inputPlayer + "'s enderchest for an unknown reason.");
                         }
                     }
-                }, runnable -> api.getScheduler().executeSyncPlayer(uuid, runnable, null));
+                }, runnable -> invseeApi.getScheduler().executeSyncPlayer(uuid, runnable, null));
             }
 
             return null;
-        }, api.getScheduler()::executeSyncGlobal);
+        }, invseeApi.getScheduler()::executeSyncGlobal);
 
         return true;
     }
