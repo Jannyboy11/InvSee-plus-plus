@@ -6,6 +6,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 
+import com.janboerman.invsee.utils.Either;
+
 public abstract class NeditImpl implements GiveApi {
 
     protected NeditImpl() {
@@ -18,6 +20,11 @@ public abstract class NeditImpl implements GiveApi {
         } catch (IOException e) {
             throw new IllegalArgumentException("Invalid nbt: " + tag);
         }
+    }
+
+    @Override
+    public final Either<String, ItemType> parseItemType(String itemType) {
+        return Convert.convertItemType(itemType);
     }
 
     protected abstract ItemStack applyTag(ItemStack stack, NBTCompound tag);

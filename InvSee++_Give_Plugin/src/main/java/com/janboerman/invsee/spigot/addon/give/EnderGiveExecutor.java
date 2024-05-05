@@ -1,6 +1,8 @@
 package com.janboerman.invsee.spigot.addon.give;
 
+import com.janboerman.invsee.spigot.addon.give.common.Convert;
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
+import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
 import com.janboerman.invsee.spigot.api.InvseeAPI;

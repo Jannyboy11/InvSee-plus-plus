@@ -41,6 +41,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.19.4-R0.1-SNAPSHOT</version>

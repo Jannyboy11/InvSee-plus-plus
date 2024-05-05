@@ -1,24 +1,22 @@
 package com.janboerman.invsee.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class ListHelper {
+// TODO optimise this using multi-release jar file
+public final class ListHelper {
 
     private ListHelper() {
     }
 
-    //TODO according to IntelliJ, this is no longer called. why do we have this?
-    @Deprecated
-    public static <T> List<T> padTo(int size, T with, List<T> list) {
-        final int listSize = list.size();
-        assert listSize <= size : "Illegal argument: list is larger than size!";
-
-        if (listSize >= size)
-            return list;
-
-        int gap = size - list.size();
-        ConstantList<T> padding = new ConstantList<>(gap, with);
-        return new ConcatList<>(list, padding);
+    public static <T> List<T> copy(List<T> list) {
+        // TODO Java 11 and later: List.copyOf(list)
+        return new ArrayList<>(list);
     }
 
+    public static <T> List<T> of(T... items) {
+        // TODO Java 11 and later: List.of(items)
+        return Arrays.asList(items);
+    }
 }

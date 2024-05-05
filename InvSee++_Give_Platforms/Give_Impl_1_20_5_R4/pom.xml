@@ -76,12 +76,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>utils</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.TheNullicorn</groupId>
             <artifactId>Nedit</artifactId>
             <version>49615cf47c</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>

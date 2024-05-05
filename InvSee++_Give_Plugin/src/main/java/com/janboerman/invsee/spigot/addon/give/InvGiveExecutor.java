@@ -1,17 +1,23 @@
 package com.janboerman.invsee.spigot.addon.give;
 
+import com.janboerman.invsee.spigot.addon.give.cmd.ArgParser;
+import com.janboerman.invsee.spigot.addon.give.cmd.ArgType;
+import com.janboerman.invsee.spigot.addon.give.common.Convert;
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
+import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.utils.Either;
+import com.janboerman.invsee.utils.Pair;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.*;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -37,53 +43,25 @@ class InvGiveExecutor implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length < 2) return false;
 
-        String inputPlayer = args[0];
-        String inputItemType = args[1];
-
-        Either<UUID, String> eitherPlayer = Convert.convertPlayer(inputPlayer);
-        CompletableFuture<Optional<UUID>> uuidFuture;
-        CompletableFuture<Optional<String>> userNameFuture;
-        if (eitherPlayer.isLeft()) {
-            UUID uuid = eitherPlayer.getLeft();
-            uuidFuture = CompletableFuture.completedFuture(Optional.of(uuid));
-            userNameFuture = invseeApi.fetchUserName(uuid);
-        } else {
-            assert eitherPlayer.isRight();
-            String userName = eitherPlayer.getRight();
-            userNameFuture = CompletableFuture.completedFuture(Optional.of(userName));
-            uuidFuture = invseeApi.fetchUniqueId(userName);
+        Optional<List<ArgType>> maybeFormat = ArgParser.determineFormat(args);
+        if (!maybeFormat.isPresent()) {
+            // Could not recognise the format. Exit early and let bukkit print the usage string.
+            return false;
         }
 
-        Either<String, ItemType> eitherMaterial = Convert.convertItemType(inputItemType);
-        if (eitherMaterial.isLeft()) { sender.sendMessage(ChatColor.RED + eitherMaterial.getLeft()); return true; }
-        assert eitherMaterial.isRight();
-        ItemType itemType = eitherMaterial.getRight();
+        List<ArgType> format = maybeFormat.get();
+        Map<ArgType, String> groupedArguments = ArgParser.splitArguments(format, args);
 
-        int amount;
-        if (args.length > 2) {
-            String inputAmount = args[2];
-            Either<String, Integer> eitherItems = Convert.convertAmount(inputAmount);
-            if (eitherItems.isLeft()) { sender.sendMessage(ChatColor.RED + eitherItems.getLeft()); return true; }
-            assert eitherItems.isRight();
-            amount = eitherItems.getRight();
-        } else {
-            amount = 1;
-        }
+        String inputPlayer = groupedArguments.get(ArgType.TARGET);
+        Pair<CompletableFuture<Optional<UUID>>, CompletableFuture<Optional<String>>> futures = ArgParser.parseTarget(invseeApi, inputPlayer);
+        CompletableFuture<Optional<UUID>> uuidFuture = futures.getFirst();
+        CompletableFuture<Optional<String>> userNameFuture = futures.getSecond();
 
-        ItemStack items = itemType.toItemStack(amount);
+        Either<String, ItemStack> eitherStack = ArgParser.parseItem(giveApi, groupedArguments);
+        if (eitherStack.isLeft()) { sender.sendMessage(ChatColor.RED + eitherStack.getLeft()); return true; }
+        assert eitherStack.isRight();
 
-        if (args.length > 3) {
-            StringJoiner inputTag = new StringJoiner(" ");
-            for (int i = 3; i < args.length; i++) inputTag.add(args[i]);
-            try {
-                items = giveApi.applyTag(items, inputTag.toString());
-            } catch (IllegalArgumentException e) {
-                sender.sendMessage(ChatColor.RED + e.getMessage());
-                return true;
-            }
-        }
-
-        final ItemStack finalItems = items;
+        final ItemStack finalItems = eitherStack.getRight();
         final CreationOptions<PlayerInventorySlot> creationOptions = invseeApi.mainInventoryCreationOptions()
                 .withOfflinePlayerSupport(plugin.offlinePlayerSupport())
                 .withUnknownPlayerSupport(plugin.unknownPlayerSupport())

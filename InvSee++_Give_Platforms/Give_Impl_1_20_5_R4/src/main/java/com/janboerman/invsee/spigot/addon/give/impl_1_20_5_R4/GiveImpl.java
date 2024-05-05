@@ -1,18 +1,14 @@
 package com.janboerman.invsee.spigot.addon.give.impl_1_20_5_R4;
 
-import com.janboerman.invsee.spigot.addon.give.common.NeditImpl;
-import me.nullicorn.nedit.type.*;
-import net.minecraft.nbt.*;
-import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
+import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
+import com.janboerman.invsee.spigot.addon.give.common.ItemType;
+import com.janboerman.invsee.utils.Either;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import java.util.Map.Entry;
+import org.bukkit.inventory.ItemStack;
 
-/**
- * @deprecated does not work for the new 'component' architecture of item stacks.
- * Will need a replacement, possibly a change of the command syntax.
- */
-@Deprecated
-public class GiveImpl extends NeditImpl {
+
+public class GiveImpl implements GiveApi {
 
     public static final GiveImpl INSTANCE = new GiveImpl();
 
@@ -20,49 +16,20 @@ public class GiveImpl extends NeditImpl {
     }
 
     @Override
-    protected org.bukkit.inventory.ItemStack applyTag(org.bukkit.inventory.ItemStack stack, NBTCompound tag) {
-        var nmsStack = CraftItemStack.asNMSCopy(stack);
-        CompoundTag nmsTag = convert(tag);
-        //nmsStack.setTag(nmsTag); // TODO 1.20.5 set the tag, but how?!
-        return CraftItemStack.asCraftMirror(nmsStack);
-    }
-
-    // TODO should be writing a converter to components instead, use Vanilla's PatchedDataComponentMap
-    // TODO call ItemStack.setComponentsClone(PatchedDataComponentMap).
-
-    private static net.minecraft.nbt.Tag convert(Object o) {
-        return switch (o) {
-            case null -> EndTag.INSTANCE;
-            case Byte b -> ByteTag.valueOf(b);
-            case Short s -> ShortTag.valueOf(s);
-            case Integer i -> IntTag.valueOf(i);
-            case Long l -> LongTag.valueOf(l);
-            case Float f -> FloatTag.valueOf(f);
-            case Double d -> DoubleTag.valueOf(d);
-            case byte[] ba -> new ByteArrayTag(ba);
-            case String s -> StringTag.valueOf(s);
-            case NBTList list -> convert(list);
-            case NBTCompound dict -> convert(dict);
-            case int[] ia -> new IntArrayTag(ia);
-            case long[] la -> new LongArrayTag(la);
-            default -> throw new RuntimeException("Cannot convert " + o + " to its nbt-equivalent");
-        };
-    }
-
-    private static CompoundTag convert(NBTCompound tag) {
-        CompoundTag compoundTag = new CompoundTag();
-        for (Entry<String, Object> entry : tag.entrySet()) {
-            compoundTag.put(entry.getKey(), convert(entry.getValue()));
+    public ItemStack applyTag(ItemStack stack, String tag) {
+        if (tag == null) {
+            return stack;
+        } else {
+            throw new IllegalArgumentException("InvSee++ for Minecraft 1.20.5 and up does not support NBT tags on item stacks.");
         }
-        return compoundTag;
     }
 
-    private static ListTag convert(NBTList tag) {
-        ListTag listTag = new ListTag();
-        for (Object o : tag) {
-            listTag.add(convert(o));
+    @Override
+    public Either<String, ItemType> parseItemType(String itemType) {
+        try {
+            return Either.right(new WithComponents(ItemParser.parseItemType(itemType)));
+        } catch (CommandSyntaxException e) {
+            return Either.left(e.getMessage());
         }
-        return listTag;
     }
-
 }

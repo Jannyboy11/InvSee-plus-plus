@@ -24,11 +24,13 @@ permissions:
 commands:
   invgive:
     description: "Give an item to a(n) (offline) player's inventory"
+    # TODO 1.20.5: can we programatically set the usage string (such that it does not contain the nbt tag in 1.20.5+)?
     usage: /<command> <target player> <item type> [<amount>] [<nbt tag>]
     permission: invseeplusplus.give.inventory
     aliases: [inventorygive, igive]
   endergive:
     description: "Give an item to a(n) (offline) player's enderchest"
+    # TODO 1.20.5: idem
     usage: /<command> <target player> <item type> [<amount>] [<nbt tag>]
     permission: invseeplusplus.give.enderchest
     aliases: [enderchestgive, egive]
