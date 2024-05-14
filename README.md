@@ -6,7 +6,7 @@ A bukkit plugin for manipulating player inventories.
 
 This plugin will still work when target players are offline, even when they have never been on the server.
 
-Do you like this plugin? Then please leave a rating anda review on [SpigotMC](https://www.spigotmc.org/resources/invsee.82342/)!
+Do you like this plugin? Then please leave a rating and a review on [SpigotMC](https://www.spigotmc.org/resources/invsee.82342/)!
 
 ### Running the plugin
 
@@ -45,7 +45,7 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `/invgive <target player> <item type> [<amount>] [<nbt tag>]`
 - `/endergive <target player> <item type> [<amount>] [<nbt tag>]`
 ###### Examples:
-On 1.20.4 an earlier:
+On 1.20.4 and earlier:
 - `/invgive Notch diamond 1 {"foo":"bar"}`
 - `/endergive Jannyboy11 wool:14`
 
