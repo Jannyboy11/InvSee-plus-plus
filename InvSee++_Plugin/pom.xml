@@ -2,7 +2,7 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>invsee-plus-plus</artifactId>
-        <version>0.28.1-SNAPSHOT</version>
+        <version>0.27.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_8_8_r3</artifactId>
-            <version>0.27.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -198,7 +198,7 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_20_6_r4</artifactId>
-            <version>0.27.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
