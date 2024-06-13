@@ -19,6 +19,7 @@ public class ServerSoftware {
             CRAFTBUKKIT_1_19_4 = new ServerSoftware(CRAFTBUKKIT, _1_19_4),
             CRAFTBUKKIT_1_20_4 = new ServerSoftware(CRAFTBUKKIT, _1_20_4),
             CRAFTBUKKIT_1_20_6 = new ServerSoftware(CRAFTBUKKIT, _1_20_6),
+            CRAFTBUKKIT_1_21 = new ServerSoftware(CRAFTBUKKIT, _1_21),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
@@ -95,7 +96,10 @@ public class ServerSoftware {
                     case CraftbukkitMappingsVersion._1_20_5: return new ServerSoftware(CRAFTBUKKIT, _1_20_5);
                     case CraftbukkitMappingsVersion._1_20_6: return CRAFTBUKKIT_1_20_6;
                 }
-
+            case "org.bukkit.craftbukkit.v1_21_R1.CraftServer":
+                switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
+                    case CraftbukkitMappingsVersion._1_21: return CRAFTBUKKIT_1_21;
+                }
             case "org.bukkit.craftbukkit.CraftServer":
                 // CraftBukkit 1.20.6 and up or Paper 1.20.4 and up:
                 try {
@@ -103,8 +107,10 @@ public class ServerSoftware {
                     return new ServerSoftware(PAPER, MinecraftVersion.fromString(server.getMinecraftVersion()));
                 } catch (NoSuchMethodError nsme) {
                     // Apparently we are not running on Paper (thanks CraftBukkit...)
+                    //TODO does this code-path ackshually trigger on re-obfuscated craftbukkit?
                     switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
                         case CraftbukkitMappingsVersion._1_20_6: return CRAFTBUKKIT_1_20_6;
+                        case CraftbukkitMappingsVersion._1_21: return CRAFTBUKKIT_1_21;
                     }
                 }
 

@@ -16,11 +16,10 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
           cache: 'maven'
-      - name: Install CraftBukkit 1.8.8, 1.12.2, 1.15.2, 1.16.5
+      - name: Install CraftBukkit 1.8.8, 1.12.2, 1.16.5
         run: |
           java -jar BuildTools.jar --rev 1.8.8 --compile craftbukkit
           java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit
-          java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit
           java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit
       - name: Install JDK 17
         uses: actions/setup-java@v3
@@ -33,6 +32,7 @@ jobs:
           java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 1.20.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.20.4 --compile craftbukkit --remapped
       - name: Install JDK 21
         uses: actions/setup-java@v4
@@ -40,13 +40,13 @@ jobs:
           distribution: 'microsoft'
           java-version: '21'
           cache: 'maven'
-      - name: Install CraftBukkit 1.20.5, 1.20.6
+      - name: Install CraftBukkit 1.20.6, 1.21
         # Use build number 4133 to compile CraftBukkit 1.20.5, see:
         # https://hub.spigotmc.org/jira/browse/BUILDTOOLS-658
         # https://hub.spigotmc.org/versions/
         run: |
-          java -jar BuildTools.jar --rev 4133 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.20.6 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 1.21 --compile craftbukkit --remapped
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release

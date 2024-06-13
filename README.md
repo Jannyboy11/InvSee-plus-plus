@@ -82,14 +82,13 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
 1. Install CraftBukkit into your local repository first by running BuildTools with
     - `java -jar BuildTools.jar --rev 1.8.8 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit`
-    - `java -jar BuildTools.jar --rev 1.15.2 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.17.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.18.2 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.19.4 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.4 --compile craftbukkit --remapped`
-    - `java -jar BuildTools.jar --rev 4133 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.6 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 1.21 --compile craftbukkit --remapped`
 2. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at InvSee++_plugin/target/InvSee++.jar.
 
@@ -112,15 +111,15 @@ There are two types of support, Tier 1 support and Tier 2 support.
 In general I support the latest patch release of popularly used Minecraft version, as well as multiple recent versions of the latest major release.
 
 Server support matrix:
-| Server Software            | 1.8.8  | 1.12.2 | 1.15.2  | 1.16.5  | 1.17.1 | 1.18.2 | 1.19.4  | 1.20.4  | 1.20.5  |
-|----------------------------|--------|--------|---------|---------|--------|--------|---------|---------|---------|
-| CraftBukkit                | Tier 1 | Tier 1 | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 1  |
-| Paper                      | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2  |
-| Folia                      | n/a    | n/a    | n/a     | n/a     | n/a    | n/a    | planned | -       | planned |
-| Other forks of CraftBukkit | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2  |
-| (Neo)Forge/Bukkit hybrids  | Tier 2 | Tier 2 | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2  |
-| Fabric/Bukkit hybrids      | Tier 2 | Tier 2 | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2  |
-| Glowstone                  | Tier 2 | Tier 2 | n/a     | n/a     | n/a    | n/a    | n/a     | n/a     | n/a     |
+| Server Software            | 1.8.8  | 1.12.2 | 1.15.2  | 1.16.5  | 1.17.1 | 1.18.2 | 1.19.4  | 1.20.1 | 1.20.4 | 1.20.6  | 1.21    |
+|----------------------------|--------|--------|---------|---------|--------|--------|---------|--------|--------|---------|---------|
+| CraftBukkit                | Tier 1 | Tier 1 | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 1  |
+| Paper                      | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
+| Folia                      | n/a    | n/a    | n/a     | n/a     | n/a    | n/a    | planned | -      | -      | planned | planned |
+| Other forks of CraftBukkit | Tier 2 | Tier 2 | Tier 2  | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
+| (Neo)Forge/Bukkit hybrids  | Tier 2 | Tier 2 | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
+| Fabric/Bukkit hybrids      | Tier 2 | Tier 2 | Tier 2* | Tier 2* | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
+| Glowstone                  | Tier 2 | Tier 2 | n/a     | n/a     | n/a    | n/a    | n/a     | n/a    | n/a    | n/a     | n/a     |
 
 *The modding frameworks that these servers are based on were released at a time when Minecraft's minimum supported version was Java 8 (or lower),
 and there is a good chance they won't be able to load mods and plugins compiled for newer Java versions.
