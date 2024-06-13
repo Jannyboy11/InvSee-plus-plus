@@ -132,12 +132,6 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>give_impl_1_15_2_r1</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
             <artifactId>give_impl_1_12_2_r1</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

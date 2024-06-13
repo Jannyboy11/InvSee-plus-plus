@@ -161,12 +161,6 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_15_2_r1</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_16_5_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
