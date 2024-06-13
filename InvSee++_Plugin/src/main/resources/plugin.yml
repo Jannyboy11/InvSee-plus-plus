@@ -3,7 +3,7 @@ main: com.janboerman.invsee.spigot.InvseePlusPlus
 author: Jannyboy11
 version: ${project.version}
 description: ${project.description}
-api-version: 1.15
+api-version: 1.16
 website: "https://github.com/Jannyboy11/InvSee-plus-plus/"
 prefix: "InvSee++"
 softdepend: [Vault, PerWorldInventory, Multiverse-Inventories, LuckPerms, GroupManager, BungeePerms, UltraPermissions]
