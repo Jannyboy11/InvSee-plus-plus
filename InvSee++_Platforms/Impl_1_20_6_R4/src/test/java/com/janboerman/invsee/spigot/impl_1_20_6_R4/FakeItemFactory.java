@@ -52,7 +52,6 @@ class FakeItemFactory implements ItemFactory {
         return null;
     }
 
-    @Override
     public Material updateMaterial(ItemMeta itemMeta, Material material) throws IllegalArgumentException {
         return material;
     }

@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.components.FoodComponent;
+import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.persistence.PersistentDataContainer;
 
@@ -250,6 +251,21 @@ class MaxStackMeta implements ItemMeta, Damageable {
     }
 
     @Override
+    public boolean hasTool() {
+        return false;
+    }
+
+    @Override
+    public ToolComponent getTool() {
+        return null;
+    }
+
+    @Override
+    public void setTool(ToolComponent toolComponent) {
+
+    }
+
+    @Override
     public boolean hasAttributeModifiers() {
         return false;
     }
@@ -296,6 +312,11 @@ class MaxStackMeta implements ItemMeta, Damageable {
 
     @Override
     public String getAsString() {
+        return "";
+    }
+
+    @Override
+    public String getAsComponentString() {
         return "";
     }
 
