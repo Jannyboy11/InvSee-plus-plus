@@ -79,7 +79,7 @@ public class FakeServer implements Server {
     private static final Logger LOGGER = Logger.getLogger(FakeServer.class.getName());
 
     private final ItemFactory itemFactory = new FakeItemFactory();
-    private final Supplier<Registry<BlockType>> emptyRegistrySupplier = () -> new FakeRegistry<>(Compat.emptyMap());
+    private final Supplier<Registry<?>> emptyRegistrySupplier = () -> new FakeRegistry<>(Compat.emptyMap());
 
     FakeServer() {
     }

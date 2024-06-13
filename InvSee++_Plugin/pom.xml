@@ -197,12 +197,6 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_20_5_r4</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_20_6_r4</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
