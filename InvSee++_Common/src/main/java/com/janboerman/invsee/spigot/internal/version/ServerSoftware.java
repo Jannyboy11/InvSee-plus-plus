@@ -13,7 +13,6 @@ public class ServerSoftware {
     public static final ServerSoftware
             CRAFTBUKKIT_1_8_8 = new ServerSoftware(CRAFTBUKKIT, _1_8_8),
             CRAFTBUKKIT_1_12_2 = new ServerSoftware(CRAFTBUKKIT, _1_12_2),
-            CRAFTBUKKIT_1_15_2 = new ServerSoftware(CRAFTBUKKIT, _1_15_2),
             CRAFTBUKKIT_1_16_5 = new ServerSoftware(CRAFTBUKKIT, _1_16_5),
             CRAFTBUKKIT_1_17_1 = new ServerSoftware(CRAFTBUKKIT, _1_17_1),
             CRAFTBUKKIT_1_18_2 = new ServerSoftware(CRAFTBUKKIT, _1_18_2),
@@ -40,7 +39,7 @@ public class ServerSoftware {
             case "org.bukkit.craftbukkit.v1_12_R1.CraftServer":
                 return CRAFTBUKKIT_1_12_2;
             case "org.bukkit.craftbukkit.v1_15_R1.CraftServer":
-                return CRAFTBUKKIT_1_15_2;
+                return new ServerSoftware(CRAFTBUKKIT, _1_15_2);
             case "org.bukkit.craftbukkit.v1_16_R3.CraftServer":
                 return CRAFTBUKKIT_1_16_5;
             case "org.bukkit.craftbukkit.v1_17_R1.CraftServer":

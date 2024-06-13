@@ -34,7 +34,6 @@ class SetupImpl implements Setup {
     static {
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_8_8, () -> new Impl_1_8_8());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_12_2, () -> new Impl_1_12_2());
-        SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_15_2, () -> new Impl_1_15_2());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_16_5, () -> new Impl_1_16_5());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_17_1, () -> new Impl_1_17_1());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_18_2, () -> new Impl_1_18_2());
@@ -93,12 +92,6 @@ class Impl_1_17_1 extends SetupImpl {
 class Impl_1_16_5 extends SetupImpl {
     Impl_1_16_5() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_16_R3.GiveImpl.INSTANCE);
-    }
-}
-
-class Impl_1_15_2 extends SetupImpl {
-    Impl_1_15_2() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_1_15_R1.GiveImpl.INSTANCE);
     }
 }
 

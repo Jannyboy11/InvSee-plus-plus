@@ -57,12 +57,6 @@ class Impl_1_12_2 extends SetupImpl {
     }
 }
 
-class Impl_1_15_2 extends SetupImpl {
-    Impl_1_15_2(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_15_R1.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_15_R1.KnownPlayersProvider(plugin, scheduler));
-    }
-}
-
 class Impl_1_16_5 extends SetupImpl {
     Impl_1_16_5(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_16_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_16_R3.KnownPlayersProvider(plugin, scheduler));
@@ -113,7 +107,6 @@ class SetupImpl implements Setup {
     static {
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_8_8, (p, l, s, c) -> new Impl_1_8_8(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_12_2, (p, l, s, c) -> new Impl_1_12_2(p, l, s, c));
-        SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_15_2, (p, l, s, c) -> new Impl_1_15_2(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_16_5, (p, l, s, c) -> new Impl_1_16_5(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_17_1, (p, l, s, c) -> new Impl_1_17_1(p, l, s, c));
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_18_2, (p, l, s, c) -> new Impl_1_18_2(p, l, s, c));
