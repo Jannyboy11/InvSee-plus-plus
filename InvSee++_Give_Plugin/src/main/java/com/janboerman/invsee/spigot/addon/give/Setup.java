@@ -38,6 +38,7 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_17_1, () -> new Impl_1_17_1());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_18_2, () -> new Impl_1_18_2());
         SUPPORTED.registerSupportedVersion(ServerSoftware.CRAFTBUKKIT_1_19_4, () -> new Impl_1_19_4());
+        SUPPORTED.registerSupportedVersion(() -> new Impl_1_20_1(), ServerSoftware.CRAFTBUKKIT_1_20_1, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_1));
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_20_4(), ServerSoftware.CRAFTBUKKIT_1_20_4, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_4));
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_20_6(), ServerSoftware.CRAFTBUKKIT_1_20_6, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_6));
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_21(), ServerSoftware.CRAFTBUKKIT_1_21, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21));
@@ -75,6 +76,12 @@ class Impl_1_20_6 extends SetupImpl {
 class Impl_1_20_4 extends SetupImpl {
     Impl_1_20_4() {
         super(com.janboerman.invsee.spigot.addon.give.impl_1_20_4_R3.GiveImpl.INSTANCE);
+    }
+}
+
+class Impl_1_20_1 extends SetupImpl {
+    Impl_1_20_1() {
+        super(com.janboerman.invsee.spigot.addon.give.impl_1_20_1_R1.GiveImpl.INSTANCE);
     }
 }
 

@@ -17,6 +17,7 @@ public class ServerSoftware {
             CRAFTBUKKIT_1_17_1 = new ServerSoftware(CRAFTBUKKIT, _1_17_1),
             CRAFTBUKKIT_1_18_2 = new ServerSoftware(CRAFTBUKKIT, _1_18_2),
             CRAFTBUKKIT_1_19_4 = new ServerSoftware(CRAFTBUKKIT, _1_19_4),
+            CRAFTBUKKIT_1_20_1 = new ServerSoftware(CRAFTBUKKIT, _1_20_1),
             CRAFTBUKKIT_1_20_4 = new ServerSoftware(CRAFTBUKKIT, _1_20_4),
             CRAFTBUKKIT_1_20_6 = new ServerSoftware(CRAFTBUKKIT, _1_20_6),
             CRAFTBUKKIT_1_21 = new ServerSoftware(CRAFTBUKKIT, _1_21),
@@ -74,7 +75,7 @@ public class ServerSoftware {
             case "org.bukkit.craftbukkit.v1_20_R1.CraftServer":
                 switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
                     case CraftbukkitMappingsVersion._1_20: return new ServerSoftware(CRAFTBUKKIT, _1_20);
-                    case CraftbukkitMappingsVersion._1_20_1: return new ServerSoftware(CRAFTBUKKIT, _1_20_1);
+                    case CraftbukkitMappingsVersion._1_20_1: return CRAFTBUKKIT_1_20_1;
                 }
             case "org.bukkit.craftbukkit.v1_20_R2.CraftServer":
                 switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {

@@ -8,12 +8,13 @@ public class LegacyVersions {
     private static final LegacyVersions INSTANCE = new LegacyVersions();
 
     private static final LegacyVersion
+            LATEST_THAT_SUPPORTS_1_20_5 = INSTANCE.register(new MinecraftVersion[] { MinecraftVersion._1_20_5, MinecraftVersion._1_15_2 }, "0.27.0",
+            "https://www.spigotmc.org/resources/invsee.82342/download?version=540041", null),
             LATEST_THAT_SUPPORTS_1_20_2 = INSTANCE.register(MinecraftVersion._1_20_2, "0.26.0",
             "https://www.spigotmc.org/resources/invsee.82342/download?version=525827", "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.26.0"),
-            LATEST_THAT_SUPPORTS_1_20_1 = INSTANCE.register(new MinecraftVersion[] { MinecraftVersion._1_20_1, MinecraftVersion._1_20_3 }, "0.24.9",
-            "https://www.spigotmc.org/resources/invsee.82342/download?version=522407",
-            "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.24.9"),
-            LATEST_THAT_SUPPORTS_1_20_3 = LATEST_THAT_SUPPORTS_1_20_1,
+            LATEST_THAT_SUPPORTS_1_20_3 = INSTANCE.register(new MinecraftVersion[] { MinecraftVersion._1_20_1, MinecraftVersion._1_20_3 }, "0.24.9",
+                    "https://www.spigotmc.org/resources/invsee.82342/download?version=522407",
+                    "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.24.9"),
             LATEST_THAT_SUPPORTS_1_20 = INSTANCE.register(MinecraftVersion._1_20, "0.22.6",
             "https://www.spigotmc.org/resources/invsee.82342/download?version=505200", "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.22.6"),
             LATEST_THAT_SUPPORTS_1_19_3 = INSTANCE.register(MinecraftVersion._1_19_3, "0.21.11",
@@ -28,7 +29,8 @@ public class LegacyVersions {
                     "https://www.spigotmc.org/resources/invsee.82342/download?version=461471", "https://github.com/Jannyboy11/InvSee-plus-plus/releases/tag/v0.12.2"),
             LATEST_THAT_SUPPORTS_1_18 = INSTANCE.register(MinecraftVersion._1_18, "0.11.10", "https://www.spigotmc.org/resources/invsee.82342/download?version=455217", null),
             LATEST_THAT_SUPPORTS_1_17 = INSTANCE.register(MinecraftVersion._1_17, "0.11.4", "https://www.spigotmc.org/resources/invsee.82342/download?version=435036", null),
-            LATEST_THAT_SUPPORTS_1_16_3 = INSTANCE.register(MinecraftVersion._1_16_3, "0.7", "https://www.spigotmc.org/resources/invsee.82342/download?version=365265", null);
+            LATEST_THAT_SUPPORTS_1_16_3 = INSTANCE.register(MinecraftVersion._1_16_3, "0.7", "https://www.spigotmc.org/resources/invsee.82342/download?version=365265", null),
+            LATEST_THAT_SUPPORTS_1_15_2 = LATEST_THAT_SUPPORTS_1_20_5;
 
     private final Map<MinecraftVersion, LegacyVersion> legacyInvSeePlusPlusVersions = new HashMap<>();
 
