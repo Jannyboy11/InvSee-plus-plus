@@ -2,7 +2,7 @@ package com.janboerman.invsee.spigot;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
-import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
+import com.janboerman.invsee.spigot.internal.view.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.Exempt;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.response.ImplementationFault;

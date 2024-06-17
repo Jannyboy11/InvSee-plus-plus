@@ -1,6 +1,5 @@
 package com.janboerman.invsee.spigot.internal.placeholder;
 
-import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;

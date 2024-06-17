@@ -12,8 +12,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.janboerman.invsee.spigot.internal.view.SpectatorInventoryView;
+
 /**
- * Options for logging interactions with {@link com.janboerman.invsee.spigot.api.SpectatorInventoryView}s.
+ * Options for logging interactions with {@link SpectatorInventoryView}s.
  *
  * @see com.janboerman.invsee.spigot.api.CreationOptions
  */

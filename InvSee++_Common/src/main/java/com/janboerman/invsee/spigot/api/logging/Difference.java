@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.janboerman.invsee.spigot.internal.view.SpectatorInventoryView;
+
 /**
- * The Difference of a {@link com.janboerman.invsee.spigot.api.SpectatorInventoryView} is the set of items that were added and removed the {@link com.janboerman.invsee.spigot.api.SpectatorInventory}.
+ * The Difference of a {@link SpectatorInventoryView} is the set of items that were added and removed the {@link com.janboerman.invsee.spigot.api.SpectatorInventory}.
  */
 public class Difference {
 

@@ -4,7 +4,7 @@ import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.Exempt;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
-import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.internal.view.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.response.*;
 import com.janboerman.invsee.spigot.api.target.Target;
 /*

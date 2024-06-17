@@ -6,6 +6,8 @@ import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+import com.janboerman.invsee.spigot.internal.view.SpectatorInventoryView;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
