@@ -17,7 +17,7 @@ public interface SpectatorInventoryView<Slot> {
      * Get the top inventory of this view.
      * @return the top inventory
      */
-    public  SpectatorInventory<Slot> getTopInventory();
+    public SpectatorInventory<Slot> getTopInventory();
 
     /**
      * Get the difference tracked by this window.

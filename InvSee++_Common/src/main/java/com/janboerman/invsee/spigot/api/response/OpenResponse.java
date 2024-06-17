@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.api.response;
 
-import com.janboerman.invsee.spigot.internal.view.SpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.SpectatorInventoryView;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;

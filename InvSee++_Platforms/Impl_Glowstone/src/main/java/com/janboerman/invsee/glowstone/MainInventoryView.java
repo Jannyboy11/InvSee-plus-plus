@@ -10,6 +10,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -17,7 +18,7 @@ import org.bukkit.plugin.Plugin;
 import javax.annotation.Nullable;
 import java.util.List;
 
-class MainInventoryView extends MainSpectatorInventoryView {
+class MainInventoryView extends BukkitInventoryView<PlayerInventorySlot> implements MainSpectatorInventoryView {
 
     private final HumanEntity spectator;
     private final MainInventory top;
@@ -101,5 +102,9 @@ class MainInventoryView extends MainSpectatorInventoryView {
             diffTracker.onClose();
     }
 
+    @Override
+    public InventoryType getType() {
+        return InventoryType.CHEST;
+    }
 
 }

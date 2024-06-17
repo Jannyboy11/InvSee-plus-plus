@@ -4,10 +4,10 @@ import static com.janboerman.invsee.utils.Compat.ifPresentOrElse;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
-import com.janboerman.invsee.spigot.internal.view.EnderSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
-import com.janboerman.invsee.spigot.internal.view.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
 import com.janboerman.invsee.spigot.api.response.OpenResponse;

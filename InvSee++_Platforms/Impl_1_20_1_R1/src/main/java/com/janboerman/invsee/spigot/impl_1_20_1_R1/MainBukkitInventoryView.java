@@ -1,9 +1,11 @@
 package com.janboerman.invsee.spigot.impl_1_20_1_R1;
 
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
-import com.janboerman.invsee.spigot.internal.view.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.logging.Difference;
 import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryView;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
@@ -13,7 +15,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nullable;
 
-class MainBukkitInventoryView extends BukkitInventoryView {
+class MainBukkitInventoryView extends BukkitInventoryView<PlayerInventorySlot> implements MainSpectatorInventoryView {
 
     final MainNmsContainer nms;
 

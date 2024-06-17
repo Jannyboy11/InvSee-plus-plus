@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.janboerman.invsee.spigot.internal.view.SpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.SpectatorInventoryView;
 
 /**
  * Options for logging interactions with {@link SpectatorInventoryView}s.

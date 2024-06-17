@@ -2,9 +2,9 @@ package com.janboerman.invsee.spigot.internal;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
-import com.janboerman.invsee.spigot.internal.view.EnderSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
-import com.janboerman.invsee.spigot.internal.view.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.Title;
 import com.janboerman.invsee.spigot.api.logging.LogGranularity;
 import com.janboerman.invsee.spigot.api.logging.LogOptions;

@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.api.logging;
 
-import com.janboerman.invsee.spigot.internal.view.SpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.SpectatorInventoryView;
 
 /**
  * Granularity for logging.

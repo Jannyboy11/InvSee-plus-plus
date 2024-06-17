@@ -4,14 +4,17 @@ import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
 import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
 import com.janboerman.invsee.spigot.api.logging.Difference;
 import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
+import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nullable;
 
-class MainBukkitInventoryView extends MainSpectatorInventoryView {
+class MainBukkitInventoryView extends BukkitInventoryView<PlayerInventorySlot> implements MainSpectatorInventoryView {
 
     final MainNmsContainer nms;
 
@@ -69,5 +72,10 @@ class MainBukkitInventoryView extends MainSpectatorInventoryView {
     public @Nullable Difference getTrackedDifference() {
         DifferenceTracker tracker = nms.tracker;
         return tracker == null ? null : tracker.getDifference();
+    }
+    
+    @Override
+    public InventoryType getType() {
+    	return InventoryType.CHEST;
     }
 }

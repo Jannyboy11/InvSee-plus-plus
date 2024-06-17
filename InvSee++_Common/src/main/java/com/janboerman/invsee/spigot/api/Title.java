@@ -2,7 +2,6 @@ package com.janboerman.invsee.spigot.api;
 
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.internal.ConstantTitle;
-import com.janboerman.invsee.spigot.internal.view.SpectatorInventoryView;
 
 import java.util.function.Function;
 
