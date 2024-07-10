@@ -19,6 +19,7 @@ import com.janboerman.invsee.spigot.internal.EventHelper;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
+import com.janboerman.invsee.utils.CollectionHelper;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -27,11 +28,13 @@ import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_21_R1.CraftServer;
@@ -234,26 +237,57 @@ public class InvseeImpl implements InvseePlatform {
         SpectatorInventorySaveEvent event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
         if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
 
-    	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
-        UUID playerId = newInventory.getSpectatedPlayerId();
-        GameProfile gameProfile = new GameProfile(playerId, newInventory.getSpectatedPlayerName());
-        ClientInformation clientInformation = ClientInformation.createDefault();
+        // TODO Ticket #105: Target player's world switches to overworld when they log off in newly generated chunks in Nether.
+        /*  What could cause this?
+                - We use the first world (usually overworld) to create the fake player entity.
+                    - Why would this world value be written to the player save file?
+                        We use fakeCraftPlayer.loadData(). Apparently this does not load the correct player location when the player
+                - other reasons?
+         */
 
-        FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(
-    			server.getServer(),
-    			world.getHandle(),
-    			gameProfile,
-                clientInformation);
-    	
+        // TODO Some of this code is 'inspired by' PlayerList#canPlayerLogin(..).
+        // TODO it seems that server.getHandle().players is modified on different Netty threads 'simultaniously'.
+        // TODO is this logic still still correct for all possible interleavings? Yes if the spectated player logs out.
+        // TODO What if the spectated player logs in? we check for that
+
+        UUID playerId = newInventory.getSpectatedPlayerId();
+
     	return CompletableFuture.supplyAsync(() -> {
-            FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
-            fakeCraftPlayer.loadData();
+
+            ServerPlayer serverPlayer = CollectionHelper.firstOrNull(server.getHandle().players, p -> p.getUUID().equals(playerId));
+            CraftPlayer craftPlayer;
+
+            if (serverPlayer == null) {
+                // The player is not online. Create a fake player entity.
+                ServerLevel world = server.getHandle().getServer().getLevel(Level.OVERWORLD);
+                GameProfile gameProfile = new GameProfile(playerId, newInventory.getSpectatedPlayerName());
+                ClientInformation clientInformation = ClientInformation.createDefault();
+
+                FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(server.getServer(), world, gameProfile, clientInformation);
+
+                FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
+                fakeCraftPlayer.loadData();
+                craftPlayer = fakeCraftPlayer;
+            } else {
+                craftPlayer = serverPlayer.getBukkitEntity();
+            }
 
             CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
-            SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
+            SI currentInv = currentInvProvider.apply(craftPlayer, creationOptions);
             transfer.accept(currentInv, newInventory);
 
-            fakeCraftPlayer.saveData();
+            craftPlayer.saveData();
+
+            // Check whether the player has logged in in the meantime.
+            if (serverPlayer == null) {
+                serverPlayer = CollectionHelper.firstOrNull(server.getHandle().players, p -> p.getUUID().equals(playerId));
+                // If so, then also set its contents.
+                if (serverPlayer != null) {
+                    currentInv = currentInvProvider.apply(serverPlayer.getBukkitEntity(), creationOptions);
+                    transfer.accept(currentInv, newInventory);
+                }
+            }
+
             return SaveResponse.saved(currentInv);
     	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
