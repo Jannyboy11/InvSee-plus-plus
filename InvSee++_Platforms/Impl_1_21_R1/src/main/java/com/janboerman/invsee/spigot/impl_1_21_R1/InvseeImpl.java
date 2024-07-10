@@ -245,10 +245,10 @@ public class InvseeImpl implements InvseePlatform {
                 - other reasons?
          */
 
-        // TODO Some of this code is 'inspired by' PlayerList#canPlayerLogin(..).
-        // TODO it seems that server.getHandle().players is modified on different Netty threads 'simultaniously'.
-        // TODO is this logic still still correct for all possible interleavings? Yes if the spectated player logs out.
-        // TODO What if the spectated player logs in? we check for that
+        // Some of this code is 'inspired by' PlayerList#canPlayerLogin(..).
+        // it seems that server.getHandle().players is modified on different Netty threads 'simultaneously'.
+        // is this logic  still correct for all possible interleavings? Yes if the spectated player logs out.
+        // What if the spectated player logs in? we check for that and repair their inventory when that happens.
 
         UUID playerId = newInventory.getSpectatedPlayerId();
 
