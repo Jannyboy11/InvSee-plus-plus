@@ -278,7 +278,7 @@ public class InvseeImpl implements InvseePlatform {
 
             craftPlayer.saveData();
 
-            // Check whether the player has logged in in the meantime.
+            // If the player was offline: check whether the player has logged in in the meantime.
             if (serverPlayer == null) {
                 serverPlayer = CollectionHelper.firstOrNull(server.getHandle().players, p -> p.getUUID().equals(playerId));
                 // If so, then also set its contents.
