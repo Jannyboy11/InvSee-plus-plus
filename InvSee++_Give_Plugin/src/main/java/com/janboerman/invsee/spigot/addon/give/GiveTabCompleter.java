@@ -9,9 +9,9 @@ import org.bukkit.Material;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Supplier;
 import java.util.stream.*;
 
 // TODO can we use Brigadier for ItemStack completions?
@@ -19,9 +19,11 @@ import java.util.stream.*;
 class GiveTabCompleter implements TabCompleter {
 
     private final GiveApi giveApi;
+    private final Supplier<Stream<Material>> materials;
 
-    GiveTabCompleter(GiveApi giveApi) {
+    GiveTabCompleter(GiveApi giveApi, Supplier<Stream<Material>> materials) {
         this.giveApi = giveApi;
+        this.materials = materials;
     }
 
     @Override
@@ -42,7 +44,7 @@ class GiveTabCompleter implements TabCompleter {
 
         else if (args.length == 2) {
             final String inputMaterial = args[1].toLowerCase();
-            Stream<String> materialNames = Arrays.stream(Material.values()).map(material -> material.name().toLowerCase());
+            Stream<String> materialNames = materials.get().map(material -> material.name().toLowerCase());
             if (!inputMaterial.isEmpty()) {
                 materialNames = materialNames.filter(name -> name.startsWith(inputMaterial));
             }

@@ -28,6 +28,7 @@ import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -44,6 +45,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.spigot.api.InvseePlusPlus {
 
@@ -207,6 +209,16 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
      */
     public InvseeAPI getApi() {
         return api;
+    }
+
+    /**
+     * Internal api.
+     * @return a stream containing all materials the server knows about
+     */
+    //Should probably move this method somewhere else.
+    //I do like this location though because it's accessible for built-in addons, but not public api.
+    public Stream<Material> materials() {
+        return platform.materials();
     }
 
     /**

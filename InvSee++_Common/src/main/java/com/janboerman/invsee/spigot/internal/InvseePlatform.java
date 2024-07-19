@@ -16,13 +16,17 @@ import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
+
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public interface InvseePlatform {
 
@@ -71,5 +75,10 @@ public interface InvseePlatform {
                 .of(LogGranularity.LOG_ON_CLOSE, Collections.singleton(LogTarget.PLUGIN_LOG_FILE), LogOptions.defaultLogFormats()), PlaceholderPalette.empty());
     }
 
+
+    // Paper wants us to move away from Material.values() https://discord.com/channels/289587909051416579/1077385604012179486/1263418959554805843
+    public default Stream<Material> materials() {
+        return Arrays.stream(Material.values());
+    }
 
 }
