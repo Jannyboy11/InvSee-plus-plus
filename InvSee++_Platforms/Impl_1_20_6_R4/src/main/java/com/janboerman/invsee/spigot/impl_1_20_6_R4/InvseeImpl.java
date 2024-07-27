@@ -19,7 +19,6 @@ import com.janboerman.invsee.spigot.internal.EventHelper;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
-import com.janboerman.invsee.utils.CollectionHelper;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -28,13 +27,11 @@ import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.level.ClientInformation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_20_R4.CraftServer;
@@ -237,46 +234,28 @@ public class InvseeImpl implements InvseePlatform {
         SpectatorInventorySaveEvent event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
         if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
 
+    	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
         UUID playerId = newInventory.getSpectatedPlayerId();
+        GameProfile gameProfile = new GameProfile(playerId, newInventory.getSpectatedPlayerName());
+        ClientInformation clientInformation = ClientInformation.createDefault();
 
-        return CompletableFuture.supplyAsync(() -> {
-
-            ServerPlayer serverPlayer = CollectionHelper.firstOrNull(server.getHandle().players, p -> p.getUUID().equals(playerId));
-            CraftPlayer craftPlayer;
-
-            if (serverPlayer == null) {
-                // The player is not online. Create a fake player entity.
-                ServerLevel world = server.getHandle().getServer().getLevel(Level.OVERWORLD);
-                GameProfile gameProfile = new GameProfile(playerId, newInventory.getSpectatedPlayerName());
-                ClientInformation clientInformation = ClientInformation.createDefault();
-
-                FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(server.getServer(), world, gameProfile, clientInformation);
-
-                FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
-                fakeCraftPlayer.loadData();
-                craftPlayer = fakeCraftPlayer;
-            } else {
-                craftPlayer = serverPlayer.getBukkitEntity();
-            }
+        FakeEntityPlayer fakeEntityPlayer = new FakeEntityPlayer(
+    			server.getServer(),
+    			world.getHandle(),
+    			gameProfile,
+                clientInformation);
+    	
+    	return CompletableFuture.supplyAsync(() -> {
+            FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
+            fakeCraftPlayer.loadData();
 
             CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
-            SI currentInv = currentInvProvider.apply(craftPlayer, creationOptions);
+            SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
             transfer.accept(currentInv, newInventory);
 
-            craftPlayer.saveData();
-
-            // If the player was offline: check whether the player has logged in in the meantime.
-            if (serverPlayer == null) {
-                serverPlayer = CollectionHelper.firstOrNull(server.getHandle().players, p -> p.getUUID().equals(playerId));
-                // If so, then also set its contents.
-                if (serverPlayer != null) {
-                    currentInv = currentInvProvider.apply(serverPlayer.getBukkitEntity(), creationOptions);
-                    transfer.accept(currentInv, newInventory);
-                }
-            }
-
+            fakeCraftPlayer.saveData();
             return SaveResponse.saved(currentInv);
-        }, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
+    	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer nmsPlayer, AbstractContainerMenu nmsView) {
