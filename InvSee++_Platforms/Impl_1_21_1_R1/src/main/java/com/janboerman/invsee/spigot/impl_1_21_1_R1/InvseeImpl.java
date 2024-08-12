@@ -37,6 +37,7 @@ import net.minecraft.world.level.storage.PlayerDataStorage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Registry;
 import org.bukkit.craftbukkit.v1_21_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_21_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftHumanEntity;
@@ -49,6 +50,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -339,6 +341,11 @@ public class InvseeImpl implements InvseePlatform {
     @Override
     public Stream<Material> materials() {
         //https://discord.com/channels/289587909051416579/1077385604012179486/1263418959554805843
-        return Bukkit.getRegistry(Material.class).stream();
+        Registry<Material> registry = Bukkit.getRegistry(Material.class);
+        if (registry != null) {
+            return registry.stream();
+        } else {
+            return Arrays.stream(Material.values());
+        }
     }
 }
