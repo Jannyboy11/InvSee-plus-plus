@@ -31,6 +31,9 @@ import java.util.List;
 
 final class GlowstoneHacks {
 
+    private GlowstoneHacks() {
+    }
+
     static List<GlowInventorySlot> getSlots(GlowInventory inventory) {
         try {
             Field field = GlowInventory.class.getDeclaredField("slots");

@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 public class GlowstoneGameVersion {
 
     private static final String GLOWSERVER_CLASS_NAME = "org.glowstone.GlowServer";
+    //TODO there actually exists just a getter for this field on the GlowServer class: GlowServer#getMinecraftVersion()
+    //TODO can we use that? We will need Glowstone as a dependency.
     private static final String GAME_VERSION_FIELD_NAME = "GAME_VERSION";
 
     static final String _1_8_8 = "1.8.8";
