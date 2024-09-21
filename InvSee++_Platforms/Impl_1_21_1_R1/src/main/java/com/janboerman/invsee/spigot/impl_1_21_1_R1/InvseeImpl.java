@@ -341,11 +341,15 @@ public class InvseeImpl implements InvseePlatform {
     @Override
     public Stream<Material> materials() {
         //https://discord.com/channels/289587909051416579/1077385604012179486/1263418959554805843
+        Stream<Material> res;
         Registry<Material> registry = Bukkit.getRegistry(Material.class);
         if (registry != null) {
-            return registry.stream();
+            res = registry.stream();
         } else {
-            return Arrays.stream(Material.values());
+            res = Registry.MATERIAL.stream();
         }
+        // Note: in the future, Registry.ITEM may become a stable api. We prefer to use that one since we don't care
+        // about Block materials; we only care about Item materials.
+        return res.filter(Material::isItem);
     }
 }
