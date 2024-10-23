@@ -61,13 +61,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
@@ -79,12 +72,6 @@
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>utils</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.TheNullicorn</groupId>
-            <artifactId>Nedit</artifactId>
-            <version>49615cf47c</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
