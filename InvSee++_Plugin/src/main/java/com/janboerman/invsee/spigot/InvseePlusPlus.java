@@ -217,7 +217,7 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
      */
     //Should probably move this method somewhere else.
     //I do like this location though because it's accessible for built-in addons, but not public api.
-    public Stream<Material> materials() {
+    public Stream<Material> itemMaterials() {
         return platform.materials();
     }
 
