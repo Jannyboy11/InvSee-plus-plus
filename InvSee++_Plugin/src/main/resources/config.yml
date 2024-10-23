@@ -5,7 +5,7 @@ tabcomplete-offline-players: true
 
 # Whether InvSee++ will let you spectate inventories of players who are offline.
 enable-offline-player-support: true
-# Whether InvSee++ will let you spectate inventories of players who never player on the server before.
+# Whether InvSee++ will let you spectate inventories of players who never played on the server before.
 enable-unknown-player-support: true
 
 # Default titles for spectator inventories.
