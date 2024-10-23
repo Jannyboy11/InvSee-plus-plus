@@ -20,8 +20,8 @@ public class ServerSoftware {
             CRAFTBUKKIT_1_20_1 = new ServerSoftware(CRAFTBUKKIT, _1_20_1),
             CRAFTBUKKIT_1_20_4 = new ServerSoftware(CRAFTBUKKIT, _1_20_4),
             CRAFTBUKKIT_1_20_6 = new ServerSoftware(CRAFTBUKKIT, _1_20_6),
-            CRAFTBUKKIT_1_21 = new ServerSoftware(CRAFTBUKKIT, _1_21),
             CRAFTBUKKIT_1_21_1 = new ServerSoftware(CRAFTBUKKIT, _1_21_1),
+            CRAFTBUKKIT_1_21_3 = new ServerSoftware(CRAFTBUKKIT, _1_21_3),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
@@ -100,8 +100,12 @@ public class ServerSoftware {
                 }
             case "org.bukkit.craftbukkit.v1_21_R1.CraftServer":
                 switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
-                    case CraftbukkitMappingsVersion._1_21: return CRAFTBUKKIT_1_21;
+                    case CraftbukkitMappingsVersion._1_21: return new ServerSoftware(CRAFTBUKKIT, _1_21);
                     case CraftbukkitMappingsVersion._1_21_1: return CRAFTBUKKIT_1_21_1;
+                }
+            case "org.bukkit.craftbukkit.v1_21_R2.CraftServer":
+                switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
+                    case CraftbukkitMappingsVersion._1_21_3: return CRAFTBUKKIT_1_21_3;
                 }
             case "org.bukkit.craftbukkit.CraftServer":
                 // CraftBukkit 1.20.6 and up or Paper 1.20.4 and up:
@@ -113,8 +117,8 @@ public class ServerSoftware {
                     //TODO does this code-path ackshually trigger on re-obfuscated craftbukkit?
                     switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
                         case CraftbukkitMappingsVersion._1_20_6: return CRAFTBUKKIT_1_20_6;
-                        case CraftbukkitMappingsVersion._1_21: return CRAFTBUKKIT_1_21;
                         case CraftbukkitMappingsVersion._1_21_1: return CRAFTBUKKIT_1_21_1;
+                        case CraftbukkitMappingsVersion._1_21_3: return CRAFTBUKKIT_1_21_3;
                     }
                 }
 
