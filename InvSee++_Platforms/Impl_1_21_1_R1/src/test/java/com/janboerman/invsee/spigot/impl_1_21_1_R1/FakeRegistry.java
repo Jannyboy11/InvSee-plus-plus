@@ -2,11 +2,13 @@ package com.janboerman.invsee.spigot.impl_1_21_1_R1;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.jetbrains.annotations.NotNull;
 
 public class FakeRegistry<T extends Keyed> implements Registry<T> {
 
@@ -19,6 +21,17 @@ public class FakeRegistry<T extends Keyed> implements Registry<T> {
     @Override
     public T get(NamespacedKey namespacedKey) {
         return map.get(namespacedKey);
+    }
+
+    @NotNull
+    @Override
+    public T getOrThrow(@NotNull NamespacedKey namespacedKey) {
+        T item = map.get(namespacedKey);
+        if (item == null) {
+            throw new NoSuchElementException(namespacedKey.toString());
+        } else {
+            return item;
+        }
     }
 
     @Override
