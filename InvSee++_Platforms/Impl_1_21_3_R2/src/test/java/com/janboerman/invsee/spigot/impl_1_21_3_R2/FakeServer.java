@@ -781,6 +781,16 @@ public class FakeServer implements Server {
     }
 
     @Override
+    public int getPauseWhenEmptyTime() {
+        return 0;
+    }
+
+    @Override
+    public void setPauseWhenEmptyTime(int i) {
+
+    }
+
+    @Override
     public ChunkGenerator.ChunkData createChunkData(World world) {
         return null;
     }
