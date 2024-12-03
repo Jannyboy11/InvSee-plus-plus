@@ -44,6 +44,7 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_21(), new ServerSoftware(MinecraftPlatform.CRAFTBUKKIT, MinecraftVersion._1_21), new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21));
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_21_1(), ServerSoftware.CRAFTBUKKIT_1_21_1, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_1));
         SUPPORTED.registerSupportedVersion(() -> new Impl_1_21_3(), ServerSoftware.CRAFTBUKKIT_1_21_3, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_3));
+        SUPPORTED.registerSupportedVersion(() -> new Impl_1_21_4(), ServerSoftware.CRAFTBUKKIT_1_21_4, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_4));
         final SetupProvider glowstoneProver = () -> new Impl_Glowstone();
         final MinecraftVersion[] minecraftVersions = MinecraftVersion.values();
         for (int idx = MinecraftVersion._1_8.ordinal(); idx < MinecraftVersion._1_12_2.ordinal(); idx ++) {
@@ -60,6 +61,12 @@ class SetupImpl implements Setup {
     @Override
     public GiveApi getGiveApi() {
         return api;
+    }
+}
+
+class Impl_1_21_4 extends SetupImpl {
+    Impl_1_21_4() {
+        super(com.janboerman.invsee.spigot.addon.give.impl_1_21_4_R3.GiveImpl.INSTANCE);
     }
 }
 
