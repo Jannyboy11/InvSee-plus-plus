@@ -49,6 +49,7 @@ jobs:
           java -jar BuildTools.jar --rev 4287 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.1 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.3 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 1.21.4 --compile craftbukkit --remapped
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release
