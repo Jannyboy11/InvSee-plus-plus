@@ -110,11 +110,18 @@
             <version>2.9</version>
             <scope>provided</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>net.alpenblock</groupId>-->
+<!--            <artifactId>BungeePerms</artifactId>-->
+<!--            <version>3.0-dev-80</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>net.alpenblock</groupId>
             <artifactId>BungeePerms</artifactId>
             <version>3.0-dev-80</version>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${basedir}/../.libs/BungeePerms-3.0-dev-80.jar</systemPath>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>me.TechsCode</groupId>-->
