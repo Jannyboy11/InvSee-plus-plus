@@ -267,7 +267,6 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		return -1;
 	}
 
-	@Override
 	public int firstPartial(Material material) {
 		if (material == null)
 			return -1;
