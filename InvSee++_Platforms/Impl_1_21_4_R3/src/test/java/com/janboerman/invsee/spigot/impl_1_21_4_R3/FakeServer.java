@@ -73,6 +73,7 @@ import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.structure.StructureManager;
 import org.bukkit.util.CachedServerIcon;
+import org.jetbrains.annotations.NotNull;
 
 public class FakeServer implements Server {
 
@@ -662,6 +663,11 @@ public class FakeServer implements Server {
 
     @Override
     public Merchant createMerchant(String s) {
+        return null;
+    }
+
+    @Override
+    public @NotNull Merchant createMerchant() {
         return null;
     }
 
