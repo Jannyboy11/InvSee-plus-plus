@@ -256,7 +256,7 @@ public class InvseeImpl implements InvseePlatform {
     	return CompletableFuture.supplyAsync(() -> {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
             fakeCraftPlayer.loadData();
-            loadWorldData(server, fakeEntityPlayer);
+            loadWorldDataAndGameMode(server, fakeEntityPlayer);
 
             CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
             SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
@@ -268,7 +268,7 @@ public class InvseeImpl implements InvseePlatform {
     }
 
 
-    private void loadWorldData(CraftServer server, FakeEntityPlayer fakeEntityPlayer) {
+    private void loadWorldDataAndGameMode(CraftServer server, FakeEntityPlayer fakeEntityPlayer) {
         // In Paper, Entity#load(CompoundTag) does not load the world info.
         // Thus, in order to not upset our users, we do it ourselves manually in order to work around this Paper bug.
         // See https://github.com/Jannyboy11/InvSee-plus-plus/issues/105.
@@ -302,6 +302,8 @@ public class InvseeImpl implements InvseePlatform {
                     fakeEntityPlayer.spawnIn(level); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
                 }
             }
+
+            fakeEntityPlayer.loadGameTypes(nbttagcompound);
         }
     }
 

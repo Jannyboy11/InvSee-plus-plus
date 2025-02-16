@@ -61,7 +61,6 @@ import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
@@ -266,7 +265,7 @@ public class InvseeImpl implements InvseePlatform {
     	return CompletableFuture.supplyAsync(() -> {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
             fakeCraftPlayer.loadData();
-            loadWorldData(server, fakeEntityPlayer); //workaround for https://github.com/PaperMC/Paper/issues/11572
+            loadWorldDataAndGameMode(server, fakeEntityPlayer); //workaround for https://github.com/PaperMC/Paper/issues/11572
 
             CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
             SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
@@ -277,7 +276,7 @@ public class InvseeImpl implements InvseePlatform {
     	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
-    private void loadWorldData(CraftServer server, FakeEntityPlayer fakeEntityPlayer) {
+    private void loadWorldDataAndGameMode(CraftServer server, FakeEntityPlayer fakeEntityPlayer) {
         // In Paper, Entity#load(CompoundTag) does not load the world info.
         // Thus, in order to not upset our users, we do it ourselves manually in order to work around this Paper bug.
         // See https://github.com/Jannyboy11/InvSee-plus-plus/issues/105.
@@ -311,6 +310,8 @@ public class InvseeImpl implements InvseePlatform {
                     fakeEntityPlayer.spawnIn(level); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
                 }
             }
+
+            fakeEntityPlayer.loadGameTypes(nbttagcompound);
         }
     }
 
