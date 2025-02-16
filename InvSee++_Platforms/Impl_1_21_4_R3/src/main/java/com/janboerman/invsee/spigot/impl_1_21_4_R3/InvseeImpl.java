@@ -283,11 +283,8 @@ public class InvseeImpl implements InvseePlatform {
         // See https://github.com/Jannyboy11/InvSee-plus-plus/issues/105.
         // See PaperMC/PlayerList#placeNewPlayer.
 
-        if (fakeEntityPlayer.level() != null) return; //player already has level (should happen on CraftBukkit & Spigot).
-
         PlayerDataStorage playerDataStorage = server.getHandle().playerIo;
         Optional<CompoundTag> optional = playerDataStorage.load(fakeEntityPlayer);
-
 
         if (optional.isPresent()) {
             ServerLevel level;
@@ -309,6 +306,7 @@ public class InvseeImpl implements InvseePlatform {
                 Optional<ResourceKey<Level>> optionalLevelKey = dataresult.resultOrPartial(message -> plugin.getLogger().severe(message));
                 ResourceKey<Level> levelResourceKey = optionalLevelKey.orElse(Level.OVERWORLD);
                 level = server.getHandle().getServer().getLevel(levelResourceKey);
+
                 if (level != null) {
                     fakeEntityPlayer.spawnIn(level); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
                 }

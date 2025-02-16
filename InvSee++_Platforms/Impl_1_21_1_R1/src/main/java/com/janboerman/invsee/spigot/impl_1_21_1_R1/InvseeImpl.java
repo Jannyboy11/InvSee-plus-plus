@@ -20,18 +20,26 @@ import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 
 import org.bukkit.Bukkit;
@@ -240,15 +248,6 @@ public class InvseeImpl implements InvseePlatform {
         SpectatorInventorySaveEvent event = EventHelper.callSpectatorInventorySaveEvent(server, newInventory);
         if (event.isCancelled()) return CompletableFuture.completedFuture(SaveResponse.notSaved(newInventory));
 
-        // TODO Ticket #105: Target player's world switches to overworld when they log off in newly generated chunks in Nether.
-        /*  What could cause this?
-                - We use the first world (usually overworld) to create the fake player entity.
-                    - Why would this world value be written to the player save file?
-                        We use fakeCraftPlayer.loadData(). Apparently this does not load the correct player location when the player
-                - other reasons?
-            Fix approach can be inspired by PlayerList#canPlayerLogin()
-         */
-
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
         UUID playerId = newInventory.getSpectatedPlayerId();
         GameProfile gameProfile = new GameProfile(playerId, newInventory.getSpectatedPlayerName());
@@ -263,6 +262,7 @@ public class InvseeImpl implements InvseePlatform {
     	return CompletableFuture.supplyAsync(() -> {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
             fakeCraftPlayer.loadData();
+            loadWorldData(server, fakeEntityPlayer);
 
             CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
             SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
@@ -271,6 +271,43 @@ public class InvseeImpl implements InvseePlatform {
             fakeCraftPlayer.saveData();
             return SaveResponse.saved(currentInv);
     	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
+    }
+
+    private void loadWorldData(CraftServer server, FakeEntityPlayer fakeEntityPlayer) {
+        // In Paper, Entity#load(CompoundTag) does not load the world info.
+        // Thus, in order to not upset our users, we do it ourselves manually in order to work around this Paper bug.
+        // See https://github.com/Jannyboy11/InvSee-plus-plus/issues/105.
+        // See PaperMC/PlayerList#placeNewPlayer.
+
+        PlayerDataStorage playerDataStorage = server.getHandle().playerIo;
+        Optional<CompoundTag> optional = playerDataStorage.load(fakeEntityPlayer);
+
+        if (optional.isPresent()) {
+            ServerLevel level;
+            CompoundTag nbttagcompound = optional.get();
+
+            org.bukkit.World bWorld = null;
+            if (nbttagcompound.contains("WorldUUIDMost") && nbttagcompound.contains("WorldUUIDLeast")) {
+                // The main way for bukkit worlds to store the world is the world UUID despite mojang adding custom worlds
+                bWorld = server.getWorld(new UUID(nbttagcompound.getLong("WorldUUIDMost"), nbttagcompound.getLong("WorldUUIDLeast")));
+            } else if (nbttagcompound.contains("world", net.minecraft.nbt.Tag.TAG_STRING)) { // legacy bukkit world name
+                bWorld = server.getWorld(nbttagcompound.getString("world"));
+            }
+
+            if (bWorld != null) {
+                level = ((CraftWorld) bWorld).getHandle();
+                fakeEntityPlayer.setServerLevel(level);
+            } else {
+                DataResult<ResourceKey<Level>> dataresult = DimensionType.parseLegacy(new Dynamic(NbtOps.INSTANCE, nbttagcompound.get("Dimension")));
+                Optional<ResourceKey<Level>> optionalLevelKey = dataresult.resultOrPartial(message -> plugin.getLogger().severe(message));
+                ResourceKey<Level> levelResourceKey = optionalLevelKey.orElse(Level.OVERWORLD);
+                level = server.getHandle().getServer().getLevel(levelResourceKey);
+
+                if (level != null) {
+                    fakeEntityPlayer.spawnIn(level); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
+                }
+            }
+        }
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer nmsPlayer, AbstractContainerMenu nmsView) {
