@@ -1,6 +1,6 @@
 package com.janboerman.invsee.utils;
 
-public class ArrayHelper {
+public final class ArrayHelper {
 
     private ArrayHelper() {
     }

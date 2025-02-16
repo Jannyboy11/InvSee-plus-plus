@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 public class UsernameTrie<V> {
 
     //TODO we might want to be case in-sensitive, but goes at the cost of tab-completing names in their right casing.
+    //TODO can we make this a lock-free thread-safe data structure?
 
     private final Node<V> root;
 
@@ -40,7 +41,7 @@ public class UsernameTrie<V> {
         return insert(username.toCharArray(), value);
     }
 
-    public Maybe<V> insert(char[] username, V value) {
+    public synchronized Maybe<V> insert(char[] username, V value) {
         Node<V> node = root.lookup(username);
         Maybe<V> oldValue = node.value;
         node.value = Maybe.just(value);
@@ -51,7 +52,7 @@ public class UsernameTrie<V> {
         return delete(username.toCharArray());
     }
 
-    public Maybe<V> delete(char[] username) {
+    public synchronized Maybe<V> delete(char[] username) {
         Node<V> node = root.lookup(username);
         Maybe<V> oldValue = node.value;
         node.value = Maybe.nothing();
@@ -63,7 +64,7 @@ public class UsernameTrie<V> {
         return get(username.toCharArray());
     }
 
-    public Maybe<V> get(char[] username) {
+    public synchronized Maybe<V> get(char[] username) {
         Node<V> node = root.lookup(username);
         Maybe<V> value = node.value;
         node.cleanUp();
@@ -74,7 +75,7 @@ public class UsernameTrie<V> {
         traverse(prefix.toCharArray(), (chars, v) -> consumer.accept(new String(chars), v));
     }
 
-    public void traverse(char[] prefix, BiConsumer<char[], ? super V> consumer) {
+    public synchronized void traverse(char[] prefix, BiConsumer<char[], ? super V> consumer) {
         Node<V> node = root.lookup(prefix);
         node.traverse(consumer);
         node.cleanUp();
