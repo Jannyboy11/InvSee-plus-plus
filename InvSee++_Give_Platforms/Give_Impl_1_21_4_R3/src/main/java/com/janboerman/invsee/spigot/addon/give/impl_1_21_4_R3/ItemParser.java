@@ -8,7 +8,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.server.MinecraftServer;
 
 final class ItemParser {
 
@@ -24,11 +24,8 @@ final class ItemParser {
     }
 
     private static CommandBuildContext getContext() {
-        HolderLookup.Provider provider = VanillaRegistries.createLookup();
-        // CraftBukkit deprecates the MinecraftServer.getDefaultRegistryAccess() method,
-        // yet, this method is used in CraftMagicNumbers#modifyItemStack.
-        // If we were to use this method, our code would look as follows:
-        // HolderLookup.Provider provider = MinecraftServer.getDefaultRegistryAccess();
+        // HolderLookup.Provider provider = VanillaRegistries.createLookup(); //does not allow access to item components? should I get another one?
+        HolderLookup.Provider provider = MinecraftServer.getDefaultRegistryAccess(); //can we avoid this deprecated method?
         return Commands.createValidationContext(provider);
     }
 }
