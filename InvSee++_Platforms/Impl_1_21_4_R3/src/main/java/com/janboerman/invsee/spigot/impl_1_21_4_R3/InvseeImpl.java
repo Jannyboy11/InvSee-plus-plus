@@ -288,9 +288,9 @@ public class InvseeImpl implements InvseePlatform {
         PlayerDataStorage playerDataStorage = server.getHandle().playerIo;
         Optional<CompoundTag> optional = playerDataStorage.load(fakeEntityPlayer);
 
-        ServerLevel level = null;
 
         if (optional.isPresent()) {
+            ServerLevel level;
             CompoundTag nbttagcompound = optional.get();
 
             org.bukkit.World bWorld = null;

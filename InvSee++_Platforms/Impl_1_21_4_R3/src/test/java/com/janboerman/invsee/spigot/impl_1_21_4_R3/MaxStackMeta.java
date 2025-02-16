@@ -26,6 +26,7 @@ import org.bukkit.inventory.meta.components.FoodComponent;
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent;
 import org.bukkit.inventory.meta.components.ToolComponent;
 import org.bukkit.inventory.meta.components.UseCooldownComponent;
+import org.bukkit.inventory.meta.components.consumable.ConsumableComponent;
 import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
@@ -366,6 +367,21 @@ class MaxStackMeta implements ItemMeta, Damageable {
 
     @Override
     public void setFood(FoodComponent foodComponent) {
+
+    }
+
+    @Override
+    public boolean hasConsumable() {
+        return false;
+    }
+
+    @Override
+    public @NotNull ConsumableComponent getConsumable() {
+        return null;
+    }
+
+    @Override
+    public void setConsumable(ConsumableComponent consumableComponent) {
 
     }
 
