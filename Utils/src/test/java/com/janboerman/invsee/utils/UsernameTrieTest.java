@@ -3,14 +3,16 @@ package com.janboerman.invsee.utils;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.IntStream;
 
 public class UsernameTrieTest {
 
-    private final char[] valid_chars = new char[] {
+    private static final char[] valid_chars = new char[] {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -138,6 +140,18 @@ public class UsernameTrieTest {
         assertEquals("Jankebal:4 Jankoekenpan:2", sj4.toString());
     }
 
+    @Test
+    public void testCleanup() {
+        UsernameTrie<Void> trie = new UsernameTrie<>();
+        for (int i = 0; i < 1_000_000; i += 1) {
+            trie.traverse(randomName(), (s, _void) -> {});
+        }
+
+        List<String> retrieved = new ArrayList<>();
+        trie.traverse("", (s, _void) -> retrieved.add(s));
+
+        assertEquals(List.of(), retrieved);
+    }
 
     @Test
     public void time100k() {

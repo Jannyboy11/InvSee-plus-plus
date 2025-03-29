@@ -56,10 +56,11 @@ public class AsyncTabCompleter implements Listener {
     @EventHandler
     public void onTabComplete(AsyncTabCompleteEvent event) {
         // Can be called from multiple threads. By the looks of it these are Netty threads.
-        //TODO if we can adjust the UsernameTrie implementation such that lookups done for 'get' and 'tabcompletion' don't restructure the internal tree structure,
-        //TODO then we could use a ReentrantReadWriteLock to protect the UsernameTrie.
-        //TODO alternatively, we could just make the UsernameTrie implementation itself thread-safe?
-        //TODO but I don't think it's such a big problem right now - incorrect tabcompletions are not the end of the world.
+        //if we can adjust the UsernameTrie implementation such that lookups done for 'get' and 'tabcompletion' don't restructure the internal tree structure,
+        //then we could use a ReentrantReadWriteLock to protect the UsernameTrie.
+        //alternatively, we could just make the UsernameTrie implementation itself thread-safe?
+        //but I don't think it's such a big problem right now - incorrect tabcompletions are not the end of the world.
+        // As of InvSee++ v0.19.19, the UsernameTrie implementation itself was made thread-safe
 
         final String buffer = event.getBuffer();
 
