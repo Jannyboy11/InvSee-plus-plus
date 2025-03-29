@@ -133,7 +133,6 @@ public class ServerSoftware {
                         case CraftbukkitMappingsVersion._1_21_5: return CRAFTBUKKIT_1_21_5;
                     }
                 }
-
             case "net.glowstone.GlowServer":
                 final String glowstoneGameVersion = GlowstoneGameVersion.getGameVersion();
                 switch (glowstoneGameVersion) {
