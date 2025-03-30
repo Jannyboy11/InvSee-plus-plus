@@ -65,6 +65,9 @@ public class AsyncTabCompleter implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         enqueue(event.getPlayer().getName());
+        if (event.getPlayer().hasPermission(InvseePlusPlus.TABCOMPLETION_PERMISSION)) {
+            playersWhoCanTabComplete.add(event.getPlayer().getUniqueId());
+        }
     }
 
     @EventHandler
