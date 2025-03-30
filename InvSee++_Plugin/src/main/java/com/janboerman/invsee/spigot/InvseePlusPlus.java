@@ -49,6 +49,8 @@ import java.util.stream.Stream;
 
 public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.spigot.api.InvseePlusPlus {
 
+    public static final String TABCOMPLETION_PERMISSION = "invseeplusplus.tabcomplete";
+
     private final boolean asyncTabcompleteEvent;
 
     private InvseeAPI api;

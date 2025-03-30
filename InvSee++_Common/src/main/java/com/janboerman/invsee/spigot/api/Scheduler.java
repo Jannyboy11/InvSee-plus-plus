@@ -18,6 +18,8 @@ public interface Scheduler {
 
     public void executeSyncGlobal(Runnable task);
 
+    public void executeSyncGlobalRepeatedly(Runnable task, long ticksInitialDelay, long ticksPeriod);
+
     public void executeAsync(Runnable task);
 
     public void executeLaterGlobal(Runnable task, long delayTicks);

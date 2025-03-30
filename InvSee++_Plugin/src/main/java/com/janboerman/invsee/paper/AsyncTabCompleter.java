@@ -12,6 +12,8 @@ import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.spigot.perworldinventory.PwiCommandArgs;
 import com.janboerman.invsee.utils.StringHelper;
 import com.janboerman.invsee.utils.UsernameTrie;
+
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -22,6 +24,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 public class AsyncTabCompleter implements Listener {
+
+    private final Set<UUID> playersWhoCanTabComplete = new ConcurrentSkipListSet<>();
 
     private final Set<String> knownLabels;
     private final InvseeAPI api;
@@ -40,6 +44,16 @@ public class AsyncTabCompleter implements Listener {
         this.knownLabels.addAll(withPrefix);
 
         scheduler.executeAsync(() -> playerDatabase.getAll(this::enqueue));
+        scheduler.executeSyncGlobalRepeatedly(() -> {
+            Set<UUID> tabcompleters = plugin.getServer().getPluginManager()
+                    .getPermissionSubscriptions(InvseePlusPlus.TABCOMPLETION_PERMISSION).stream()
+                    .filter(permissible -> permissible.hasPermission(InvseePlusPlus.TABCOMPLETION_PERMISSION)) // necessary because of negative permissions :-)
+                    .filter(permissible -> permissible instanceof Player)
+                    .map(permissible -> ((Player) permissible).getUniqueId())
+                    .collect(Collectors.toSet());
+            playersWhoCanTabComplete.addAll(tabcompleters);
+            playersWhoCanTabComplete.retainAll(tabcompleters);
+        }, 0L, 20L * 60); //every minute
     }
 
     private void enqueue(String name) {
@@ -61,6 +75,13 @@ public class AsyncTabCompleter implements Listener {
         //alternatively, we could just make the UsernameTrie implementation itself thread-safe?
         //but I don't think it's such a big problem right now - incorrect tabcompletions are not the end of the world.
         // As of InvSee++ v0.19.19, the UsernameTrie implementation itself was made thread-safe
+
+        if (event.getSender() instanceof Player) {
+            if (!playersWhoCanTabComplete.contains(((Player) event.getSender()).getUniqueId())) {
+                event.setHandled(true);
+                return;
+            }
+        }
 
         final String buffer = event.getBuffer();
 

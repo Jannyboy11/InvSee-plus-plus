@@ -30,6 +30,11 @@ public class DefaultScheduler implements Scheduler {
         executeSync(task);
     }
 
+    @Override
+    public void executeSyncGlobalRepeatedly(Runnable task, long ticksInitialDelay, long ticksPeriod) {
+        plugin.getServer().getScheduler().runTaskTimer(plugin, task, ticksInitialDelay, ticksPeriod);
+    }
+
     private void executeSync(Runnable task) {
         if (plugin.getServer().isPrimaryThread()) {
             task.run();

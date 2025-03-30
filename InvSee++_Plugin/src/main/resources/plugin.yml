@@ -31,6 +31,7 @@ permissions:
       invseeplusplus.exempt.endersee: true
       invseeplusplus.bypass-exempt.invsee: true
       invseeplusplus.bypass-exempt.endersee: true
+      invseeplusplus.tabcomplete: true
       invseeplusplus.give.*: true
       invseeplusplus.clear.*: true
     default: false
@@ -62,6 +63,8 @@ permissions:
   invseeplusplus.invsee.view:
     description: Gives access to view a player's inventory
     default: op
+    children:
+      invseeplusplus.tabcomplete: true
   invseeplusplus.invsee.edit:
     description: Gives access to edit a player's inventory
     default: op
@@ -70,11 +73,17 @@ permissions:
   invseeplusplus.endersee.view:
     description: Gives access to view a player's enderchest
     default: op
+    children:
+      invseeplusplus.tabcomplete: true
   invseeplusplus.endersee.edit:
     description: Gives access to edit a player's enderchest
     default: op
     children:
       invseeplusplus.endersee.view: true
+
+  invseeplusplus.tabcomplete:
+    description: Gives the player access to tabcomplete player names.
+    default: op
 
   invseeplusplus.exempt.invsee:
     description: Makes it impossible for the owner of this permission to be spectated using /invsee

@@ -29,6 +29,8 @@ public class InvseeTabCompleter implements TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.hasPermission(InvseePlusPlus.TABCOMPLETION_PERMISSION)) return emptyList();
+
         InvseeAPI api = plugin.getApi();
         Player player = sender instanceof Player ? (Player) sender : null;
 

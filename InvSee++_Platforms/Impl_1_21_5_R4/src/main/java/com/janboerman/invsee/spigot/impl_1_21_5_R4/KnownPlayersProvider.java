@@ -1,8 +1,5 @@
 package com.janboerman.invsee.spigot.impl_1_21_5_R4;
 
-import static com.janboerman.invsee.spigot.internal.NBTConstants.TAG_COMPOUND;
-import static com.janboerman.invsee.spigot.internal.NBTConstants.TAG_STRING;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
