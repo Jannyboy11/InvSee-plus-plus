@@ -79,13 +79,6 @@ public class AsyncTabCompleter implements Listener {
         //but I don't think it's such a big problem right now - incorrect tabcompletions are not the end of the world.
         // As of InvSee++ v0.19.19, the UsernameTrie implementation itself was made thread-safe
 
-        if (event.getSender() instanceof Player) {
-            if (!playersWhoCanTabComplete.contains(((Player) event.getSender()).getUniqueId())) {
-                event.setHandled(true);
-                return;
-            }
-        }
-
         final String buffer = event.getBuffer();
 
         while (!nameQueue.isEmpty()) {
@@ -108,6 +101,15 @@ public class AsyncTabCompleter implements Listener {
                     matchedLabel = label;
                     prefixIgnoreCase = true;
                     break;
+                }
+            }
+
+            if (equalsIgnoreCase || prefixIgnoreCase) {
+                if (event.getSender() instanceof Player) {
+                    if (!playersWhoCanTabComplete.contains(((Player) event.getSender()).getUniqueId())) {
+                        event.setHandled(true);
+                        return;
+                    }
                 }
             }
 
