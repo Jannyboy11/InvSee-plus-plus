@@ -1,6 +1,6 @@
 package com.janboerman.invsee.utils;
 
-public class Rethrow {
+public final class Rethrow {
 
     private Rethrow() {}
 

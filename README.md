@@ -90,7 +90,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
     - `java -jar BuildTools.jar --rev 1.20.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.4 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.20.6 --compile craftbukkit --remapped`
-    - `java -jar BuildTools.jar --rev 1.21 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 4287 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.21.1 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.21.3 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.21.4 --compile craftbukkit --remapped`
