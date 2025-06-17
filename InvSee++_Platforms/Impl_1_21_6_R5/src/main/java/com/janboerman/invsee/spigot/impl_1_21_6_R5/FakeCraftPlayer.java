@@ -42,7 +42,7 @@ public class FakeCraftPlayer extends CraftPlayer {
     }
 
     private Optional<ValueInput> loadPlayerTag() {
-        return server.getHandle().playerIo.load(getName(), getUniqueId().toString(), ProblemReporter.DISCARDING, getHandle().registryAccess());
+        return server.getHandle().playerIo.load(getName(), getUniqueId().toString(), ThrowingProblemReporter.INSTANCE, getHandle().registryAccess());
     }
 
     @Override

@@ -36,7 +36,7 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 			return CompletedEmpty.the();
 		
 		return CompletableFuture.supplyAsync(() -> {
-					return worldNBTStorage.load("InvSee++ Player", uniqueId.toString(), ProblemReporter.DISCARDING, RegistryAccess.EMPTY)
+					return worldNBTStorage.load("InvSee++ Player", uniqueId.toString(), ThrowingProblemReporter.INSTANCE, RegistryAccess.EMPTY)
 							.flatMap(playerTag -> playerTag.child("bukkit"))
 							.flatMap(bukkitTag -> bukkitTag.getString("lastKnownName"));
 				},

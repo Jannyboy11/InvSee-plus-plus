@@ -288,6 +288,7 @@ public class InvseeImpl implements InvseePlatform {
             ValueInput nbttagcompound = optional.get();
 
             org.bukkit.World bWorld = null;
+            // TODO fix issue 'Expected field 'WorldUUIDMost' to contain value of type COMPOUND, but got LONG' when saving data.
             if (nbttagcompound.child("WorldUUIDMost").isPresent() && nbttagcompound.child("WorldUUIDLeast").isPresent()) {
                 // The main way for bukkit worlds to store the world is the world UUID despite mojang adding custom worlds
                 bWorld = server.getWorld(new UUID(nbttagcompound.getLong("WorldUUIDMost").get(), nbttagcompound.getLong("WorldUUIDLeast").get()));
