@@ -131,6 +131,12 @@ class Impl_1_21_5 extends SetupImpl {
     }
 }
 
+class Impl_1_21_6 extends SetupImpl {
+    Impl_1_21_6(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_21_6_R5.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_6_R5.KnownPlayersProvider(plugin, scheduler));
+    }
+}
+
 class Impl_Glowstone extends SetupImpl {
     Impl_Glowstone(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.glowstone.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.glowstone.KnownPlayersProvider(plugin, scheduler));
@@ -157,6 +163,7 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_3(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_3, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_3));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_4(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_4, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_4));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_5(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_5, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_5));
+        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_6(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_6, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_6));
 
         final SetupProvider glowstoneProver = (p, l, s, c) -> new Impl_Glowstone(p, l, s, c);
         final MinecraftVersion[] minecraftVersions = MinecraftVersion.values();
