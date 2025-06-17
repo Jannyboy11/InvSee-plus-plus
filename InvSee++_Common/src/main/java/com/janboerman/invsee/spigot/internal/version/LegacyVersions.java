@@ -3,7 +3,7 @@ package com.janboerman.invsee.spigot.internal.version;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LegacyVersions {
+public final class LegacyVersions {
 
     private static final LegacyVersions INSTANCE = new LegacyVersions();
 
