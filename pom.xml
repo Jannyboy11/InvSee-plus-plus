@@ -23,6 +23,7 @@
         <module>InvSee++_Platforms/Impl_1_21_3_R2</module>
         <module>InvSee++_Platforms/Impl_1_21_4_R3</module>
         <module>InvSee++_Platforms/Impl_1_21_5_R4</module>
+        <module>InvSee++_Platforms/Impl_1_21_6_R5</module>
         <module>InvSee++_Platforms/Impl_Glowstone</module>
         <module>InvSee++_MultiverseInventories</module> <!-- TODO finish this module -->
         <module>InvSee++_PerWorldInventory</module>

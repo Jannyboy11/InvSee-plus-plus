@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.impl_1_21_5_R4;
+package com.janboerman.invsee.spigot.impl_1_21_6_R5;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -38,12 +38,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Registry;
-import org.bukkit.craftbukkit.v1_21_R4.CraftServer;
-import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_21_R4.util.CraftChatMessage;
+import org.bukkit.craftbukkit.v1_21_R5.CraftServer;
+import org.bukkit.craftbukkit.v1_21_R5.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R5.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_21_R5.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R5.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R5.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -61,6 +61,7 @@ import net.minecraft.server.dedicated.DedicatedPlayerList;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
@@ -68,6 +69,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.PlayerDataStorage;
+import net.minecraft.world.level.storage.ValueInput;
 
 public class InvseeImpl implements InvseePlatform {
 
@@ -217,18 +219,14 @@ public class InvseeImpl implements InvseePlatform {
     	PlayerDataStorage worldNBTStorage = playerList.playerIo;
     	
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
-    	Location spawn = world.getSpawnLocation();
-    	float yaw = spawn.getYaw();
     	GameProfile gameProfile = new GameProfile(player, name);
     	
     	FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
     			world.getHandle(),
-    			new BlockPos(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()),
-    			yaw,
     			gameProfile);
     	
     	return CompletableFuture.supplyAsync(() -> {
-    		Optional<CompoundTag> playerCompound = worldNBTStorage.load(fakeEntityHuman);
+    		Optional<ValueInput> playerCompound = worldNBTStorage.load(fakeEntityHuman, ThrowingProblemReporter.INSTANCE);
             if (playerCompound.isEmpty()) {
                 // player file does not exist
                 if (!options.isUnknownPlayerSupported()) {
@@ -283,17 +281,17 @@ public class InvseeImpl implements InvseePlatform {
         // See PaperMC/PlayerList#placeNewPlayer.
 
         PlayerDataStorage playerDataStorage = server.getHandle().playerIo;
-        Optional<CompoundTag> optional = playerDataStorage.load(fakeEntityPlayer);
+        Optional<ValueInput> optional = playerDataStorage.load(fakeEntityPlayer, ThrowingProblemReporter.INSTANCE);
 
         if (optional.isPresent()) {
             ServerLevel level;
-            CompoundTag nbttagcompound = optional.get();
+            ValueInput nbttagcompound = optional.get();
 
             org.bukkit.World bWorld = null;
-            if (nbttagcompound.contains("WorldUUIDMost") && nbttagcompound.contains("WorldUUIDLeast")) {
+            if (nbttagcompound.child("WorldUUIDMost").isPresent() && nbttagcompound.child("WorldUUIDLeast").isPresent()) {
                 // The main way for bukkit worlds to store the world is the world UUID despite mojang adding custom worlds
                 bWorld = server.getWorld(new UUID(nbttagcompound.getLong("WorldUUIDMost").get(), nbttagcompound.getLong("WorldUUIDLeast").get()));
-            } else if (nbttagcompound.contains("world")) { // legacy bukkit world name
+            } else if (nbttagcompound.child("world").isPresent()) { // legacy bukkit world name
                 bWorld = server.getWorld(nbttagcompound.getString("world").get());
             }
 
@@ -301,7 +299,7 @@ public class InvseeImpl implements InvseePlatform {
                 level = ((CraftWorld) bWorld).getHandle();
                 fakeEntityPlayer.setServerLevel(level);
             } else {
-                DataResult<ResourceKey<Level>> dataresult = DimensionType.parseLegacy(new Dynamic<>(NbtOps.INSTANCE, nbttagcompound.get("Dimension")));
+                DataResult<ResourceKey<Level>> dataresult = parseLegacyDimensionType(nbttagcompound.getInt("Dimension"));
                 Optional<ResourceKey<Level>> optionalLevelKey = dataresult.resultOrPartial(message -> plugin.getLogger().severe(message));
                 ResourceKey<Level> levelResourceKey = optionalLevelKey.orElse(Level.OVERWORLD);
                 level = server.getHandle().getServer().getLevel(levelResourceKey);
@@ -313,6 +311,17 @@ public class InvseeImpl implements InvseePlatform {
 
             fakeEntityPlayer.loadGameTypes(nbttagcompound);
         }
+    }
+
+    private static DataResult<ResourceKey<Level>> parseLegacyDimensionType(Optional<Integer> dimensionInput) {
+        if (dimensionInput.isPresent()) {
+            switch (dimensionInput.get()) {
+                case -1: return DataResult.success(Level.NETHER);
+                case 0: return DataResult.success(Level.OVERWORLD);
+                case 1: return DataResult.success(Level.END);
+            }
+        }
+        return DataResult.error(() -> "Empty dimension: " + dimensionInput);
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer nmsPlayer, AbstractContainerMenu nmsView) {
