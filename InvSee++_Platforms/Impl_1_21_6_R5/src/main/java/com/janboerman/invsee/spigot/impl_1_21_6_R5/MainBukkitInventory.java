@@ -133,21 +133,15 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 
 	@Override
 	public ItemStack[] getArmourContents() {
-		var inv = getInventory().nmsPlayerInventory;
-		int storageContents = inv.getNonEquipmentItems().size();
-
-		return new ItemStack[] {
-				CraftItemStack.asCraftMirror(inv.getItem(storageContents)),
-				CraftItemStack.asCraftMirror(inv.getItem(storageContents + 1)),
-				CraftItemStack.asCraftMirror(inv.getItem(storageContents + 2)),
-				CraftItemStack.asCraftMirror(inv.getItem(storageContents + 3))
-		};
+		return getInventory().nmsPlayerInventory.getArmorContents().stream()
+				.map(CraftItemStack::asCraftMirror)
+				.toArray(ItemStack[]::new);
 	}
 
 	@Override
 	public void setArmourContents(ItemStack[] armourContents) {
 		Objects.requireNonNull(armourContents, "armourContents cannot be null");
-		int armourContentsSize = Inventory.EQUIPMENT_SLOT_MAPPING.size() - 1/*offhand*/;
+		int armourContentsSize = Inventory.INVENTORY_SIZE - Inventory.SLOT_OFFHAND;
 		if (armourContents.length != armourContentsSize)
 			throw new IllegalArgumentException("armour contents must be of length " + armourContentsSize);
 
@@ -164,14 +158,16 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 		var inv = getInventory().nmsPlayerInventory;
 		// See initialisation of net.minecraft.world.entity.player.Inventory#EQUIPMENT_SLOT_MAPPING.
 		return new ItemStack[] {
-				CraftItemStack.asCraftMirror(inv.getItem(40))
+				CraftItemStack.asCraftMirror(inv.getItem(40)),
+				CraftItemStack.asCraftMirror(inv.getItem(41)),
+				CraftItemStack.asCraftMirror(inv.getItem(42))
  		};
 	}
 
 	@Override
 	public void setOffHandContents(ItemStack[] offHand) {
 		Objects.requireNonNull(offHand, "offHand cannot be null");
-		int offHandContentsSize = 1; // may change in the future? seems weird though..
+		int offHandContentsSize = 3;
 		if (offHand.length != offHandContentsSize)
 			throw new IllegalArgumentException("offHand must be of length " + offHandContentsSize);
 

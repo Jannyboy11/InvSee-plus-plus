@@ -56,15 +56,21 @@ class MainNmsContainer extends AbstractContainerMenu {
 		} else if (place == PlayerInventorySlot.ARMOUR_HELMET) {
 			final int referringTo = 39;
 			return new HelmetSlot(top, referringTo, magicX, magicY); //idem?
-		} else if (place.isPersonal()) {
-			final int referringTo = place.ordinal() - PlayerInventorySlot.PERSONAL_00.ordinal() + 45;
-			return new PersonalSlot(inaccessiblePlaceholder, top, referringTo, magicX, magicY); //idem?
 		} else if (place.isOffHand()) {
 			final int referringTo = 40;
 			return new OffhandSlot(top, referringTo, magicX, magicY); //idem?
-		} else if (place.isCursor() && !spectatingOwnInventory) {
+		} else if (place.isBody()) {
 			final int referringTo = 41;
+			return new BodySlot(top, referringTo, magicX, magicY); //idem?
+		} else if (place.isSaddle()) {
+			final int referringTo = 42;
+			return new SaddleSlot(top, referringTo, magicX, magicY); //idem?
+		} else if (place.isCursor() && !spectatingOwnInventory) {
+			final int referringTo = 43;
 			return new CursorSlot(top, referringTo, magicX, magicY); //idem?
+		} else if (place.isPersonal()) {
+			final int referringTo = place.ordinal() - PlayerInventorySlot.PERSONAL_00.ordinal() + 45;
+			return new PersonalSlot(inaccessiblePlaceholder, top, referringTo, magicX, magicY); //idem?
 		} else {
 			return new InaccessibleSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY); //idem?
 		}

@@ -17,7 +17,7 @@ public class PlayerInventoryMirror implements Mirror<PlayerInventorySlot> {
             "i_09 i_10 i_11 i_12 i_13 i_14 i_15 i_16 i_17\n" +
             "i_18 i_19 i_20 i_21 i_22 i_23 i_24 i_25 i_26\n" +
             "i_27 i_28 i_29 i_30 i_31 i_32 i_33 i_34 i_35\n" +
-            "a_b  a_l  a_c  a_h  oh   c    _    _    _   \n" +
+            "a_b  a_l  a_c  a_h  oh   b    s    c    _   \n" +
             "p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08";
 
     public static PlayerInventoryMirror DEFAULT = new PlayerInventoryMirror(DEFAULT_TEMPLATE);
@@ -52,6 +52,9 @@ public class PlayerInventoryMirror implements Mirror<PlayerInventorySlot> {
             case "a_h ": return PlayerInventorySlot.ARMOUR_HELMET;
 
             case "oh  ": return PlayerInventorySlot.OFFHAND;
+            case "b   ": return PlayerInventorySlot.BODY;
+            case "s   ": return PlayerInventorySlot.SADDLE;
+
             case "c   ": return PlayerInventorySlot.CURSOR;
 
             default:
@@ -105,6 +108,9 @@ public class PlayerInventoryMirror implements Mirror<PlayerInventorySlot> {
                     case ARMOUR_HELMET: stringBuilder.append("a_h "); break;
 
                     case OFFHAND: stringBuilder.append("oh  "); break;
+                    case BODY: stringBuilder.append("b   "); break;
+                    case SADDLE: stringBuilder.append("s   "); break;
+
                     case CURSOR: stringBuilder.append("c   "); break;
 
                     default:

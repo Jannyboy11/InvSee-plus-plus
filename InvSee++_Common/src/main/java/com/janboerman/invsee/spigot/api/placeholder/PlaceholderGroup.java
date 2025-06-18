@@ -5,6 +5,8 @@ public enum PlaceholderGroup {
     INACCESSIBLE,
     ARMOUR,
     OFFHAND,
+    BODY,
+    SADDLE,
     CURSOR,
     CRAFTING,
     ANVIL,
@@ -18,13 +20,18 @@ public enum PlaceholderGroup {
 
     public boolean isPersonal() {
         switch (this) {
-            case INACCESSIBLE:
-            case ARMOUR:
-            case OFFHAND:
-            case CURSOR:
-                return false;
-            default:
+            case CRAFTING:
+            case ANVIL:
+            case MERCHANT:
+            case CARTOGRAPHY:
+            case ENCHANTING:
+            case GRINDSTONE:
+            case LOOM:
+            case SMITHING:
+            case STONECUTTER:
                 return true;
+            default:
+                return false;
         }
     }
 }

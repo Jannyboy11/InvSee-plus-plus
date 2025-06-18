@@ -47,6 +47,9 @@ public enum PlayerInventorySlot {
 
     OFFHAND,
 
+    BODY,
+    SADDLE,
+
     CURSOR,
 
     PERSONAL_00,
@@ -156,6 +159,22 @@ public enum PlayerInventorySlot {
     }
 
     /**
+     * Get whether this slot is a body slot.
+     * @return true if this slot is the body slot, otherwise false
+     */
+    public boolean isBody() {
+        return this == BODY;
+    }
+
+    /**
+     * Get whether this slot is a saddle slot.
+     * @return true if this slot is the saddle slot, otherwise false
+     */
+    public boolean isSaddle() {
+        return this == SADDLE;
+    }
+
+    /**
      * Get whether this slot is the cursor slot. The cursor slot is the slot that hosts the item that the target player is holding in its cursor when they are viewing an inventory themselves.
      * @return true if this slot is the cursor slot, otherwise false
      */
@@ -172,8 +191,12 @@ public enum PlayerInventorySlot {
             return 36 + ordinal() - ARMOUR_BOOTS.ordinal();
         } else if (isOffHand()) {
             return 40;
-        } else if (isCursor()) {
+        } else if (isBody()) {
             return 41;
+        } else if (isSaddle()) {
+            return 42;
+        } else if (isCursor()) {
+            return 43;
         } else {
             return 45 + ordinal() - PERSONAL_00.ordinal();
         }
@@ -181,8 +204,8 @@ public enum PlayerInventorySlot {
 
     /** Get the slot given its index in the {@link com.janboerman.invsee.spigot.api.MainSpectatorInventory}. */
     public static PlayerInventorySlot byDefaultIndex(int index) {
-        if (0 <= index && index <= 41) {
-            return VALUES[index]; //storage, armour, offhand, cursor
+        if (0 <= index && index <= 43) {
+            return VALUES[index]; //storage, armour, offhand, body, saddle, cursor
         } else if (45 <= index && index < 54) {
             return VALUES[index + PERSONAL_00.ordinal() - 45]; //personal
         } else {

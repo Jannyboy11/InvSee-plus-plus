@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot.impl_1_21_6_R5;
 
+import static com.janboerman.invsee.spigot.internal.placeholder.Placeholders.BODY;
 import static com.janboerman.invsee.spigot.internal.placeholder.Placeholders.BOOTS;
 import static com.janboerman.invsee.spigot.internal.placeholder.Placeholders.CARTOGRAPHY;
 import static com.janboerman.invsee.spigot.internal.placeholder.Placeholders.CHESTPLATE;
@@ -44,6 +45,7 @@ import static org.bukkit.Material.NETHERITE_INGOT;
 import static org.bukkit.Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE;
 import static org.bukkit.Material.ORANGE_STAINED_GLASS_PANE;
 import static org.bukkit.Material.PINK_STAINED_GLASS_PANE;
+import static org.bukkit.Material.SADDLE;
 import static org.bukkit.Material.SHIELD;
 import static org.bukkit.Material.SMITHING_TABLE;
 import static org.bukkit.Material.STRUCTURE_VOID;
@@ -76,6 +78,8 @@ public class Placeholders {
     private static final ItemStack GLASS_ARMOUR_LEGGINGS = makeStack(LIGHT_BLUE_STAINED_GLASS_PANE, name(LEGGINGS));
     private static final ItemStack GLASS_ARMOUR_BOOTS = makeStack(LIGHT_BLUE_STAINED_GLASS_PANE, name(BOOTS));
     private static final ItemStack GLASS_OFFHAND = makeStack(YELLOW_STAINED_GLASS_PANE, name(OFFHAND));
+    private static final ItemStack GLASS_BODY = makeStack(GRAY_STAINED_GLASS_PANE, name(BODY));
+    private static final ItemStack GLASS_SADDLE = makeStack(ORANGE_STAINED_GLASS_PANE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.SADDLE));
     private static final ItemStack GLASS_CURSOR = makeStack(WHITE_STAINED_GLASS_PANE, name(CURSOR));
     private static final ItemStack GLASS_CRAFTING = makeStack(ORANGE_STAINED_GLASS_PANE, name(CRAFTING));
     private static final ItemStack GLASS_ANVIL = makeStack(GRAY_STAINED_GLASS_PANE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.ANVIL));
@@ -104,6 +108,8 @@ public class Placeholders {
         meta.setBlockState(banner);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE);
     });
+    private static final ItemStack ICON_BODY = makeStack(null, name(BODY));
+    private static final ItemStack ICON_SADDLE = makeStack(SADDLE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.SADDLE));
     private static final ItemStack ICON_CURSOR = makeStack(STRUCTURE_VOID, name(CURSOR));
     private static final ItemStack ICON_CRAFTING = makeStack(CRAFTING_TABLE, name(CRAFTING));
     private static final ItemStack ICON_ANVIL = makeStack(Material.ANVIL, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.ANVIL));
@@ -126,6 +132,8 @@ public class Placeholders {
             GLASS_ARMOUR_LEGGINGS,
             GLASS_ARMOUR_BOOTS,
             GLASS_OFFHAND,
+            GLASS_BODY,
+            GLASS_SADDLE,
             GLASS_CURSOR,
             GLASS_CRAFTING,
             GLASS_ANVIL,
@@ -148,6 +156,8 @@ public class Placeholders {
             ICON_ARMOUR_LEGGINGS,
             ICON_ARMOUR_BOOTS,
             ICON_OFFHAND,
+            ICON_BODY,
+            ICON_SADDLE,
             ICON_CURSOR,
             ICON_CRAFTING,
             ICON_ANVIL,
@@ -167,8 +177,8 @@ public class Placeholders {
 
 class PlaceholderPalette extends SimplePlaceholderPalette {
 
-    public PlaceholderPalette(String name, ItemStack inaccessible, ItemStack armourHelmet, ItemStack armourChestplate, ItemStack armourLeggings, ItemStack armourBoots, ItemStack offHand, ItemStack cursor, ItemStack crafting, ItemStack anvil, ItemStack merchant, ItemStack cartography, ItemStack enchantingItem, ItemStack enchantingFuel, ItemStack grindstone, ItemStack loom, ItemStack smithingBase, ItemStack smithingTemplate, ItemStack smithingAddition, ItemStack stonecutter, ItemStack generic) {
-        super(name, inaccessible, armourHelmet, armourChestplate, armourLeggings, armourBoots, offHand, cursor, crafting, anvil, merchant, cartography, enchantingItem, enchantingFuel, grindstone, loom, smithingBase, smithingTemplate, smithingAddition, stonecutter, generic);
+    public PlaceholderPalette(String name, ItemStack inaccessible, ItemStack armourHelmet, ItemStack armourChestplate, ItemStack armourLeggings, ItemStack armourBoots, ItemStack offHand, ItemStack body, ItemStack saddle, ItemStack cursor, ItemStack crafting, ItemStack anvil, ItemStack merchant, ItemStack cartography, ItemStack enchantingItem, ItemStack enchantingFuel, ItemStack grindstone, ItemStack loom, ItemStack smithingBase, ItemStack smithingTemplate, ItemStack smithingAddition, ItemStack stonecutter, ItemStack generic) {
+        super(name, inaccessible, armourHelmet, armourChestplate, armourLeggings, armourBoots, offHand, body, saddle, cursor, crafting, anvil, merchant, cartography, enchantingItem, enchantingFuel, grindstone, loom, smithingBase, smithingTemplate, smithingAddition, stonecutter, generic);
     }
 
     @Override
@@ -186,6 +196,8 @@ class PlaceholderPalette extends SimplePlaceholderPalette {
                     case ARMOUR_HELMET: return armourHelmet();
                 }
             case OFFHAND: return offHand();
+            case BODY: return body();
+            case SADDLE: return saddle();
             case CURSOR: return cursor();
             case CRAFTING: return crafting();
             case ANVIL: return anvil();

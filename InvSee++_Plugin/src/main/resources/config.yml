@@ -19,6 +19,8 @@ titles:
 #     - i_xx is a regular inventory 'container' slot (xx being the slot number)
 #     - a_x is an armour slot: b for boots, l for leggings, c for chest and h for helmet
 #     - oh is the offhand slot
+#     - b is the body slot
+#     - s is the saddle slot
 #     - c is the cursor slot
 #     - p_xx is a 'personal' slot, where the contents of the player's crafting items / anvil items / enchanting table items / etc. live
 #     - _ is an unused slot
@@ -31,7 +33,7 @@ templates:
     i_09 i_10 i_11 i_12 i_13 i_14 i_15 i_16 i_17
     i_18 i_19 i_20 i_21 i_22 i_23 i_24 i_25 i_26
     i_27 i_28 i_29 i_30 i_31 i_32 i_33 i_34 i_35
-    a_b  a_l  a_c  a_h  oh   c    _    _    _   
+    a_b  a_l  a_c  a_h  oh   b    s    c    _   
     p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08
   enderchest: |
     e_00 e_01 e_02 e_03 e_04 e_05 e_06 e_07 e_08

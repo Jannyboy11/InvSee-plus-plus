@@ -56,6 +56,20 @@ class OffhandSlot extends EquipmentSlot {
     }
 }
 
+//TODO should this be an EquipmentSlot?
+class BodySlot extends Slot {
+    BodySlot(MainNmsInventory inventory, int index, int magicX, int magicY) {
+        super(inventory, index, magicX, magicY);
+    }
+}
+
+//TODO should this be an EquipmentSlot?
+class SaddleSlot extends Slot {
+    SaddleSlot(MainNmsInventory inventory, int index, int magicX, int magicY) {
+        super(inventory, index, magicX, magicY);
+    }
+}
+
 class CursorSlot extends Slot {
     public CursorSlot(Container inventory, int index, int magicX, int magicY) {
         super(inventory, index, magicX, magicY);

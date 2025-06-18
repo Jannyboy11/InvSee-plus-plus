@@ -21,6 +21,8 @@ public class Placeholders {
     public static final String LEGGINGS = ChatColor.AQUA + "Leggings";
     public static final String BOOTS = ChatColor.AQUA + "Boots";
     public static final String OFFHAND = ChatColor.AQUA + "Off-hand";
+    public static final String BODY = ChatColor.AQUA + "Body";
+    public static final String SADDLE = ChatColor.AQUA + "Saddle";
     public static final String CURSOR = ChatColor.AQUA + "Cursor";
     public static final String CRAFTING = ChatColor.AQUA + "Crafting ingredient";
     public static final String ANVIL = ChatColor.AQUA + "Anvil input";

@@ -9,7 +9,7 @@ public abstract class SimplePlaceholderPalette implements PlaceholderPalette {
 
     private final String name;
 
-    private final ItemStack inaccessible, armourHelmet, armourChestplate, armourLeggings, armourBoots, offHand, cursor, crafting, anvil, merchant, cartography, enchantingItem, enchantingFuel, grindstone, loom, smithingBase, smithingTemplate, smithingAddition, stonecutter, generic;
+    private final ItemStack inaccessible, armourHelmet, armourChestplate, armourLeggings, armourBoots, offHand, body, saddle, cursor, crafting, anvil, merchant, cartography, enchantingItem, enchantingFuel, grindstone, loom, smithingBase, smithingTemplate, smithingAddition, stonecutter, generic;
 
     public SimplePlaceholderPalette(String name,
 
@@ -19,6 +19,8 @@ public abstract class SimplePlaceholderPalette implements PlaceholderPalette {
                                     ItemStack armourLeggings,
                                     ItemStack armourBoots,
                                     ItemStack offHand,
+                                    ItemStack body,
+                                    ItemStack saddle,
                                     ItemStack cursor,
                                     ItemStack crafting,
                                     ItemStack anvil,
@@ -41,6 +43,8 @@ public abstract class SimplePlaceholderPalette implements PlaceholderPalette {
         this.armourLeggings = armourLeggings;
         this.armourBoots = armourBoots;
         this.offHand = offHand;
+        this.body = body;
+        this.saddle = saddle;
         this.cursor = cursor;
         this.crafting = crafting;
         this.anvil = anvil;
@@ -65,6 +69,8 @@ public abstract class SimplePlaceholderPalette implements PlaceholderPalette {
     @Override public ItemStack armourLeggings() { return clone(armourLeggings); }
     @Override public ItemStack armourBoots() { return clone(armourBoots); }
     @Override public ItemStack offHand() { return clone(offHand); }
+    @Override public ItemStack body() { return clone(body); }
+    @Override public ItemStack saddle() { return clone(saddle); }
     @Override public ItemStack cursor() { return clone(cursor); }
     @Override public ItemStack crafting() { return clone(crafting); }
     @Override public ItemStack anvil() { return clone(anvil); }

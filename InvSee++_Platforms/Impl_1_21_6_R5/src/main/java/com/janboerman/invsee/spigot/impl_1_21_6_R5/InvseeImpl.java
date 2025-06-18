@@ -138,6 +138,8 @@ public class InvseeImpl implements InvseePlatform {
                 else if (slot instanceof ChestplateSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.armourChestplate()));
                 else if (slot instanceof HelmetSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.armourHelmet()));
                 else if (slot instanceof OffhandSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.offHand()));
+                else if (slot instanceof BodySlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.body()));
+                else if (slot instanceof SaddleSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.saddle()));
                 else if (slot instanceof CursorSlot) sendItemChange(nmsPlayer, rawIndex, CraftItemStack.asNMSCopy(palette.cursor()));
                 else if (slot instanceof PersonalSlot personal) sendItemChange(nmsPlayer, rawIndex, personal.works() ? CraftItemStack.asNMSCopy(palette.generic()) : inaccessible);
             }
@@ -288,19 +290,21 @@ public class InvseeImpl implements InvseePlatform {
             ValueInput nbttagcompound = optional.get();
 
             org.bukkit.World bWorld = null;
-            // TODO fix issue 'Expected field 'WorldUUIDMost' to contain value of type COMPOUND, but got LONG' when saving data.
-            if (nbttagcompound.child("WorldUUIDMost").isPresent() && nbttagcompound.child("WorldUUIDLeast").isPresent()) {
+            Optional<Long> worldUUIDMost = nbttagcompound.getLong("WorldUUIDMost");
+            Optional<Long> worldUUIDLeast = nbttagcompound.getLong("WorldUUIDLeast");
+            Optional<String> legacyBukkitWorld;
+            if (worldUUIDMost.isPresent() && worldUUIDLeast.isPresent()) {
                 // The main way for bukkit worlds to store the world is the world UUID despite mojang adding custom worlds
-                bWorld = server.getWorld(new UUID(nbttagcompound.getLong("WorldUUIDMost").get(), nbttagcompound.getLong("WorldUUIDLeast").get()));
-            } else if (nbttagcompound.child("world").isPresent()) { // legacy bukkit world name
-                bWorld = server.getWorld(nbttagcompound.getString("world").get());
+                bWorld = server.getWorld(new UUID(worldUUIDMost.get(), worldUUIDLeast.get()));
+            } else if ((legacyBukkitWorld = nbttagcompound.getString("world")).isPresent()) { // legacy bukkit world name
+                bWorld = server.getWorld(legacyBukkitWorld.get());
             }
 
             if (bWorld != null) {
                 level = ((CraftWorld) bWorld).getHandle();
                 fakeEntityPlayer.setServerLevel(level);
             } else {
-                DataResult<ResourceKey<Level>> dataresult = parseLegacyDimensionType(nbttagcompound.getInt("Dimension"));
+                DataResult<ResourceKey<Level>> dataresult = parseLegacyDimensionType(nbttagcompound);
                 Optional<ResourceKey<Level>> optionalLevelKey = dataresult.resultOrPartial(message -> plugin.getLogger().severe(message));
                 ResourceKey<Level> levelResourceKey = optionalLevelKey.orElse(Level.OVERWORLD);
                 level = server.getHandle().getServer().getLevel(levelResourceKey);
@@ -314,7 +318,8 @@ public class InvseeImpl implements InvseePlatform {
         }
     }
 
-    private static DataResult<ResourceKey<Level>> parseLegacyDimensionType(Optional<Integer> dimensionInput) {
+    private static DataResult<ResourceKey<Level>> parseLegacyDimensionType(ValueInput nbttagcompound) {
+        Optional<Integer> dimensionInput = nbttagcompound.getInt("Dimension");
         if (dimensionInput.isPresent()) {
             switch (dimensionInput.get()) {
                 case -1: return DataResult.success(Level.NETHER);
@@ -322,7 +327,13 @@ public class InvseeImpl implements InvseePlatform {
                 case 1: return DataResult.success(Level.END);
             }
         }
-        return DataResult.error(() -> "Empty dimension: " + dimensionInput);
+
+        Optional<ResourceKey<Level>> decodedLevel = nbttagcompound.read("Dimension", Level.RESOURCE_KEY_CODEC);
+        if (decodedLevel.isPresent()) {
+            return DataResult.success(decodedLevel.get());
+        } else {
+            return DataResult.error(() -> "No Dimension information in " + nbttagcompound + ".");
+        }
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer nmsPlayer, AbstractContainerMenu nmsView) {
@@ -374,6 +385,10 @@ public class InvseeImpl implements InvseePlatform {
             return CraftItemStack.asNMSCopy(palette.armourLeggings());
         } else if (slot instanceof OffhandSlot) {
             return CraftItemStack.asNMSCopy(palette.offHand());
+        } else if (slot instanceof BodySlot) {
+            return CraftItemStack.asNMSCopy(palette.body());
+        } else if (slot instanceof SaddleSlot) {
+            return CraftItemStack.asNMSCopy(palette.saddle());
         } else if (slot instanceof CursorSlot) {
             return CraftItemStack.asNMSCopy(palette.cursor());
         } else if (slot instanceof PersonalSlot personalSlot) {

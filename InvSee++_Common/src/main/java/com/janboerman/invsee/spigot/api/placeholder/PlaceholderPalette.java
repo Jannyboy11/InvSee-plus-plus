@@ -17,6 +17,8 @@ public interface PlaceholderPalette {
     public ItemStack armourBoots();
 
     public ItemStack offHand();
+    public ItemStack body();
+    public ItemStack saddle();
 
     public ItemStack cursor();
 
@@ -80,6 +82,16 @@ class EmptyPalette implements PlaceholderPalette {
 
     @Override
     public ItemStack offHand() {
+        return EMPTY_STACK;
+    }
+
+    @Override
+    public ItemStack body() {
+        return EMPTY_STACK;
+    }
+
+    @Override
+    public ItemStack saddle() {
         return EMPTY_STACK;
     }
 

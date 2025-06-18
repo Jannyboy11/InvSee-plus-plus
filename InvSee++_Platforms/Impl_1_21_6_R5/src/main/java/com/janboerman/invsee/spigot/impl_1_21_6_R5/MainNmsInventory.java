@@ -24,10 +24,6 @@ import net.minecraft.world.item.ItemStack;
 
 class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements Container, MenuProvider {
 
-//	protected NonNullList<ItemStack> storageContents;
-//	protected NonNullList<ItemStack> armourContents;
-//	protected NonNullList<ItemStack> offHand;
-//
 	protected Inventory nmsPlayerInventory;
 
 	protected Ref<ItemStack> onCursor;
