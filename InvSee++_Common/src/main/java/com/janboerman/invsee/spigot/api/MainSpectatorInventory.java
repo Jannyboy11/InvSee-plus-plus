@@ -22,7 +22,7 @@ public interface MainSpectatorInventory extends SpectatorInventory<PlayerInvento
     /** Change the items in the player's armour slots. */
     void setArmourContents(ItemStack[] armourContents);
 
-    /** Get the items in the player's offhand. The length of array is usually 1.*/
+    /** Get the items in the player's offhand. As per MC 1.21.6, this array includes the player's BODY and SADDLE items.*/
     ItemStack[] getOffHandContents();
 
     /** Set the items in the player's offhand. The length of this array must be equal to {@code getOffHandContents().length}. */

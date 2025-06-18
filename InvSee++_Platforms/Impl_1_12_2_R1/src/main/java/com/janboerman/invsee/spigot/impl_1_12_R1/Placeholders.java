@@ -98,6 +98,8 @@ public class Placeholders {
             GLASS_ARMOUR_LEGGINGS,
             GLASS_ARMOUR_BOOTS,
             GLASS_OFFHAND,
+            null,
+            null,
             GLASS_CURSOR,
             GLASS_CRAFTING,
             GLASS_ANVIL,
@@ -120,6 +122,8 @@ public class Placeholders {
             ICON_ARMOUR_LEGGINGS,
             ICON_ARMOUR_BOOTS,
             ICON_OFFHAND,
+            null,
+            null,
             ICON_CURSOR,
             ICON_CRAFTING,
             ICON_ANVIL,
@@ -139,8 +143,8 @@ public class Placeholders {
 
 class PlaceholderPalette extends SimplePlaceholderPalette {
 
-    public PlaceholderPalette(String name, ItemStack inaccessible, ItemStack armourHelmet, ItemStack armourChestplate, ItemStack armourLeggings, ItemStack armourBoots, ItemStack offHand, ItemStack cursor, ItemStack crafting, ItemStack anvil, ItemStack merchant, ItemStack cartography, ItemStack enchantingItem, ItemStack enchantingFuel, ItemStack grindstone, ItemStack loom, ItemStack smithingBase, ItemStack smithingTemplate, ItemStack smithingAddition, ItemStack stonecutter, ItemStack generic) {
-        super(name, inaccessible, armourHelmet, armourChestplate, armourLeggings, armourBoots, offHand, cursor, crafting, anvil, merchant, cartography, enchantingItem, enchantingFuel, grindstone, loom, smithingBase, smithingTemplate, smithingAddition, stonecutter, generic);
+    public PlaceholderPalette(String name, ItemStack inaccessible, ItemStack armourHelmet, ItemStack armourChestplate, ItemStack armourLeggings, ItemStack armourBoots, ItemStack offHand, ItemStack body, ItemStack saddle, ItemStack cursor, ItemStack crafting, ItemStack anvil, ItemStack merchant, ItemStack cartography, ItemStack enchantingItem, ItemStack enchantingFuel, ItemStack grindstone, ItemStack loom, ItemStack smithingBase, ItemStack smithingTemplate, ItemStack smithingAddition, ItemStack stonecutter, ItemStack generic) {
+        super(name, inaccessible, armourHelmet, armourChestplate, armourLeggings, armourBoots, offHand, body, saddle, cursor, crafting, anvil, merchant, cartography, enchantingItem, enchantingFuel, grindstone, loom, smithingBase, smithingTemplate, smithingAddition, stonecutter, generic);
     }
 
     @Override

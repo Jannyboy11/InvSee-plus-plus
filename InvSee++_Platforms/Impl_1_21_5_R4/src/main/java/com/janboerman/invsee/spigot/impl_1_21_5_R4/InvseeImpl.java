@@ -301,7 +301,7 @@ public class InvseeImpl implements InvseePlatform {
                 level = ((CraftWorld) bWorld).getHandle();
                 fakeEntityPlayer.setServerLevel(level);
             } else {
-                DataResult<ResourceKey<Level>> dataresult = DimensionType.parseLegacy(new Dynamic(NbtOps.INSTANCE, nbttagcompound.get("Dimension")));
+                DataResult<ResourceKey<Level>> dataresult = DimensionType.parseLegacy(new Dynamic<>(NbtOps.INSTANCE, nbttagcompound.get("Dimension")));
                 Optional<ResourceKey<Level>> optionalLevelKey = dataresult.resultOrPartial(message -> plugin.getLogger().severe(message));
                 ResourceKey<Level> levelResourceKey = optionalLevelKey.orElse(Level.OVERWORLD);
                 level = server.getHandle().getServer().getLevel(levelResourceKey);

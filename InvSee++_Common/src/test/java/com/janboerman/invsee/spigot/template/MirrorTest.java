@@ -17,7 +17,7 @@ public class MirrorTest {
         i_09 i_10 i_11 i_12 i_13 i_14 i_15 i_16 i_17
         i_18 i_19 i_20 i_21 i_22 i_23 i_24 i_25 i_26
         i_27 i_28 i_29 i_30 i_31 i_32 i_33 i_34 i_35
-        a_b  a_l  a_c  a_h  oh   c    _    _    _  \s
+        a_b  a_l  a_c  a_h  oh   b    s    c    _  \s
         p_00 p_01 p_02 p_03 p_04 p_05 p_06 p_07 p_08
         """;
 
@@ -35,7 +35,7 @@ public class MirrorTest {
         PlayerInventorySlot.CONTAINER_09, PlayerInventorySlot.CONTAINER_10, PlayerInventorySlot.CONTAINER_11, PlayerInventorySlot.CONTAINER_12, PlayerInventorySlot.CONTAINER_13, PlayerInventorySlot.CONTAINER_14, PlayerInventorySlot.CONTAINER_15, PlayerInventorySlot.CONTAINER_16, PlayerInventorySlot.CONTAINER_17,
         PlayerInventorySlot.CONTAINER_18, PlayerInventorySlot.CONTAINER_19, PlayerInventorySlot.CONTAINER_20, PlayerInventorySlot.CONTAINER_21, PlayerInventorySlot.CONTAINER_22, PlayerInventorySlot.CONTAINER_23, PlayerInventorySlot.CONTAINER_24, PlayerInventorySlot.CONTAINER_25, PlayerInventorySlot.CONTAINER_26,
         PlayerInventorySlot.CONTAINER_27, PlayerInventorySlot.CONTAINER_28, PlayerInventorySlot.CONTAINER_29, PlayerInventorySlot.CONTAINER_30, PlayerInventorySlot.CONTAINER_31, PlayerInventorySlot.CONTAINER_32, PlayerInventorySlot.CONTAINER_33, PlayerInventorySlot.CONTAINER_34, PlayerInventorySlot.CONTAINER_35,
-        PlayerInventorySlot.ARMOUR_BOOTS, PlayerInventorySlot.ARMOUR_LEGGINGS, PlayerInventorySlot.ARMOUR_CHESTPLATE, PlayerInventorySlot.ARMOUR_HELMET, PlayerInventorySlot.OFFHAND, PlayerInventorySlot.CURSOR, null, null, null,
+        PlayerInventorySlot.ARMOUR_BOOTS, PlayerInventorySlot.ARMOUR_LEGGINGS, PlayerInventorySlot.ARMOUR_CHESTPLATE, PlayerInventorySlot.ARMOUR_HELMET, PlayerInventorySlot.OFFHAND, PlayerInventorySlot.BODY, PlayerInventorySlot.SADDLE, PlayerInventorySlot.CURSOR, null,
         PlayerInventorySlot.PERSONAL_00, PlayerInventorySlot.PERSONAL_01, PlayerInventorySlot.PERSONAL_02, PlayerInventorySlot.PERSONAL_03, PlayerInventorySlot.PERSONAL_04, PlayerInventorySlot.PERSONAL_05, PlayerInventorySlot.PERSONAL_06, PlayerInventorySlot.PERSONAL_07, PlayerInventorySlot.PERSONAL_08
     };
 
@@ -123,7 +123,7 @@ public class MirrorTest {
                 PlayerInventorySlot.CONTAINER_18, PlayerInventorySlot.CONTAINER_19, PlayerInventorySlot.CONTAINER_20, PlayerInventorySlot.CONTAINER_21, PlayerInventorySlot.CONTAINER_22, PlayerInventorySlot.CONTAINER_23, PlayerInventorySlot.CONTAINER_24, PlayerInventorySlot.CONTAINER_25, PlayerInventorySlot.CONTAINER_26,
                 PlayerInventorySlot.CONTAINER_09, PlayerInventorySlot.CONTAINER_10, PlayerInventorySlot.CONTAINER_11, PlayerInventorySlot.CONTAINER_12, PlayerInventorySlot.CONTAINER_13, PlayerInventorySlot.CONTAINER_14, PlayerInventorySlot.CONTAINER_15, PlayerInventorySlot.CONTAINER_16, PlayerInventorySlot.CONTAINER_17,
                 PlayerInventorySlot.CONTAINER_00, PlayerInventorySlot.CONTAINER_01, PlayerInventorySlot.CONTAINER_02, PlayerInventorySlot.CONTAINER_03, PlayerInventorySlot.CONTAINER_04, PlayerInventorySlot.CONTAINER_05, PlayerInventorySlot.CONTAINER_06, PlayerInventorySlot.CONTAINER_07, PlayerInventorySlot.CONTAINER_08,
-                PlayerInventorySlot.ARMOUR_BOOTS, PlayerInventorySlot.ARMOUR_LEGGINGS, PlayerInventorySlot.ARMOUR_CHESTPLATE, PlayerInventorySlot.ARMOUR_HELMET, PlayerInventorySlot.OFFHAND, PlayerInventorySlot.CURSOR, null, null, null,
+                PlayerInventorySlot.ARMOUR_BOOTS, PlayerInventorySlot.ARMOUR_LEGGINGS, PlayerInventorySlot.ARMOUR_CHESTPLATE, PlayerInventorySlot.ARMOUR_HELMET, PlayerInventorySlot.OFFHAND, PlayerInventorySlot.BODY, PlayerInventorySlot.SADDLE, PlayerInventorySlot.CURSOR, null,
                 PlayerInventorySlot.PERSONAL_00, PlayerInventorySlot.PERSONAL_01, PlayerInventorySlot.PERSONAL_02, PlayerInventorySlot.PERSONAL_03, PlayerInventorySlot.PERSONAL_04, PlayerInventorySlot.PERSONAL_05, PlayerInventorySlot.PERSONAL_06, PlayerInventorySlot.PERSONAL_07, PlayerInventorySlot.PERSONAL_08
         };
 
