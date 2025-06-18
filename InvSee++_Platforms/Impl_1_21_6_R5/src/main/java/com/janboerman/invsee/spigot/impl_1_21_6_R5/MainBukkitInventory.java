@@ -141,7 +141,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 	@Override
 	public void setArmourContents(ItemStack[] armourContents) {
 		Objects.requireNonNull(armourContents, "armourContents cannot be null");
-		int armourContentsSize = Inventory.INVENTORY_SIZE - Inventory.SLOT_OFFHAND;
+		int armourContentsSize = Inventory.SLOT_OFFHAND - Inventory.INVENTORY_SIZE;
 		if (armourContents.length != armourContentsSize)
 			throw new IllegalArgumentException("armour contents must be of length " + armourContentsSize);
 

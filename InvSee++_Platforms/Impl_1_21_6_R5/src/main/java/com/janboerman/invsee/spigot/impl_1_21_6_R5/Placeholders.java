@@ -33,6 +33,7 @@ import static org.bukkit.Material.CHAINMAIL_LEGGINGS;
 import static org.bukkit.Material.CHEST;
 import static org.bukkit.Material.CRAFTING_TABLE;
 import static org.bukkit.Material.CYAN_STAINED_GLASS_PANE;
+import static org.bukkit.Material.DIAMOND_HORSE_ARMOR;
 import static org.bukkit.Material.EMERALD;
 import static org.bukkit.Material.ENCHANTING_TABLE;
 import static org.bukkit.Material.GRAY_STAINED_GLASS_PANE;
@@ -108,7 +109,7 @@ public class Placeholders {
         meta.setBlockState(banner);
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DYE);
     });
-    private static final ItemStack ICON_BODY = makeStack(null, name(BODY));
+    private static final ItemStack ICON_BODY = makeStack(DIAMOND_HORSE_ARMOR, name(BODY));
     private static final ItemStack ICON_SADDLE = makeStack(SADDLE, name(com.janboerman.invsee.spigot.internal.placeholder.Placeholders.SADDLE));
     private static final ItemStack ICON_CURSOR = makeStack(STRUCTURE_VOID, name(CURSOR));
     private static final ItemStack ICON_CRAFTING = makeStack(CRAFTING_TABLE, name(CRAFTING));
