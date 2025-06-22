@@ -7,16 +7,26 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 import com.janboerman.invsee.utils.FuzzyReflection;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.PlayerDataStorage;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
 
-public class HybridServerSupport {
+/**
+ * Since MC 1.21.6, this class is not only used to patch up differences between CraftBukkit-based server and Forge-based servers,
+ * but also differences between CraftBukkit and Paper.
+ */
+public final class HybridServerSupport {
 
     private HybridServerSupport() {}
 
@@ -75,6 +85,25 @@ public class HybridServerSupport {
                 RuntimeException ex = new RuntimeException("No method known of getting the enderchest items");
                 ex.addSuppressed(vanillaFieldIsActuallyPrivate);
                 ex.addSuppressed(forgeMethodNotFound);
+                throw ex;
+            }
+        }
+    }
+
+    public static Optional<ValueInput> load(PlayerDataStorage playerIO, String name, String uuid, ProblemReporter problemReporter, RegistryAccess registryAccess) {
+        try {
+            return playerIO.load(name, uuid, problemReporter, registryAccess);
+        } catch (NoSuchMethodError craftbukkitMethodNotFound) {
+            //call the paper method: load(Ljava/lang/String;Ljava/lang/String;Lnet/minecraft/util/ProblemReporter;)Ljava/util/Optional
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            try {
+                MethodHandle methodHandle = lookup.findVirtual(PlayerDataStorage.class, "load", MethodType.methodType(Optional.class, String.class, String.class, ProblemReporter.class));
+                Optional<CompoundTag> optionalCompoundTag = (Optional<CompoundTag>) methodHandle.invoke(playerIO, name, uuid, problemReporter);
+                return optionalCompoundTag.map(compoundTag -> TagValueInput.create(problemReporter, registryAccess, compoundTag));
+            } catch (Throwable paperMethodNotFound) {
+                RuntimeException ex = new RuntimeException("No method known of loading the player's data file");
+                ex.addSuppressed(craftbukkitMethodNotFound);
+                ex.addSuppressed(paperMethodNotFound);
                 throw ex;
             }
         }

@@ -13,7 +13,6 @@ import org.bukkit.craftbukkit.v1_21_R5.CraftServer;
 import org.bukkit.plugin.Plugin;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 
 public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
@@ -36,7 +35,7 @@ public class NameSearchSaveFilesStrategy implements NameResolveStrategy {
 			return CompletedEmpty.the();
 		
 		return CompletableFuture.supplyAsync(() -> {
-					return worldNBTStorage.load("InvSee++ Player", uniqueId.toString(), ThrowingProblemReporter.INSTANCE, RegistryAccess.EMPTY)
+					return HybridServerSupport.load(worldNBTStorage, "InvSee++ Player", uniqueId.toString(), ThrowingProblemReporter.INSTANCE, RegistryAccess.EMPTY)
 							.flatMap(playerTag -> playerTag.child("bukkit"))
 							.flatMap(bukkitTag -> bukkitTag.getString("lastKnownName"));
 				},
