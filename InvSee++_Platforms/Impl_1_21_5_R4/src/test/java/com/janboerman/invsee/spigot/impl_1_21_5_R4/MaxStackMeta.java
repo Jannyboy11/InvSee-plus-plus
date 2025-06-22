@@ -117,6 +117,11 @@ class MaxStackMeta implements ItemMeta, Damageable {
     public void setCustomModelData(Integer integer) {
 
     }
+    
+    @Override
+    public boolean hasCustomModelDataComponent() {
+        return false;
+    }
 
     @Override
     public void setCustomModelDataComponent(CustomModelDataComponent customModelDataComponent) {
