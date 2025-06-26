@@ -62,6 +62,7 @@ class MainBukkitInventory extends CraftInventory implements MainInventory<MainNm
 				case LOOM -> PlaceholderGroup.LOOM;
 				case SMITHING, SMITHING_NEW -> PlaceholderGroup.SMITHING;
 				case STONECUTTER -> PlaceholderGroup.STONECUTTER;
+				case CRAFTER -> null;
 				default -> throw new RuntimeException("CraftResultInventory with unexpected InventoryType: " + cri.getType());
 			};
 		}
