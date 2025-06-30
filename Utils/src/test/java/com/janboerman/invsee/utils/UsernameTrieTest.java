@@ -90,9 +90,14 @@ public class UsernameTrieTest {
             trie.insert(word, null);
         }
 
-        final StringJoiner sj = new StringJoiner(" ");
-        trie.traverse("", (str, v) -> sj.add(str));
-        assertEquals("PiEs Piet Pizza", sj.toString());
+        StringJoiner sj1 = new StringJoiner(" ");
+        trie.traverse("", (str, v) -> sj1.add(str));
+        assertEquals("PiEs Piet Pizza", sj1.toString());
+
+        // TODO https://github.com/Jannyboy11/InvSee-plus-plus/issues/147
+//        StringJoiner sj2 = new StringJoiner(" ");
+//        trie.traverse("Pie", (str, v) -> sj2.add(str));
+//        assertEquals("PiEs Piet", sj2.toString());
     }
 
     @Test

@@ -24,6 +24,7 @@
         <module>InvSee++_Platforms/Impl_1_21_4_R3</module>
         <module>InvSee++_Platforms/Impl_1_21_5_R4</module>
         <module>InvSee++_Platforms/Impl_1_21_6_R5</module>
+        <module>InvSee++_Platforms/Impl_1_21_7_R5</module>
         <module>InvSee++_Platforms/Impl_Glowstone</module>
         <module>InvSee++_MultiverseInventories</module> <!-- TODO finish this module -->
         <module>InvSee++_PerWorldInventory</module>
@@ -44,6 +45,7 @@
         <module>InvSee++_Give_Platforms/Give_Impl_1_21_4_R3</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_21_5_R4</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_21_6_R5</module>
+        <module>InvSee++_Give_Platforms/Give_Impl_1_21_7_R5</module>
         <module>InvSee++_Give_Platforms/Give_Impl_Glowstone</module>
         <module>InvSee++_Give_Plugin</module>
         <module>InvSee++_Clear_Plugin</module>
