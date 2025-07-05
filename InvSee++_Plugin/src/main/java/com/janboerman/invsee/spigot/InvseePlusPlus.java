@@ -156,9 +156,11 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
 
         PluginCommand invseeCommand = getCommand("invsee");
         PluginCommand enderseeCommand = getCommand("endersee");
+        PluginCommand reloadCommand = getCommand("invseeplusplusreload");
 
         invseeCommand.setExecutor(new InvseeCommandExecutor(this));
         enderseeCommand.setExecutor(new EnderseeCommandExecutor(this));
+        reloadCommand.setExecutor(new ReloadCommandExecutor(this));
 
         invseeCommand.setTabCompleter(tabCompleter);
         enderseeCommand.setTabCompleter(tabCompleter);

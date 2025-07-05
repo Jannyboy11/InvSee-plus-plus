@@ -20,6 +20,11 @@ commands:
     permission: invseeplusplus.endersee.view
     usage: "/endersee <username>|<uuid>"
     aliases: [enderchestsee, esee]
+  invseeplusplusreload:
+    description: Reload InvSee++' configuration
+    permission: invseeplusplus.reload
+    usage: "/<command>"
+    aliases: ["isppreload", "invsee++reload", "is++reload"]
 
 permissions:
   invseeplusplus.*:
@@ -32,6 +37,7 @@ permissions:
       invseeplusplus.bypass-exempt.invsee: true
       invseeplusplus.bypass-exempt.endersee: true
       invseeplusplus.tabcomplete: true
+      invseeplusplus.reload: true
       invseeplusplus.give.*: true
       invseeplusplus.clear.*: true
     default: false
@@ -83,6 +89,10 @@ permissions:
 
   invseeplusplus.tabcomplete:
     description: Gives the player access to tabcomplete player names.
+    default: op
+
+  invseeplusplus.reload:
+    description: Gives access to reload InvSee++' configuration.
     default: op
 
   invseeplusplus.exempt.invsee:

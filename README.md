@@ -30,7 +30,8 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.exempt.endersee` makes it impossible to spectate the enderchest of the owner of this permission.
 - `invseeplusplus.bypass-exempt.invsee` ignore whether target players are exempted from having their inventory spectated.
 - `invseeplusplus.bypass-exempt.endersee` ignore whether target players are exempted from having their enderchest spectated.
-- `invseeplusplus.tabcomplete` allows username tabcompletion in /invsee or /endersee commands. This permission is automatically provided by `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`.  
+- `invseeplusplus.tabcomplete` allows username tabcompletion in /invsee or /endersee commands. This permission is automatically provided by `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`.
+- `invseeplusplus.reload` reloads the configuration.
 
 ###### Aggregate permissions:
 - `invseeplusplus.view` provides `invseeplusplus.invsee.view` and `invseeplusplus.endersee.view`.
