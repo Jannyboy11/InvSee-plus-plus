@@ -49,6 +49,7 @@
         <module>InvSee++_Give_Platforms/Give_Impl_Glowstone</module>
         <module>InvSee++_Give_Plugin</module>
         <module>InvSee++_Clear_Plugin</module>
+        <module>InvSee++_Clone_Plugin</module>
     </modules>
     <packaging>pom</packaging>
 

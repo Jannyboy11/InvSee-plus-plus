@@ -1,0 +1,34 @@
+name: InvSeePlusPlus_Clone
+version: ${project.version}
+main: com.janboerman.invsee.spigot.addon.clone.ClonePlugin
+depend: [InvSeePlusPlus]
+api-version: 1.13
+prefix: "InvSee++_Clone"
+description: Clone player's inventories and enderchests.
+folia-supported: false
+
+permissions:
+  invseeplusplus.clone.*:
+    description: Grants all permissions for the InvSee++ Clone addon
+    children:
+      - invseeplusplus.clone.inventory
+      - invseeplusplus.clone.enderchest
+    default: false
+  invseeplusplus.clone.inventory:
+    description: "Allows you to use /invclone"
+    default: op
+  invseeplusplus.clone.enderchest:
+    description: "Allows you to use /enderclone"
+    default: op
+
+commands:
+  invclone:
+    description: "Clone a(n) (offline) player's inventory to yourself or another player"
+    usage: /<command> <source player> [<target player>]
+    permission: invseeplusplus.clone.inventory
+    aliases: [inventoryclone, iclone]
+  enderclone:
+    description: "Clone a(n) (offline) player's enderchest to yourself or another player"
+    usage: /<command> <source player> [<target player>]
+    permission: invseeplusplus.clone.enderchest
+    aliases: [enderchestclone, eclone]
