@@ -65,6 +65,7 @@ jobs:
             InvSee++_Plugin/target/InvSee++.jar
             InvSee++_Give_Plugin/target/InvSee++_Give.jar
             InvSee++_Clear_Plugin/target/InvSee++_Clear.jar
+            InvSee++_Clone_Plugin/target/InvSee++_Clone.jar
 #      No longer needed since the maven-release-plugin already does this.
 #      - name: Deploy to GitHub Packages
 #        env:
