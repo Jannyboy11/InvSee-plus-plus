@@ -19,24 +19,27 @@ public final class ReloadCommandExecutor implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label,
             @NotNull String[] args) {
-        plugin.getLogger().info("Reloading configuration..");
-        plugin.reloadConfig();
+        reloadPlugin(plugin);
 
         PluginManager pluginManager = plugin.getServer().getPluginManager();
 
-        Plugin invseePlusPlus_Give = pluginManager.getPlugin("InvSeePlusPlus_Give");
-        if (invseePlusPlus_Give != null) {
-            invseePlusPlus_Give.getLogger().info("Reloading configuration..");
-            invseePlusPlus_Give.reloadConfig();
-        }
+        reloadPlugin(pluginManager, "InvSeePlusPlus_Give");
+        reloadPlugin(pluginManager, "InvSeePlusPlus_Clear");
+        reloadPlugin(pluginManager, "InvSeePlusPlus_Clone");
 
-        Plugin invseePlusPlus_Clear = pluginManager.getPlugin("InvSeePlusPlus_Clear");
-        if (invseePlusPlus_Clear != null) {
-            invseePlusPlus_Clear.getLogger().info("Reloading configuration..");
-            invseePlusPlus_Clear.reloadConfig();
-        }
-
-        sender.sendMessage(ChatColor.GREEN + "InvSee++ configuration was reloaded");
+        sender.sendMessage(ChatColor.GREEN + "InvSee++ configuration was reloaded.");
         return true;
+    }
+
+    private static void reloadPlugin(PluginManager pluginManager, String pluginName) {
+        Plugin plugin = pluginManager.getPlugin(pluginName);
+        if (plugin != null) {
+            reloadPlugin(plugin);
+        }
+    }
+
+    private static void reloadPlugin(Plugin plugin) {
+        plugin.getLogger().info("Reloading configuration..");
+        plugin.reloadConfig();
     }
 }

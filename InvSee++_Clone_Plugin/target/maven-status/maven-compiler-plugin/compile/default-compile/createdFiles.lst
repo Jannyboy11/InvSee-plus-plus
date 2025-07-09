@@ -1,0 +1,5 @@
+com\janboerman\invsee\spigot\addon\clone\EnderCloneExecutor.class
+com\janboerman\invsee\spigot\addon\clone\TargetUtil.class
+com\janboerman\invsee\spigot\addon\clone\ClonePlugin.class
+com\janboerman\invsee\spigot\addon\clone\InvCloneExecutor.class
+com\janboerman\invsee\spigot\addon\clone\Responses.class

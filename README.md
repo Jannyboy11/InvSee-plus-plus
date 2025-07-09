@@ -71,6 +71,19 @@ On 1.20.5 and later:
 - `invseeplusplus.clear.inventory` allows access to `/invclear`.
 - `invseeplusplus.clear.enderchest` allows access to `/enderclear`.
 
+
+#### InvSee++_Clone
+##### Commands:
+- `/invclone <source player> <target player>?`
+- `/enderclone <source player> <target player>?`
+###### Examples:
+- `/invclone Notch` (copies Notch's inventory to yourself)
+- `/enderclear Jannyboy11 Notch` (copies Jannyboy11's enderchest to Notch's enderchest)
+##### Permissions:
+- `invseeplusplus.clone.*` provides `invseeplusplus.clone.inventory` and `invseeplusplus.clone.enderchest`.
+- `invseeplusplus.clone.inventory` allows access to `/invclone`.
+- `invseeplusplus.clone.enderchest` allows access to `/enderclone`.
+
 ### Contact
 
 Bugs & Feature requests: [GitHub issues](https://github.com/Jannyboy11/InvSee-plus-plus/issues)
