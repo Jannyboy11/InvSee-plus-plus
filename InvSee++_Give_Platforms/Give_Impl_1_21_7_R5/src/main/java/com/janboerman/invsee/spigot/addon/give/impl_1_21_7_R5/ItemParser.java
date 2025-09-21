@@ -17,6 +17,7 @@ final class ItemParser {
     }
 
     static ItemInput parseItemType(String text) throws CommandSyntaxException {
+        // Could be using CraftItemFactory to create an ItemStack from a string directly?
         ItemArgument argument = new ItemArgument(COMMAND_BUILD_CONTEXT);
         ItemInput itemInput = argument.parse(new StringReader(text));
         return itemInput;
