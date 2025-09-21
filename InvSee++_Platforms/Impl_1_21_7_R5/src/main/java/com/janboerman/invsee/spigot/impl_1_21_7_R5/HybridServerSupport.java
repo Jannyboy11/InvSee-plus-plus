@@ -11,9 +11,12 @@ import java.util.Optional;
 
 import com.janboerman.invsee.utils.FuzzyReflection;
 
+import org.bukkit.craftbukkit.v1_21_R5.CraftRegistry;
+
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
@@ -103,6 +106,21 @@ public final class HybridServerSupport {
             } catch (Throwable paperMethodNotFound) {
                 RuntimeException ex = new RuntimeException("No method known of loading the player's data file");
                 ex.addSuppressed(craftbukkitMethodNotFound);
+                ex.addSuppressed(paperMethodNotFound);
+                throw ex;
+            }
+        }
+    }
+
+    public static RegistryAccess getDefaultRegistry() {
+        try {
+            return MinecraftServer.getDefaultRegistryAccess();
+        } catch (NoSuchMethodError craftBukkitMethodNotFound) {
+            try {
+                return CraftRegistry.getMinecraftRegistry();
+            } catch (NoSuchMethodError paperMethodNotFound) {
+                RuntimeException ex = new RuntimeException("No method known of obtaining the default registry");
+                ex.addSuppressed(craftBukkitMethodNotFound);
                 ex.addSuppressed(paperMethodNotFound);
                 throw ex;
             }
