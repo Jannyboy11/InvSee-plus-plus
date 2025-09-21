@@ -130,6 +130,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 		} else {
 			this.tracker = null;
 		}
+		ItemStack inaccessibleSlotPlaceholder = CraftItemStack.asNMSCopy(creationOptions.getPlaceholderPalette().inaccessible());
 
 		//top inventory slots
 		for (int yPos = 0; yPos < 6; yPos++) {
@@ -138,7 +139,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 				int magicX = 8 + xPos * 18;
 				int magicY = 18 + yPos * 18;
 
-				addSlot(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY, CraftItemStack.asNMSCopy(creationOptions.getPlaceholderPalette().inaccessible())));
+				addSlot(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY, inaccessibleSlotPlaceholder));
 			}
 		}
 		
