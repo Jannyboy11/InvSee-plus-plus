@@ -1,6 +1,5 @@
-package com.janboerman.invsee.spigot.addon.give.impl_1_21_6_R5;
+package com.janboerman.invsee.spigot.addon.give.impl_1_21_7_R5;
 
-import com.janboerman.invsee.spigot.impl_1_21_7_R5.HybridServerSupport;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -24,7 +23,7 @@ final class ItemParser {
     }
 
     private static CommandBuildContext getContext() {
-        HolderLookup.Provider provider = HybridServerSupport.getDefaultRegistry();
+        HolderLookup.Provider provider = PaperSupport.getDefaultRegistry();
         return Commands.createValidationContext(provider);
     }
 }

@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.addon.give.impl_1_21_6_R5;
+package com.janboerman.invsee.spigot.addon.give.impl_1_21_7_R5;
 
 import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.utils.Either;
