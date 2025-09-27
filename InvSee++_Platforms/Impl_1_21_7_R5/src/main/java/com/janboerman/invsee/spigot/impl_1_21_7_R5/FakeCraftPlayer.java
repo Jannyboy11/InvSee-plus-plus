@@ -5,8 +5,6 @@ import java.util.Optional;
 import org.bukkit.craftbukkit.v1_21_R5.CraftServer;
 import org.bukkit.craftbukkit.v1_21_R5.entity.CraftPlayer;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 

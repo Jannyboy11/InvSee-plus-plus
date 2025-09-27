@@ -48,6 +48,8 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.TagType;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
@@ -312,12 +314,18 @@ public class InvseeImpl implements InvseePlatform {
     }
 
     private static DataResult<ResourceKey<Level>> parseLegacyDimensionType(ValueInput nbttagcompound) {
-        Optional<Integer> dimensionInput = nbttagcompound.getInt("Dimension");
-        if (dimensionInput.isPresent()) {
-            switch (dimensionInput.get()) {
-                case -1: return DataResult.success(Level.NETHER);
-                case 0: return DataResult.success(Level.OVERWORLD);
-                case 1: return DataResult.success(Level.END);
+        try {
+            Optional<Integer> dimensionInput = nbttagcompound.getInt("Dimension"); // because of our PoblemReporter, this throws an exception when the type is not int.
+            if (dimensionInput.isPresent()) {
+                switch (dimensionInput.get()) {
+                    case -1: return DataResult.success(Level.NETHER);
+                    case 0: return DataResult.success(Level.OVERWORLD);
+                    case 1: return DataResult.success(Level.END);
+                }
+            }
+        } catch (WrongNbtTypeException e) {
+            if (e.problem.actual() != StringTag.TYPE) {
+                return DataResult.error(() -> "Unexpected NBT type for field 'Dimension'. Expected number or string, but got: " + e.problem.actual().getName());
             }
         }
 
