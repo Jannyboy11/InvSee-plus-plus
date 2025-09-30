@@ -54,6 +54,7 @@ jobs:
           java -jar BuildTools.jar --rev 1.21.5 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.6 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 4522 --compile craftbukkit --remapped
+          java -jar BuildTools.jar --rev 1.21.9 --compile craftbukkit --remapped
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release
@@ -80,7 +81,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           javadoc-branch: javadoc
           java-distribution: temurin
-          java-version: 24
+          java-version: 25
           custom-command: 'mvn package javadoc:aggregate -pl :invsee-plus-plus,:invsee-plus-plus_plugin,:invsee-plus-plus_common'
           target-folder: javadoc
           project: maven

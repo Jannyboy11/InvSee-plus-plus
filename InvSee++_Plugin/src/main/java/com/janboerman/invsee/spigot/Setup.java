@@ -140,7 +140,13 @@ class Impl_1_21_6 extends SetupImpl {
 
 class Impl_1_21_7 extends SetupImpl {
     Impl_1_21_7(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_21_6_R5.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_6_R5.KnownPlayersProvider(plugin, scheduler));
+        super(new com.janboerman.invsee.spigot.impl_1_21_7_R5.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_7_R5.KnownPlayersProvider(plugin, scheduler));
+    }
+}
+
+class Impl_1_21_9 extends SetupImpl {
+    Impl_1_21_9(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
+        super(new com.janboerman.invsee.spigot.impl_1_21_9_R6.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_9_R6.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
