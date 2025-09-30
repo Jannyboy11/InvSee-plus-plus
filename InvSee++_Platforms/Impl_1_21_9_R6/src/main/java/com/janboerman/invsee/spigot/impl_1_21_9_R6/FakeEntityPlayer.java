@@ -61,6 +61,7 @@ class FakeEntityPlayer extends ServerPlayer {
         Class<?>[] expectedParameterTypes = new Class<?>[] { GameType.class, GameType.class };
         for (Method m : ServerPlayerGameMode.class.getDeclaredMethods()) {
             if (Arrays.equals(m.getParameterTypes(), expectedParameterTypes)) {
+                m.setAccessible(true);
                 return m;
             }
         }
