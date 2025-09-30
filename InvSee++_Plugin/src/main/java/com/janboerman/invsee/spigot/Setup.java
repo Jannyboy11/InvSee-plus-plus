@@ -114,12 +114,6 @@ class Impl_1_21_1 extends SetupImpl {
     }
 }
 
-class Impl_1_21_3 extends SetupImpl {
-    Impl_1_21_3(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_21_3_R2.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_3_R2.KnownPlayersProvider(plugin, scheduler));
-    }
-}
-
 class Impl_1_21_4 extends SetupImpl {
     Impl_1_21_4(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_21_4_R3.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_4_R3.KnownPlayersProvider(plugin, scheduler));
@@ -129,12 +123,6 @@ class Impl_1_21_4 extends SetupImpl {
 class Impl_1_21_5 extends SetupImpl {
     Impl_1_21_5(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
         super(new com.janboerman.invsee.spigot.impl_1_21_5_R4.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_5_R4.KnownPlayersProvider(plugin, scheduler));
-    }
-}
-
-class Impl_1_21_6 extends SetupImpl {
-    Impl_1_21_6(Plugin plugin, NamesAndUUIDs lookup, Scheduler scheduler, OpenSpectatorsCache cache) {
-        super(new com.janboerman.invsee.spigot.impl_1_21_6_R5.InvseeImpl(plugin, lookup, scheduler, cache), new com.janboerman.invsee.spigot.impl_1_21_6_R5.KnownPlayersProvider(plugin, scheduler));
     }
 }
 
@@ -173,10 +161,8 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_20_6(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_20_6, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_20_6));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21(p, l, s, c), new ServerSoftware(MinecraftPlatform.CRAFTBUKKIT, MinecraftVersion._1_21), new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_1(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_1, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_1));
-        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_3(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_3, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_3));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_4(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_4, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_4));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_5(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_5, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_5));
-        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_6(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_6, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_6));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_7(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_7, ServerSoftware.CRAFTBUKKIT_1_21_8, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_7), new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_8));
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_1_21_9(p, l, s, c), ServerSoftware.CRAFTBUKKIT_1_21_9, new ServerSoftware(MinecraftPlatform.PAPER, MinecraftVersion._1_21_9));
 

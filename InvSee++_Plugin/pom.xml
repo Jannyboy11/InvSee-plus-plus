@@ -215,12 +215,6 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_21_3_r2</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_4_r3</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -228,12 +222,6 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_5_r4</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.janboerman.invsee</groupId>
-            <artifactId>impl_1_21_6_r5</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

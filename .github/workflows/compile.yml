@@ -40,7 +40,7 @@ jobs:
           distribution: 'microsoft'
           java-version: '21'
           cache: 'maven'
-      - name: Install CraftBukkit 1.20.6, 1.21, 1.21, 1.21.3, 1.21.4, 1.21.5, 1.21.6, 1.21.7
+      - name: Install CraftBukkit 1.20.6, 1.21, 1.21, 1.21.4, 1.21.5, 1.21.7
         # Use build number 4287 to compile CraftBukkit 1.21,
         # Use build number 5422 to compile CraftBukkit 1.21.7,
         # https://hub.spigotmc.org/jira/browse/BUILDTOOLS-658
@@ -49,10 +49,8 @@ jobs:
           java -jar BuildTools.jar --rev 1.20.6 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 4287 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.1 --compile craftbukkit --remapped
-          java -jar BuildTools.jar --rev 1.21.3 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.4 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.5 --compile craftbukkit --remapped
-          java -jar BuildTools.jar --rev 1.21.6 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 4522 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.9 --compile craftbukkit --remapped
       - name: Compile InvSee++
