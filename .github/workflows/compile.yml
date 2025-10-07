@@ -40,9 +40,10 @@ jobs:
           distribution: 'microsoft'
           java-version: '21'
           cache: 'maven'
-      - name: Install CraftBukkit 1.20.6, 1.21, 1.21, 1.21.4, 1.21.5, 1.21.7
+      - name: Install CraftBukkit 1.20.6, 1.21, 1.21, 1.21.4, 1.21.5, 1.21.7, 1.21.9
         # Use build number 4287 to compile CraftBukkit 1.21,
-        # Use build number 5422 to compile CraftBukkit 1.21.7,
+        # Use build number 4522 to compile CraftBukkit 1.21.7,
+        # Use build number 4539 to compile CraftBukkit 1.21.9
         # https://hub.spigotmc.org/jira/browse/BUILDTOOLS-658
         # https://hub.spigotmc.org/versions/
         run: |
