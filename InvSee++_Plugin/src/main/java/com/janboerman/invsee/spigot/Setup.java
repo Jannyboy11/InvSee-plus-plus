@@ -20,7 +20,7 @@ public interface Setup {
     public static Setup setup(Plugin plugin, Scheduler scheduler, NamesAndUUIDs lookup, OpenSpectatorsCache cache) {
         Server server = plugin.getServer();
         ServerSoftware serverSoftware = ServerSoftware.detect(server);
-        plugin.getLogger().info("Detected server software compatibility: " + serverSoftware);
+        plugin.getLogger().info("Detected server software: " + serverSoftware);
 
         if (serverSoftware == null)
             throw new RuntimeException(SupportedServerSoftware.getUnsupportedPlatformMessage(server));
