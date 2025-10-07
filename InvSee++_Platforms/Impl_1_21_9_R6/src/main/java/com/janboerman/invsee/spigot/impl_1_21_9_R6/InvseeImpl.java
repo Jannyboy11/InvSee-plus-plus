@@ -48,7 +48,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
@@ -67,6 +66,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+
+import static com.janboerman.invsee.spigot.impl_1_21_9_R6.HybridServerSupport.getServer;
+import static com.janboerman.invsee.spigot.impl_1_21_9_R6.HybridServerSupport.loadPlayerData;
 
 public class InvseeImpl implements InvseePlatform {
 
@@ -225,7 +227,7 @@ public class InvseeImpl implements InvseePlatform {
     			gameProfile);
     	
     	return CompletableFuture.supplyAsync(() -> {
-    		Optional<ValueInput> playerCompound = worldNBTStorage.load(fakeEntityHuman)
+    		Optional<ValueInput> playerCompound = loadPlayerData(worldNBTStorage, fakeEntityHuman)
                     .map(tag -> TagValueInput.create(ThrowingProblemReporter.INSTANCE, fakeEntityHuman.registryAccess(), tag));
             if (playerCompound.isEmpty()) {
                 // player file does not exist
@@ -281,7 +283,7 @@ public class InvseeImpl implements InvseePlatform {
         // See PaperMC/PlayerList#placeNewPlayer.
 
         PlayerDataStorage playerDataStorage = server.getHandle().playerIo;
-        Optional<ValueInput> optional = playerDataStorage.load(fakeEntityPlayer)
+        Optional<ValueInput> optional = loadPlayerData(playerDataStorage, fakeEntityPlayer)
                 .map(tag -> TagValueInput.create(ThrowingProblemReporter.INSTANCE, fakeEntityPlayer.registryAccess(), tag));
 
         if (optional.isPresent()) {
@@ -353,7 +355,7 @@ public class InvseeImpl implements InvseePlatform {
             nmsPlayer.connection.handleContainerClose(new ServerboundContainerClosePacket(nmsPlayer.containerMenu.containerId));
         }
 
-        CraftServer server = nmsPlayer.server.server;
+        CraftServer server = getServer(nmsPlayer).server;
         CraftPlayer bukkitPlayer = nmsPlayer.getBukkitEntity();
         nmsPlayer.containerMenu.transferTo(nmsView, bukkitPlayer);
         InventoryOpenEvent event = new InventoryOpenEvent(nmsView.getBukkitView());

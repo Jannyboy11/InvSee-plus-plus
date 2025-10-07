@@ -110,7 +110,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
     - `java -jar BuildTools.jar --rev 1.21.4 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 1.21.5 --compile craftbukkit --remapped`
     - `java -jar BuildTools.jar --rev 4522 --compile craftbukkit --remapped`
-    - `java -jar BuildTools.jar --rev 1.21.9 --compile craftbukkit --remapped`
+    - `java -jar BuildTools.jar --rev 4539 --compile craftbukkit --remapped`
 2. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at InvSee++_plugin/target/InvSee++.jar.
 

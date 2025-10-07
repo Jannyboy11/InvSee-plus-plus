@@ -15,9 +15,11 @@ import com.janboerman.invsee.utils.FuzzyReflection;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -109,6 +111,34 @@ public final class HybridServerSupport {
                 ex.addSuppressed(paperMethodNotFound);
                 throw ex;
             }
+        }
+    }
+
+    public static MinecraftServer getServer(ServerPlayer nmsPlayer) {
+        try {
+            return nmsPlayer.server;
+        } catch (IllegalAccessError error) {
+            Field[] fields = FuzzyReflection.getFieldOfType(ServerPlayer.class, MinecraftServer.class);
+            if (fields.length == 1) {
+                try {
+                    return (MinecraftServer) fields[0].get(nmsPlayer);
+                } catch (IllegalAccessException exception) {
+                    RuntimeException ex = new RuntimeException("No method known of obtaining the EntityPlayer's MinecraftServer");
+                    ex.addSuppressed(error);
+                    ex.addSuppressed(exception);
+                    throw ex;
+                }
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    public static Optional<CompoundTag> loadPlayerData(PlayerDataStorage worldNbtStorage, Player entityHuman) {
+        try {
+            return worldNbtStorage.load(entityHuman);
+        } catch (NoSuchMethodError nsme) {
+            return worldNbtStorage.load(entityHuman.nameAndId());
         }
     }
 

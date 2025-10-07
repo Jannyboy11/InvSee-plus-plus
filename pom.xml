@@ -76,7 +76,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.version>5.10.2</junit.version>
-        <specialsource-maven-plugin.version>2.0.2</specialsource-maven-plugin.version>
+        <specialsource-maven-plugin.version>2.0.4</specialsource-maven-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <maven-shade-plugin.version>3.5.3</maven-shade-plugin.version>

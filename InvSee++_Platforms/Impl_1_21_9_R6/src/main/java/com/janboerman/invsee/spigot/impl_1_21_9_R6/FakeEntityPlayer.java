@@ -17,6 +17,8 @@ import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.GameType;
 
+import static com.janboerman.invsee.spigot.impl_1_21_9_R6.HybridServerSupport.getServer;
+
 class FakeEntityPlayer extends ServerPlayer {
 
     private static final Method SET_GAME_MODE_FOR_PLAYER = findSetGameModeForPlayer();
@@ -30,7 +32,7 @@ class FakeEntityPlayer extends ServerPlayer {
     @Override
     public FakeCraftPlayer getBukkitEntity() {
         if (bukkitEntity == null) {
-            bukkitEntity = new FakeCraftPlayer(super.server.server, this);
+            bukkitEntity = new FakeCraftPlayer(getServer(this).server, this);
 
             try {
                 //https://github.com/Jannyboy11/InvSee-plus-plus/issues/72
