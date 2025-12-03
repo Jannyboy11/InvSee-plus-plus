@@ -21,6 +21,8 @@ public class FakeCraftPlayer extends CraftPlayer {
      * This should fix https://github.com/Jannyboy11/InvSee-plus-plus/issues/13. */
     @Override
     public void setExtraData(ValueOutput tag) {
+        super.setExtraData(tag);
+
         Optional<ValueInput> maybeFreshlyLoaded = loadPlayerTag();
         if (maybeFreshlyLoaded.isPresent()) { //can be absent if the player hasn't played before.
             ValueInput freshlyLoaded = maybeFreshlyLoaded.get();
