@@ -77,6 +77,7 @@ public interface InvseePlatform {
 
 
     // Paper wants us to move away from Material.values() https://discord.com/channels/289587909051416579/1077385604012179486/1263418959554805843
+    /** Get a stream of item materials known to the server. */
     public default Stream<Material> materials() {
         return Arrays.stream(Material.values());
     }

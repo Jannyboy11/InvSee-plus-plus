@@ -2,6 +2,8 @@ package com.janboerman.invsee.spigot.impl_1_21_7_R5;
 
 import java.util.Optional;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.TagValueOutput;
 import org.bukkit.craftbukkit.v1_21_R5.CraftServer;
 import org.bukkit.craftbukkit.v1_21_R5.entity.CraftPlayer;
 
@@ -26,8 +28,13 @@ public class FakeCraftPlayer extends CraftPlayer {
             Optional<ValueInput> readBukkit = freshlyLoaded.child("bukkit");
             Optional<ValueInput> readPaper = freshlyLoaded.child("Paper");
 
-            ValueOutput writeBukkit = tag.child("bukkit");
-            ValueOutput writePaper = tag.child("Paper");
+            // Note: it is of utmost importance to NEVER call tag.child("bukkit") or tag.child("Paper").
+            // Doing so will cause the entire "bukkit" or "Paper" sections to be reset to an empty NBTTagCompound.
+            // So instead, we will just obtain the NBTTagCompound by calling .buildResult(), and write to that compound!
+            // See https://github.com/Jannyboy11/InvSee-plus-plus/issues/172
+            CompoundTag writeTag = ((TagValueOutput) tag).buildResult();
+            CompoundTag writeBukkit = writeTag.getCompoundOrEmpty("bukkit");
+            CompoundTag writePaper = writeTag.getCompoundOrEmpty("Paper");
 
             //populate using bukkit's and paper's old values
             copyLong(readBukkit, writeBukkit, "lastPlayed");
@@ -35,8 +42,8 @@ public class FakeCraftPlayer extends CraftPlayer {
         }
     }
 
-    private static void copyLong(Optional<ValueInput> from, ValueOutput to, String key) {
-        from.flatMap(input -> input.getLong(key)).ifPresent(value -> to.putLong(key, value));
+    private static void copyLong(Optional<ValueInput> from, CompoundTag writeTag, String key) {
+        from.flatMap(valueInput -> valueInput.getLong(key)).ifPresent(longValue -> writeTag.putLong(key, longValue));
     }
 
     private Optional<ValueInput> loadPlayerTag() {
