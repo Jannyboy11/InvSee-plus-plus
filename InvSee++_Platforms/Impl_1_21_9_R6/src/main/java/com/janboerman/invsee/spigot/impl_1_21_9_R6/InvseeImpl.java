@@ -326,8 +326,9 @@ public class InvseeImpl implements InvseePlatform {
     }
 
     private static DataResult<ResourceKey<Level>> parseLegacyDimensionType(ValueInput nbttagcompound) {
+        // Attempt to read the dimension from an int.
         try {
-            Optional<Integer> dimensionInput = nbttagcompound.getInt("Dimension"); // because of our PoblemReporter, this throws an exception when the type is not int.
+            Optional<Integer> dimensionInput = nbttagcompound.getInt("Dimension"); // because of our ProblemReporter, this throws an exception when the type is not int.
             if (dimensionInput.isPresent()) {
                 switch (dimensionInput.get()) {
                     case -1: return DataResult.success(Level.NETHER);
@@ -341,6 +342,7 @@ public class InvseeImpl implements InvseePlatform {
             }
         }
 
+        // Attempt to read the dimension from a string.
         Optional<ResourceKey<Level>> decodedLevel = nbttagcompound.read("Dimension", Level.RESOURCE_KEY_CODEC);
         if (decodedLevel.isPresent()) {
             return DataResult.success(decodedLevel.get());
