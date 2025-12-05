@@ -5,7 +5,7 @@
 -protected
 -sourcepath
 '/home/runner/work/InvSee-plus-plus/InvSee-plus-plus/InvSee++_Common/src/main/java:/home/runner/work/InvSee-plus-plus/InvSee-plus-plus/InvSee++_Common/target/generated-sources/annotations:/home/runner/work/InvSee-plus-plus/InvSee-plus-plus/InvSee++_Plugin/src/main/java:/home/runner/work/InvSee-plus-plus/InvSee-plus-plus/InvSee++_Plugin/target/generated-sources/annotations'
--source 17
+-source 25
 -author
 -bottom
 'Copyright &#169; 2025. All rights reserved.'
@@ -18,7 +18,7 @@
 -doctitle
 'InvSee++ 0.30.13-SNAPSHOT API'
 -link
-'https://jd.papermc.io/folia/1.19'
+'https://hub.spigotmc.org/javadocs/bukkit'
 -nohelp
 -tag
 "apiNote:a:API Note:"
