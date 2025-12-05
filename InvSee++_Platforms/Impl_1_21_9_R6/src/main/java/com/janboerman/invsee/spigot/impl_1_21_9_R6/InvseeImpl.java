@@ -30,12 +30,17 @@ import com.janboerman.invsee.spigot.internal.EventHelper;
 import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
+import com.janboerman.invsee.spigot.internal.TestingCompatLayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Registry;
+import org.bukkit.craftbukkit.v1_21_R6.CraftRegistry;
 import org.bukkit.craftbukkit.v1_21_R6.CraftServer;
 import org.bukkit.craftbukkit.v1_21_R6.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R6.entity.CraftHumanEntity;
@@ -70,7 +75,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import static com.janboerman.invsee.spigot.impl_1_21_9_R6.HybridServerSupport.getServer;
 import static com.janboerman.invsee.spigot.impl_1_21_9_R6.HybridServerSupport.loadPlayerData;
 
-public class InvseeImpl implements InvseePlatform {
+public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
 
     private final Plugin plugin;
     private final OpenSpectatorsCache cache;
@@ -276,6 +281,8 @@ public class InvseeImpl implements InvseePlatform {
     	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
     }
 
+
+
     private void loadWorldDataAndGameMode(CraftServer server, FakeEntityPlayer fakeEntityPlayer) {
         // In Paper, Entity#load(CompoundTag) does not load the world info.
         // Thus, in order to not upset our users, we do it ourselves manually in order to work around this Paper bug.
@@ -433,5 +440,22 @@ public class InvseeImpl implements InvseePlatform {
         // Note: in the future, Registry.ITEM may become a stable api. We prefer to use that one since we don't care
         // about Block materials; we only care about Item materials.
         return res.filter(Material::isItem);
+    }
+
+
+    // === Testing ===
+
+    @Override
+    public Object loadPlayerSaveCompound(UUID playerId, String playerName) {
+        CraftServer craftServer = (CraftServer) plugin.getServer();
+        PlayerDataStorage worldNBTStorage = craftServer.getHandle().playerIo;
+        RegistryAccess registryAccess = CraftRegistry.getMinecraftRegistry();
+        ProblemReporter problemReporter = ThrowingProblemReporter.INSTANCE;
+
+        ValueInput valueInput = HybridServerSupport.load(worldNBTStorage, playerName, playerId.toString(), problemReporter, registryAccess).get();
+        TagValueInput tagValueInput = (TagValueInput) valueInput;
+        CompoundTag compoundTag = tagValueInput.input;
+
+        return compoundTag;
     }
 }
