@@ -109,9 +109,9 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <!-- Folia api javadoc -->
+                    <!-- Spigot api javadoc -->
                     <links>
-                        <link>https://jd.papermc.io/folia/1.19/</link>
+                        <link>https://hub.spigotmc.org/javadocs/bukkit/</link>
                     </links>
 
                     <!-- make the javadoc tool stop complain about unrecognised tags -->
@@ -143,7 +143,7 @@
                     <failOnError>false</failOnError>
 
                     <!-- so that proper hyperlinks to standard jdk classes are generated -->
-                    <additionalOptions>-source 17</additionalOptions>
+                    <additionalOptions>-source 25</additionalOptions>
                 </configuration>
             </plugin>
         </plugins>
