@@ -959,8 +959,6 @@ public class InvseeAPI {
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onSpectatorClose(InventoryCloseEvent event) {
-            // TODO if the player just has read permission (not write permission), then we don't need to save the inventory.
-            // TODO might even be able to perform a save only when the inventory contents is different from when the spectator first opened it?
             Inventory inventory = event.getInventory();
             if (inventory instanceof MainSpectatorInventory) {
                 MainSpectatorInventory spectatorInventory = (MainSpectatorInventory) inventory;
