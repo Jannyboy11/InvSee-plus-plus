@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.internal;
 
-public class PlayerFileHelper {
+public final class PlayerFileHelper {
 
     private PlayerFileHelper() {}
 

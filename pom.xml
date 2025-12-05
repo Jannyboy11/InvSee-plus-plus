@@ -48,6 +48,7 @@
         <module>InvSee++_Give_Plugin</module>
         <module>InvSee++_Clear_Plugin</module>
         <module>InvSee++_Clone_Plugin</module>
+        <module>InvSee++_Test_Plugin</module>
     </modules>
     <packaging>pom</packaging>
 
