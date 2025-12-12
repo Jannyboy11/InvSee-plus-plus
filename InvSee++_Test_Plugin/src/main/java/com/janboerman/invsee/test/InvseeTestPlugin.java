@@ -45,6 +45,7 @@ public final class InvseeTestPlugin extends JavaPlugin {
                         sender.sendMessage("Oh noes! " + error.getMessage());
                     }
                 });
+        // TODO another test case: opening an inventory and setting an item, and saving, causes the nbt tag compound to change.
     }
 
     private void logTestStep(int testNo, int testStep, String message) {
