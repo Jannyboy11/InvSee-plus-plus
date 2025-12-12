@@ -3,7 +3,7 @@
 
     <groupId>com.janboerman.invsee</groupId>
     <artifactId>invsee-plus-plus</artifactId>
-    <version>0.30.13-SNAPSHOT</version>
+    <version>0.30.13</version>
 
     <modules>
         <module>Utils</module>
@@ -59,7 +59,7 @@
 
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/Jannyboy11/InvSee-plus-plus.git</developerConnection>
-        <tag>v0.29.12</tag>
+        <tag>v0.30.13</tag>
     </scm>
 
     <distributionManagement>
