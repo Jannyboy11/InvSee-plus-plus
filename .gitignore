@@ -7,6 +7,9 @@
 #Maven
 target/*
 
+#paper-nms-maven-plugin
+**/.paper-nms
+
 #Eclipse
 **/.settings/*
 **/.project

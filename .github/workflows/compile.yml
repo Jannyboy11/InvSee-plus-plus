@@ -55,6 +55,9 @@ jobs:
           java -jar BuildTools.jar --rev 4522 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 4539 --compile craftbukkit --remapped
           java -jar BuildTools.jar --rev 1.21.11 --compile craftbukkit --remapped
+      - name: Install Paper 1.21.11
+        run: |
+          mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_1_21_11
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release
