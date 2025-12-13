@@ -39,6 +39,20 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
         </plugins>
 
         <resources>
@@ -85,6 +99,12 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>give_impl_1_21_11_r7</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>give_impl_paper_1_21_11</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
