@@ -70,6 +70,7 @@
                     <archive>
                         <manifestEntries>
                             <Multi-Release>true</Multi-Release>
+                            <paperweight-mappings-namespace>mojang</paperweight-mappings-namespace>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -240,6 +241,12 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_11_r7</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>impl_paper_1_21_11</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
