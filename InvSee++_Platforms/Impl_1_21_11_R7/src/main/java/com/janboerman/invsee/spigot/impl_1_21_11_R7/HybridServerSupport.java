@@ -22,6 +22,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.PlayerEnderChestContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -141,5 +142,22 @@ public final class HybridServerSupport {
             return worldNbtStorage.load(entityHuman.nameAndId());
         }
     }
+
+    public static void spawnIn(FakeEntityPlayer fakeEntityPlayer, Level world) {
+        try {
+            fakeEntityPlayer.spawnIn(world, true/*ignore respawn anchor charge*/); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
+        } catch (NoSuchMethodError e1) {
+            try {
+                Method[] methods = FuzzyReflection.getMethodOfType(ServerPlayer.class, void.class, Level.class);
+                methods[0].invoke(fakeEntityPlayer, world); //on Paper the boolean parameter for respawn anchor charge does not exist.
+            } catch (ArrayIndexOutOfBoundsException | ReflectiveOperationException e2) {
+                RuntimeException ex = new RuntimeException("No method known to set the player's location.");
+                ex.addSuppressed(e1);
+                ex.addSuppressed(e2);
+                throw ex;
+            }
+        }
+    }
+
 
 }
