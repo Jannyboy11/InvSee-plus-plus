@@ -7,8 +7,10 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.janboerman.invsee.utils.FuzzyReflection;
 
@@ -16,6 +18,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.util.ProblemReporter;
@@ -147,13 +150,15 @@ public final class HybridServerSupport {
         try {
             fakeEntityPlayer.spawnIn(world, true/*ignore respawn anchor charge*/); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
         } catch (NoSuchMethodError e1) {
+            RuntimeException ex = new RuntimeException("No method known to set the player's location.");
+            ex.addSuppressed(e1);
             try {
-                Method[] methods = FuzzyReflection.getMethodOfType(ServerPlayer.class, void.class, Level.class);
-                methods[0].invoke(fakeEntityPlayer, world); //on Paper the boolean parameter for respawn anchor charge does not exist.
-            } catch (ArrayIndexOutOfBoundsException | ReflectiveOperationException e2) {
-                RuntimeException ex = new RuntimeException("No method known to set the player's location.");
-                ex.addSuppressed(e1);
-                ex.addSuppressed(e2);
+                // Because we are likely on Paper, and it uses mojang mappings at runtime, we can just reflectively call the method
+                // without worrying about obfuscation mappings :)
+                Method method = ServerPlayer.class.getDeclaredMethod("spawnIn", ServerLevel.class);
+                method.invoke(fakeEntityPlayer, world);
+            } catch (ReflectiveOperationException e3) {
+                ex.addSuppressed(e3);
                 throw ex;
             }
         }
