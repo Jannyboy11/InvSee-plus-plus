@@ -16,6 +16,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.util.ProblemReporter;
@@ -139,6 +140,24 @@ public final class HybridServerSupport {
             return worldNbtStorage.load(entityHuman);
         } catch (NoSuchMethodError nsme) {
             return worldNbtStorage.load(entityHuman.nameAndId());
+        }
+    }
+
+    public static void spawnIn(FakeEntityPlayer fakeEntityPlayer, ServerLevel world) {
+        try {
+            fakeEntityPlayer.spawnIn(world, true/*ignore respawn anchor charge*/); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
+        } catch (NoSuchMethodError e1) {
+            RuntimeException ex = new RuntimeException("No method known to set the player's location.");
+            ex.addSuppressed(e1);
+            try {
+                // Because we are likely on Paper, and it uses mojang mappings at runtime, we can just reflectively call the method
+                // without worrying about obfuscation mappings :)
+                Method method = ServerPlayer.class.getDeclaredMethod("spawnIn", ServerLevel.class);
+                method.invoke(fakeEntityPlayer, world);
+            } catch (ReflectiveOperationException e3) {
+                ex.addSuppressed(e3);
+                throw ex;
+            }
         }
     }
 
