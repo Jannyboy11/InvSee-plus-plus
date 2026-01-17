@@ -307,7 +307,7 @@ public class InvseeImpl implements InvseePlatform {
                 level = server.getHandle().getServer().getLevel(levelResourceKey);
 
                 if (level != null) {
-                    fakeEntityPlayer.spawnIn(level); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
+                    HybridServerSupport.spawnIn(fakeEntityPlayer, level); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
                 }
             }
 
