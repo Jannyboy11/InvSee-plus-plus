@@ -16,7 +16,7 @@ See also: [What Server Software does InvSee++ support?](#supported-server-softwa
 
 ### Commands
 - `/invsee <userName>|<uniqueId> [PWI{...}]`
-- `/endersee <userName>|<uniequeId> [PWI{...}]`
+- `/endersee <userName>|<uniqueId> [PWI{...}]`
 Note that for integration with PerWorldInventory, `load-data-on-join` needs to be set to `true` in its config.
 - `/invseeplusplusreload`
 
@@ -39,7 +39,7 @@ Note that for integration with PerWorldInventory, `load-data-on-join` needs to b
 - `invseeplusplus.edit` provides `invseeplusplus.invsee.edit` and `invseeplusplus.endersee.edit`.
 - `invseeplusplus.exempt` provides `invseeplusplus.exempt.invsee` and `invseeplusplus.exempt.endersee`.
 - `invseeplusplus.bypass-exempt` provides `invseeplusplus.bypass-exempt.invsee` and `invseeplusplus.bypass-exempt.endersee`.
-- `invseeplusplus.*` provides all eight of the base permissions as well as all of the addon permissions.
+- `invseeplusplus.*` provides all ten of the base permissions as well as all of the addon permissions.
 
 ## Addons
 
@@ -79,7 +79,7 @@ On 1.20.5 and later:
 - `/enderclone <source player> <target player>?`
 ###### Examples:
 - `/invclone Notch` (copies Notch's inventory to yourself)
-- `/enderclear Jannyboy11 Notch` (copies Jannyboy11's enderchest to Notch's enderchest)
+- `/enderclone Jannyboy11 Notch` (copies Jannyboy11's enderchest to Notch's enderchest)
 ##### Permissions:
 - `invseeplusplus.clone.*` provides `invseeplusplus.clone.inventory` and `invseeplusplus.clone.enderchest`.
 - `invseeplusplus.clone.inventory` allows access to `/invclone`.
@@ -154,3 +154,4 @@ Is there any server that implements the Bukkit api that I'm missing? Don't hesit
 | Minecraft version: | 1.8.x      | 1.12.x     | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.[0-4]  | 1.20.[5-6]  | 1.21.x      |
 |--------------------|------------|------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
 | Java version:      | 8 or newer | 8 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer | 17 or newer | 21 or newer | 21 or newer |
+
