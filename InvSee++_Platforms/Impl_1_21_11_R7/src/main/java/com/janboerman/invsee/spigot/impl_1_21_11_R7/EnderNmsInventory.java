@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 
 class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkitInventory, EnderNmsInventory> implements Container, MenuProvider {
 
-	protected NonNullList<ItemStack> storageContents;
+	protected List<ItemStack> storageContents;
 
 	EnderNmsInventory(Player target, CreationOptions<EnderChestSlot> creationOptions) {
 		super(target.getUUID(), target.getScoreboardName(), creationOptions);
