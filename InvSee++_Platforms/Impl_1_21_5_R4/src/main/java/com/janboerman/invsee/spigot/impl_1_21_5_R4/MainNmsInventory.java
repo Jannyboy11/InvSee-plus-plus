@@ -27,7 +27,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 //	protected NonNullList<ItemStack> storageContents;
 //	protected NonNullList<ItemStack> armourContents;
 //	protected NonNullList<ItemStack> offHand;
-//
+
 	protected Inventory nmsPlayerInventory;
 
 	protected Ref<ItemStack> onCursor;

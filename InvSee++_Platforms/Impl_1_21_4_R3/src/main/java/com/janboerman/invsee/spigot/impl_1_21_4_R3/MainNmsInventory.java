@@ -5,8 +5,6 @@ import java.util.List;
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
-import com.janboerman.invsee.spigot.impl_1_21_4_R3.MainBukkitInventory;
-import com.janboerman.invsee.spigot.impl_1_21_4_R3.MainNmsContainer;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
 import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
@@ -26,9 +24,9 @@ import net.minecraft.world.item.ItemStack;
 
 class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements Container, MenuProvider {
 
-	protected NonNullList<ItemStack> storageContents;
-	protected NonNullList<ItemStack> armourContents;
-	protected NonNullList<ItemStack> offHand;
+	protected /*NonNull*/List<ItemStack> storageContents;
+	protected /*NonNull*/List<ItemStack> armourContents;
+	protected /*NonNull*/List<ItemStack> offHand;
 	
 	protected Ref<ItemStack> onCursor;
 	protected List<ItemStack> craftingContents;

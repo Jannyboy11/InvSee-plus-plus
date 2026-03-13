@@ -22,9 +22,9 @@ import java.util.List;
 
 class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements Container, MenuProvider {
 
-	protected NonNullList<ItemStack> storageContents;
-	protected NonNullList<ItemStack> armourContents;
-	protected NonNullList<ItemStack> offHand;
+	protected /*NonNull*/List<ItemStack> storageContents;
+	protected /*NonNull*/List<ItemStack> armourContents;
+	protected /*NonNull*/List<ItemStack> offHand;
 	
 	protected Ref<ItemStack> onCursor;
 	protected List<ItemStack> craftingContents;
