@@ -4,7 +4,7 @@ import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
-import net.minecraft.core.NonNullList;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -21,9 +21,9 @@ import java.util.UUID;
 
 class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkitInventory, EnderNmsInventory> implements Container, MenuProvider {
 
-	protected NonNullList<ItemStack> storageContents;
+	protected /*NonNull*/List<ItemStack> storageContents;
 
-	EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, NonNullList<ItemStack> storageContents, CreationOptions<EnderChestSlot> creationOptions) {
+	EnderNmsInventory(UUID targetPlayerUuid, String targetPlayerName, /*NonNull*/List<ItemStack> storageContents, CreationOptions<EnderChestSlot> creationOptions) {
 		super(targetPlayerUuid, targetPlayerName, creationOptions);
 		this.storageContents = storageContents;
 	}

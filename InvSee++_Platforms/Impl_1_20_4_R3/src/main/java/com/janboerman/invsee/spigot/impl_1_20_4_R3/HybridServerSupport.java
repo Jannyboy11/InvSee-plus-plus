@@ -14,6 +14,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class HybridServerSupport {
 
@@ -62,14 +63,15 @@ public class HybridServerSupport {
         }
     }
 
-    public static NonNullList<ItemStack> enderChestItems(PlayerEnderChestContainer enderChest) {
+    // return List<ItemStack> instead of NonNullList<ItemStack> to ensure compatibility with UniverseSpigot
+    public static /*NonNull*/List<ItemStack> enderChestItems(PlayerEnderChestContainer enderChest) {
         try {
             return enderChest.items;
         } catch (NoSuchFieldError | IllegalAccessError vanillaFieldIsActuallyPrivate) {
             try {
                 //call the forge method: getContents()Ljava/util/List<net/minecraft/world/item/ItemStack>;
                 //fortunately CraftBukkit contains this method as well, so we can just call it directly without reflection! :D
-                return (NonNullList<ItemStack>) enderChest.getContents();
+                return enderChest.getContents();
             } catch (Throwable forgeMethodNotFound) {
                 RuntimeException ex = new RuntimeException("No method known of getting the enderchest items");
                 ex.addSuppressed(vanillaFieldIsActuallyPrivate);
