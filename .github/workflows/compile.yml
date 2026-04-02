@@ -67,9 +67,9 @@ jobs:
       - name: Install CraftBukkit 26.1.1
         run: |
           java -jar BuildTools.jar --rev 26.1.1 --compile craftbukkit
-      - name: Install Paper 26.1.1
-        run: |
-          mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_1_1
+#      - name: Install Paper 26.1.1 TODO does not seem to work yet..
+#        run: |
+#          mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_1_1
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release
