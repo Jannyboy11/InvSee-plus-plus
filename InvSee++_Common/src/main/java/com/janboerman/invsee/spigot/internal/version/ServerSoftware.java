@@ -30,7 +30,9 @@ public class ServerSoftware {
             CRAFTBUKKIT_1_21_9 = new ServerSoftware(CRAFTBUKKIT, _1_21_9),
             CRAFTBUKKIT_1_21_10 = new ServerSoftware(CRAFTBUKKIT, _1_21_10),
             CRAFTBUKKIT_1_21_11 = new ServerSoftware(CRAFTBUKKIT, _1_21_11),
+            CRAFTBUKKIT_26_1_1 = new ServerSoftware(CRAFTBUKKIT, _26_1_1),
             PAPER_1_21_11 = new ServerSoftware(PAPER, _1_21_11),
+            PAPER_26_1_1 = new ServerSoftware(PAPER, _26_1_1),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
@@ -145,13 +147,12 @@ public class ServerSoftware {
                     case CraftbukkitMappingsVersion._1_21_11: return CRAFTBUKKIT_1_21_11;
                 }
             case "org.bukkit.craftbukkit.CraftServer":
-                // CraftBukkit 1.20.6 and up or Paper 1.20.4 and up:
+                // CraftBukkit 26.1 and up or Paper 1.20.4 and up:
                 try {
                     // Call Server#getMinecraftVersion() to find out the version (this method was added by Paper).
                     return new ServerSoftware(PAPER, MinecraftVersion.fromString(server.getMinecraftVersion()));
                 } catch (NoSuchMethodError nsme) {
-                    // Apparently we are not running on Paper (thanks CraftBukkit...)
-                    //TODO does this code-path ackshually trigger on re-obfuscated craftbukkit?
+                    // Apparently we are not running on Paper
                     switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
                         case CraftbukkitMappingsVersion._1_20_6: return CRAFTBUKKIT_1_20_6;
                         case CraftbukkitMappingsVersion._1_21_1: return CRAFTBUKKIT_1_21_1;
@@ -162,6 +163,7 @@ public class ServerSoftware {
                         case CraftbukkitMappingsVersion._1_21_7: return CRAFTBUKKIT_1_21_7;
                         case CraftbukkitMappingsVersion._1_21_9: return CRAFTBUKKIT_1_21_9;
                         case CraftbukkitMappingsVersion._1_21_11: return CRAFTBUKKIT_1_21_11;
+                        case CraftbukkitMappingsVersion._26_1_1: return CRAFTBUKKIT_26_1_1;
                     }
                 }
             case "net.glowstone.GlowServer":

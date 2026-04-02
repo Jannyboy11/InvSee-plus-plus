@@ -58,6 +58,18 @@ jobs:
       - name: Install Paper 1.21.11
         run: |
           mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_1_21_11
+      - name: Install JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'microsoft'
+          java-version: '25'
+          cache: 'maven'
+      - name: Install CraftBukkit 26.1.1
+        run: |
+          java -jar BuildTools.jar --rev 26.1.1 --compile craftbukkit
+#      - name: Install Paper 26.1.1 TODO does not seem to work yet..
+#        run: |
+#          mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_1_1
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Create tagged release

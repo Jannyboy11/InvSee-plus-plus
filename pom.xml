@@ -26,6 +26,8 @@
         <module>InvSee++_Platforms/Impl_1_21_9_R6</module>
         <module>InvSee++_Platforms/Impl_1_21_11_R7</module>
         <module>InvSee++_Platforms/Impl_Paper_1_21_11</module>
+        <module>InvSee++_Platforms/Impl_26_1_1</module>
+<!--        <module>InvSee++_Platforms/Impl_Paper_26_1_1</module> &lt;!&ndash; TODO Paper 26.1.1 is not yet available? &ndash;&gt;-->
         <module>InvSee++_Platforms/Impl_Glowstone</module>
         <module>InvSee++_MultiverseInventories</module> <!-- TODO finish this module -->
         <module>InvSee++_PerWorldInventory</module>
@@ -48,6 +50,7 @@
         <module>InvSee++_Give_Platforms/Give_Impl_1_21_9_R6</module>
         <module>InvSee++_Give_Platforms/Give_Impl_1_21_11_R7</module>
         <module>InvSee++_Give_Platforms/Give_Impl_Paper_1_21_11</module>
+        <module>InvSee++_Give_Platforms/Give_Impl_26_1_1</module>
         <module>InvSee++_Give_Platforms/Give_Impl_Glowstone</module>
         <module>InvSee++_Give_Plugin</module>
         <module>InvSee++_Clear_Plugin</module>
@@ -84,7 +87,7 @@
         <specialsource-maven-plugin.version>2.0.4</specialsource-maven-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
-        <maven-shade-plugin.version>3.5.3</maven-shade-plugin.version>
+        <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
         <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
 
         <maven.deploy.skip>releases</maven.deploy.skip>
