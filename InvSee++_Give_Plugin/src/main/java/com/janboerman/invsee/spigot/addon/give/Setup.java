@@ -72,7 +72,7 @@ class SetupImpl implements Setup {
 
 class Impl_26_1_1 extends SetupImpl {
     Impl_26_1_1() {
-        super(com.janboerman.invsee.spigot.addon.give.impl_26_1_1.GiveImpl.INSTANCE)
+        super(com.janboerman.invsee.spigot.addon.give.impl_26_1_1.GiveImpl.INSTANCE);
     }
 }
 

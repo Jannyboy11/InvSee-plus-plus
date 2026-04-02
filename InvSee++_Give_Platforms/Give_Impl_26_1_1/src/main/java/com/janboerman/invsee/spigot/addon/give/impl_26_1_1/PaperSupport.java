@@ -1,6 +1,6 @@
 package com.janboerman.invsee.spigot.addon.give.impl_26_1_1;
 
-import org.bukkit.craftbukkit.v1_21_R7.CraftRegistry;
+import org.bukkit.craftbukkit.CraftRegistry;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
