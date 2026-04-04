@@ -11,10 +11,8 @@
     <name>InvSee++ implementation for Paper 26.1.1</name>
 
     <properties>
-        <!-- Note: paper-nms-maven-plugin does not use R0.1 tag in version. -->
-        <paper.version>26.1.1-SNAPSHOT</paper.version>
+        <paper.version>26.1.1.build.14-alpha</paper.version>
         <paper-nms-maven-plugin.version>1.4.10</paper-nms-maven-plugin.version>
-        <bukkit.version>26.1.1-R0.1-SNAPSHOT</bukkit.version>
         <authlib.version>7.0.61</authlib.version>
         <datafixerupper.version>9.0.19</datafixerupper.version>
         <netty.version>4.2.7.Final</netty.version>
@@ -81,7 +79,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>${bukkit.version}</version>
+            <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
