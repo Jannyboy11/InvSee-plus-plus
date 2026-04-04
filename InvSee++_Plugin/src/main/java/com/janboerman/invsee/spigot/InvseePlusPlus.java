@@ -1,5 +1,6 @@
 package com.janboerman.invsee.spigot;
 
+import com.janboerman.invsee.faststats.FastStats;
 import com.janboerman.invsee.paper.AsyncTabCompleter;
 import com.janboerman.invsee.folia.FoliaScheduler;
 import com.janboerman.invsee.spigot.api.CreationOptions;
@@ -25,8 +26,7 @@ import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -61,7 +61,8 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
     private CreationOptions<EnderChestSlot> platformCreationOptionsEnderInventory;
     private boolean dirtyConfig = false;
 
-    private Metrics bstats;
+    private org.bstats.bukkit.Metrics bStats;
+    private dev.faststats.core.Metrics fastStats;
 
     public InvseePlusPlus() {
         boolean asyncTabCompleteEvent;
@@ -136,6 +137,8 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
 
         //bStats
         setupBStats();
+        //fastStats
+        setupFastStats();
 
         //idea: shoulder look functionality. an admin will always see the same inventory that the target player sees.
         //can I make it so that the bottom slots show the target player's inventory slots? would probably need to do some nms hacking
@@ -179,21 +182,33 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
         }
     }
 
+    // Note: must be called from onEnable.
     private void setupBStats() {
         int pluginId = 9309;
-        bstats = new Metrics(this, pluginId);
-        bstats.addCustomChart(new SimplePie("Back-end", () -> {
-            if (this.api instanceof PerWorldInventorySeeApi) {
-                return "PerWorldInventory";
+        bStats = new org.bstats.bukkit.Metrics(this, pluginId);
+        bStats.addCustomChart(new org.bstats.charts.SimplePie("Back-end", () -> getBackendMetric()));
+    }
+
+    // Note: must be called from onEnable.
+    private void setupFastStats() {
+        fastStats = dev.faststats.bukkit.BukkitMetrics.factory()
+                .addMetric(dev.faststats.core.data.Metric.string("Back-end", () -> getBackendMetric()))
+                .token(FastStats.API_TOKEN)
+                .create(this);
+        fastStats.ready();
+    }
+
+    private String getBackendMetric() {
+        if (this.api instanceof PerWorldInventorySeeApi) {
+            return "PerWorldInventory";
 //            } else if (this.api instanceof MultiverseInventoriesSeeApi) {
 //                return "Multiverse-Inventories";
-            }
-            //else if: MyWorlds
-            //else if: Separe-World-Items
-            else {
-                return "Vanilla";
-            }
-        }));
+        }
+        //else if: MyWorlds
+        //else if: Separe-World-Items
+        else {
+            return "Vanilla";
+        }
     }
 	
 	@Override
@@ -202,8 +217,11 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
             api.shutDown(); //complete all inventory futures - ensures /invgive and /endergive will still work even if the server shuts down.
         }
 
-        if (bstats != null) {
-            bstats.shutdown();
+        if (bStats != null) {
+            bStats.shutdown();
+        }
+        if (fastStats != null) {
+            fastStats.shutdown();
         }
 	}
 
