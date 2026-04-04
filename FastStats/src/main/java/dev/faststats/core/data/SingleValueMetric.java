@@ -14,8 +14,8 @@ final class SingleValueMetric<T> extends SimpleMetric<T> {
     @Override
     public Optional<JsonElement> getData() throws Exception {
         return compute().map(data -> {
-            if (data instanceof final Boolean bool) return new JsonPrimitive(bool);
-            if (data instanceof final Number number) return new JsonPrimitive(number);
+            if (data instanceof Boolean) return new JsonPrimitive((Boolean) data);
+            if (data instanceof Number) return new JsonPrimitive((Number) data);
             return new JsonPrimitive(data.toString());
         });
     }

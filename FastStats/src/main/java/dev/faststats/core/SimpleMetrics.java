@@ -427,7 +427,7 @@ public abstract class SimpleMetrics implements Metrics {
                 + "# Keeping metrics enabled is recommended, but you can opt out by setting\n"
                 + "# 'enabled=false' in plugins/faststats/config.properties.\n"
                 + "#\n"
-                + "# If you suspect a plugin is collecting personal data or bypassing the "enabled" option,\n"
+                + "# If you suspect a plugin is collecting personal data or bypassing the \"enabled\" option,\n"
                 + "# please report it at: https://faststats.dev/abuse\n"
                 + "#\n"
                 + "# For more information, visit: https://faststats.dev/info\n";

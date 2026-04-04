@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  *
  * @since 0.10.0
  */
-public interface ErrorTracker permits SimpleErrorTracker {
+public interface ErrorTracker {
     /**
      * Create and attach a new context-aware error tracker.
      * <p>

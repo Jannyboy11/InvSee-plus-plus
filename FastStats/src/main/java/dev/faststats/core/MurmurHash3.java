@@ -1,7 +1,6 @@
 package dev.faststats.core;
 
 import com.google.gson.JsonObject;
-import org.jetbrains.annotations.Contract;
 
 import java.nio.charset.StandardCharsets;
 
@@ -37,7 +36,7 @@ final class MurmurHash3 {
      * @return a 2-element array containing the lower 64 bits at index 0 and upper 64 bits at index 1
      * @see <a href="https://en.wikipedia.org/wiki/MurmurHash">MurmurHash on Wikipedia</a>
      */
-    @Contract(value = "_ -> new", pure = true)
+//    @Contract(value = "_ -> new", pure = true)
     private static long[] hash(final String data) {
         final byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
         long h1 = 0L;
@@ -157,7 +156,7 @@ final class MurmurHash3 {
      * @return the mixed 64-bit value
      * @see <a href="https://en.wikipedia.org/wiki/MurmurHash#Algorithm">MurmurHash Algorithm on Wikipedia</a>
      */
-    @Contract(pure = true)
+//    @Contract(pure = true)
     private static long fmix64(long k) {
         k ^= k >>> 33;
         k *= 0xff51afd7ed558ccdL;
@@ -178,7 +177,7 @@ final class MurmurHash3 {
      * @param offset the starting index in the byte array (must have at least 4 bytes from offset)
      * @return the 32-bit integer value read in little-endian order
      */
-    @Contract(pure = true)
+//    @Contract(pure = true)
     private static int getInt(final byte[] bytes, final int offset) {
         return (bytes[offset] & 0xff) |
                 ((bytes[offset + 1] & 0xff) << 8) |
