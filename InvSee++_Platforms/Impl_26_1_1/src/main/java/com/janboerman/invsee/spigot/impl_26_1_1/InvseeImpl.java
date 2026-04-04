@@ -33,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Registry;
@@ -224,6 +225,9 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
                     return SpectateResponse.fail(NotCreatedReason.unknownTarget(Target.byGameProfile(player, name)));
                 } //else: unknown/new players are supported!
                 // if we get here, then we create a spectator inventory for the non-existent player anyway.
+                // To prevent a new player entering the world at (0,0,0), we set its spawn location here.
+                org.bukkit.Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation().add(0, 1, 0);
+                fakeEntityHuman.setPos(new Vec3(spawn.getX(), spawn.getY(), spawn.getZ()));
             } else {
                 // player file already exists, load the data from the compound onto the player
                 fakeEntityHuman.readAdditionalSaveData(playerCompound.get());   //only player-specific stuff
