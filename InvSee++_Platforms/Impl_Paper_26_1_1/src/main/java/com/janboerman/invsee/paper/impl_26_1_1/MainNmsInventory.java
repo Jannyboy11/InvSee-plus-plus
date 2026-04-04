@@ -1,4 +1,4 @@
-package com.janboerman.invsee.paper.impl_1_21_11;
+package com.janboerman.invsee.paper.impl_26_1_1;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.target.Target;

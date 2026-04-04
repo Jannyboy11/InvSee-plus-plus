@@ -1,4 +1,4 @@
-package com.janboerman.invsee.paper.impl_1_21_11;
+package com.janboerman.invsee.paper.impl_26_1_1;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
@@ -70,8 +70,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-import static com.janboerman.invsee.paper.impl_1_21_11.HybridServerSupport.getServer;
-import static com.janboerman.invsee.paper.impl_1_21_11.HybridServerSupport.loadPlayerData;
+import static com.janboerman.invsee.paper.impl_26_1_1.HybridServerSupport.getServer;
+import static com.janboerman.invsee.paper.impl_26_1_1.HybridServerSupport.loadPlayerData;
 
 public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
 

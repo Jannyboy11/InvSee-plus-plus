@@ -1,4 +1,4 @@
-package com.janboerman.invsee.paper.impl_1_21_11;
+package com.janboerman.invsee.paper.impl_26_1_1;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.logging.DifferenceTracker;
@@ -10,7 +10,7 @@ import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -76,7 +76,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 
 	// decorate clicked method for tracking/logging
 	@Override
-	public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+	public void clicked(int i, int j, ContainerInput inventoryclicktype, Player entityhuman) {
 		//TODO Folia: schedule task that is synchronised across both the target player's EntityScheduler as well as the spectator player's EntityScheduler.
 		//TODO because now we have a data race.
 		//TODO when we arrive here, we are in the tick thread of the Spectator player.

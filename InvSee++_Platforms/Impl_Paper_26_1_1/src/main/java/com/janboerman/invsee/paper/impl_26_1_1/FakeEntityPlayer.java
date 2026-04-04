@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.janboerman.invsee.paper.impl_1_21_11.HybridServerSupport.getServer;
+import static com.janboerman.invsee.paper.impl_26_1_1.HybridServerSupport.getServer;
 
 class FakeEntityPlayer extends ServerPlayer {
 

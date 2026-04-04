@@ -12,7 +12,7 @@
 
     <properties>
         <paper.version>26.1.1.build.14-alpha</paper.version>
-        <paper-nms-maven-plugin.version>1.4.10</paper-nms-maven-plugin.version>
+        <paper-nms-maven-plugin.version>1.4.11</paper-nms-maven-plugin.version>
         <authlib.version>7.0.61</authlib.version>
         <datafixerupper.version>9.0.19</datafixerupper.version>
         <netty.version>4.2.7.Final</netty.version>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>ca.bkaw</groupId>
             <artifactId>paper-nms</artifactId>
-            <version>${paper.version}</version>
+            <version>${paper.version}-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
