@@ -466,7 +466,7 @@ public abstract class SimpleMetrics implements Metrics {
             };
 
             final boolean enabled = externallyManaged ? externallyEnabled : predicate.test("enabled", true);
-            final boolean errorTracking = predicate.test("submitErrors", true);
+            final boolean errorTracking = predicate.test("submitErrors", false); // InvSee++: changed default from true to false.
             final boolean additionalMetrics = predicate.test("submitAdditionalMetrics", true);
             final boolean debug = predicate.test("debug", false);
 

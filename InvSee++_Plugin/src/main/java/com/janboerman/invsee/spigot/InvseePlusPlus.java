@@ -186,13 +186,13 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
     private void setupBStats() {
         int pluginId = 9309;
         bStats = new org.bstats.bukkit.Metrics(this, pluginId);
-        bStats.addCustomChart(new org.bstats.charts.SimplePie("Back-end", () -> getBackendMetric()));
+        bStats.addCustomChart(new org.bstats.charts.SimplePie("Back-end", this::getBackendMetric));
     }
 
     // Note: must be called from onEnable.
     private void setupFastStats() {
         fastStats = dev.faststats.bukkit.BukkitMetrics.factory()
-                .addMetric(dev.faststats.core.data.Metric.string("Back-end", () -> getBackendMetric()))
+                .addMetric(dev.faststats.core.data.Metric.string("back_end", this::getBackendMetric))
                 .token(FastStats.API_TOKEN)
                 .create(this);
         fastStats.ready();
@@ -210,6 +210,8 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
             return "Vanilla";
         }
     }
+    // TODO other metrics: download-source? (UNKNONW, SPIGOT_MC, GITHUB, HANGAR, MODRINTH)
+    // TODO should do deployments from CI if I want this.
 	
 	@Override
 	public void onDisable() {
