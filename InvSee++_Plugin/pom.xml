@@ -125,6 +125,14 @@
             <version>3.0.2</version>
             <scope>compile</scope>
         </dependency>
+        <!-- This is a bit of an odd one: FastStats is vendored in our sources.
+             We may use its own maven dependency in the future whenever Java 8 support is implemented. -->
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>faststats</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- first-party libraries -->
         <dependency>

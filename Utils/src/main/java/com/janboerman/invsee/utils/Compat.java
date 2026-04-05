@@ -5,17 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class Compat {
@@ -85,5 +78,32 @@ public class Compat {
             outputStream.flush();
             return outputStream.toByteArray();
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Optional<T> optionalOr(Optional<T> optional, Supplier<? extends Optional<? extends T>> supplier) {
+        Objects.requireNonNull(supplier);
+        if (optional.isPresent()) {
+            return optional;
+        } else {
+            return Objects.requireNonNull((Optional<T>) supplier.get());
+        }
+    }
+
+    public static <T> Set<T> setCopy(Collection<? extends T> coll) {
+        return new HashSet<>(coll);
+    }
+
+    public static <T> Set<T> emptySet() {
+        return Collections.emptySet();
+    }
+
+    public static String stringRepeat(String base, int repeat) {
+        if (base == null) return null;
+        StringJoiner stringJoiner = new StringJoiner("");
+        for (int i = 0; i < repeat; ++i) {
+            stringJoiner.add(base);
+        }
+        return stringJoiner.toString();
     }
 }

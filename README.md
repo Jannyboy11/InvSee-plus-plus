@@ -85,6 +85,12 @@ On 1.20.5 and later:
 - `invseeplusplus.clone.inventory` allows access to `/invclone`.
 - `invseeplusplus.clone.enderchest` allows access to `/enderclone`.
 
+### Statistics
+
+InvSee++ by default sends statistics to [bStats](https://bstats.org/plugin/bukkit/InvseePlusPlus/9309) and [FastStats](https://faststats.dev/project/invsee-plus-plus/invsee%2B%2B).
+The statistics are meant to be anonymous, and they help me with future development.
+If you wish to opt-out of metrics collection, you can edit their config files in /plugins/bStats and /plugin/fastStats.
+
 ### Contact
 
 Bugs & Feature requests: [GitHub issues](https://github.com/Jannyboy11/InvSee-plus-plus/issues)

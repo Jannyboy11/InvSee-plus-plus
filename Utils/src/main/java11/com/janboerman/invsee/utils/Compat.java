@@ -1,19 +1,9 @@
 package com.janboerman.invsee.utils;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.io.InputStream;
 import java.io.IOException;
@@ -42,7 +32,7 @@ public class Compat {
         return string.lines();
     }
 
-    public static <T> List<T> listCopy(Collection<T> coll) {
+    public static <T> List<T> listCopy(Collection<? extends T> coll) {
         return List.copyOf(coll);
     }
 
@@ -69,5 +59,21 @@ public class Compat {
     public static byte[] readAllBytes(InputStream inputStream) throws IOException {
         if (inputStream == null) return null;
         return inputStream.readAllBytes();
+    }
+
+    public static <T> Optional<T> optionalOr(Optional<T> optional, Supplier<? extends Optional<? extends T>> supplier) {
+        return optional.or(supplier);
+    }
+
+    public static <T> Set<T> setCopy(Collection<? extends T> coll) {
+        return Set.copyOf(coll);
+    }
+
+    public static <T> Set<T> emptySet() {
+        return Set.of();
+    }
+
+    public static String stringRepeat(String toBeRepeated, int count) {
+        return toBeRepeated.repeat(count);
     }
 }
