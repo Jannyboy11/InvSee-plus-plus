@@ -417,7 +417,7 @@ public abstract class SimpleMetrics implements Metrics {
         public boolean externallyManaged() { return externallyManaged; }
 
         public static final String DEFAULT_COMMENT =
-                 "FastStats (https://faststats.dev) collects anonymous usage statistics for plugin developers.\n"
+                 " FastStats (https://faststats.dev) collects anonymous usage statistics for plugin developers.\n"
                 + "# This helps developers understand how their projects are used in the real world.\n"
                 + "#\n"
                 + "# No IP addresses, player data, or personal information is collected.\n"
