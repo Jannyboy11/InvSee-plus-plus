@@ -12,7 +12,7 @@
 
     <properties>
         <paper.version>26.1.1.build.14-alpha</paper.version>
-        <paper-nms-maven-plugin.version>1.4.11-SNAPSHOT</paper-nms-maven-plugin.version>
+        <paper-nms-maven-plugin.version>1.4.11-SNAPSHOT</paper-nms-maven-plugin.version> <!-- TODO change to release version. -->
         <authlib.version>7.0.61</authlib.version>
         <datafixerupper.version>9.0.19</datafixerupper.version>
         <netty.version>4.2.7.Final</netty.version>
@@ -22,6 +22,11 @@
         <pluginRepository>
             <id>bytecode.space</id>
             <url>https://repo.bytecode.space/repository/maven-public/</url>
+        </pluginRepository>
+        <!-- TODO remove Repsy repo when official Paper 26.1.1 support has landed in upstream distribution of paper-nms-maven-plugin. -->
+        <pluginRepository>
+            <id>jannyboy11-repsy</id>
+            <url>https://repo.repsy.io/mvn/jannyboy11/minecraft</url>
         </pluginRepository>
     </pluginRepositories>
 
