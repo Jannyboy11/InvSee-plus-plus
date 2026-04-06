@@ -10,7 +10,7 @@ import com.janboerman.invsee.spigot.api.template.Mirror;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -58,7 +58,7 @@ class EnderNmsContainer extends AbstractContainerMenu {
 
 	// decorate clicked method for tracking/logging
 	@Override
-	public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+	public void clicked(int i, int j, ContainerInput inventoryclicktype, Player entityhuman) {
 		//TODO Folia: schedule task that is synchronised across both the target player's EntityScheduler as well as the spectator player's EntityScheduler.
 		//TODO because now we have a data race.
 		//TODO can I use java.util.concurrent.{Exchanger, CyclicBarrier or Phaser} perhaps??
