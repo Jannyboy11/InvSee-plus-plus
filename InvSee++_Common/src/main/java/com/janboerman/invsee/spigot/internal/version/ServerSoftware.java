@@ -30,6 +30,7 @@ public class ServerSoftware {
             CRAFTBUKKIT_1_21_9 = new ServerSoftware(CRAFTBUKKIT, _1_21_9),
             CRAFTBUKKIT_1_21_10 = new ServerSoftware(CRAFTBUKKIT, _1_21_10),
             CRAFTBUKKIT_1_21_11 = new ServerSoftware(CRAFTBUKKIT, _1_21_11),
+            CRAFTBUKKIT_26_1 = new ServerSoftware(CRAFTBUKKIT, _26_1),
             CRAFTBUKKIT_26_1_1 = new ServerSoftware(CRAFTBUKKIT, _26_1_1),
             CRAFTBUKKIT_26_1_2 = new ServerSoftware(CRAFTBUKKIT, _26_1_2),
             PAPER_1_21_11 = new ServerSoftware(PAPER, _1_21_11),
@@ -165,7 +166,12 @@ public class ServerSoftware {
                         case CraftbukkitMappingsVersion._1_21_7: return CRAFTBUKKIT_1_21_7;
                         case CraftbukkitMappingsVersion._1_21_9: return CRAFTBUKKIT_1_21_9;
                         case CraftbukkitMappingsVersion._1_21_11: return CRAFTBUKKIT_1_21_11;
-                        case CraftbukkitMappingsVersion._26_1_1: return CRAFTBUKKIT_26_1_1;
+                        case CraftbukkitMappingsVersion._26_1_1: switch (server.getBukkitVersion()) {
+                            case "26.1-R0.1-SNAPSHOT": return CRAFTBUKKIT_26_1;
+                            case "26.1.1-R0.1-SNAPSHOT": return CRAFTBUKKIT_26_1_1;
+                            case "26.1.2-R0.1-SNAPSHOT": return CRAFTBUKKIT_26_1_2;
+                            default: return CRAFTBUKKIT_26_1_1;
+                        }
                     }
                 }
             case "net.glowstone.GlowServer":
