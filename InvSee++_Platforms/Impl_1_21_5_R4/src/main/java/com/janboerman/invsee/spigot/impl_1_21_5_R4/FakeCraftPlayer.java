@@ -24,15 +24,20 @@ public class FakeCraftPlayer extends CraftPlayer {
             CompoundTag freshlyLoaded = maybeFreshlyLoaded.get();
             Optional<CompoundTag> maybeBukkit = freshlyLoaded.getCompound("bukkit");
             Optional<CompoundTag> maybePaper = freshlyLoaded.getCompound("Paper");
+            // https://github.com/Jannyboy11/InvSee-plus-plus/issues/193
+            Optional<CompoundTag> maybeRootVehicle = freshlyLoaded.getCompound("RootVehicle");
 
             CompoundTag loadedBukkit;
             CompoundTag loadedPaper;
+            CompoundTag loadedRootVehicle;
 
             //populate using bukkit's and paper's old values
             if (tag.contains("bukkit") && maybeBukkit.isPresent() && !(loadedBukkit = maybeBukkit.get()).isEmpty())
                 tag.getCompound("bukkit").get().putLong("lastPlayed", loadedBukkit.getLong("lastPlayed").get());
             if (tag.contains("Paper") && maybePaper.isPresent() && !(loadedPaper = maybePaper.get()).isEmpty())
                 tag.getCompound("Paper").get().putLong("LastSeen", loadedPaper.getLong("LastSeen").get());
+            if (maybeRootVehicle.isPresent() && !(loadedRootVehicle = maybeRootVehicle.get()).isEmpty())
+                tag.put("RootVehicle", loadedRootVehicle);
         }
     }
 

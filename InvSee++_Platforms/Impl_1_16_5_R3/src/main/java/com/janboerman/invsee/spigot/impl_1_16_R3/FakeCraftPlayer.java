@@ -11,6 +11,9 @@ public class FakeCraftPlayer extends CraftPlayer {
         super(server, entity);
     }
 
+    /* Normally, CraftPlayer overwrites the bukkit.lastPlayed field with System.currentTimeMillis()
+     * For fake players, we want to keep the original value. Same for Paper.LastSeen.
+     * This should fix https://github.com/Jannyboy11/InvSee-plus-plus/issues/13. */
     @Override
     public void setExtraData(NBTTagCompound tag) {
         super.setExtraData(tag);
@@ -19,11 +22,15 @@ public class FakeCraftPlayer extends CraftPlayer {
         if (freshlyLoaded != null) {
             NBTTagCompound loadedBukkit = freshlyLoaded.getCompound("bukkit");
             NBTTagCompound loadedPaper = freshlyLoaded.getCompound("Paper");
+            // https://github.com/Jannyboy11/InvSee-plus-plus/issues/193
+            NBTTagCompound loadedRootVehicle = freshlyLoaded.getCompound("RootVehicle");
 
             if (tag.hasKeyOfType("bukkit", NBTConstants.TAG_COMPOUND) && loadedBukkit != null && !loadedBukkit.isEmpty())
                 tag.getCompound("bukkit").setLong("lastPlayed", loadedBukkit.getLong("lastPlayed"));
             if (tag.hasKeyOfType("Paper", NBTConstants.TAG_COMPOUND) && loadedPaper != null && !loadedPaper.isEmpty())
                 tag.getCompound("Paper").setLong("LastSeen", loadedPaper.getLong("LastSeen"));
+            if (loadedRootVehicle != null && !loadedRootVehicle.isEmpty())
+                tag.set("RootVehicle", loadedRootVehicle);
         }
     }
 

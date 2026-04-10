@@ -1,6 +1,7 @@
 package com.janboerman.invsee.paper.impl_1_21_11;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -28,6 +29,8 @@ public class FakeCraftPlayer extends CraftPlayer {
 
             Optional<ValueInput> readBukkit = freshlyLoaded.child("bukkit");
             Optional<ValueInput> readPaper = freshlyLoaded.child("Paper");
+            // https://github.com/Jannyboy11/InvSee-plus-plus/issues/193
+            Optional<ValueInput> readRootVehicle = freshlyLoaded.child("RootVehicle");
 
             // Note: it is of utmost importance to NEVER call tag.child("bukkit") or tag.child("Paper").
             // Doing so will cause the entire "bukkit" or "Paper" sections to be reset to an empty NBTTagCompound.
@@ -40,11 +43,18 @@ public class FakeCraftPlayer extends CraftPlayer {
             //populate using bukkit's and paper's old values
             copyLong(readBukkit, writeBukkit, "lastPlayed");
             copyLong(readPaper, writePaper, "LastSeen");
+            copyCompound(readRootVehicle, writeTag, "RootVehicle");
         }
     }
 
     private static void copyLong(Optional<ValueInput> from, CompoundTag writeTag, String key) {
         from.flatMap(valueInput -> valueInput.getLong(key)).ifPresent(longValue -> writeTag.putLong(key, longValue));
+    }
+
+    private static void copyCompound(Optional<ValueInput> from, CompoundTag writeTag, String key) {
+        if (from.isPresent() && from.get() instanceof TagValueInput tagValueInput) {
+            writeTag.put(key, tagValueInput.input);
+        }
     }
 
     private Optional<ValueInput> loadPlayerTag() {
