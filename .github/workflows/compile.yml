@@ -64,9 +64,11 @@ jobs:
           distribution: 'microsoft'
           java-version: '25'
           cache: 'maven'
+      # Use build number 4617 to compile CraftBukkit 26.1.1
+      # https://hub.spigotmc.org/versions/
       - name: Install CraftBukkit 26.1.1
         run: |
-          java -jar BuildTools.jar --rev 26.1.1 --compile craftbukkit
+          java -jar BuildTools.jar --rev 4617 --compile craftbukkit
       - name: Install Paper 26.1.1
         run: |
           mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_1_1
