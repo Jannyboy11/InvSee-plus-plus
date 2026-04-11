@@ -129,6 +129,9 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
         api.setLogOptions(getLogOptions(config));
         api.setPlaceholderPalette(getPlaceholderPalette(platform, config));
 
+        // TODO read config for uuid, username resolve strategies.
+        lookup.materialiseUsernameAndUniqueIdResolveStrategies();
+
         //commands
         setupCommands();
 

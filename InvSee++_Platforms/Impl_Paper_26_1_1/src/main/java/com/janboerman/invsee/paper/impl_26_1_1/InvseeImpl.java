@@ -24,6 +24,7 @@ import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.spigot.internal.TestingCompatLayer;
+import com.janboerman.invsee.spigot.internal.resolve.ResolveStrategyType;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.RegistryAccess;
@@ -85,13 +86,8 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
         this.cache = cache;
         this.scheduler = scheduler;
 
-        if (lookup.onlineMode(plugin.getServer())) {
-            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin, scheduler));
-        } else {
-            // If we are in offline mode, then we should insert this strategy *before* the UUIDOfflineModeStrategy.
-            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin, scheduler));
-        }
-        lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin, scheduler));
+        lookup.addUuidResolveStrategy(ResolveStrategyType.PLAYER_DATA_SAVE_FILES, new UUIDSearchSaveFilesStrategy(plugin, scheduler));
+        lookup.addNameResolveType(ResolveStrategyType.PLAYER_DATA_SAVE_FILES, new NameSearchSaveFilesStrategy(plugin, scheduler));
     }
 
     @Override

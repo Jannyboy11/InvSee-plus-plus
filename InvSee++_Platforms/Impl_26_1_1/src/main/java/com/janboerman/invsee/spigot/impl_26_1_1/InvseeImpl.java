@@ -10,6 +10,7 @@ import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.*;
+import com.janboerman.invsee.spigot.internal.resolve.ResolveStrategyType;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.RegistryAccess;
@@ -33,7 +34,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Registry;
@@ -71,13 +71,8 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
         this.cache = cache;
         this.scheduler = scheduler;
 
-        if (lookup.onlineMode(plugin.getServer())) {
-            lookup.uuidResolveStrategies.add(new UUIDSearchSaveFilesStrategy(plugin, scheduler));
-        } else {
-            // If we are in offline mode, then we should insert this strategy *before* the UUIDOfflineModeStrategy.
-            lookup.uuidResolveStrategies.add(lookup.uuidResolveStrategies.size() - 1, new UUIDSearchSaveFilesStrategy(plugin, scheduler));
-        }
-        lookup.nameResolveStrategies.add(2, new NameSearchSaveFilesStrategy(plugin, scheduler));
+        lookup.addUuidResolveStrategy(ResolveStrategyType.PLAYER_DATA_SAVE_FILES, new UUIDSearchSaveFilesStrategy(plugin, scheduler));
+        lookup.addNameResolveType(ResolveStrategyType.PLAYER_DATA_SAVE_FILES, new NameSearchSaveFilesStrategy(plugin, scheduler));
     }
 
     @Override

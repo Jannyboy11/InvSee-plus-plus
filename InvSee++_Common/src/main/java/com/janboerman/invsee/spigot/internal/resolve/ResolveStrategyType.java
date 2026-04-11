@@ -1,4 +1,4 @@
-package com.janboerman.invsee.spigot.internal;
+package com.janboerman.invsee.spigot.internal.resolve;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,26 +30,6 @@ public enum ResolveStrategyType {
         this.humanReadableName = configValue;
     }
 
-    static List<ResolveStrategyType> defaultStrategies(boolean onlineMode, boolean hasProxy, boolean paper) {
-        List<ResolveStrategyType> result = new ArrayList<>();
-        result.add(ONLINE_PLAYER);
-        result.add(LOGGED_OUT_PLAYERS_CACHE);
-        if (paper) {
-            result.add(PAPER_OFFLINE_PLAYER_CACHE);
-        }
-        result.add(PERMISSION_PLUGIN);
-        if (hasProxy) {
-            result.add(PROXY);
-        }
-        if (onlineMode) {
-            result.add(MOJANG_REST_API_CALL);
-        } else {
-            result.add(SPOOF);
-        }
-        result.add(PLAYER_DATA_SAVE_FILES);
-        return result;
-    }
-
     public ResolveStrategyType fromString(String configValue) {
         for (ResolveStrategyType strategy : values()) {
             if (strategy.humanReadableName.equals(configValue)) {
@@ -57,5 +37,21 @@ public enum ResolveStrategyType {
             }
         }
         throw new IllegalArgumentException("Unrecognized resolve strategy: " + configValue);
+    }
+
+    public static List<ResolveStrategyType> defaultStrategies(boolean onlineMode) {
+        List<ResolveStrategyType> result = new ArrayList<>();
+        result.add(ONLINE_PLAYER);
+        result.add(LOGGED_OUT_PLAYERS_CACHE);
+        result.add(PAPER_OFFLINE_PLAYER_CACHE);
+        result.add(PERMISSION_PLUGIN);
+        result.add(PROXY);
+        if (onlineMode) {
+            result.add(MOJANG_REST_API_CALL);
+        } else {
+            result.add(SPOOF);
+        }
+        result.add(PLAYER_DATA_SAVE_FILES);
+        return result;
     }
 }
