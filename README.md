@@ -91,6 +91,8 @@ InvSee++ by default sends statistics to [bStats](https://bstats.org/plugin/bukki
 The statistics are meant to be anonymous, and they help me with future development.
 If you wish to opt-out of metrics collection, you can edit their config files in /plugins/bStats and /plugin/fastStats.
 
+[![Servers & Players](https://faststats.dev/embed/2cfe5112-d8dc-4b71-8759-c0b0601d0076?w=800&h=300)](https://faststats.dev/project/invsee-plus-plus/invsee++)
+
 ### Contact
 
 Bugs & Feature requests: [GitHub issues](https://github.com/Jannyboy11/InvSee-plus-plus/issues)
@@ -159,8 +161,12 @@ and there is a good chance they won't be able to load mods and plugins compiled 
 
 Is there any server that implements the Bukkit api that I'm missing? Don't hesitate to create [an issue](https://github.com/Jannyboy11/InvSee-plus-plus/issues/new) and request support! 
 
+
+[![Historic Minecraft Version Usage](https://faststats.dev/embed/010faaef-face-4f9d-8288-61621c708031?w=800&h=300)](https://faststats.dev/project/invsee-plus-plus/invsee++)
+
 ### Supported Java versions
 | Minecraft version: | 1.8.x      | 1.12.x     | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.[0-4]  | 1.20.[5-6]  | 1.21.x      | 26.x.x      |
 |--------------------|------------|------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
 | Java version:      | 8 or newer | 8 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer | 17 or newer | 21 or newer | 21 or newer | 25 or newer |
 
+[![Java Versions](https://faststats.dev/embed/dc2e7402-115d-457d-a230-c025ba101968?w=600&h=300)](https://faststats.dev/project/invsee-plus-plus/invsee++)
