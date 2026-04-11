@@ -30,7 +30,7 @@ public enum ResolveStrategyType {
         this.humanReadableName = configValue;
     }
 
-    public ResolveStrategyType fromString(String configValue) {
+    public static ResolveStrategyType fromString(String configValue) {
         for (ResolveStrategyType strategy : values()) {
             if (strategy.humanReadableName.equals(configValue)) {
                 return strategy;
