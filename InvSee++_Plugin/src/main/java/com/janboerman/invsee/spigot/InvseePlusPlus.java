@@ -527,7 +527,7 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
     }
 
     private static List<ResolveStrategyType> toResolveStrategyTypes(List<String> list) {
-        if (list == null) return null;
+        if (list == null || list.isEmpty()) return null;
         List<ResolveStrategyType> result = new ArrayList<>(list.size());
         for (String strat : list) {
             result.add(ResolveStrategyType.fromString(strat));

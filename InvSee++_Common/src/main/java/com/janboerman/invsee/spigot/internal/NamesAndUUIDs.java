@@ -165,13 +165,11 @@ public class NamesAndUUIDs {
         }
     }
 
-    // TODO get from config, if available.
     public void setUuidResolveTypes(List<ResolveStrategyType> resolveTypes) {
         this.uuidResolveTypes.clear();
         this.uuidResolveTypes.addAll(resolveTypes);
     }
 
-    // TODO get from config, if available.
     public void setNameResolveTypes(List<ResolveStrategyType> resolveTypes) {
         this.nameResolveTypes.clear();
         this.nameResolveTypes.addAll(resolveTypes);
