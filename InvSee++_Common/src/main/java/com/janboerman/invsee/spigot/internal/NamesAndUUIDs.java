@@ -1,9 +1,11 @@
 package com.janboerman.invsee.spigot.internal;
 
+import com.janboerman.invsee.mojangapi.ElectroidAPI;
 import com.janboerman.invsee.mojangapi.MojangAPI;
 import com.janboerman.invsee.spigot.api.InvseeAPI;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.api.resolve.*;
+import com.janboerman.invsee.spigot.internal.resolve.ResolveStrategyType;
 import com.janboerman.invsee.utils.CaseInsensitiveMap;
 import com.janboerman.invsee.utils.Maybe;
 import com.janboerman.invsee.utils.SynchronizedIterator;
@@ -14,14 +16,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
@@ -72,7 +68,9 @@ public class NamesAndUUIDs {
     });
     private final Map<UUID, String> userNameCacheView = Collections.unmodifiableMap(userNameCache);
 
-    //TODO make order configurable from InvSee++'s config
+    private final Plugin plugin;
+    private final Scheduler scheduler;
+
     /** The list of strategies used to resolve players' unique IDs. Strategies are attempted in order. */
     public final List<UUIDResolveStrategy> uuidResolveStrategies;
     /** The list of strategies used to resolve players' usernames. Strategies are attempted in order. */
@@ -81,20 +79,18 @@ public class NamesAndUUIDs {
     private boolean bungeeCord = false, bungeeCordOnline = false;
     private boolean velocity = false, velocityOnline = false;
 
+    final List<ResolveStrategyType> uuidResolveTypes;
+    final List<ResolveStrategyType> nameResolveTypes;
+
+    private final EnumMap<ResolveStrategyType, UUIDResolveStrategy> availableUuidResolveStrategies = new EnumMap<>(ResolveStrategyType.class);
+    private final EnumMap<ResolveStrategyType, NameResolveStrategy> availableNameResolveStrategies = new EnumMap<>(ResolveStrategyType.class);
+
     /** @deprecated internal api */
     @Deprecated
     public NamesAndUUIDs(Plugin plugin, Scheduler scheduler) {
-
-        MojangAPI mojangApi = new MojangAPI(scheduler::executeAsync);
-
-        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
-        this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>(10));
-
-        this.uuidResolveStrategies.add(new UUIDOnlinePlayerStrategy(plugin.getServer(), scheduler::executeSyncGlobal));
-        this.nameResolveStrategies.add(new NameOnlinePlayerStrategy(plugin.getServer(), scheduler::executeSyncGlobal));
-
-        this.uuidResolveStrategies.add(new UUIDInMemoryStrategy(uuidCache));
-        this.nameResolveStrategies.add(new NameInMemoryStrategy(userNameCache));
+        Server server = plugin.getServer();
+        this.plugin = plugin;
+        this.scheduler = scheduler;
 
         if (SPIGOT) {
             Configuration spigotConfig = plugin.getServer().spigot().getConfig();
@@ -105,8 +101,6 @@ public class NamesAndUUIDs {
         }
 
         if (PAPER) {
-            this.uuidResolveStrategies.add(new UUIDPaperCacheStrategy(plugin, scheduler));
-
             try {
                 YamlConfiguration paperConfig = plugin.getServer().spigot().getPaperConfig();
                 ConfigurationSection proxiesSection = paperConfig.getConfigurationSection("proxies");
@@ -128,25 +122,79 @@ public class NamesAndUUIDs {
             }
         }
 
-        this.uuidResolveStrategies.add(new UUIDPermissionPluginStrategy(plugin, scheduler));
-        this.nameResolveStrategies.add(new NamePermissionPluginStrategy(plugin, scheduler));
+        this.uuidResolveStrategies = Collections.synchronizedList(new ArrayList<>());
+        this.nameResolveStrategies = Collections.synchronizedList(new ArrayList<>());
+
+        this.uuidResolveTypes = ResolveStrategyType.defaultStrategies(onlineMode(server));
+        this.nameResolveTypes = ResolveStrategyType.defaultStrategies(onlineMode(server));
+
+        // register available resolve strategies.
+        availableUuidResolveStrategies.put(ResolveStrategyType.ONLINE_PLAYER, new UUIDOnlinePlayerStrategy(server, scheduler::executeSyncGlobal));
+        availableNameResolveStrategies.put(ResolveStrategyType.ONLINE_PLAYER, new NameOnlinePlayerStrategy(server, scheduler::executeSyncGlobal));
+
+        availableUuidResolveStrategies.put(ResolveStrategyType.LOGGED_OUT_PLAYERS_CACHE, new UUIDInMemoryStrategy(uuidCache));
+        availableNameResolveStrategies.put(ResolveStrategyType.LOGGED_OUT_PLAYERS_CACHE, new NameInMemoryStrategy(userNameCache));
+
+        if (PAPER) {
+            availableUuidResolveStrategies.put(ResolveStrategyType.PAPER_OFFLINE_PLAYER_CACHE, new UUIDPaperCacheStrategy(plugin, scheduler));
+            // Paper does not provide Server#getOfflinePlayerIfCached with a UUID argument.. >:(
+        }
+
+        availableUuidResolveStrategies.put(ResolveStrategyType.PERMISSION_PLUGIN, new UUIDPermissionPluginStrategy(plugin, scheduler));
+        availableNameResolveStrategies.put(ResolveStrategyType.PERMISSION_PLUGIN, new NamePermissionPluginStrategy(plugin, scheduler));
 
         if (bungeeCord || velocity) {
-            this.uuidResolveStrategies.add(new UUIDBungeeCordStrategy(plugin, scheduler));
+            availableUuidResolveStrategies.put(ResolveStrategyType.PROXY, new UUIDBungeeCordStrategy(plugin, scheduler));
             //there is no BungeeCord plugin message subchannel which can get a player name given a uuid.
             //the only way to do that currently is to 'get' a list of all players, and for every player in that list
             //request the uuid. If one matches the argument uuid, then that is the one.
             //this is too expensive for my tastes so I'm not going to implement a NameBungeeCordStrategy for now.
         }
 
-        //these methods 'resolve' names and uuids for players that have never played on the server before.
-        //they implement the marker interface NewPlayerSupport.
-        if (onlineMode(plugin.getServer())) {
-            this.uuidResolveStrategies.add(new UUIDMojangAPIStrategy(plugin, mojangApi));
-            this.nameResolveStrategies.add(new NameMojangAPIStrategy(plugin, mojangApi)); //ok, theoretically this could occur if the player already played before.
+        if (onlineMode(server)) {
+            MojangAPI mojangApi = new MojangAPI(scheduler::executeAsync);
+            ElectroidAPI electroidAPI = new ElectroidAPI(scheduler::executeAsync);
+
+            availableUuidResolveStrategies.put(ResolveStrategyType.MOJANG_REST_API_CALL, new UUIDMojangAPIStrategy(plugin, mojangApi));
+            availableNameResolveStrategies.put(ResolveStrategyType.MOJANG_REST_API_CALL, new NameMojangAPIStrategy(plugin, mojangApi));
+
+            availableUuidResolveStrategies.put(ResolveStrategyType.ELECTROID_REST_API_CALL, new UUIDElectroidAPIStrategy(plugin, electroidAPI));
+            availableNameResolveStrategies.put(ResolveStrategyType.ELECTROID_REST_API_CALL, new NameElectroidAPIStrategy(plugin, electroidAPI));
         } else {
-            this.uuidResolveStrategies.add(new UUIDOfflineModeStrategy());
-            //how to fake a username given a uuid, in offline mode?
+            availableUuidResolveStrategies.put(ResolveStrategyType.SPOOF, new UUIDOfflineModeStrategy());
+        }
+    }
+
+    public void setUuidResolveTypes(List<ResolveStrategyType> resolveTypes) {
+        this.uuidResolveTypes.clear();
+        this.uuidResolveTypes.addAll(resolveTypes);
+    }
+
+    public void setNameResolveTypes(List<ResolveStrategyType> resolveTypes) {
+        this.nameResolveTypes.clear();
+        this.nameResolveTypes.addAll(resolveTypes);
+    }
+
+    public void addUuidResolveStrategy(ResolveStrategyType resolveType, UUIDResolveStrategy strategy) {
+        availableUuidResolveStrategies.put(resolveType, strategy);
+    }
+
+    public void addNameResolveType(ResolveStrategyType resolveTypes, NameResolveStrategy strategy) {
+        availableNameResolveStrategies.put(resolveTypes, strategy);
+    }
+
+    public void materialiseUsernameAndUniqueIdResolveStrategies() {
+        resetResolveStrategies(uuidResolveStrategies, uuidResolveTypes, availableUuidResolveStrategies);
+        resetResolveStrategies(nameResolveStrategies, nameResolveTypes, availableNameResolveStrategies);
+    }
+
+    private static <T> void resetResolveStrategies(List<T> receiver, List<ResolveStrategyType> resolveTypes, Map<ResolveStrategyType, T> available) {
+        receiver.clear();
+        for (ResolveStrategyType resolveStrategyType : resolveTypes) {
+            T strategy = available.get(resolveStrategyType);
+            if (strategy != null) {
+                receiver.add(strategy);
+            }
         }
     }
 
@@ -211,5 +259,4 @@ public class NamesAndUUIDs {
             }
         });
     }
-
 }

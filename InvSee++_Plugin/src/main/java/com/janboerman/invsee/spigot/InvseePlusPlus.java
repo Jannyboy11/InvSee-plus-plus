@@ -24,6 +24,7 @@ import com.janboerman.invsee.spigot.internal.InvseePlatform;
 import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.spigot.api.Scheduler;
+import com.janboerman.invsee.spigot.internal.resolve.ResolveStrategyType;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 
@@ -40,6 +41,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
@@ -128,6 +130,11 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
         api.setEnderInventoryMirror(getEnderChestMirror(config));
         api.setLogOptions(getLogOptions(config));
         api.setPlaceholderPalette(getPlaceholderPalette(platform, config));
+        List<ResolveStrategyType> uuidResolveStrategies = getUuidResolveStrategies(config);
+        if (uuidResolveStrategies != null) lookup.setUuidResolveTypes(uuidResolveStrategies);
+        List<ResolveStrategyType> nameResolveStrategies = getUsernameResolveStrategies(config);
+        if (nameResolveStrategies != null) lookup.setNameResolveTypes(nameResolveStrategies);
+        lookup.materialiseUsernameAndUniqueIdResolveStrategies();
 
         //commands
         setupCommands();
@@ -510,6 +517,24 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
                 "e_36 e_37 e_38 e_39 e_40 e_41 e_42 e_43 e_44\n" +
                 "e_45 e_46 e_47 e_48 e_49 e_50 e_51 e_52 e_53");
     }
+
+    private static List<ResolveStrategyType> getUuidResolveStrategies(FileConfiguration config) {
+        return toResolveStrategyTypes(config.getStringList("uuid-resolve-strategies"));
+    }
+
+    private static List<ResolveStrategyType> getUsernameResolveStrategies(FileConfiguration config) {
+        return toResolveStrategyTypes(config.getStringList("username-resolve-strategies"));
+    }
+
+    private static List<ResolveStrategyType> toResolveStrategyTypes(List<String> list) {
+        if (list == null || list.isEmpty()) return null;
+        List<ResolveStrategyType> result = new ArrayList<>(list.size());
+        for (String strat : list) {
+            result.add(ResolveStrategyType.fromString(strat));
+        }
+        return result;
+    }
+
 
     /** @deprecated use your own player database instead. */
     @Deprecated//(forRemoval = true, since = "0.22.0") //TODO remove in 1.0

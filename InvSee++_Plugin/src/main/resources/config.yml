@@ -96,3 +96,23 @@ logging:
 # Selects the palette of placeholders to be used in slots for armour, crafting, enchanting, anvil, merchant, loom, cartography, smithing, grindstone, stonecutter.
 # Choose one of: 'glass panes', 'icons' or 'empty'.
 placeholder-palette: 'glass panes'
+
+# Configure the order of strategies used in order to obtain Unique IDs for provided usernames.
+# Possible values: "online player", "logged out players cache", "paper offline player cache", "permission plugin", "proxy", "mojang rest api call", "electroid mojang api call", "player data save files", "spoof".
+#uuid-resolve-strategies:
+#  - "online player"
+#  - "logged out players cache"
+#  - "paper offline player cache"
+#  - "permission plugin"
+#  - "proxy"
+#  - "mojang rest api call"
+#  - "player data save files"
+
+# Configure the order of strategies used in order to obtain the usernames for provided player Unique IDs.
+# Possible values: "online player", "logged out players cache", "permission plugin", "mojang rest api call", "electroid mojang api call", "player data save files".
+#username-resolve-strategies:
+#  - "online player"
+#  - "logged out players cache"
+#  - "permission plugin"
+#  - "mojang rest api call"
+#  - "player data save files"
