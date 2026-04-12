@@ -106,4 +106,17 @@ public class Compat {
         }
         return stringJoiner.toString();
     }
+
+    public static int majorJavaVersion() {
+        String version = System.getProperty("java.version");
+
+        if (version.startsWith("1.")) {
+            // Java 8 or lower
+            return Integer.parseInt(version.substring(2, 3));
+        } else {
+            // Java 9 or higher
+            int dot = version.indexOf(".");
+            return dot != -1 ? Integer.parseInt(version.substring(0, dot)) : Integer.parseInt(version);
+        }
+    }
 }

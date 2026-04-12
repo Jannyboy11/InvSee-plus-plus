@@ -76,4 +76,8 @@ public class Compat {
     public static String stringRepeat(String toBeRepeated, int count) {
         return toBeRepeated.repeat(count);
     }
+
+    public static int majorJavaVersion() {
+        return Runtime.version().feature();
+    }
 }

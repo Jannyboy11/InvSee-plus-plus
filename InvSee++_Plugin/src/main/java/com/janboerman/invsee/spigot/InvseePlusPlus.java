@@ -28,6 +28,7 @@ import com.janboerman.invsee.spigot.internal.resolve.ResolveStrategyType;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventoryHook;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 
+import com.janboerman.invsee.utils.Compat;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -41,10 +42,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -200,6 +198,7 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
     private void setupFastStats() {
         fastStats = dev.faststats.bukkit.BukkitMetrics.factory()
                 .addMetric(dev.faststats.core.data.Metric.string("back_end", this::getBackendMetric))
+                .addMetric(dev.faststats.core.data.Metric.number("major_java_version", Compat::majorJavaVersion))
                 .token(FastStats.API_TOKEN)
                 .create(this);
         fastStats.ready();
