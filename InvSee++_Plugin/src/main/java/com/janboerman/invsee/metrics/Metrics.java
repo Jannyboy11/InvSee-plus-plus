@@ -5,6 +5,10 @@ import com.janboerman.invsee.spigot.InvseePlusPlus;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.utils.Compat;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collections;
+
 public final class Metrics {
 
     private static final int MAJOR_JAVA_VERSION = Compat.majorJavaVersion();
@@ -23,6 +27,7 @@ public final class Metrics {
     public static Metrics enable(InvseePlusPlus plugin) {
         String downloadSource = DownloadSource.detect(plugin).toString();
         String backEnd = getBackendMetric(plugin);
+        Instant start = Instant.now();
 
         org.bstats.bukkit.Metrics bStats;
         dev.faststats.bukkit.BukkitMetrics fastStats;
@@ -32,6 +37,7 @@ public final class Metrics {
             bStats = new org.bstats.bukkit.Metrics(plugin, pluginId);
             bStats.addCustomChart(new org.bstats.charts.SimplePie("Back-end", () -> backEnd));  // bStats no longer allows dashes in chartIds in custom charts on their website?!
             bStats.addCustomChart(new org.bstats.charts.SimplePie("downloadSource", () -> downloadSource));
+            bStats.addCustomChart(new org.bstats.charts.SimplePie("uptime", () -> getUptime(start).toString()));
         }
 
         {
@@ -39,6 +45,7 @@ public final class Metrics {
                     .addMetric(dev.faststats.core.data.Metric.number("major_java_version", () -> MAJOR_JAVA_VERSION))
                     .addMetric(dev.faststats.core.data.Metric.string("back_end", () -> backEnd))
                     .addMetric(dev.faststats.core.data.Metric.string("download_source", () -> downloadSource))
+                    .addMetric(dev.faststats.core.data.Metric.number("uptime_days", () -> getDaysUptime(start)))
                     .token(FastStats.API_TOKEN)
                     .create(plugin);
             fastStats.ready();
@@ -65,5 +72,15 @@ public final class Metrics {
         else {
             return "Vanilla";
         }
+    }
+
+    private static Uptime getUptime(Instant from) {
+        Instant now = Instant.now();
+        return Uptime.calculate(from, now);
+    }
+
+    private static int getDaysUptime(Instant from) {
+        Instant now = Instant.now();
+        return (int)Duration.between(from, now).toDays();
     }
 }

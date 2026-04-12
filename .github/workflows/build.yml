@@ -1,6 +1,11 @@
-name: Compile
+name: Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - '**'   # run on all branches
+    tags-ignore:
+      - '**'   # ignore all tags
 
 jobs:
   build:
@@ -74,7 +79,7 @@ jobs:
           mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_1_1
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
-      - name: Create tagged release
+      - name: Create tagged release # TODO shouldn't do this here anymore. use separate release workflow.
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         uses: softprops/action-gh-release@v1
