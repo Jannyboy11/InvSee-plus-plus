@@ -39,7 +39,7 @@ public final class HangarVersionUploader {
     private static final String HANGAR_API_STAGING = "https://hangar.papermc.io/api/v1";
     private static final String HANGAR_API_LOCAL = "http://localhost:3333/api/v1";
     private static final Logger LOGGER = LoggerFactory.getLogger(HangarVersionUploader.class);
-    private static final String HANGAR_API_URL = HANGAR_API_STAGING; // TODO: Use appropriate URL
+    private static final String HANGAR_API_URL = HANGAR_API_PRODUCTION;
     private static final Gson GSON = new Gson();
     private final String apiKey;
     private ActiveJWT activeJWT;
@@ -77,8 +77,6 @@ public final class HangarVersionUploader {
     }
 
     public static void main(final String[] args) throws IOException {
-        // TODO: Get the API key from the Profile Dropdown -> Settings -> API Keys
-        // TODO: Insert your own project's namespace, dependencies, and version data
         final String projectName = "InvSee-plus-plus";
         final String apiKey = getApiKey();
         final List<Path> filePaths = List.of(
@@ -90,13 +88,8 @@ public final class HangarVersionUploader {
         String pluginVersion = readPluginVersion(filePaths.get(0));
         List<String> minecraftVersions = List.of(getMinecraftVersions());
 
-//        final List<PluginDependency> paperPluginDependencies = List.of(
-//                PluginDependency.createWithHangarNamespace("ViaVersion", true),
-//                PluginDependency.createWithUrl("Maintenance", "https://github.com/kennytv/Maintenance", false)
-//        );
         final List<MultipartFileOrUrl> fileInfo = List.of(
                 new MultipartFileOrUrl(List.of(Platform.PAPER), null) // Since the url is null here, the file from the filePaths list will be used
-//                new MultipartFileOrUrl(List.of(Platform.WATERFALL, Platform.VELOCITY), "https://somedownloadurl.test")
         );
         final VersionUpload versionUpload = new VersionUpload(
                 pluginVersion,
