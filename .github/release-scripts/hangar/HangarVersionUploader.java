@@ -91,7 +91,9 @@ public final class HangarVersionUploader {
         String channel = pluginVersion.endsWith("-SNAPSHOT") ? "Alpha" : "Release";
 
         final List<MultipartFileOrUrl> fileInfo = List.of(
-                new MultipartFileOrUrl(List.of(Platform.PAPER), null) // Since the url is null here, the file from the filePaths list will be used
+                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
+                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
+                new MultipartFileOrUrl(List.of(Platform.PAPER), null)
         );
         final VersionUpload versionUpload = new VersionUpload(
                 pluginVersion,
