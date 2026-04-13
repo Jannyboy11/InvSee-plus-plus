@@ -2,6 +2,7 @@
 //|   - com.google.code.gson:gson:2.13.2
 //|   - org.apache.httpcomponents.client5:httpclient5:5.6
 //|   - org.slf4j:slf4j-api:2.0.17
+//|   - org.slf4j:slf4j-jdk14:2.0.17
 //|   - org.checkerframework:checker-qual:4.0.0
 //|   - org.yaml:snakeyaml:2.6
 
