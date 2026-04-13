@@ -88,6 +88,7 @@ public final class HangarVersionUploader {
 
         String pluginVersion = readPluginVersion(filePaths.get(0));
         List<String> minecraftVersions = List.of(getMinecraftVersions());
+        String channel = pluginVersion.endsWith("-SNAPSHOT") ? "Alpha" : "Release";
 
         final List<MultipartFileOrUrl> fileInfo = List.of(
                 new MultipartFileOrUrl(List.of(Platform.PAPER), null) // Since the url is null here, the file from the filePaths list will be used
@@ -102,7 +103,7 @@ public final class HangarVersionUploader {
                 ),
                 "Automated deployment for InvSee++ v" + pluginVersion,
                 fileInfo,
-                "Alpha" // TODO change to 'Release'
+                channel
         );
 
         final HangarVersionUploader uploader = new HangarVersionUploader(apiKey);
