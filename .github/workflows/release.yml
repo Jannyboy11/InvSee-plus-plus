@@ -192,8 +192,12 @@ jobs:
         run: |
           echo Hangar > download-source.txt
           zip plugins/InvSee++.jar download-source.txt
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github/release-scripts/hangar/
       - name: Publish new version to Hangar
-        uses: actions/checkout@v6
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
         run: |
@@ -232,6 +236,7 @@ jobs:
 #        run: |
 #          echo Modrinth > download-source.txt
 #          zip plugins/InvSee++.jar download-source.txt
+#      - uses actions/checkout@v6
 #      - name: Publish new version to Modrinth
 #        env:
 #          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
