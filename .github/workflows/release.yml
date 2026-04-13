@@ -194,46 +194,45 @@ jobs:
           zip plugins/InvSee++.jar download-source.txt
       - name: Publish new version to Hangar
         uses: actions/checkout@v6
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.13'
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
         run: |
-          pip install -r .github/requirements.txt
-          python3 publish_hangar.py
+          curl -L https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/1.1.5/mill-dist-1.1.5-mill.sh -o mill
+          chmod +x mill
+          ./mill .github/release-scripts/hangar/HangerVersionUploader.java
+          
 
-  release_modrinth:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Download InvSee++
-        uses: actions/download-artifact@v4
-        with:
-          name: InvSee++
-          path: plugins/InvSee++.jar
-      - name: Download InvSee++_Give
-        uses: actions/download-artifact@v4
-        with:
-          name: InvSee++_Give
-          path: plugins/InvSee++_Give.jar
-      - name: Download InvSee++_Clear
-        uses: actions/download-artifact@v4
-        with:
-          name: InvSee++_Clear
-          path: plugins/InvSee++_Clear.jar
-      - name: Download InvSee++_Clone
-        uses: actions/download-artifact@v4
-        with:
-          name: InvSee++_Clone
-          path: plugins/InvSee++_Clone.jar
-      - name: Set download-source to GitHub
-        run: |
-          echo Modrinth > download-source.txt
-          zip plugins/InvSee++.jar download-source.txt
-      - name: Publish new version to Modrinth
-        env:
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-        run: |
-          echo "TODO!"
+#  release_modrinth:
+#    runs-on: ubuntu-latest
+#    needs: build
+#
+#    steps:
+#      - name: Download InvSee++
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: InvSee++
+#          path: plugins/InvSee++.jar
+#      - name: Download InvSee++_Give
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: InvSee++_Give
+#          path: plugins/InvSee++_Give.jar
+#      - name: Download InvSee++_Clear
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: InvSee++_Clear
+#          path: plugins/InvSee++_Clear.jar
+#      - name: Download InvSee++_Clone
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: InvSee++_Clone
+#          path: plugins/InvSee++_Clone.jar
+#      - name: Set download-source to GitHub
+#        run: |
+#          echo Modrinth > download-source.txt
+#          zip plugins/InvSee++.jar download-source.txt
+#      - name: Publish new version to Modrinth
+#        env:
+#          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+#        run: |
+#          echo "TODO!"
