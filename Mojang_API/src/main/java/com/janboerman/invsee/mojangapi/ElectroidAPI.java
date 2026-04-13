@@ -31,7 +31,7 @@ public class ElectroidAPI {
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5 * 1000); //5 seconds
                 connection.setRequestProperty("Accept", "application/json");
-                connection.setRequestProperty("User-Agent", "InvSee++/MojangAPI");
+                connection.setRequestProperty("User-Agent", "InvSee++/ElectroidAPI");
 
                 int statusCode = connection.getResponseCode();
                 switch (statusCode) {
@@ -59,7 +59,7 @@ public class ElectroidAPI {
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(5 * 1000); //5 seconds
                 connection.setRequestProperty("Accept", "application/json");
-                connection.setRequestProperty("User-Agent", "InvSee++/MojangAPI");
+                connection.setRequestProperty("User-Agent", "InvSee++/ElectroidAPI");
 
                 int statusCode = connection.getResponseCode();
                 switch (statusCode) {
