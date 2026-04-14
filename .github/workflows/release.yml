@@ -139,7 +139,7 @@ jobs:
           path: $GITHUB_WORKSPACE/plugins/InvSee++.jar
           merge-multiple: true
       - name: Download InvSee++_Give
-        uses: actions/download-artifact@8
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++_Give
           path: $GITHUB_WORKSPACE/plugins/InvSee++_Give.jar
@@ -183,7 +183,7 @@ jobs:
           path: plugins/InvSee++.jar
           merge-multiple: true
       - name: Download InvSee++_Give
-        uses: actions/download-artifact@8
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++_Give
           path: plugins/InvSee++_Give.jar
