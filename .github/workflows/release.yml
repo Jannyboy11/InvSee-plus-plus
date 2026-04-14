@@ -103,24 +103,28 @@ jobs:
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Upload InvSee++
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: InvSee++
+          archive: false
           path: InvSee++_Plugin/target/InvSee++.jar
       - name: Upload InvSee++_Give
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: InvSee++_Give
+          archive: false
           path: InvSee++_Give_Plugin/target/InvSee++_Give.jar
       - name: Upload InvSee++_Clear
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: InvSee++_Clear
+          archive: false
           path: InvSee++_Clear_Plugin/target/InvSee++_Clear.jar
       - name: Upload InvSee++_Clone
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: InvSee++_Clone
+          archive: false
           path: InvSee++_Clone_Plugin/target/InvSee++_Clone.jar
 
   release_github:
@@ -129,25 +133,29 @@ jobs:
 
     steps:
       - name: Download InvSee++
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++
-          path: plugins/InvSee++.jar
+          path: $GITHUB_WORKSPACE/plugins/InvSee++.jar
+          merge-multiple: true
       - name: Download InvSee++_Give
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@8
         with:
           name: InvSee++_Give
-          path: artifacts/InvSee++_Give.jar
+          path: $GITHUB_WORKSPACE/plugins/InvSee++_Give.jar
+          merge-multiple: true
       - name: Download InvSee++_Clear
-        uses: plugins/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++_Clear
-          path: artifacts/InvSee++_Clear.jar
+          path: $GITHUB_WORKSPACE/plugins/InvSee++_Clear.jar
+          merge-multiple: true
       - name: Download InvSee++_Clone
-        uses: plugins/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++_Clone
-          path: artifacts/InvSee++_Clone.jar
+          path: $GITHUB_WORKSPACE/plugins/InvSee++_Clone.jar
+          merge-multiple: true
       - name: Set download-source to GitHub
         run: |
           echo GitHub > download-source.txt
@@ -158,10 +166,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            plugins/InvSee++.jar
-            plugins/InvSee++_Give.jar
-            plugins/InvSee++_Clear.jar
-            plugins/InvSee++_Clone.jar
+            $GITHUB_WORKSPACE/plugins/InvSee++.jar
+            $GITHUB_WORKSPACE/plugins/InvSee++_Give.jar
+            $GITHUB_WORKSPACE/plugins/InvSee++_Clear.jar
+            $GITHUB_WORKSPACE/plugins/InvSee++_Clone.jar
 
   release_hangar:
     runs-on: ubuntu-latest
@@ -169,25 +177,23 @@ jobs:
 
     steps:
       - name: Download InvSee++
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++
           path: plugins/InvSee++.jar
+          merge-multiple: true
       - name: Download InvSee++_Give
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@8
         with:
           name: InvSee++_Give
           path: plugins/InvSee++_Give.jar
+          merge-multiple: true
       - name: Download InvSee++_Clear
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++_Clear
           path: plugins/InvSee++_Clear.jar
-      - name: Download InvSee++_Clone
-        uses: actions/download-artifact@v4
-        with:
-          name: InvSee++_Clone
-          path: plugins/InvSee++_Clone.jar
+          merge-multiple: true
       - name: Set download-source to GitHub
         run: |
           echo Hangar > download-source.txt
