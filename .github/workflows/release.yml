@@ -136,25 +136,25 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: InvSee++
-          path: $GITHUB_WORKSPACE/plugins/InvSee++.jar
+          path: $GITHUB_WORKSPACE/plugins
           merge-multiple: true
       - name: Download InvSee++_Give
-        uses: actions/download-artifact@8
+        uses: actions/download-artifact@v8
         with:
           name: InvSee++_Give
-          path: $GITHUB_WORKSPACE/plugins/InvSee++_Give.jar
+          path: $GITHUB_WORKSPACE/plugins
           merge-multiple: true
       - name: Download InvSee++_Clear
         uses: actions/download-artifact@v8
         with:
           name: InvSee++_Clear
-          path: $GITHUB_WORKSPACE/plugins/InvSee++_Clear.jar
+          path: $GITHUB_WORKSPACE/plugins
           merge-multiple: true
       - name: Download InvSee++_Clone
         uses: actions/download-artifact@v8
         with:
           name: InvSee++_Clone
-          path: $GITHUB_WORKSPACE/plugins/InvSee++_Clone.jar
+          path: $GITHUB_WORKSPACE/plugins
           merge-multiple: true
       - name: Set download-source to GitHub
         run: |
@@ -180,19 +180,19 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: InvSee++
-          path: plugins/InvSee++.jar
+          path: plugins
           merge-multiple: true
       - name: Download InvSee++_Give
         uses: actions/download-artifact@8
         with:
           name: InvSee++_Give
-          path: plugins/InvSee++_Give.jar
+          path: plugins
           merge-multiple: true
       - name: Download InvSee++_Clear
         uses: actions/download-artifact@v8
         with:
           name: InvSee++_Clear
-          path: plugins/InvSee++_Clear.jar
+          path: plugins
           merge-multiple: true
       - name: Set download-source to GitHub
         run: |
