@@ -157,22 +157,9 @@ jobs:
     needs: build
 
     steps:
-      - name: Download InvSee++
+      - name: Download InvSee++ and addons
         uses: actions/download-artifact@v8
         with:
-          name: InvSee++
-          path: plugins
-          merge-multiple: true
-      - name: Download InvSee++_Give
-        uses: actions/download-artifact@v8
-        with:
-          name: InvSee++_Give
-          path: plugins
-          merge-multiple: true
-      - name: Download InvSee++_Clear
-        uses: actions/download-artifact@v8
-        with:
-          name: InvSee++_Clear
           path: plugins
           merge-multiple: true
       - name: Set download-source to GitHub
