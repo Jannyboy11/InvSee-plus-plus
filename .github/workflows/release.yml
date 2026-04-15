@@ -175,6 +175,8 @@ jobs:
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
         run: |
+          pwd
+          ls
           curl -L https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/1.1.5/mill-dist-1.1.5-mill.sh -o mill
           chmod +x mill
           ./mill .github/release-scripts/hangar/HangerVersionUploader.java
