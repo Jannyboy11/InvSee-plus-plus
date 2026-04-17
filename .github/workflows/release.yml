@@ -162,7 +162,7 @@ jobs:
         with:
           path: plugins
           merge-multiple: true
-      - name: Set download-source to GitHub
+      - name: Set download-source to Hangar
         run: |
           echo Hangar > download-source.txt
           zip plugins/InvSee++.jar download-source.txt
@@ -206,7 +206,7 @@ jobs:
 #        with:
 #          name: InvSee++_Clone
 #          path: plugins/InvSee++_Clone.jar
-#      - name: Set download-source to GitHub
+#      - name: Set download-source to Modrinth
 #        run: |
 #          echo Modrinth > download-source.txt
 #          zip plugins/InvSee++.jar download-source.txt
