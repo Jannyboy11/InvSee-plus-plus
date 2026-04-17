@@ -173,17 +173,13 @@ jobs:
           echo Hangar > download-source.txt
           zip plugins/InvSee++.jar download-source.txt
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 1
-          sparse-checkout: |
-            release-scripts/hangar/
       - name: Publish new version to Hangar
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
         run: |
           curl -L https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/1.1.5/mill-dist-1.1.5-mill.sh -o mill
           chmod +x mill
-          ./mill release-scripts/hangar/HangerVersionUploader.java
+          ./mill HangerVersionUploader.java
 
 #  TODO implement this:
 #  release_modrinth:
