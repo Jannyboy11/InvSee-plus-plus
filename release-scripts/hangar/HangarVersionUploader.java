@@ -91,7 +91,7 @@ public final class HangarVersionUploader {
         String channel = pluginVersion.endsWith("-SNAPSHOT") ? "Alpha" : "Release";
 
         final List<MultipartFileOrUrl> fileInfo = List.of(
-                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
+                new MultipartFileOrUrl(List.of(Platform.PAPER), null)
                 // TODO are these wrong? should they be here for InvSee++_Give and InvSee++_Clear? Hangar rejects them when I use these.
 //                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
 //                new MultipartFileOrUrl(List.of(Platform.PAPER), null)
