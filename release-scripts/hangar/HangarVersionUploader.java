@@ -107,7 +107,7 @@ public final class HangarVersionUploader {
                 fileInfo,
                 channel
         );
-        LOGGER.info("VersionUpload: {}", versionUpload);
+        LOGGER.info("VersionUpload: {}.", versionUpload);
 
         final HangarVersionUploader uploader = new HangarVersionUploader(apiKey);
         try (final CloseableHttpClient client = HttpClients.createDefault()) {
@@ -136,6 +136,7 @@ public final class HangarVersionUploader {
 
         // Attach files (one file for each platform where no external url is defined in the version upload data)
         for (final Path filePath : filePaths) {
+            LOGGER.info("Adding file {} as multipart.", filePath.toAbsolutePath());
             builder.addPart("files", new FileBody(filePath.toFile(), ContentType.DEFAULT_BINARY));
         }
 
