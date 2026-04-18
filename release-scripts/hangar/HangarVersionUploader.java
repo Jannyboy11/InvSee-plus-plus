@@ -107,6 +107,7 @@ public final class HangarVersionUploader {
                 fileInfo,
                 channel
         );
+        LOGGER.info("VersionUpload: {}", versionUpload);
 
         final HangarVersionUploader uploader = new HangarVersionUploader(apiKey);
         try (final CloseableHttpClient client = HttpClients.createDefault()) {
