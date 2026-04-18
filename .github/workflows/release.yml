@@ -172,7 +172,12 @@ jobs:
         run: |
           echo Hangar > download-source.txt
           zip plugins/InvSee++.jar download-source.txt
-      - uses: actions/checkout@v6
+      - name: Download Hangar upload script
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            HangarVersionUploader.java
+          sparse-checkout-cone-mode: false
       - name: Publish new version to Hangar
         env:
           HANGAR_TOKEN: ${{ secrets.HANGAR_TOKEN }}
