@@ -185,7 +185,7 @@ jobs:
           pwd
           ls
           chmod +x release-scripts/mill-dist-1.1.5-mill.sh
-          ./release-scripts/mill-dist-1.1.5-mill.sh HangerVersionUploader.java
+          ./release-scripts/mill-dist-1.1.5-mill.sh HangarVersionUploader.java
 
 #  TODO implement this:
 #  release_modrinth:
