@@ -11,7 +11,7 @@ import java.util.Collections;
 
 public final class Metrics {
 
-    private static final int MAJOR_JAVA_VERSION = Compat.majorJavaVersion();
+    private static final String MAJOR_JAVA_VERSION = "Java " + Compat.majorJavaVersion();
 
     private final org.bstats.bukkit.Metrics bStats;
     private final dev.faststats.bukkit.BukkitMetrics fastStats;
@@ -42,7 +42,7 @@ public final class Metrics {
 
         {
             fastStats = dev.faststats.bukkit.BukkitMetrics.factory()
-                    .addMetric(dev.faststats.core.data.Metric.number("major_java_version", () -> MAJOR_JAVA_VERSION))
+                    .addMetric(dev.faststats.core.data.Metric.string("major_java_version", () -> MAJOR_JAVA_VERSION))
                     .addMetric(dev.faststats.core.data.Metric.string("back_end", () -> backEnd))
                     .addMetric(dev.faststats.core.data.Metric.string("download_source", () -> downloadSource))
                     .addMetric(dev.faststats.core.data.Metric.number("uptime_days", () -> getDaysUptime(start)))

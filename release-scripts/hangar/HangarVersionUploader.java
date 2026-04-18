@@ -92,8 +92,9 @@ public final class HangarVersionUploader {
 
         final List<MultipartFileOrUrl> fileInfo = List.of(
                 new MultipartFileOrUrl(List.of(Platform.PAPER), null),
-                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
-                new MultipartFileOrUrl(List.of(Platform.PAPER), null)
+                // TODO are these wrong? should they be here for InvSee++_Give and InvSee++_Clear? Hangar rejects them when I use these.
+//                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
+//                new MultipartFileOrUrl(List.of(Platform.PAPER), null)
         );
         final VersionUpload versionUpload = new VersionUpload(
                 pluginVersion,
@@ -147,6 +148,11 @@ public final class HangarVersionUploader {
         final boolean success = client.execute(post, response -> {
             if (response.getCode() != 200) {
                 LOGGER.error("Error uploading version {}: {}", response.getCode(), response.getReasonPhrase());
+                if (response instanceof org.apache.hc.core5.http.HttpEntityContainer entityResponse) {
+                    var httpEntity = response.getEntity();
+                    var contents = new String(httpEntity.getContent().readAllBytes(), StandardCharsets.UTF_8);
+                    LOGGER.error("Response body: {}", contents);
+                }
                 return false;
             }
             return true;
