@@ -1,14 +1,9 @@
 name: Release
 
-# TODO change to this to run only on tags.
-#on:
-#  push:
-#    tags:
-#      - '*'
 on:
   push:
-    branches:
-      - 'feature/download-source'
+    tags:
+      - '*'
 
 env:
   # Single line string with spaces between values.
