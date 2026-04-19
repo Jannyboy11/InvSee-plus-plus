@@ -1,6 +1,11 @@
-name: Compile
+name: Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - '**'   # run on all branches
+    tags-ignore:
+      - '**'   # ignore all tags
 
 jobs:
   build:
@@ -74,23 +79,6 @@ jobs:
           mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_1_1
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
-      - name: Create tagged release
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            InvSee++_Plugin/target/InvSee++.jar
-            InvSee++_Give_Plugin/target/InvSee++_Give.jar
-            InvSee++_Clear_Plugin/target/InvSee++_Clear.jar
-            InvSee++_Clone_Plugin/target/InvSee++_Clone.jar
-#      No longer needed since the maven-release-plugin already does this.
-#      - name: Deploy to GitHub Packages
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        if: startsWith(github.ref, 'refs/tags/')
-#        run: mvn deploy
       - name: Deploy Javadoc
         uses: MathieuSoysal/Javadoc-publisher.yml@v2.4.0
         if: github.ref == 'refs/heads/master'
