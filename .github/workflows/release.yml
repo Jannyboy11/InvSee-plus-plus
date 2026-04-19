@@ -29,6 +29,7 @@ env:
     26.1
     26.1.1
     26.1.2
+  # TODO can we auto-detect the versions based on the implementations present? probably yes!
 
 jobs:
   build:
