@@ -178,39 +178,28 @@ jobs:
           chmod +x release-scripts/mill-dist-1.1.5-mill.sh
           ./release-scripts/mill-dist-1.1.5-mill.sh release-scripts/hangar/HangarVersionUploader.java
 
-#  TODO implement this:
-#  release_modrinth:
-#    runs-on: ubuntu-latest
-#    needs: build
-#
-#    steps:
-#      - name: Download InvSee++
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: InvSee++
-#          path: plugins/InvSee++.jar
-#      - name: Download InvSee++_Give
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: InvSee++_Give
-#          path: plugins/InvSee++_Give.jar
-#      - name: Download InvSee++_Clear
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: InvSee++_Clear
-#          path: plugins/InvSee++_Clear.jar
-#      - name: Download InvSee++_Clone
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: InvSee++_Clone
-#          path: plugins/InvSee++_Clone.jar
-#      - name: Set download-source to Modrinth
-#        run: |
-#          echo Modrinth > download-source.txt
-#          zip plugins/InvSee++.jar download-source.txt
-#      - uses actions/checkout@v6
-#      - name: Publish new version to Modrinth
-#        env:
-#          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-#        run: |
-#          echo "TODO!"
+  release_modrinth:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download Modrinth upload script
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: |
+            release-scripts
+      - name: Download InvSee++ and addons
+        uses: actions/download-artifact@v8
+        with:
+          path: plugins
+          merge-multiple: true
+      - name: Set download-source to Modrinth
+        run: |
+          echo Modrinth > download-source.txt
+          zip plugins/InvSee++.jar download-source.txt
+      - name: Publish new version to Modrinth
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          chmod +x release-scripts/mill-dist-1.1.5-mill.sh
+          ./release-scripts/mill-dist-1.1.5-mill.sh release-scripts/modrinth/ModrinthVersionUploader.java
