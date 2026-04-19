@@ -13,5 +13,6 @@ com.janboerman.invsee.spigot.api.logging
 com.janboerman.invsee.spigot.api.target
 com.janboerman.invsee.spigot.api.response
 com.janboerman.invsee.spigot
+com.janboerman.invsee.metrics
 com.janboerman.invsee.folia
 com.janboerman.invsee.paper
