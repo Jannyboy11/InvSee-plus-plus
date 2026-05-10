@@ -8,10 +8,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>give_impl_paper_26_1_1</artifactId>
-    <name>InvSee++ Give implementation for Paper 26.1.1</name>
+    <name>InvSee++ Give implementation for Paper 26.1.2</name>
 
     <properties>
-        <paper.version>26.1.1.build.29-alpha</paper.version>
+        <paper.version>26.1.2.build.59-stable</paper.version>
     </properties>
 
     <pluginRepositories>
@@ -28,7 +28,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <release>21</release>
+                    <release>25</release>
                 </configuration>
             </plugin>
         </plugins>
