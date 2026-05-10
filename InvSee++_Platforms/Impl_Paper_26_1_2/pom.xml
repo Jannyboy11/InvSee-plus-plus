@@ -7,17 +7,26 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>give_impl_paper_26_1_1</artifactId>
-    <name>InvSee++ Give implementation for Paper 26.1.2</name>
+    <artifactId>impl_paper_26_1_2</artifactId>
+    <name>InvSee++ implementation for Paper 26.1.2</name>
 
     <properties>
         <paper.version>26.1.2.build.59-stable</paper.version>
+        <paper-nms-maven-plugin.version>1.4.11-SNAPSHOT</paper-nms-maven-plugin.version> <!-- TODO change to release version. -->
+        <authlib.version>7.0.61</authlib.version>
+        <datafixerupper.version>9.0.19</datafixerupper.version>
+        <netty.version>4.2.7.Final</netty.version>
     </properties>
 
     <pluginRepositories>
         <pluginRepository>
             <id>bytecode.space</id>
             <url>https://repo.bytecode.space/repository/maven-public/</url>
+        </pluginRepository>
+        <!-- TODO remove Repsy repo when official Paper 26.1.1 support has landed in upstream distribution of paper-nms-maven-plugin. -->
+        <pluginRepository>
+            <id>jannyboy11-repsy</id>
+            <url>https://repo.repsy.io/mvn/jannyboy11/minecraft</url>
         </pluginRepository>
     </pluginRepositories>
 
@@ -31,6 +40,12 @@
                     <release>25</release>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>ca.bkaw</groupId>
+                <artifactId>paper-nms-maven-plugin</artifactId>
+                <version>${paper-nms-maven-plugin.version}</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -43,6 +58,30 @@
 
     <dependencies>
         <dependency>
+            <groupId>ca.bkaw</groupId>
+            <artifactId>paper-nms</artifactId>
+            <version>${paper.version}-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>${authlib.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>datafixerupper</artifactId>
+            <version>${datafixerupper.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${netty.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>${paper.version}</version>
@@ -50,7 +89,7 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>invsee-plus-plus_give_common</artifactId>
+            <artifactId>invsee-plus-plus_common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -58,12 +97,6 @@
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>utils</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>ca.bkaw</groupId>
-            <artifactId>paper-nms</artifactId>
-            <version>${paper.version}-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

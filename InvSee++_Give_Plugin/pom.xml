@@ -84,7 +84,7 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
-            <artifactId>give_impl_paper_26_1_1</artifactId>
+            <artifactId>give_impl_paper_26_1_2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
