@@ -11,7 +11,10 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
-import java.io.InputStream;
+import java.util.zip.ZipOutputStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class HangarVersionUploader {
