@@ -35,6 +35,8 @@ public final class Metrics {
         org.bstats.bukkit.Metrics bStats;
         dev.faststats.bukkit.BukkitMetrics fastStats;
 
+        // TODO metric idea: api-consumers: other plugins which consume the InvSee++ api.
+        // TODO this would require an api-restructure though, much like https://github.com/Jannyboy11/InvSee-plus-plus/issues/92
         {
             final int pluginId = 9309;
             bStats = new org.bstats.bukkit.Metrics(plugin, pluginId);
