@@ -92,7 +92,7 @@ public final class HangarVersionUploader {
 
         final List<MultipartFileOrUrl> fileInfo = List.of(
                 new MultipartFileOrUrl(List.of(Platform.PAPER), null)
-                // TODO are these wrong? should they be here for InvSee++_Give and InvSee++_Clear? Hangar rejects them when I use these.
+                // TODO for the time being, only a single file is accepted by the Hangar server, see: https://github.com/HangarMC/Hangar/issues/1550
 //                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
 //                new MultipartFileOrUrl(List.of(Platform.PAPER), null)
         );
@@ -117,16 +117,11 @@ public final class HangarVersionUploader {
     }
 
     private static void zipFiles(List<Path> files, Path zipPath) throws IOException {
-        try (OutputStream fos = Files.newOutputStream(zipPath);
-             ZipOutputStream zos = new ZipOutputStream(fos)) {
-
+        try (OutputStream fos = Files.newOutputStream(zipPath); ZipOutputStream zos = new ZipOutputStream(fos)) {
             for (Path file : files) {
-                // Use just the file name inside the zip
                 ZipEntry entry = new ZipEntry(file.getFileName().toString());
                 zos.putNextEntry(entry);
-
                 Files.copy(file, zos);
-
                 zos.closeEntry();
             }
         }
@@ -151,6 +146,7 @@ public final class HangarVersionUploader {
         final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.addPart("versionUpload", new StringBody(GSON.toJson(versionUpload), ContentType.APPLICATION_JSON));
 
+        // Group together .jar files into .zip file until Hangar supports multiple files per release: https://github.com/HangarMC/Hangar/issues/1550
         final Path zipFilePath = Path.of("plugins/InvSee++.zip");
         zipFiles(filePaths, zipFilePath);
 
