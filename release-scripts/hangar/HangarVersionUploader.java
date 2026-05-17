@@ -116,6 +116,22 @@ public final class HangarVersionUploader {
         }
     }
 
+    private static void zipFiles(List<Path> files, Path zipPath) throws IOException {
+        try (OutputStream fos = Files.newOutputStream(zipPath);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+            for (Path file : files) {
+                // Use just the file name inside the zip
+                ZipEntry entry = new ZipEntry(file.getFileName().toString());
+                zos.putNextEntry(entry);
+
+                Files.copy(file, zos);
+
+                zos.closeEntry();
+            }
+        }
+    }
+
     /**
      * Uploads a new version to Hangar.
      *
@@ -135,11 +151,11 @@ public final class HangarVersionUploader {
         final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.addPart("versionUpload", new StringBody(GSON.toJson(versionUpload), ContentType.APPLICATION_JSON));
 
-        // Attach files (one file for each platform where no external url is defined in the version upload data)
-        for (final Path filePath : filePaths) {
-            LOGGER.info("Adding file {} as multipart.", filePath.toAbsolutePath());
-            builder.addPart("files", new FileBody(filePath.toFile(), ContentType.DEFAULT_BINARY));
-        }
+        final Path zipFilePath = Path.of("plugins/InvSee++.zip");
+        zipFiles(filePaths, zipFilePath);
+
+        LOGGER.info("Adding file {} as multipart.", zipFilePath.toAbsolutePath());
+        builder.addPart("files", new FileBody(zipFilePath.toFile(), ContentType.DEFAULT_BINARY));
 
         final HttpPost post = new HttpPost("%s/projects/%s/upload".formatted(HANGAR_API_URL, project));
         post.setEntity(builder.build());
