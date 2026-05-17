@@ -3,7 +3,7 @@ package com.janboerman.invsee.metrics;
 import java.time.Duration;
 import java.time.Instant;
 
-public enum Uptime {
+public enum TimePeriod {
 
     LESS_THAN_ONE_DAY("< 1 day"),
     ONE_DAY_2_ONE_WEEK("1 day - 1 week"),
@@ -16,7 +16,7 @@ public enum Uptime {
 
     private final String toString;
 
-    private Uptime(String toString) {
+    private TimePeriod(String toString) {
         this.toString = toString;
     }
 
@@ -24,7 +24,7 @@ public enum Uptime {
         return toString;
     }
 
-    static Uptime calculate(Instant from, Instant to) {
+    static TimePeriod calculate(Instant from, Instant to) {
         long days = Duration.between(from, to).toDays();
         if (days < 1) {
             return LESS_THAN_ONE_DAY;

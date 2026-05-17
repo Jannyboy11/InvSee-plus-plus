@@ -41,6 +41,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -509,5 +510,9 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
         sender.sendMessage(ChatColor.YELLOW + "Most likely this is a Minecraft/InvSee++ version mismatch.");
         sender.sendMessage(ChatColor.YELLOW + "Check your logs for more information.");
         return true;
+    }
+
+    public Path getJarFilePath() {
+        return getFile().toPath();
     }
 }

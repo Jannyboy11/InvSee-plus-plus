@@ -5,9 +5,11 @@ import com.janboerman.invsee.spigot.InvseePlusPlus;
 import com.janboerman.invsee.spigot.perworldinventory.PerWorldInventorySeeApi;
 import com.janboerman.invsee.utils.Compat;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.logging.Level;
 
 public final class Metrics {
 
@@ -28,6 +30,7 @@ public final class Metrics {
         String downloadSource = DownloadSource.detect(plugin).toString();
         String backEnd = getBackendMetric(plugin);
         Instant start = Instant.now();
+        Instant installationTime = getInstallationTime(plugin);
 
         org.bstats.bukkit.Metrics bStats;
         dev.faststats.bukkit.BukkitMetrics fastStats;
@@ -37,15 +40,22 @@ public final class Metrics {
             bStats = new org.bstats.bukkit.Metrics(plugin, pluginId);
             bStats.addCustomChart(new org.bstats.charts.SimplePie("Back-end", () -> backEnd));  // bStats no longer allows dashes in chartIds in custom charts on their website?!
             bStats.addCustomChart(new org.bstats.charts.SimplePie("downloadSource", () -> downloadSource));
-            bStats.addCustomChart(new org.bstats.charts.SimplePie("uptime", () -> getUptime(start).toString()));
+            bStats.addCustomChart(new org.bstats.charts.SimplePie("uptime", () -> getTimePeriod(start).toString()));
+            if (installationTime != null) {
+                bStats.addCustomChart(new org.bstats.charts.SimplePie("installationAge", () -> getTimePeriod(installationTime).toString()));
+            }
         }
 
         {
-            fastStats = dev.faststats.bukkit.BukkitMetrics.factory()
+            dev.faststats.bukkit.BukkitMetrics.Factory fastStatsFactory = dev.faststats.bukkit.BukkitMetrics.factory()
                     .addMetric(dev.faststats.core.data.Metric.number("major_java_version", () -> MAJOR_JAVA_VERSION))
                     .addMetric(dev.faststats.core.data.Metric.string("back_end", () -> backEnd))
                     .addMetric(dev.faststats.core.data.Metric.string("download_source", () -> downloadSource))
-                    .addMetric(dev.faststats.core.data.Metric.number("uptime_days", () -> getDaysUptime(start)))
+                    .addMetric(dev.faststats.core.data.Metric.number("uptime_days", () -> getDaysSince(start)));
+            if (installationTime != null) {
+                fastStatsFactory.addMetric(dev.faststats.core.data.Metric.number("installation_age_days", () -> getDaysSince(installationTime)));
+            }
+            fastStats = fastStatsFactory
                     .token(FastStats.API_TOKEN)
                     .create(plugin);
             fastStats.ready();
@@ -69,18 +79,28 @@ public final class Metrics {
         //else if: Separe-World-Items
         //else if: PolyVerse (Lokka30/ArcanePlugins)
         //else if: World (TheNextLvl)
+        //else if: PerWorlds (NonSwag)
         else {
             return "Vanilla";
         }
     }
 
-    private static Uptime getUptime(Instant from) {
+    private static TimePeriod getTimePeriod(Instant from) {
         Instant now = Instant.now();
-        return Uptime.calculate(from, now);
+        return TimePeriod.calculate(from, now);
     }
 
-    private static int getDaysUptime(Instant from) {
+    private static int getDaysSince(Instant from) {
         Instant now = Instant.now();
         return (int)Duration.between(from, now).toDays();
+    }
+
+    private static Instant getInstallationTime(InvseePlusPlus plugin) {
+        try {
+            return Files.getLastModifiedTime(plugin.getJarFilePath()).toInstant();
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Could not obtain plugin last modified time.", e);
+            return null;
+        }
     }
 }
