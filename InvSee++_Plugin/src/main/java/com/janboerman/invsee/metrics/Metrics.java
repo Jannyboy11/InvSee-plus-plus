@@ -78,8 +78,7 @@ public final class Metrics {
         //else if: MyWorlds
         //else if: Separe-World-Items
         //else if: PolyVerse (Lokka30/ArcanePlugins)
-        //else if: World (TheNextLvl)
-        //else if: PerWorlds (NonSwag)
+        //else if: World (TheNextLvl) / PerWorlds (NonSwag)
         else {
             return "Vanilla";
         }
@@ -92,7 +91,7 @@ public final class Metrics {
 
     private static int getDaysSince(Instant from) {
         Instant now = Instant.now();
-        return (int)Duration.between(from, now).toDays();
+        return (int) Duration.between(from, now).toDays();
     }
 
     private static Instant getInstallationTime(InvseePlusPlus plugin) {
