@@ -14,6 +14,7 @@ import com.janboerman.invsee.spigot.api.response.OpenResponse;
 import com.janboerman.invsee.spigot.api.response.SaveResponse;
 import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
+import com.janboerman.invsee.spigot.api.target.UniqueIdTarget;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
@@ -23,6 +24,7 @@ import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
 import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
 import com.janboerman.invsee.spigot.api.Scheduler;
 import com.janboerman.invsee.spigot.internal.inventory.Personal;
+import com.janboerman.invsee.utils.Compat;
 import me.ebonjaeger.perworldinventory.Group;
 import me.ebonjaeger.perworldinventory.data.PlayerProfile;
 import me.ebonjaeger.perworldinventory.data.ProfileKey;
@@ -51,6 +53,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform {
@@ -464,6 +467,17 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
         return saveEnderChest(enderChest, profileKey, saveVanilla);
     }
 
+    private CompletableFuture<Boolean> isTargetExempted(ProfileKey profileKey, Target target, BiPredicate<Target, String> isExempted) {
+        Set<String> worlds = Compat.setCopy(profileKey.getGroup().getWorlds());
+        // force async for LuckPerms.
+        Executor executor =  plugin.getServer().getPluginManager().isPluginEnabled("LuckPerms")
+                ? scheduler::executeAsync
+                : target instanceof UniqueIdTarget
+                        ? runnable -> scheduler.executeSyncPlayer(((UniqueIdTarget) target).getUniqueId(), runnable, () -> {})
+                        : scheduler::executeSyncGlobal;
+        return CompletableFuture.supplyAsync(() -> worlds.stream().anyMatch(world -> isExempted.test(target, world)), executor);
+    }
+
     public CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOfflineInventory(UUID playerId, String playerName, CreationOptions<PlayerInventorySlot> options, ProfileKey profileKey) {
         return createOfflineInventory(playerId, playerName, options, profileKey, pwiHook.isGroupManagedByPWI(profileKey.getGroup()));
     }
@@ -473,11 +487,13 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
 
         //check whether the player is not exempted.
         final Target target = Target.byGameProfile(playerId, playerName);
-        if (profileKey.getGroup().getWorlds().stream().anyMatch(world -> exempt.isExemptedFromHavingMainInventorySpectated(target, world)))
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+        CompletableFuture<Boolean> exempted = isTargetExempted(profileKey, target, exempt::isExemptedFromHavingMainInventorySpectated);
 
         //try non-managed
-        CompletableFuture<SpectateResponse<MainSpectatorInventory>> fromVanillaStorageOfflineInv = wrapped.createOfflineInventory(playerId, playerName, options);
+        CompletableFuture<SpectateResponse<MainSpectatorInventory>> fromVanillaStorageOfflineInv = exempted.thenCompose(isExempted -> {
+            if (isExempted) return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+            else return wrapped.createOfflineInventory(playerId, playerName, options);
+        });
         if (!pwiHook.pwiManagedInventories()) return fromVanillaStorageOfflineInv;
 
         //create a fake player for PWI so that we can load data onto it!
@@ -594,11 +610,13 @@ public class PerWorldInventorySeeApi extends InvseeAPI implements InvseePlatform
 
         //check whether the player is not exempted.
         final Target target = Target.byGameProfile(playerId, playerName);
-        if (profileKey.getGroup().getWorlds().stream().anyMatch(world -> exempt.isExemptedFromHavingEnderchestSpectated(target, world)))
-            return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+        CompletableFuture<Boolean> exempted = isTargetExempted(profileKey, target, exempt::isExemptedFromHavingEnderchestSpectated);
 
         //try non-managed
-        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> nonPwiEnderSpectatorFuture = wrapped.createOfflineEnderChest(playerId, playerName, options);
+        CompletableFuture<SpectateResponse<EnderSpectatorInventory>> nonPwiEnderSpectatorFuture = exempted.thenCompose(isExempted -> {
+            if (isExempted) return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
+            else return wrapped.createOfflineEnderChest(playerId, playerName, options);
+        });
         if (!pwiHook.pwiManagedEnderChests()) return nonPwiEnderSpectatorFuture;
 
         //create a fake player for PWI so that we can load data onto it!

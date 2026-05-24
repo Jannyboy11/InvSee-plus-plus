@@ -24,5 +24,5 @@ public interface Scheduler {
 
     public void executeLaterGlobal(Runnable task, long delayTicks);
 
-    void executeLaterAsync(Runnable task, long delayTicks);
+    public void executeLaterAsync(Runnable task, long delayTicks);
 }
