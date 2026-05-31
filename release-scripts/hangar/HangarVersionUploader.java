@@ -11,7 +11,10 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
-import java.io.InputStream;
+import java.util.zip.ZipOutputStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class HangarVersionUploader {
@@ -92,7 +95,7 @@ public final class HangarVersionUploader {
 
         final List<MultipartFileOrUrl> fileInfo = List.of(
                 new MultipartFileOrUrl(List.of(Platform.PAPER), null)
-                // TODO are these wrong? should they be here for InvSee++_Give and InvSee++_Clear? Hangar rejects them when I use these.
+                // TODO for the time being, only a single file is accepted by the Hangar server, see: https://github.com/HangarMC/Hangar/issues/1550
 //                new MultipartFileOrUrl(List.of(Platform.PAPER), null),
 //                new MultipartFileOrUrl(List.of(Platform.PAPER), null)
         );
@@ -116,6 +119,17 @@ public final class HangarVersionUploader {
         }
     }
 
+    private static void zipFiles(List<Path> files, Path zipPath) throws IOException {
+        try (OutputStream fos = Files.newOutputStream(zipPath); ZipOutputStream zos = new ZipOutputStream(fos)) {
+            for (Path file : files) {
+                ZipEntry entry = new ZipEntry(file.getFileName().toString());
+                zos.putNextEntry(entry);
+                Files.copy(file, zos);
+                zos.closeEntry();
+            }
+        }
+    }
+
     /**
      * Uploads a new version to Hangar.
      *
@@ -135,11 +149,12 @@ public final class HangarVersionUploader {
         final MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.addPart("versionUpload", new StringBody(GSON.toJson(versionUpload), ContentType.APPLICATION_JSON));
 
-        // Attach files (one file for each platform where no external url is defined in the version upload data)
-        for (final Path filePath : filePaths) {
-            LOGGER.info("Adding file {} as multipart.", filePath.toAbsolutePath());
-            builder.addPart("files", new FileBody(filePath.toFile(), ContentType.DEFAULT_BINARY));
-        }
+        // Group together .jar files into .zip file until Hangar supports multiple files per release: https://github.com/HangarMC/Hangar/issues/1550
+        final Path zipFilePath = Path.of("plugins/InvSee++.zip");
+        zipFiles(filePaths, zipFilePath);
+
+        LOGGER.info("Adding file {} as multipart.", zipFilePath.toAbsolutePath());
+        builder.addPart("files", new FileBody(zipFilePath.toFile(), ContentType.DEFAULT_BINARY));
 
         final HttpPost post = new HttpPost("%s/projects/%s/upload".formatted(HANGAR_API_URL, project));
         post.setEntity(builder.build());
