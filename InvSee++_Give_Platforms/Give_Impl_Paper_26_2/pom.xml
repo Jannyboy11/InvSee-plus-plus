@@ -7,12 +7,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>give_impl_26_2</artifactId>
-    <name>InvSee++ Give implementation for CraftBukkit 26.2</name>
+    <artifactId>give_impl_paper_26_2</artifactId>
+    <name>InvSee++ Give implementation for Paper 26.2</name>
 
     <properties>
-        <bukkit.version>26.2-R0.1-SNAPSHOT</bukkit.version>
+        <paper.version>26.2-rc-2.build.5-alpha</paper.version>
     </properties>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>bytecode.space</id>
+            <url>https://repo.bytecode.space/repository/maven-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <plugins>
@@ -27,7 +34,20 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>${paper.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>invsee-plus-plus_give_common</artifactId>
@@ -41,9 +61,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>${bukkit.version}</version>
+            <groupId>ca.bkaw</groupId>
+            <artifactId>paper-nms</artifactId>
+            <version>${paper.version}-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

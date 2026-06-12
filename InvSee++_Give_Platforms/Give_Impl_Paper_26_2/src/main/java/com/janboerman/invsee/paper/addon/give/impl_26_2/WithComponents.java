@@ -1,14 +1,11 @@
-package com.janboerman.invsee.spigot.addon.give.impl_26_2;
+package com.janboerman.invsee.paper.addon.give.impl_26_2;
 
 import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.utils.Either;
-
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
+import net.minecraft.commands.arguments.item.ItemInput;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
-
-import net.minecraft.commands.arguments.item.ItemInput;
 
 final class WithComponents implements ItemType {
 

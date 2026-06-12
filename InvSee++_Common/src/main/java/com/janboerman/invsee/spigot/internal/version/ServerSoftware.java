@@ -210,12 +210,12 @@ public class ServerSoftware {
         if (!(o instanceof ServerSoftware)) return false;
 
         ServerSoftware that = (ServerSoftware) o;
-        return this.platform == that.platform && Objects.equals(this.version, that.version);
+        return this.platform == that.platform && Objects.equals(this.versionString, that.versionString);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(platform, version);
+        return Objects.hash(platform, versionString);
     }
 
     public MinecraftPlatform getPlatform() {

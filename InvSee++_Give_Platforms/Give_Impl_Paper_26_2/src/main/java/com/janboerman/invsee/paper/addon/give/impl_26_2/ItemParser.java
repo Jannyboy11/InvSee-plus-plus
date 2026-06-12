@@ -1,13 +1,13 @@
-package com.janboerman.invsee.spigot.addon.give.impl_26_2;
+package com.janboerman.invsee.paper.addon.give.impl_26_2;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.HolderLookup;
+import org.bukkit.craftbukkit.CraftRegistry;
 
 final class ItemParser {
 
@@ -24,7 +24,7 @@ final class ItemParser {
     }
 
     private static CommandBuildContext getContext() {
-        HolderLookup.Provider provider = PaperSupport.getDefaultRegistry();
+        HolderLookup.Provider provider = CraftRegistry.getMinecraftRegistry();
         return Commands.createValidationContext(provider);
     }
 }

@@ -1,14 +1,12 @@
-package com.janboerman.invsee.spigot.addon.give.impl_26_2;
+package com.janboerman.invsee.paper.addon.give.impl_26_2;
 
 import com.janboerman.invsee.spigot.addon.give.common.Convert;
 import com.janboerman.invsee.spigot.addon.give.common.GiveApi;
 import com.janboerman.invsee.spigot.addon.give.common.ItemType;
 import com.janboerman.invsee.utils.Either;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
-import org.bukkit.inventory.ItemStack;
-
 import net.minecraft.world.Container;
+import org.bukkit.inventory.ItemStack;
 
 public class GiveImpl implements GiveApi {
 
