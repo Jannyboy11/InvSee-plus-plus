@@ -70,6 +70,14 @@ class SetupImpl implements Setup {
     }
 }
 
+// TODO juni 2026:
+//class Impl_26_2 extends SetupImpl {
+//    Impl_26_2() {
+//        super(com.janboerman.invsee.spigot.addon.give.impl_26_2.GiveImpl.INSTANCE);
+//    }
+//}
+
+
 class Impl_26_1_1 extends SetupImpl {
     Impl_26_1_1() {
         super(com.janboerman.invsee.spigot.addon.give.impl_26_1_1.GiveImpl.INSTANCE);

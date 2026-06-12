@@ -36,16 +36,24 @@ public class ServerSoftware {
             PAPER_1_21_11 = new ServerSoftware(PAPER, _1_21_11),
             PAPER_26_1_1 = new ServerSoftware(PAPER, _26_1_1),
             PAPER_26_1_2 = new ServerSoftware(PAPER, _26_1_2),
+            PAPER_26_2 = new ServerSoftware(PAPER, _26_2),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
 
     private MinecraftPlatform platform;
     private MinecraftVersion version;
+    private String versionString;
 
     public ServerSoftware(MinecraftPlatform platform, MinecraftVersion version) {
         this.platform = platform;
         this.version = version;
+        this.versionString = version.toString();
+    }
+
+    public ServerSoftware(MinecraftPlatform platform, String version) {
+        this.platform = platform;
+        this.versionString = version;
     }
 
     public static ServerSoftware detect(final Server server) {
@@ -153,7 +161,7 @@ public class ServerSoftware {
                 // CraftBukkit 26.1 and up or Paper 1.20.4 and up:
                 try {
                     // Call Server#getMinecraftVersion() to find out the version (this method was added by Paper).
-                    return new ServerSoftware(PAPER, MinecraftVersion.fromString(server.getMinecraftVersion()));
+                    return new ServerSoftware(PAPER, server.getMinecraftVersion());
                 } catch (NoSuchMethodError nsme) {
                     // Apparently we are not running on Paper
                     switch (CraftbukkitMappingsVersion.getMappingsVersion(server)) {
@@ -185,7 +193,7 @@ public class ServerSoftware {
         }
 
         if (serverClassName.matches("org\\.bukkit\\.craftbukkit\\.v((.?)*)\\.CraftServer")) {
-            return new ServerSoftware(CRAFTBUKKIT, null);
+            return new ServerSoftware(CRAFTBUKKIT, (String)null);
         }
 
         return null;
@@ -202,7 +210,7 @@ public class ServerSoftware {
         if (!(o instanceof ServerSoftware)) return false;
 
         ServerSoftware that = (ServerSoftware) o;
-        return this.platform == that.platform && this.version == that.version;
+        return this.platform == that.platform && Objects.equals(this.version, that.version);
     }
 
     @Override
@@ -216,6 +224,10 @@ public class ServerSoftware {
 
     public MinecraftVersion getVersion() {
         return version;
+    }
+
+    public String getVersionString() {
+        return versionString;
     }
 
 }

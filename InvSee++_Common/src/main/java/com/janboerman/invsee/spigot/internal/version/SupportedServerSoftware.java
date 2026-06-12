@@ -36,7 +36,7 @@ public class SupportedServerSoftware<ImplementationProvider> {
         return platform + " version " + server.getVersion() + " is not supported by this release of InvSee++. "
                 + "Please use one of the following " + platform + " versions: " + supportedVersions.keySet().stream()
                         .filter(software -> software.getPlatform() == platform)
-                        .map(software -> software.getVersion().toString())
+                        .map(software -> software.getVersionString())
                         .collect(Collectors.joining(", ", "[", "]")) + ". "
                 + "Alternatively you can try upgrading InvSee++ if any of the versions listed here is older than your server's Minecraft version. "
                 + "InvSee++ is available on SpigotMC (recommended): " + "https://www.spigotmc.org/resources/invsee.82342/" + " and on GitHub: "
