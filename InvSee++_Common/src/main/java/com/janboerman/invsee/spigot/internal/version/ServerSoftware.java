@@ -41,9 +41,9 @@ public class ServerSoftware {
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
 
-    private MinecraftPlatform platform;
-    private MinecraftVersion version;
-    private String versionString;
+    private final MinecraftPlatform platform;
+    private final MinecraftVersion version;
+    private final String versionString;
 
     public ServerSoftware(MinecraftPlatform platform, MinecraftVersion version) {
         this.platform = platform;
@@ -54,6 +54,7 @@ public class ServerSoftware {
     public ServerSoftware(MinecraftPlatform platform, String version) {
         this.platform = platform;
         this.versionString = version;
+        this.version = null;
     }
 
     public static ServerSoftware detect(final Server server) {
