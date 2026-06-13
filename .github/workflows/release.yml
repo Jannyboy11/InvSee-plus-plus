@@ -147,7 +147,7 @@ jobs:
       - name: Create Release on GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             plugins/InvSee++.jar
