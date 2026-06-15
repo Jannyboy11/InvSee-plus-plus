@@ -416,11 +416,7 @@ public class InvseeAPI {
             if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            MainSpectatorInventory spectatorInventory = platform.spectateInventory(targetPlayer, options);
-            UUID uuid = targetPlayer.getUniqueId();
-            lookup.cacheNameAndUniqueId(uuid, targetName);
-            openSpectatorsCache.cache(spectatorInventory);
-            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+            return createOnlineMainInventory(targetPlayer, targetPlayer.getUniqueId(), targetName, options);
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
@@ -519,10 +515,7 @@ public class InvseeAPI {
             if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingMainInventorySpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            MainSpectatorInventory spectatorInventory = spectateInventory(targetPlayer, title, mirror);
-            lookup.cacheNameAndUniqueId(playerId, playerName);
-            openSpectatorsCache.cache(spectatorInventory);
-            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+            return createOnlineMainInventory(targetPlayer, playerId, playerName, options);
         } else if (!offlineSupport) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
@@ -669,11 +662,7 @@ public class InvseeAPI {
             if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
-            UUID uuid = targetPlayer.getUniqueId();
-            lookup.cacheNameAndUniqueId(uuid, targetName);
-            openSpectatorsCache.cache(spectatorInventory);
-            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+            return createOnlineEnderInventory(targetPlayer, targetPlayer.getUniqueId(), targetName, options);
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
@@ -767,10 +756,7 @@ public class InvseeAPI {
             if (!options.canBypassExemptedPlayers() && exempt.isExemptedFromHavingEnderchestSpectated(target))
                 return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.targetHasExemptPermission(target)));
 
-            EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
-            lookup.cacheNameAndUniqueId(playerId, playerName);
-            openSpectatorsCache.cache(spectatorInventory);
-            return CompletableFuture.completedFuture(SpectateResponse.succeed(spectatorInventory));
+            return createOnlineEnderInventory(targetPlayer, playerId, playerName, options);
         } else if (!options.isOfflinePlayerSupported()) {
             return CompletableFuture.completedFuture(SpectateResponse.fail(NotCreatedReason.offlineSupportDisabled()));
         }
@@ -824,10 +810,24 @@ public class InvseeAPI {
 
     // ================================== Open Main/Ender Inventory ==================================
 
+    private CompletableFuture<SpectateResponse<MainSpectatorInventory>> createOnlineMainInventory(Player targetPlayer, UUID uuid, String name, CreationOptions<PlayerInventorySlot> options) {
+        return CompletableFuture.supplyAsync(() -> {
+            MainSpectatorInventory spectatorInventory = platform.spectateInventory(targetPlayer, options);
+            lookup.cacheNameAndUniqueId(uuid, name);
+            openSpectatorsCache.cache(spectatorInventory);
+            return SpectateResponse.succeed(spectatorInventory);
+        }, runnable -> scheduler.executeSyncPlayer(uuid, runnable, null));
+    }
+
     private final CompletableFuture<OpenResponse<MainSpectatorInventoryView>> spectateInventory(Player spectator, CompletableFuture<SpectateResponse<MainSpectatorInventory>> future, CreationOptions<PlayerInventorySlot> options) {
         final CompletableFuture<OpenResponse<MainSpectatorInventoryView>> result = new CompletableFuture<>();
         future.whenComplete((SpectateResponse<MainSpectatorInventory> response, Throwable throwable) -> {
-            if (throwable == null) {
+            if (throwable != null) {
+                result.completeExceptionally(throwable);
+                return;
+            }
+
+            scheduler.executeSyncPlayer(spectator.getUniqueId(), () -> {
                 if (response.isSuccess()) {
                     try {
                         OpenResponse<MainSpectatorInventoryView> openResponse = platform.openMainSpectatorInventory(spectator, response.getInventory(), options);
@@ -838,17 +838,30 @@ public class InvseeAPI {
                 } else {
                     result.complete(OpenResponse.closed(NotOpenedReason.notCreated(response.getReason())));
                 }
-            } else {
-                result.completeExceptionally(throwable);
-            }
+            }, () -> result.complete(OpenResponse.closed(NotOpenedReason.generic())));
         });
         return result;
+    }
+
+    /** @see #createOnlineMainInventory */
+    private CompletableFuture<SpectateResponse<EnderSpectatorInventory>> createOnlineEnderInventory(Player targetPlayer, UUID uuid, String name, CreationOptions<EnderChestSlot> options) {
+        return CompletableFuture.supplyAsync(() -> {
+            EnderSpectatorInventory spectatorInventory = platform.spectateEnderChest(targetPlayer, options);
+            lookup.cacheNameAndUniqueId(uuid, name);
+            openSpectatorsCache.cache(spectatorInventory);
+            return SpectateResponse.succeed(spectatorInventory);
+        }, runnable -> scheduler.executeSyncPlayer(uuid, runnable, null));
     }
 
     private final CompletableFuture<OpenResponse<EnderSpectatorInventoryView>> spectateEnderChest(Player spectator, CompletableFuture<SpectateResponse<EnderSpectatorInventory>> future, CreationOptions<EnderChestSlot> options) {
         final CompletableFuture<OpenResponse<EnderSpectatorInventoryView>> result = new CompletableFuture<>();
         future.whenComplete((SpectateResponse<EnderSpectatorInventory> response, Throwable throwable) -> {
-            if (throwable == null) {
+            if (throwable != null) {
+                result.completeExceptionally(throwable);
+                return;
+            }
+
+            scheduler.executeSyncPlayer(spectator.getUniqueId(), () -> {
                 if (response.isSuccess()) {
                     try {
                         OpenResponse<EnderSpectatorInventoryView> openResponse = platform.openEnderSpectatorInventory(spectator, response.getInventory(), options);
@@ -859,9 +872,7 @@ public class InvseeAPI {
                 } else {
                     result.complete(OpenResponse.closed(NotOpenedReason.notCreated(response.getReason())));
                 }
-            } else {
-                result.completeExceptionally(throwable);
-            }
+            }, () -> result.complete(OpenResponse.closed(NotOpenedReason.generic())));
         });
         return result;
     }

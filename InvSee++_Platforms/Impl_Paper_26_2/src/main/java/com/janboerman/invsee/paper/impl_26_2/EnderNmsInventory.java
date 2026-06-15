@@ -4,6 +4,7 @@ import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -22,11 +23,32 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 
 	protected /*NonNull*/List<ItemStack> storageContents;
 
+	// Folia STM support: see MainNmsInventory for the rationale. When detached, this holds a snapshot of the
+	// online target's ender chest and edits are committed back on the target's EntityScheduler.
+	com.janboerman.invsee.spigot.api.Scheduler stmScheduler;
+	java.util.UUID stmLiveTargetId;
+
 	EnderNmsInventory(Player target, CreationOptions<EnderChestSlot> creationOptions) {
 		super(target.getUUID(), target.getScoreboardName(), creationOptions);
 		PlayerEnderChestContainer inv = target.getEnderChestInventory();
 		this.storageContents = HybridServerSupport.enderChestItems(inv);
 		this.maxStack = inv.getMaxStackSize();
+	}
+
+	boolean isStmDetached() {
+		return stmScheduler != null && stmLiveTargetId != null;
+	}
+
+	void detachSnapshotForFolia(Player liveTarget, com.janboerman.invsee.spigot.api.Scheduler scheduler) {
+		List<ItemStack> live = HybridServerSupport.enderChestItems(liveTarget.getEnderChestInventory());
+		NonNullList<ItemStack> copy = NonNullList.withSize(live.size(), ItemStack.EMPTY);
+		for (int i = 0; i < live.size(); i++) {
+			copy.set(i, live.get(i).copy());
+		}
+		this.storageContents = copy;
+		this.maxStack = liveTarget.getEnderChestInventory().getMaxStackSize();
+		this.stmScheduler = scheduler;
+		this.stmLiveTargetId = this.targetPlayerUuid;
 	}
 
 	@Override
@@ -92,7 +114,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 	@Override
 	public ItemStack getItem(int slot) {
 		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
-		
+
 		return storageContents.get(slot);
 	}
 
@@ -121,7 +143,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 	@Override
 	public ItemStack removeItem(int slot, int amount) {
 		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
-		
+
 		ItemStack stack = ContainerHelper.removeItem(storageContents, slot, amount);
 		if (!stack.isEmpty()) {
 			this.setChanged();
@@ -133,7 +155,7 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 	@Override
 	public ItemStack removeItemNoUpdate(int slot) {
 		if (slot < 0 || slot >= getContainerSize()) return ItemStack.EMPTY;
-		
+
 		ItemStack stack = storageContents.get(slot);
 		if (stack.isEmpty()) {
 			return ItemStack.EMPTY;
@@ -153,12 +175,12 @@ class EnderNmsInventory extends AbstractNmsInventory<EnderChestSlot, EnderBukkit
 	@Override
 	public void setItem(int slot, ItemStack itemStack) {
 		if (slot < 0 || slot >= getContainerSize()) return;
-		
+
 		storageContents.set(slot, itemStack);
 		if (!itemStack.isEmpty() && itemStack.getCount() > getMaxStackSize()) {
 			itemStack.setCount(getMaxStackSize());
 		}
-		
+
 		setChanged();
 	}
 

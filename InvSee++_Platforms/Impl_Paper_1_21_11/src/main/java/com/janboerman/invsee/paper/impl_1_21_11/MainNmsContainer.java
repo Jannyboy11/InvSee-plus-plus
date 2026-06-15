@@ -14,11 +14,16 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.plugin.Plugin;
 
+import com.janboerman.invsee.spigot.api.Scheduler;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 class MainNmsContainer extends AbstractContainerMenu {
 
@@ -36,6 +41,10 @@ class MainNmsContainer extends AbstractContainerMenu {
 	private static Slot makeSlot(Mirror<PlayerInventorySlot> mirror, boolean spectatingOwnInventory, MainNmsInventory top, int positionIndex, int magicX, int magicY,
 								 ItemStack inaccessiblePlaceholder) {
 		final PlayerInventorySlot place = mirror.getSlot(positionIndex);
+
+		if (top.isStmDetached() && place != null && (place.isCursor() || place.isPersonal())) {
+			return new InaccessibleSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
+		}
 
 		if (place == null) {
 			return new InaccessibleSlot(inaccessiblePlaceholder, top, positionIndex, magicX, magicY);
@@ -77,11 +86,10 @@ class MainNmsContainer extends AbstractContainerMenu {
 	// decorate clicked method for tracking/logging
 	@Override
 	public void clicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
-		//TODO Folia: schedule task that is synchronised across both the target player's EntityScheduler as well as the spectator player's EntityScheduler.
-		//TODO because now we have a data race.
-		//TODO when we arrive here, we are in the tick thread of the Spectator player.
-		//TODO an STM-type solution is probably the best - we make changes to a dummy top inventory and commit each change (item diffs) to the real inventory in the target entity scheduler thread.
-		//TODO need to properly take care of aborts/rollbacks if a diff can't be replayed on the real inventory.
+		if (top.isStmDetached()) {
+			stmClicked(i, j, inventoryclicktype, entityhuman);
+			return;
+		}
 
 		List<org.bukkit.inventory.ItemStack> contentsBefore = null, contentsAfter;
 		if (tracker != null) {
@@ -96,6 +104,81 @@ class MainNmsContainer extends AbstractContainerMenu {
 		}
 	}
 
+	private void stmClicked(int i, int j, ClickType inventoryclicktype, Player entityhuman) {
+		final int size = top.nmsPlayerInventory.getContainerSize();
+
+		// snapshot the player-storage slots (incl. armour/offhand/body/saddle) before the click - safe, this
+		// reads the detached copy owned by the spectator's region thread.
+		final ItemStack[] before = new ItemStack[size];
+		for (int s = 0; s < size; s++) before[s] = top.nmsPlayerInventory.getItem(s).copy();
+
+		List<org.bukkit.inventory.ItemStack> trackBefore = null;
+		if (tracker != null) trackBefore = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+
+		// apply the click to the detached snapshot (top) and the spectator's own live bottom inventory.
+		super.clicked(i, j, inventoryclicktype, entityhuman);
+
+		if (tracker != null) {
+			List<org.bukkit.inventory.ItemStack> trackAfter = top.getContents().stream().map(CraftItemStack::asBukkitCopy).toList();
+			tracker.onClick(trackBefore, trackAfter);
+		}
+
+		final ItemStack[] after = new ItemStack[size];
+		boolean anyChange = false;
+		for (int s = 0; s < size; s++) {
+			after[s] = top.nmsPlayerInventory.getItem(s).copy();
+			if (!ItemStack.matches(before[s], after[s])) anyChange = true;
+		}
+		if (!anyChange) return;
+
+		final UUID targetId = top.stmLiveTargetId;
+		final Scheduler scheduler = top.stmScheduler;
+		// commit on the target's region thread; if the target logged off the edits simply stay in the snapshot.
+		scheduler.executeSyncPlayer(targetId, () -> commitToLiveTarget(targetId, before, after, size), () -> {});
+	}
+
+	private void commitToLiveTarget(UUID targetId, ItemStack[] before, ItemStack[] after, int size) {
+		Plugin plugin = creationOptions.getPlugin();
+		org.bukkit.entity.Player bukkitTarget = plugin.getServer().getPlayer(targetId);
+		if (bukkitTarget == null) return; // target went offline between scheduling and running
+		Inventory liveInv = ((CraftPlayer) bukkitTarget).getHandle().getInventory();
+
+		List<Integer> conflictSlots = null;
+		List<ItemStack> conflictValues = null;
+		for (int s = 0; s < size; s++) {
+			if (ItemStack.matches(before[s], after[s])) continue; // spectator did not change this slot
+			ItemStack real = liveInv.getItem(s);
+			if (ItemStack.matches(real, before[s])) {
+				// the live slot still matches what the spectator saw -> safe to apply the edit.
+				liveInv.setItem(s, after[s].copy());
+			} else {
+				// the target changed this slot concurrently -> keep the live value and re-sync the spectator.
+				if (conflictSlots == null) { conflictSlots = new ArrayList<>(); conflictValues = new ArrayList<>(); }
+				conflictSlots.add(s);
+				conflictValues.add(real.copy());
+			}
+		}
+
+		if (conflictSlots != null) {
+			final List<Integer> fConflictSlots = conflictSlots;
+			final List<ItemStack> fConflictValues = conflictValues;
+			top.stmScheduler.executeSyncPlayer(player.getUUID(), () -> resyncSpectator(fConflictSlots, fConflictValues), () -> {});
+		}
+	}
+
+	private void resyncSpectator(List<Integer> conflictSlots, List<ItemStack> conflictValues) {
+		Mirror<PlayerInventorySlot> mirror = creationOptions.getMirror();
+		for (int k = 0; k < conflictSlots.size(); k++) {
+			int s = conflictSlots.get(k);
+			ItemStack real = conflictValues.get(k);
+			top.nmsPlayerInventory.setItem(s, real.copy()); // bring the snapshot back in line with reality
+			Integer rawIndex = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(s));
+			if (rawIndex != null) {
+				InvseeImpl.sendItemChange((net.minecraft.server.level.ServerPlayer) player, rawIndex.intValue(), real);
+			}
+		}
+	}
+
 	// decorate removed method for tracking/logging
 	@Override
 	public void removed(Player entityhuman) {
@@ -105,10 +188,10 @@ class MainNmsContainer extends AbstractContainerMenu {
 			tracker.onClose();
 		}
 	}
-	
+
 	MainNmsContainer(int id, MainNmsInventory nmsInventory, Inventory bottomInventory, Player spectator, CreationOptions<PlayerInventorySlot> creationOptions) {
 		super(MenuType.GENERIC_9x6, id);
-		
+
 		this.top = nmsInventory;
 		this.bottom = bottomInventory;
 		this.player = spectator;
@@ -140,10 +223,10 @@ class MainNmsContainer extends AbstractContainerMenu {
 				addSlot(makeSlot(mirror, spectatingOwnInventory, top, index, magicX, magicY, inaccessibleSlotPlaceholder));
 			}
 		}
-		
+
 		//bottom inventory slots
 		int magicAddY = (6 /*6 for 6 rows of the top inventory*/ - 4 /*4 for 4 rows of the bottom inventory*/) * 18;
-		
+
 		//player 'storage'
 		for (int yPos = 1; yPos < 4; yPos++) {
 			for (int xPos = 0; xPos < 9; xPos++) {
@@ -153,7 +236,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 				addSlot(new Slot(bottomInventory, index, magicX, magicY));
 			}
 		}
-		
+
 		//player 'hotbar' (yPos = 0)
 		for (int xPos = 0; xPos < 9; xPos++) {
 			int index = xPos;
@@ -175,7 +258,7 @@ class MainNmsContainer extends AbstractContainerMenu {
 	public boolean stillValid(Player player) {
 		return true;
 	}
-	
+
 	@Override
 	public ItemStack quickMoveStack(Player entityHuman, int rawIndex) {
         //returns ItemStack.EMPTY when we are done transferring the itemstack on the rawIndex
@@ -185,14 +268,14 @@ class MainNmsContainer extends AbstractContainerMenu {
 		//in any case, let's just do this first: prevent shift-clicking when spectating your own inventory
 		if (spectatingOwnInventory)
 			return ItemStack.EMPTY;
-		
+
 		ItemStack itemStack = ItemStack.EMPTY;
 		final Slot slot = getSlot(rawIndex);
 		final int topRows = 6;
-		
+
 		if (slot != null && slot.hasItem()) {
 			ItemStack clickedSlotItem = slot.getItem();
-			
+
 			itemStack = clickedSlotItem.copy();
 			if (rawIndex < topRows * 9) {
 				//clicked in the top inventory
@@ -205,14 +288,14 @@ class MainNmsContainer extends AbstractContainerMenu {
 					return ItemStack.EMPTY;
 				}
 			}
-			
+
 			if (clickedSlotItem.isEmpty()) {
 				slot.set(ItemStack.EMPTY);
 			} else {
 				slot.setChanged();
 			}
 		}
-		
+
 		return itemStack;
 	}
 

@@ -436,6 +436,7 @@ public class InvseePlusPlus extends JavaPlugin implements com.janboerman.invsee.
         }
 
         if (folia) {
+            plugin.getLogger().info("Detected Folia - using region-aware scheduler. Online players are spectated through a detached snapshot whose edits are committed on the target's region thread.");
             return new FoliaScheduler(plugin);
         } else {
             return new DefaultScheduler(plugin);

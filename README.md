@@ -150,7 +150,7 @@ Server support matrix:
 |----------------------------|--------|--------|---------|--------|--------|---------|--------|--------|---------|--------|--------|--------|--------|--------|--------|--------|---------|---------|
 | CraftBukkit                | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2  | Tier 1  |
 | Paper                      | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
-| Folia                      | n/a    | n/a    | n/a     | n/a    | n/a    | planned | -      | -      | planned | -      | -      | -      | -      | -      | -      | -      | -       | planned |
+| Folia                      | n/a    | n/a    | n/a     | n/a    | n/a    | planned | -      | -      | planned | -      | -      | -      | -      | -      | -      | -      | Tier 2  | Tier 2  |
 | UniverseSpigot             | n/a    | n/a    | n/a     | n/a    | n/a    | n/a     | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
 | Other forks of CraftBukkit | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
 | (Neo)Forge/Bukkit hybrids  | Tier 2 | Tier 2 | Tier 2* | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2  | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2 | Tier 2  | Tier 2  |
@@ -159,6 +159,12 @@ Server support matrix:
 
 *The modding frameworks that these servers are based on were released at a time when Minecraft's minimum supported version was Java 8 (or lower),
 and there is a good chance they won't be able to load mods and plugins compiled for newer Java versions.
+
+†Folia support is experimental. Because a target's inventory and a spectator's inventory are ticked on different
+region threads, online targets are spectated through a detached snapshot of their inventory; edits are committed back
+to the live target on the target's `EntityScheduler`, guarded by an expected-before check so concurrent changes cannot
+duplicate items (conflicting slots are rolled back and re-synced). The cursor and personal/crafting slots are shown
+read-only on Folia. Offline targets and regular (non-Folia) servers are unaffected. See issue #58.
 
 Is there any server that implements the Bukkit api that I'm missing? Don't hesitate to create [an issue](https://github.com/Jannyboy11/InvSee-plus-plus/issues/new) and request support! 
 

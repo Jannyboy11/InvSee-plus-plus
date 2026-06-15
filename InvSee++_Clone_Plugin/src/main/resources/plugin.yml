@@ -5,7 +5,7 @@ depend: [InvSeePlusPlus]
 api-version: 1.13
 prefix: "InvSee++_Clone"
 description: Clone player's inventories and enderchests.
-folia-supported: false
+folia-supported: true
 
 permissions:
   invseeplusplus.clone.*:

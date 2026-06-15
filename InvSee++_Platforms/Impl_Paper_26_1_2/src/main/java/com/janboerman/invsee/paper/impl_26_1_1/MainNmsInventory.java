@@ -11,6 +11,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.EntityEquipment;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,7 +28,10 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	protected Ref<ItemStack> onCursor;
 	protected List<ItemStack> craftingContents;
 	protected List<ItemStack> personalContents;  //crafting, anvil, smithing, grindstone, stone cutter, loom, merchant, enchanting
-	
+
+	com.janboerman.invsee.spigot.api.Scheduler stmScheduler;
+	java.util.UUID stmLiveTargetId;
+
 	protected MainNmsInventory(Player target, CreationOptions<PlayerInventorySlot> creationOptions) {
 		super(target.getUUID(), target.getScoreboardName(), creationOptions);
 		Inventory inv = target.getInventory();
@@ -38,6 +42,37 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy (in contrast to getItems() which uses List.copyOf(this.items) !!!)
         this.maxStack = inv.getMaxStackSize();
+	}
+
+	boolean isStmDetached() {
+		return stmScheduler != null && stmLiveTargetId != null;
+	}
+
+	void detachSnapshotForFolia(Player liveTarget, com.janboerman.invsee.spigot.api.Scheduler scheduler) {
+		Inventory live = liveTarget.getInventory();
+		int size = live.getContainerSize();
+		Inventory snapshot = new Inventory(liveTarget, new EntityEquipment());
+		for (int i = 0; i < size; i++) {
+			snapshot.setItem(i, live.getItem(i).copy());
+		}
+		this.nmsPlayerInventory = snapshot;
+
+		final ItemStack[] cursorHolder = { liveTarget.containerMenu.getCarried().copy() };
+		this.onCursor = new Ref<>() {
+			@Override public void set(ItemStack item) { cursorHolder[0] = item; }
+			@Override public ItemStack get() { return cursorHolder[0]; }
+		};
+
+		List<ItemStack> liveCraft = liveTarget.inventoryMenu.getCraftSlots().getContents();
+		NonNullList<ItemStack> craftCopy = NonNullList.withSize(liveCraft.size(), ItemStack.EMPTY);
+		for (int i = 0; i < liveCraft.size(); i++) {
+			craftCopy.set(i, liveCraft.get(i).copy());
+		}
+		this.personalContents = this.craftingContents = craftCopy;
+
+		this.maxStack = live.getMaxStackSize();
+		this.stmScheduler = scheduler;
+		this.stmLiveTargetId = this.targetPlayerUuid;
 	}
 
 	@Override
@@ -70,7 +105,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		this.personalContents = from.personalContents;
 		setChanged();
 	}
-	
+
 	private Ref<ItemStack> decideWhichItem(int slot) {
 		if (0 <= slot && slot < nmsPlayerInventory.getContainerSize()) {
 			return new Ref<>() {
@@ -78,18 +113,18 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 				@Override public ItemStack get() { return nmsPlayerInventory.getItem(slot); }
 			};
 		}
-		
+
 		if (nmsPlayerInventory.getContainerSize() == slot) {
 			return onCursor;
 		}
-		
+
 		if (45 <= slot && slot < 54) {
 			int idx = slot - 45;
 			if (idx < personalContents.size()) {
 				return Ref.ofList(idx,  personalContents);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -128,7 +163,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	public List<ItemStack> getContents() {
 		List<ItemStack> paddingOne = NonNullList.withSize(45 - nmsPlayerInventory.getContainerSize() - 1/*cursor*/, ItemStack.EMPTY);
 		List<ItemStack> paddingTwo = NonNullList.withSize(9 - personalContents.size(), ItemStack.EMPTY);
-		
+
 		return new ConcatList<>(nmsPlayerInventory.getContents(),
 				new ConcatList<>(new SingletonList<>(onCursor),
 						new ConcatList<>(paddingOne,
@@ -141,7 +176,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	public ItemStack getItem(int slot) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return ItemStack.EMPTY;
-		
+
 		return ref.get();
 	}
 
@@ -155,7 +190,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		}
 
 		if (!onCursor.get().isEmpty()) return false;
-		
+
 		return true;
 	}
 
@@ -176,7 +211,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	public ItemStack removeItem(int slot, int amount) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return ItemStack.EMPTY;
-		
+
 		ItemStack stack = ref.get();
 		if (!stack.isEmpty() && amount > 0) {
 			ItemStack oldStackCopy = ref.get().split(amount);
@@ -194,7 +229,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	public ItemStack removeItemNoUpdate(int slot) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return ItemStack.EMPTY;
-		
+
 		ItemStack stack = ref.get();
 		if (stack.isEmpty()) {
 			return ItemStack.EMPTY;
@@ -215,12 +250,12 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	public void setItem(int slot, ItemStack stack) {
 		var ref = decideWhichItem(slot);
 		if (ref == null) return;
-		
+
 		ref.set(stack);
 		if (!stack.isEmpty() && stack.getCount() > getMaxStackSize()) {
 			stack.setCount(getMaxStackSize());
 		}
-		
+
 		setChanged();
 	}
 

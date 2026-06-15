@@ -149,10 +149,19 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
 
     @Override
     public MainSpectatorInventory spectateInventory(HumanEntity player, CreationOptions<PlayerInventorySlot> options) {
-        MainNmsInventory spectatorInv = new MainNmsInventory(((CraftHumanEntity) player).getHandle(), options);
+        net.minecraft.world.entity.player.Player handle = ((CraftHumanEntity) player).getHandle();
+        MainNmsInventory spectatorInv = new MainNmsInventory(handle, options);
+        // On Folia, an *online* target's inventory lives on a different region thread than the spectator.
+        // Spectate a detached snapshot and commit edits back on the target's EntityScheduler.
+        boolean realOnlinePlayer = !(handle instanceof FakeEntityHuman) && !(handle instanceof FakeEntityPlayer);
+        if (FoliaSupport.ENABLED && realOnlinePlayer) {
+            spectatorInv.detachSnapshotForFolia(handle, scheduler);
+        }
         MainBukkitInventory bukkitInventory = spectatorInv.bukkit();
-        InventoryView targetView = player.getOpenInventory();
-        bukkitInventory.watch(targetView);
+        if (!spectatorInv.isStmDetached()) {
+            InventoryView targetView = player.getOpenInventory();
+            bukkitInventory.watch(targetView);
+        }
         cache.cache(bukkitInventory);
         return bukkitInventory;
     }
@@ -196,7 +205,12 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
 
     @Override
     public EnderSpectatorInventory spectateEnderChest(HumanEntity player, CreationOptions<EnderChestSlot> options) {
-        EnderNmsInventory spectatorInv = new EnderNmsInventory(((CraftHumanEntity) player).getHandle(), options);
+        net.minecraft.world.entity.player.Player handle = ((CraftHumanEntity) player).getHandle();
+        EnderNmsInventory spectatorInv = new EnderNmsInventory(handle, options);
+        boolean realOnlinePlayer = !(handle instanceof FakeEntityHuman) && !(handle instanceof FakeEntityPlayer);
+        if (FoliaSupport.ENABLED && realOnlinePlayer) {
+            spectatorInv.detachSnapshotForFolia(handle, scheduler);
+        }
         EnderBukkitInventory bukkitInventory = spectatorInv.bukkit();
         cache.cache(bukkitInventory);
         return bukkitInventory;
@@ -217,14 +231,14 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
         CraftServer server = (CraftServer) plugin.getServer();
     	DedicatedPlayerList playerList = server.getHandle();
     	PlayerDataStorage worldNBTStorage = playerList.playerIo;
-    	
+
     	CraftWorld world = (CraftWorld) server.getWorlds().get(0);
     	GameProfile gameProfile = new GameProfile(player, name);
-    	
+
     	FakeEntityHuman fakeEntityHuman = new FakeEntityHuman(
     			world.getHandle(),
     			gameProfile);
-    	
+
     	return CompletableFuture.supplyAsync(() -> {
     		Optional<ValueInput> playerCompound = loadPlayerData(worldNBTStorage, fakeEntityHuman)
                     .map(tag -> TagValueInput.create(ThrowingProblemReporter.INSTANCE, fakeEntityHuman.registryAccess(), tag));
@@ -260,7 +274,7 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
     			world.getHandle(),
     			gameProfile,
                 clientInformation);
-    	
+
     	return CompletableFuture.supplyAsync(() -> {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
             fakeCraftPlayer.loadData();

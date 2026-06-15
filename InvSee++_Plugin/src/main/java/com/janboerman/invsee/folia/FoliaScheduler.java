@@ -45,7 +45,11 @@ public class FoliaScheduler implements Scheduler {
 
     @Override
     public void executeSyncGlobalRepeatedly(Runnable task, long ticksInitialDelay, long ticksPeriod) {
-        plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> task.run(), ticksInitialDelay, ticksPeriod);
+        // Folia's GlobalRegionScheduler forbids an initial delay or period <= 0 (the BukkitScheduler tolerates 0),
+        // so clamp to the minimum of 1 tick to keep the cross-platform Scheduler contract.
+        long initialDelay = Math.max(1L, ticksInitialDelay);
+        long period = Math.max(1L, ticksPeriod);
+        plugin.getServer().getGlobalRegionScheduler().runAtFixedRate(plugin, scheduledTask -> task.run(), initialDelay, period);
     }
 
     @Override
@@ -55,11 +59,12 @@ public class FoliaScheduler implements Scheduler {
 
     @Override
     public void executeLaterGlobal(Runnable task, long delayTicks) {
-        plugin.getServer().getGlobalRegionScheduler().runDelayed(plugin, scheduledTask -> task.run(), delayTicks);
+        plugin.getServer().getGlobalRegionScheduler().runDelayed(plugin, scheduledTask -> task.run(), Math.max(1L, delayTicks));
     }
 
     @Override
     public void executeLaterAsync(Runnable task, long delayTicks) {
-        plugin.getServer().getAsyncScheduler().runDelayed(plugin, scheduledTask -> task.run(), delayTicks * 50, TimeUnit.MILLISECONDS);
+        long delayMillis = Math.max(1L, delayTicks) * 50L;
+        plugin.getServer().getAsyncScheduler().runDelayed(plugin, scheduledTask -> task.run(), delayMillis, TimeUnit.MILLISECONDS);
     }
 }
