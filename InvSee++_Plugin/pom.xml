@@ -283,6 +283,18 @@
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
+            <artifactId>impl_26_3</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
+            <artifactId>impl_paper_26_3</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_glowstone</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>

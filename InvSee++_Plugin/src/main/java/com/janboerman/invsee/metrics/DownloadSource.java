@@ -14,6 +14,7 @@ public enum DownloadSource {
     MODRINTH,
     GITHUB,
     HANGAR,
+    MCFOUNDRY,
     UNKNOWN;
 
     @Override
@@ -23,6 +24,7 @@ public enum DownloadSource {
             case MODRINTH: return "Modrinth";
             case HANGAR: return "Hangar";
             case GITHUB: return "GitHub";
+            case MCFOUNDRY: return "MCFoundry";
             default: return "Unknown";
         }
     }
@@ -34,6 +36,7 @@ public enum DownloadSource {
             case "Modrinth": return MODRINTH;
             case "Hangar": return HANGAR;
             case "GitHub": return GITHUB;
+            case "MCFoundry": return MCFOUNDRY;
             default: return UNKNOWN;
         }
     }

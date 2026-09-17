@@ -34,10 +34,12 @@ public class ServerSoftware {
             CRAFTBUKKIT_26_1_1 = new ServerSoftware(CRAFTBUKKIT, _26_1_1),
             CRAFTBUKKIT_26_1_2 = new ServerSoftware(CRAFTBUKKIT, _26_1_2),
             CRAFTBUKKIT_26_2 = new ServerSoftware(CRAFTBUKKIT, _26_2),
+            CRAFTBUKKIT_26_3 = new ServerSoftware(CRAFTBUKKIT, _26_3),
             PAPER_1_21_11 = new ServerSoftware(PAPER, _1_21_11),
             PAPER_26_1_1 = new ServerSoftware(PAPER, _26_1_1),
             PAPER_26_1_2 = new ServerSoftware(PAPER, _26_1_2),
             PAPER_26_2 = new ServerSoftware(PAPER, _26_2),
+            PAPER_26_3 = new ServerSoftware(PAPER, _26_3),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
@@ -181,7 +183,8 @@ public class ServerSoftware {
                             case "26.1.1-R0.1-SNAPSHOT": return CRAFTBUKKIT_26_1_1;
                             case "26.1.2-R0.1-SNAPSHOT": return CRAFTBUKKIT_26_1_2;
                             case "26.2-R0.1-SNAPSHOT": return CRAFTBUKKIT_26_2;
-                            default: return CRAFTBUKKIT_26_2;
+                            case "26.3-R0.1-SNAPSHOT": return CRAFTBUKKIT_26_3;
+                            default: return CRAFTBUKKIT_26_3;
                         }
                     }
                 }
