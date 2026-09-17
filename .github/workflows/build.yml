@@ -71,14 +71,16 @@ jobs:
           cache: 'maven'
       # Use build number 4617 to compile CraftBukkit 26.1.1
       # https://hub.spigotmc.org/versions/
-      - name: Install CraftBukkit 26.1.1, 26.2
+      - name: Install CraftBukkit 26.1.1, 26.2, 26.3
         run: |
           java -jar BuildTools.jar --rev 4617 --compile craftbukkit
           java -jar BuildTools.jar --rev 26.2 --compile craftbukkit
-      - name: Install Paper 26.1.2, 26.2
+          java -jar BuildTools.jar --rev 26.3 --compile craftbukkit
+      - name: Install Paper 26.1.2, 26.2, 26.3
         run: |
           mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_1_2
           mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_2
+          mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_3
       - name: Compile InvSee++
         run: mvn clean package install --batch-mode --update-snapshots
       - name: Deploy Javadoc

@@ -1,15 +1,29 @@
-package com.janboerman.invsee.spigot.impl_26_3;
+package com.janboerman.invsee.paper.impl_26_3;
 
-import com.janboerman.invsee.spigot.api.*;
+import com.janboerman.invsee.spigot.api.CreationOptions;
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventory;
+import com.janboerman.invsee.spigot.api.EnderSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventory;
+import com.janboerman.invsee.spigot.api.MainSpectatorInventoryView;
+import com.janboerman.invsee.spigot.api.Scheduler;
+import com.janboerman.invsee.spigot.api.SpectatorInventory;
 import com.janboerman.invsee.spigot.api.event.SpectatorInventorySaveEvent;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderGroup;
 import com.janboerman.invsee.spigot.api.placeholder.PlaceholderPalette;
-import com.janboerman.invsee.spigot.api.response.*;
+import com.janboerman.invsee.spigot.api.response.NotCreatedReason;
+import com.janboerman.invsee.spigot.api.response.NotOpenedReason;
+import com.janboerman.invsee.spigot.api.response.OpenResponse;
+import com.janboerman.invsee.spigot.api.response.SaveResponse;
+import com.janboerman.invsee.spigot.api.response.SpectateResponse;
 import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
-import com.janboerman.invsee.spigot.internal.*;
+import com.janboerman.invsee.spigot.internal.EventHelper;
+import com.janboerman.invsee.spigot.internal.InvseePlatform;
+import com.janboerman.invsee.spigot.internal.NamesAndUUIDs;
+import com.janboerman.invsee.spigot.internal.OpenSpectatorsCache;
+import com.janboerman.invsee.spigot.internal.TestingCompatLayer;
 import com.janboerman.invsee.spigot.internal.resolve.ResolveStrategyType;
 import com.mojang.authlib.GameProfile;
 import com.mojang.serialization.DataResult;
@@ -34,6 +48,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Registry;
@@ -57,8 +72,8 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
-import static com.janboerman.invsee.spigot.impl_26_3.HybridServerSupport.getServer;
-import static com.janboerman.invsee.spigot.impl_26_3.HybridServerSupport.loadPlayerData;
+import static com.janboerman.invsee.paper.impl_26_3.HybridServerSupport.getServer;
+import static com.janboerman.invsee.paper.impl_26_3.HybridServerSupport.loadPlayerData;
 
 public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
 
@@ -219,11 +234,14 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
                 if (!options.isUnknownPlayerSupported()) {
                     return SpectateResponse.fail(NotCreatedReason.unknownTarget(Target.byGameProfile(player, name)));
                 } //else: unknown/new players are supported!
-                // if we get here, then we create a spectator inventory for the non-existent player anyway.
+                // If we get here, then we create a spectator inventory for the non-existent player anyway.
+                // To prevent a new player entering the world at (0,0,0), we set its spawn location here.
+                org.bukkit.Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation().add(0, 1, 0);
+                fakeEntityHuman.setPos(new Vec3(spawn.getX(), spawn.getY(), spawn.getZ()));
             } else {
-                // player file already exists, load the data from the compound onto the player
+                // Player file already exists, load the data from the compound onto the player
                 fakeEntityHuman.readAdditionalSaveData(playerCompound.get());   //only player-specific stuff
-                //fakeEntityHuman.load(playerCompound.get());                   //ALL entity data
+                //fakeEntityHuman.load(playerCompound.get());                   //ALL entity data (includes player's location)
             }
 
     		CraftHumanEntity craftHumanEntity = new FakeCraftHumanEntity(server, fakeEntityHuman);
@@ -250,7 +268,6 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
     	return CompletableFuture.supplyAsync(() -> {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
             fakeCraftPlayer.loadData();
-            // TODO do we still need this workaround? CraftBukkit shouldn't have the same bug as Paper, no?
             loadWorldDataAndGameMode(server, fakeEntityPlayer); //workaround for https://github.com/PaperMC/Paper/issues/11572
 
             CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
@@ -299,7 +316,8 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
                 level = server.getHandle().getServer().getLevel(levelResourceKey);
 
                 if (level != null) {
-                    fakeEntityPlayer.spawnIn(level, true/*ignore respawn anchor charge*/); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
+                    fakeEntityPlayer.setLevel(level);  //note: not only sets the ServerLevel, also sets gamemode.
+                    // Paper is using Entity#setLevel(Level) in PlayerList#respawn, whereas CraftBukkit is using ServerPlayer#spawnIn(Level, boolean).
                 }
             }
 

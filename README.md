@@ -126,7 +126,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
     - `java -jar BuildTools.jar --rev 26.2 --compile craftbukkit`
     - `mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_2`
     - `java -jar BuildTools.jar --rev 26.3 --compile craftbukkit`
-    - // TODO paper
+    - `mvn ca.bkaw:paper-nms-maven-plugin:init --pl :impl_paper_26_3`
 2. In the root directory of this project run `mvn clean package`.
 You can find the plugin jar at InvSee++_plugin/target/InvSee++.jar.
 

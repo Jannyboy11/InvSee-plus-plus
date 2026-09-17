@@ -32,7 +32,7 @@
         <module>InvSee++_Platforms/Impl_26_3</module>
         <module>InvSee++_Platforms/Impl_Paper_26_1_2</module>
         <module>InvSee++_Platforms/Impl_Paper_26_2</module>
-        <!-- TODO Paper 26.3 -->
+        <module>InvSee++_Platforms/Impl_Paper_26_3</module>
         <module>InvSee++_Platforms/Impl_Glowstone</module>
         <module>InvSee++_MultiverseInventories</module> <!-- TODO finish this module -->
         <module>InvSee++_PerWorldInventory</module>
