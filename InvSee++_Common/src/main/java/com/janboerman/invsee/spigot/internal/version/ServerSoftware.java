@@ -39,6 +39,7 @@ public class ServerSoftware {
             PAPER_26_1_1 = new ServerSoftware(PAPER, _26_1_1),
             PAPER_26_1_2 = new ServerSoftware(PAPER, _26_1_2),
             PAPER_26_2 = new ServerSoftware(PAPER, _26_2),
+            PAPER_26_3 = new ServerSoftware(PAPER, _26_3),
             GLOWSTONE_1_8_8 = new ServerSoftware(GLOWSTONE, _1_8_8),
             GLOWSTONE_1_8_9 = new ServerSoftware(GLOWSTONE, _1_8_9),
             GLOWSTONE_1_12_2 = new ServerSoftware(GLOWSTONE, _1_12_2);
