@@ -7,11 +7,11 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>give_impl_26_2</artifactId>
-    <name>InvSee++ Give implementation for CraftBukkit 26.2</name>
+    <artifactId>give_impl_26_3</artifactId>
+    <name>InvSee++ Give implementation for CraftBukkit 26.3</name>
 
     <properties>
-        <bukkit.version>26.2-R0.1-SNAPSHOT</bukkit.version>
+        <bukkit.version>26.3-R0.1-SNAPSHOT</bukkit.version>
     </properties>
 
     <build>
