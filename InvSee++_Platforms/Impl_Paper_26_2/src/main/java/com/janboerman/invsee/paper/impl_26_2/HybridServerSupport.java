@@ -74,20 +74,11 @@ public final class HybridServerSupport {
 
     // return List<ItemStack> instead of NonNullList<ItemStack> to ensure compatibility with UniverseSpigot
     public static List<ItemStack> enderChestItems(PlayerEnderChestContainer enderChest) {
-        try {
-            return enderChest.items;
-        } catch (NoSuchFieldError | IllegalAccessError vanillaFieldIsActuallyPrivate) {
-            try {
-                //call the forge method: getContents()Ljava/util/List<net/minecraft/world/item/ItemStack>;
-                //fortunately CraftBukkit contains this method as well, so we can just call it directly without reflection! :D
-                return enderChest.getContents();
-            } catch (Throwable forgeMethodNotFound) {
-                RuntimeException ex = new RuntimeException("No method known of getting the enderchest items");
-                ex.addSuppressed(vanillaFieldIsActuallyPrivate);
-                ex.addSuppressed(forgeMethodNotFound);
-                throw ex;
-            }
-        }
+        // Note: on Paper, PlayerEnderchestContainer#items is not publicly visible. We have to use the accessor method
+        // (which does not copy!)
+        // We are lucky because this exact method is not only added by Paper, but also by Forge, so we don't need a
+        // reflection-based fallback method call.
+        return enderChest.getContents();
     }
 
     public static Optional<ValueInput> load(PlayerDataStorage playerIO, String name, String uuid, ProblemReporter problemReporter, RegistryAccess registryAccess) {

@@ -316,7 +316,7 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
                 level = server.getHandle().getServer().getLevel(levelResourceKey);
 
                 if (level != null) {
-                    fakeEntityPlayer.spawnIn(level); //note: not only sets the ServerLevel, also sets gamemode.
+                    fakeEntityPlayer.setServerLevel(level); //note: not only sets the ServerLevel, also sets gamemode.
                 }
             }
 

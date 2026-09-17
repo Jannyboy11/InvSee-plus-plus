@@ -316,7 +316,7 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
                 level = server.getHandle().getServer().getLevel(levelResourceKey);
 
                 if (level != null) {
-                    fakeEntityPlayer.setLevel(level);  //note: not only sets the ServerLevel, also sets gamemode.
+                    fakeEntityPlayer.setServerLevel(level); //note: not only sets the ServerLevel, also sets gamemode.
                     // Paper is using Entity#setLevel(Level) in PlayerList#respawn, whereas CraftBukkit is using ServerPlayer#spawnIn(Level, boolean).
                 }
             }

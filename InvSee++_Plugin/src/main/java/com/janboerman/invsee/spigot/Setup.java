@@ -217,7 +217,7 @@ class SetupImpl implements Setup {
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_Paper_1_21_11(p, l, s, c), ServerSoftware.PAPER_1_21_11);
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_26_1_1(p, l, s, c), ServerSoftware.CRAFTBUKKIT_26_1_1, ServerSoftware.CRAFTBUKKIT_26_1_2, ServerSoftware.CRAFTBUKKIT_26_1);
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_Paper_26_1_1(p, l, s, c), ServerSoftware.PAPER_26_1_1, ServerSoftware.PAPER_26_1_2);
-        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_Paper_26_2(p, l, s, c), new ServerSoftware(MinecraftPlatform.PAPER, "26.2 Release Candidate 2"), ServerSoftware.PAPER_26_2);
+        SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_Paper_26_2(p, l, s, c), ServerSoftware.PAPER_26_2);
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_26_2(p, l, s, c), ServerSoftware.CRAFTBUKKIT_26_2);
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_26_3(p, l, s, c), ServerSoftware.CRAFTBUKKIT_26_3);
         SUPPORTED.registerSupportedVersion((p, l, s, c) -> new Impl_Paper_26_3(p, l, s, c), ServerSoftware.PAPER_26_3);

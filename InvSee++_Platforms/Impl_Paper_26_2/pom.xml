@@ -11,7 +11,7 @@
     <name>InvSee++ implementation for Paper 26.2</name>
 
     <properties>
-        <paper.version>26.2-rc-2.build.5-alpha</paper.version>
+        <paper.version>26.2.build.99-stable</paper.version>
         <paper-nms-maven-plugin.version>1.4.11-SNAPSHOT</paper-nms-maven-plugin.version>
         <authlib.version>7.0.61</authlib.version>
         <datafixerupper.version>9.0.19</datafixerupper.version>
