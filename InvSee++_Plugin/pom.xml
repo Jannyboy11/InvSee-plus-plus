@@ -2,12 +2,11 @@
     <parent>
         <groupId>com.janboerman.invsee</groupId>
         <artifactId>invsee-plus-plus</artifactId>
-        <version>0.31.18-SNAPSHOT</version>
+        <version>0.31.16-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>invsee-plus-plus_plugin</artifactId>
-  <version>0.31.17-SNAPSHOT</version>
     <name>InvSee++ Plugin</name>
 
     <properties>
@@ -131,7 +130,7 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>faststats</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -139,19 +138,19 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>invsee-plus-plus_common</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>mojang-api</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>utils</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -159,145 +158,145 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_8_8_r3</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_12_2_r1</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_16_5_r3</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_17_1_r1</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_18_2_r2</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_19_4_r3</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_20_1_r1</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_20_4_r3</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_20_6_r4</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_r1</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_1_r1</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_4_r3</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_5_r4</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_7_r5</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_9_r6</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_1_21_11_r7</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_paper_1_21_11</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_26_1_1</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_paper_26_1_2</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_26_2</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_paper_26_2</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_26_3</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_paper_26_3</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>impl_glowstone</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 <!--        <dependency>-->
@@ -309,7 +308,7 @@
         <dependency>
             <groupId>com.janboerman.invsee</groupId>
             <artifactId>invsee-plus-plus_per-world-inventory</artifactId>
-            <version>0.31.18-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
 
