@@ -103,7 +103,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
 
 ###### Prerequisites: [JDK-21](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
-1. Install CraftBukkit into your local repository first by running BuildTools with
+1. Install CraftBukkit and Paper into your local repository first by running BuildTools and Maven with
     - `java -jar BuildTools.jar --rev 1.8.8 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.12.2 --compile craftbukkit`
     - `java -jar BuildTools.jar --rev 1.16.5 --compile craftbukkit`
