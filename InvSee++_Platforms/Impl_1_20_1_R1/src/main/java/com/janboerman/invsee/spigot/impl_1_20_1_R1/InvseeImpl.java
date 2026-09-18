@@ -100,10 +100,8 @@ public class InvseeImpl implements InvseePlatform {
             ItemStack inaccessible = CraftItemStack.asNMSCopy(palette.inaccessible());
             for (int i = PlayerInventorySlot.CONTAINER_35.defaultIndex() + 1; i < nmsInventory.getContainerSize(); i++) {
                 Integer idx = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(i));
-                if (idx == null) {
-                    sendItemChange(nmsPlayer, i, inaccessible);
-                    continue;
-                }
+                if (idx == null) continue;
+
                 int rawIndex = idx.intValue();
 
                 Slot slot = nmsWindow.getSlot(rawIndex);
