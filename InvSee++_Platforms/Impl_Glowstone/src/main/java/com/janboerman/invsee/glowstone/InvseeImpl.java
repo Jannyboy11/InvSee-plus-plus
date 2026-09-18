@@ -141,10 +141,8 @@ public class InvseeImpl implements InvseePlatform {
             ItemStack inaccessible = palette.inaccessible();
             for (int inventoryIndex = PlayerInventorySlot.CONTAINER_35.defaultIndex() + 1; inventoryIndex < inv.getSize(); inventoryIndex++) {
                 Integer idx = mirror.getIndex(PlayerInventorySlot.byDefaultIndex(inventoryIndex));
-                if (idx == null) {
-                    sendItemChange(glowPlayer, inventoryIndex, inaccessible);
-                    continue;
-                }
+                if (idx == null) continue;
+
                 int rawIndex = idx.intValue();
 
                 GlowInventorySlot slot = glowInventory.getSlot(inventoryIndex);
