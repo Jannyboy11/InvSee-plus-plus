@@ -11,7 +11,7 @@
     <name>InvSee++ Give implementation for Paper 26.2</name>
 
     <properties>
-        <paper.version>26.2-rc-2.build.5-alpha</paper.version>
+        <paper.version>26.2.build.99-stable</paper.version>
     </properties>
 
     <pluginRepositories>
