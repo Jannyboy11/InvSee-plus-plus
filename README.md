@@ -89,7 +89,7 @@ On 1.20.5 and later:
 
 InvSee++ by default sends statistics to [bStats](https://bstats.org/plugin/bukkit/InvseePlusPlus/9309) and [FastStats](https://faststats.dev/project/invsee-plus-plus/invsee%2B%2B).
 The statistics are meant to be anonymous, and they help me with future development.
-If you wish to opt-out of metrics collection, you can edit their config files in /plugins/bStats and /plugin/fastStats.
+If you wish to opt-out of metrics collection, you can edit their config files in /plugins/bStats and /plugins/fastStats.
 
 [![Servers & Players](https://faststats.dev/embed/2cfe5112-d8dc-4b71-8759-c0b0601d0076?w=800&h=300)](https://faststats.dev/project/invsee-plus-plus/invsee++)
 
@@ -101,7 +101,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
 
 ### Compiling
 
-###### Prerequisites: [JDK-21](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
+###### Prerequisites: [JDK-25](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
 1. Install CraftBukkit and Paper into your local repository first by running BuildTools and Maven with
     - `java -jar BuildTools.jar --rev 1.8.8 --compile craftbukkit`
