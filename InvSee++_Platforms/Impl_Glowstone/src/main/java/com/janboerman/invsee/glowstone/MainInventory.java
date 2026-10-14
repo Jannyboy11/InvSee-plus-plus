@@ -98,6 +98,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
             list = new ConcatList<>(list, Collections.nCopies(9 - personalSlots.size(), InaccessibleSlot.INSTANCE));
         }
         GlowstoneHacks.setSlots(this, list);
+        // TODO: update target player crafting result, based on matching recipe.
     }
 
     @Override
@@ -228,6 +229,7 @@ class MainInventory extends GlowInventory implements MainSpectatorInventory, Sha
         cursorSlot.setItem(InvseeImpl.EMPTY_STACK);
         craftingSlots.forEach(slot -> slot.setItem(InvseeImpl.EMPTY_STACK));
         personalSlots.forEach(slot -> slot.setItem(InvseeImpl.EMPTY_STACK));
+        updateContents();
     }
 
     //
