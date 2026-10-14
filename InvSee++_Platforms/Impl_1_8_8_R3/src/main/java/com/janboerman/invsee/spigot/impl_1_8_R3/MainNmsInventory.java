@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 
 class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements IInventory, ITileEntityContainer {
 
+    protected Runnable updateTargetCraftingResults;
     protected ItemStack[] storageContents;
     protected ItemStack[] armourContents;
     //Minecraft 1.8.8 has no concept of off-hand!
@@ -50,6 +51,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         };
         IInventory /*InventoryCrafting*/ playerCrafting = ((CraftInventory) target.defaultContainer.getBukkitView().getTopInventory()).getInventory();
         this.personalContents = this.playerCraftingContents = playerCrafting.getContents();
+        this.updateTargetCraftingResults = () -> target.defaultContainer.a(inv);
     }
 
     void setPersonalContents(ItemStack[] personalContents, int size) {
@@ -98,6 +100,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         this.playerCraftingContents = from.playerCraftingContents;
         this.personalContents = from.personalContents;
         this.personalContentsSize = from.personalContentsSize;
+        this.updateTargetCraftingResults = from.updateTargetCraftingResults;
         update();
     }
 
@@ -190,6 +193,9 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 
     @Override
     public void update() {
+        //update target player cached crafting recipe:
+        updateTargetCraftingResults.run();
+
         //called after an item in the inventory was removed, added or updated.
         //looking at InventorySubContainer, I don't think we need to do anything here.
 
