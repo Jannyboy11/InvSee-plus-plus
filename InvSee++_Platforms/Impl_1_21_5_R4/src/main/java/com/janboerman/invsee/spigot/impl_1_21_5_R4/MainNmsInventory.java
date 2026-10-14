@@ -108,6 +108,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		if (craftingContents != personalContents) {
 			craftingContents.clear();
 		}
+		setChanged();
 	}
 
 	//vanilla
@@ -213,7 +214,8 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	//vanilla
 	@Override
 	public void setChanged() {
-		//nothing to do here?
+		//update target player cached crafting recipe:
+		this.nmsPlayerInventory.player.inventoryMenu.slotsChanged(nmsPlayerInventory);
 	}
 
 	//vanilla

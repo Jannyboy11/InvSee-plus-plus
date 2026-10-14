@@ -22,6 +22,7 @@ import java.util.List;
 
 class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBukkitInventory, MainNmsInventory> implements Container, MenuProvider {
 
+	protected /*NonNull*/Runnable updateTargetCraftingResults;
 	protected /*NonNull*/List<ItemStack> storageContents;
 	protected /*NonNull*/List<ItemStack> armourContents;
 	protected /*NonNull*/List<ItemStack> offHand;
@@ -41,6 +42,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 			@Override public ItemStack get() { return target.containerMenu.getCarried(); }
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy (in contrast to getItems() which uses List.copyOf(this.items) !!!)
+		this.updateTargetCraftingResults = () -> target.inventoryMenu.slotsChanged(inv);
 	}
 
 	@Override
@@ -73,6 +75,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		this.onCursor = from.onCursor;
 		this.craftingContents = from.craftingContents;
 		this.personalContents = from.personalContents;
+		this.updateTargetCraftingResults = from.updateTargetCraftingResults;
 		setChanged();
 	}
 	
@@ -120,6 +123,7 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		if (craftingContents != personalContents) {
 			craftingContents.clear();
 		}
+		setChanged();
 	}
 
 	//vanilla
@@ -233,7 +237,8 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	//vanilla
 	@Override
 	public void setChanged() {
-		//nothing to do here?
+		//update target player cached crafting recipe:
+		updateTargetCraftingResults.run();
 	}
 
 	//vanilla

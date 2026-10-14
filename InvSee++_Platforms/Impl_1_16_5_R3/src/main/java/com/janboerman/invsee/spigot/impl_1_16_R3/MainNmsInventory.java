@@ -2,8 +2,6 @@ package com.janboerman.invsee.spigot.impl_1_16_R3;
 
 import com.janboerman.invsee.spigot.api.CreationOptions;
 import com.janboerman.invsee.spigot.api.target.Target;
-import com.janboerman.invsee.spigot.api.template.EnderChestSlot;
-import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.ShallowCopy;
 import com.janboerman.invsee.utils.ConcatList;
@@ -30,6 +28,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
 
     private static final TileEntityTypes TileEntityTypeFakePlayerInventory = new TileEntityTypes(MainNmsInventory::new, Set.of(), new com.mojang.datafixers.types.constant.EmptyPart());
 
+    protected Runnable updateTargetCraftingResults;
     protected final UUID spectatedPlayerUuid;
     protected final String spectatedPlayerName;
     protected NonNullList<ItemStack> storageContents;
@@ -76,7 +75,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
             }
         };
         this.personalContents = this.playerCraftingContents = target.defaultContainer.j().getContents(); //luckily getContents() does not copy
-
+        this.updateTargetCraftingResults = () -> target.defaultContainer.a(inv);
         this.creationOptions = creationOptions;
     }
 
@@ -98,6 +97,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
         this.onCursor = from.onCursor;
         this.playerCraftingContents = from.playerCraftingContents;
         this.personalContents = from.personalContents;
+        this.updateTargetCraftingResults = from.updateTargetCraftingResults;
         update();
     }
 
@@ -219,6 +219,9 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
 
     @Override
     public void update() {
+        //update target player cached crafting recipe:
+        updateTargetCraftingResults.run();
+
         //called after an item in the inventory was removed, added or updated.
         //looking at InventorySubContainer, I don't think we need to do anything here.
 
@@ -289,6 +292,7 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
         offHand.clear();
         onCursor.set(EMPTY_STACK);
         playerCraftingContents.clear();
+        update();
     }
 
     @Override

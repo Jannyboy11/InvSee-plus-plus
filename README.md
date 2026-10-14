@@ -89,7 +89,7 @@ On 1.20.5 and later:
 
 InvSee++ by default sends statistics to [bStats](https://bstats.org/plugin/bukkit/InvseePlusPlus/9309) and [FastStats](https://faststats.dev/project/invsee-plus-plus/invsee%2B%2B).
 The statistics are meant to be anonymous, and they help me with future development.
-If you wish to opt-out of metrics collection, you can edit their config files in /plugins/bStats and /plugin/fastStats.
+If you wish to opt-out of metrics collection, you can edit their config files in /plugins/bStats and /plugins/fastStats.
 
 [![Servers & Players](https://faststats.dev/embed/2cfe5112-d8dc-4b71-8759-c0b0601d0076?w=800&h=300)](https://faststats.dev/project/invsee-plus-plus/invsee++)
 
@@ -101,7 +101,7 @@ Anything else can be discussed via the [discussion thread on SpigotMC](https://w
 
 ### Compiling
 
-###### Prerequisites: [JDK-21](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
+###### Prerequisites: [JDK-25](https://jdk.java.net/) or newer, [BuildTools](https://www.spigotmc.org/wiki/buildtools/) and [Maven](https://maven.apache.org).
 
 1. Install CraftBukkit and Paper into your local repository first by running BuildTools and Maven with
     - `java -jar BuildTools.jar --rev 1.8.8 --compile craftbukkit`
@@ -172,5 +172,3 @@ Is there any server that implements the Bukkit api that I'm missing? Don't hesit
 | Minecraft version: | 1.8.x      | 1.12.x     | 1.16.x      | 1.17.x      | 1.18.x      | 1.19.x      | 1.20.[0-4]  | 1.20.[5-6]  | 1.21.x      | 26.x.x      |
 |--------------------|------------|------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|
 | Java version:      | 8 or newer | 8 or newer | 11 or newer | 16 or newer | 17 or newer | 17 or newer | 17 or newer | 21 or newer | 21 or newer | 25 or newer |
-
-[![Java Versions](https://faststats.dev/embed/dc2e7402-115d-457d-a230-c025ba101968?w=600&h=300)](https://faststats.dev/project/invsee-plus-plus/invsee++)

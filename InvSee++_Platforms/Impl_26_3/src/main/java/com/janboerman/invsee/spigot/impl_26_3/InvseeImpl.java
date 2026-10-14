@@ -247,9 +247,7 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
     	
     	return CompletableFuture.supplyAsync(() -> {
             FakeCraftPlayer fakeCraftPlayer = fakeEntityPlayer.getBukkitEntity();
-            fakeCraftPlayer.loadData();
-            // TODO do we still need this workaround? CraftBukkit shouldn't have the same bug as Paper, no?
-            loadWorldDataAndGameMode(server, fakeEntityPlayer); //workaround for https://github.com/PaperMC/Paper/issues/11572
+            fakeCraftPlayer.loadData(); // On CraftBukkit, this will also load the player's world from the data file (but not on Paper).
 
             CreationOptions<Slot> creationOptions = newInventory.getCreationOptions();
             SI currentInv = currentInvProvider.apply(fakeCraftPlayer, creationOptions);
@@ -258,83 +256,6 @@ public class InvseeImpl implements InvseePlatform, TestingCompatLayer {
             fakeCraftPlayer.saveData();
             return SaveResponse.saved(currentInv);
     	}, runnable -> scheduler.executeSyncPlayer(playerId, runnable, null));
-    }
-
-
-
-    private void loadWorldDataAndGameMode(CraftServer server, FakeEntityPlayer fakeEntityPlayer) {
-        // In Paper, Entity#load(CompoundTag) does not load the world info.
-        // Thus, in order to not upset our users, we do it ourselves manually in order to work around this Paper bug.
-        // See https://github.com/Jannyboy11/InvSee-plus-plus/issues/105.
-        // See PaperMC/PlayerList#placeNewPlayer.
-
-        PlayerDataStorage playerDataStorage = server.getHandle().playerIo;
-        Optional<ValueInput> optional = loadPlayerData(playerDataStorage, fakeEntityPlayer)
-                .map(tag -> TagValueInput.create(ThrowingProblemReporter.INSTANCE, fakeEntityPlayer.registryAccess(), tag));
-
-        if (optional.isPresent()) {
-            ServerLevel level;
-            ValueInput nbttagcompound = optional.get();
-
-            org.bukkit.World bWorld = null;
-            Optional<Long> worldUUIDMost = nbttagcompound.getLong("WorldUUIDMost");
-            Optional<Long> worldUUIDLeast = nbttagcompound.getLong("WorldUUIDLeast");
-            Optional<String> legacyBukkitWorld;
-            if (worldUUIDMost.isPresent() && worldUUIDLeast.isPresent()) {
-                // The main way for bukkit worlds to store the world is the world UUID despite mojang adding custom worlds
-                bWorld = server.getWorld(new UUID(worldUUIDMost.get(), worldUUIDLeast.get()));
-            } else if ((legacyBukkitWorld = nbttagcompound.getString("world")).isPresent()) { // legacy bukkit world name
-                bWorld = server.getWorld(legacyBukkitWorld.get());
-            }
-
-            if (bWorld != null) {
-                level = ((CraftWorld) bWorld).getHandle();
-                fakeEntityPlayer.setServerLevel(level);
-            } else {
-                DataResult<ResourceKey<Level>> dataresult = parseLegacyDimensionType(nbttagcompound);
-                Optional<ResourceKey<Level>> optionalLevelKey = dataresult.resultOrPartial(message -> plugin.getLogger().severe(message));
-                ResourceKey<Level> levelResourceKey = optionalLevelKey.orElse(Level.OVERWORLD);
-                level = server.getHandle().getServer().getLevel(levelResourceKey);
-
-                if (level != null) {
-                    fakeEntityPlayer.spawnIn(level, true/*ignore respawn anchor charge*/); //note: not only sets the ServerLevel, also sets x/y/z coordinates and gamemode.
-                }
-            }
-
-            loadGameTypes(fakeEntityPlayer, nbttagcompound);
-        }
-    }
-
-    private static void loadGameTypes(FakeEntityPlayer fakeEntityPlayer, ValueInput nbtTagCompound) {
-        GameType gameType1 = nbtTagCompound == null ? null : nbtTagCompound.read("playerGameType", GameType.LEGACY_ID_CODEC).orElse(null);
-        GameType gameType2 = nbtTagCompound == null ? null : nbtTagCompound.read("previousPlayerGameType", GameType.LEGACY_ID_CODEC).orElse(null);
-        fakeEntityPlayer.setGameMode(gameType1, gameType2);
-    }
-
-    private static DataResult<ResourceKey<Level>> parseLegacyDimensionType(ValueInput nbttagcompound) {
-        // Attempt to read the dimension from an int.
-        try {
-            Optional<Integer> dimensionInput = nbttagcompound.getInt("Dimension"); // because of our ProblemReporter, this throws an exception when the type is not int.
-            if (dimensionInput.isPresent()) {
-                switch (dimensionInput.get()) {
-                    case -1: return DataResult.success(Level.NETHER);
-                    case 0: return DataResult.success(Level.OVERWORLD);
-                    case 1: return DataResult.success(Level.END);
-                }
-            }
-        } catch (WrongNbtTypeException e) {
-            if (e.problem.actual() != StringTag.TYPE) {
-                return DataResult.error(() -> "Unexpected NBT type for field 'Dimension'. Expected number or string, but got: " + e.problem.actual().getName());
-            }
-        }
-
-        // Attempt to read the dimension from a string.
-        Optional<ResourceKey<Level>> decodedLevel = nbttagcompound.read("Dimension", Level.RESOURCE_KEY_CODEC);
-        if (decodedLevel.isPresent()) {
-            return DataResult.success(decodedLevel.get());
-        } else {
-            return DataResult.error(() -> "No Dimension information in " + nbttagcompound + ".");
-        }
     }
 
     private static Optional<InventoryOpenEvent> callInventoryOpenEvent(ServerPlayer nmsPlayer, AbstractContainerMenu nmsView) {
