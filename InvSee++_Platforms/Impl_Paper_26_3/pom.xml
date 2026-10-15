@@ -12,7 +12,7 @@
 
     <properties>
         <!-- See https://repo.papermc.io/repository/maven-public/io/papermc/paper/dev-bundle/ -->
-        <paper.version>26.3.build.8-alpha</paper.version>
+        <paper.version>26.3.build.193-stable</paper.version>
         <paper-nms-maven-plugin.version>1.4.11-SNAPSHOT</paper-nms-maven-plugin.version>
         <authlib.version>7.0.61</authlib.version>
         <datafixerupper.version>9.0.19</datafixerupper.version>

@@ -10,6 +10,7 @@ import com.janboerman.invsee.utils.ConcatList;
 import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
 
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.craftbukkit.v1_21_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_21_R3.util.CraftChatMessage;
 
@@ -45,7 +46,9 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy (in contrast to getItems() which uses List.copyOf(this.items) !!!)
         this.maxStack = inv.getMaxStackSize();
-		this.updateTargetCraftingResults = () -> target.inventoryMenu.slotsChanged(inv);
+		this.updateTargetCraftingResults = () -> {
+			if (target instanceof ServerPlayer serverPlayer) serverPlayer.inventoryMenu.slotsChanged(inv);
+		};
 	}
 
 	@Override

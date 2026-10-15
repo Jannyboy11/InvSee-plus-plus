@@ -53,7 +53,9 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
         };
         IInventory /*InventoryCrafting*/ playerCrafting = ((CraftInventory) target.defaultContainer.getBukkitView().getTopInventory()).getInventory();
         this.personalContents = this.playerCraftingContents = playerCrafting.getContents();
-        this.updateTargetCraftingResults = () -> target.defaultContainer.a(inv);
+        this.updateTargetCraftingResults = () -> {
+            if (target instanceof EntityPlayer) target.defaultContainer.a(inv);
+        };
     }
 
     @Override

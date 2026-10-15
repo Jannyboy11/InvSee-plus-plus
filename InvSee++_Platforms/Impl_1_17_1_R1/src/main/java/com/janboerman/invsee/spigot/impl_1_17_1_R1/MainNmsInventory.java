@@ -9,6 +9,7 @@ import com.janboerman.invsee.spigot.api.target.Target;
 import com.janboerman.invsee.spigot.api.template.Mirror;
 import com.janboerman.invsee.spigot.api.template.PlayerInventorySlot;
 import com.janboerman.invsee.spigot.internal.inventory.AbstractNmsInventory;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.entity.HumanEntity;
@@ -65,7 +66,9 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
             }
         };
         this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
-        this.updateTargetCraftingResults = () -> target.inventoryMenu.slotsChanged(inv);
+        this.updateTargetCraftingResults = () -> {
+            if (target instanceof ServerPlayer serverPlayer) serverPlayer.inventoryMenu.slotsChanged(inv);
+        };
     }
 
     @Override

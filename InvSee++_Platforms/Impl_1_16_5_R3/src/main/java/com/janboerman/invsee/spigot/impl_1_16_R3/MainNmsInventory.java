@@ -75,7 +75,9 @@ public class MainNmsInventory extends TileEntityContainer /* cannot extend Abstr
             }
         };
         this.personalContents = this.playerCraftingContents = target.defaultContainer.j().getContents(); //luckily getContents() does not copy
-        this.updateTargetCraftingResults = () -> target.defaultContainer.a(inv);
+        this.updateTargetCraftingResults = () -> {
+            if (target instanceof EntityPlayer) target.defaultContainer.a(inv);
+        };
         this.creationOptions = creationOptions;
     }
 

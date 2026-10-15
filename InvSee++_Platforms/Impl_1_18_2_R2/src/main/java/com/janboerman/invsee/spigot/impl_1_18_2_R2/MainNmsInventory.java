@@ -10,6 +10,7 @@ import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,7 +50,9 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 			}
 		};
 		this.personalContents = this.craftingContents = target.inventoryMenu.getCraftSlots().getContents(); //luckily getContents() does not copy
-		this.updateTargetCraftingResults = () -> target.inventoryMenu.slotsChanged(inv);
+		this.updateTargetCraftingResults = () -> {
+			if (target instanceof ServerPlayer serverPlayer) serverPlayer.inventoryMenu.slotsChanged(inv);
+		};
 	}
 
 	@Override

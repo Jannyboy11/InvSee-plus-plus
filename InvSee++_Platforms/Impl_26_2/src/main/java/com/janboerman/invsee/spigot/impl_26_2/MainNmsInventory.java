@@ -9,6 +9,7 @@ import com.janboerman.invsee.utils.Ref;
 import com.janboerman.invsee.utils.SingletonList;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -208,7 +209,9 @@ class MainNmsInventory extends AbstractNmsInventory<PlayerInventorySlot, MainBuk
 	@Override
 	public void setChanged() {
 		//update target player cached crafting recipe:
-		this.nmsPlayerInventory.player.inventoryMenu.slotsChanged(nmsPlayerInventory);
+		if (this.nmsPlayerInventory.player instanceof ServerPlayer serverPlayer) {
+			serverPlayer.inventoryMenu.slotsChanged(nmsPlayerInventory);
+		}
 	}
 
 	//vanilla
